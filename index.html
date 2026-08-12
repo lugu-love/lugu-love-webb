@@ -91,6 +91,12 @@ outline: none;
 transform: scale(.98);
 }
 
+/* A single opening glimmer acknowledges that the logo is an entrance, without
+   turning it into a constantly demanding button. */
+.place-mark {
+animation: place-mark-awaken 3.4s ease 1.3s both;
+}
+
 .place-mark-logo {
 display: block;
 width: 34px;
@@ -461,6 +467,122 @@ transform: translate3d(var(--bottle-x), calc(var(--bottle-y) - 12px), 0) rotate(
 pointer-events: auto;
 animation: bottle-arrive var(--bottle-arrive) linear forwards;
 filter: drop-shadow(0 0 18px rgba(118, 201, 255, .28)) drop-shadow(0 0 30px rgba(255, 205, 116, .46));
+transform-origin: center center;
+}
+
+.voice-bottle-visual {
+position: absolute;
+inset: 0;
+z-index: 0;
+overflow: visible;
+transform-origin: center center;
+scale: 1;
+translate: var(--bottle-zoom-x, 0px) var(--bottle-zoom-y, 0px);
+transition:
+scale .45s cubic-bezier(.2, .72, .2, 1),
+translate .45s cubic-bezier(.2, .72, .2, 1);
+animation: bottle-invite 3.8s ease-in-out var(--letter-delay) infinite;
+}
+
+.voice-bottle.zoom-level-2 .voice-bottle-visual {
+scale: 2;
+z-index: 7;
+}
+
+.voice-bottle.rabbit-expanded .voice-letter-text {
+opacity: 0 !important;
+}
+
+/* The card is permanently moved out of the rotating bottle once it has
+   arrived, so its position no longer inherits bottle rotation or scaling. */
+.voice-letter.is-floating-card {
+position: absolute;
+z-index: 10;
+display: grid;
+grid-template-columns: minmax(0, 1fr) auto;
+column-gap: 16px;
+row-gap: 8px;
+width: min(calc(var(--stage-width) * .82), 352px);
+min-height: 0;
+padding: 10px;
+opacity: .98;
+overflow: visible;
+transform: none;
+animation: none;
+transition: left .55s cubic-bezier(.2, .72, .2, 1), top .55s cubic-bezier(.2, .72, .2, 1);
+}
+
+.voice-letter.is-floating-card .voice-letter-text {
+position: relative;
+grid-column: 1 / -1;
+left: 0;
+top: auto;
+width: 100%;
+min-height: 0;
+font-size: 16px;
+line-height: 1.48;
+letter-spacing: .035em;
+transform: none;
+opacity: 1 !important;
+}
+
+.voice-letter.is-floating-card .voice-letter-text span {
+transform: none;
+}
+
+.voice-letter.is-floating-card .voice-letter-footer {
+position: relative;
+grid-column: 1;
+grid-row: 2;
+left: 0;
+bottom: auto;
+width: 100%;
+gap: 2px;
+font-size: 10px;
+letter-spacing: .065em;
+}
+
+.voice-letter.is-floating-card .voice-world-button {
+position: relative;
+grid-column: 2;
+grid-row: 2;
+align-self: end;
+right: 0;
+bottom: auto;
+min-width: 120px;
+height: 31px;
+padding: 0 9px;
+}
+
+.voice-letter.is-floating-card .world-house-title {
+font-size: 13px;
+}
+
+.voice-letter.is-returned-to-bottle {
+width: min(calc(var(--stage-width) * .76), 330px);
+min-height: 218px;
+opacity: .98;
+transform: translateX(calc(-50% - 40px)) translateY(20px) rotate(var(--letter-tilt)) scale(.92);
+animation: none;
+}
+
+.fengxin-rabbit-farewell-star {
+position: fixed;
+z-index: 61;
+width: 8px;
+height: 8px;
+border-radius: 50%;
+background: #fff8d5;
+box-shadow: 0 0 8px rgba(255, 248, 213, .98), 0 0 20px rgba(151, 218, 255, .72), 0 0 36px rgba(151, 218, 255, .36);
+pointer-events: none;
+animation: rabbit-farewell-star 4.2s linear forwards;
+}
+
+@keyframes rabbit-farewell-star {
+0% { opacity: 0; transform: translate(-50%, -50%) scale(.35); }
+18% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+72% { opacity: .74; transform: translate(-50%, -50%) scale(.72); }
+100% { opacity: 0; transform: translate(-50%, -50%) translateY(-18px) scale(.18); }
 }
 
 .voice-bottle.is-closing {
@@ -518,7 +640,8 @@ height: 12px;
 border-radius: 50%;
 border: 1px solid rgba(255, 236, 196, .52);
 background: radial-gradient(ellipse, rgba(255, 238, 191, .5), rgba(255, 238, 191, 0) 68%);
-box-shadow: inset 0 0 8px rgba(255, 255, 255, .28), 0 0 12px rgba(255, 199, 100, .34);
+/* Keep the reflection inside the bottle; no outer gold halo. */
+box-shadow: inset 0 0 8px rgba(255, 255, 255, .28);
 transform: translateX(-50%);
 }
 
@@ -616,6 +739,7 @@ transform: translateX(-50%) rotate(var(--letter-tilt)) scale(.46);
 opacity: 0;
 overflow: hidden;
 animation: letter-float-out 1.5s ease var(--letter-delay) forwards;
+transition: top .7s cubic-bezier(.2, .72, .2, 1);
 }
 
 .voice-letter::before,
@@ -782,6 +906,8 @@ line-height: var(--hand-line-height);
 letter-spacing: var(--hand-letter-spacing);
 transform: translateX(-50%) skewX(var(--hand-skew));
 text-align: left;
+opacity: 1;
+transition: opacity .45s ease;
 }
 
 .voice-letter-text span {
@@ -873,7 +999,7 @@ align-items: flex-start;
 gap: 3px;
 color: rgba(255, 250, 236, .9);
 font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
-font-size: clamp(10px, .95vw, 13px);
+font-size: clamp(11px, 1.05vw, 14px);
 font-weight: 300;
 line-height: 1.28;
 letter-spacing: .1em;
@@ -918,10 +1044,10 @@ flex-direction: row;
 justify-content: center;
 align-items: center;
 gap: 5px;
-height: 24px;
+height: 27px;
 width: auto;
-min-width: 96px;
-padding: 0 8px;
+min-width: 106px;
+padding: 0 9px;
 border: 1px solid rgba(255, 236, 196, .36);
 border-radius: 4px;
 background: rgba(255, 255, 255, .04);
@@ -937,6 +1063,28 @@ filter: blur(2px);
 transform: translateY(5px) translateX(-4px);
 transition: opacity 1.2s ease .14s, filter 1.2s ease .14s, transform 1.2s ease .14s, border-color .3s ease, background .3s ease, box-shadow .3s ease;
 overflow: hidden;
+}
+
+.voice-world-flower {
+position: relative;
+display: block;
+flex: 0 0 17px;
+width: 17px;
+height: 22px;
+overflow: visible;
+}
+
+.voice-world-flower .voice-letter-rose {
+left: 1px;
+top: .5px;
+scale: .26;
+transform: rotate(var(--rose-tilt));
+transform-origin: 0 0;
+}
+
+body.is-music-playing .voice-world-flower .voice-letter-rose,
+body.is-music-playing .voice-world-flower .voice-letter-rose::after {
+animation: none;
 }
 
 .world-house-icon {
@@ -975,7 +1123,7 @@ top: -3px;
 
 .world-house-title {
 display: block;
-font-size: 10px;
+font-size: 11px;
 font-weight: 600;
 letter-spacing: .04em;
 line-height: 1;
@@ -997,6 +1145,7 @@ white-space: nowrap;
 opacity: .86;
 filter: blur(0);
 transform: translateY(0) translateX(0);
+animation: world-button-invite 3.2s ease-in-out infinite;
 }
 
 .voice-world-button:hover,
@@ -1019,6 +1168,19 @@ transform: translateY(-1px) translateX(0) scale(1.18);
 pointer-events: none;
 }
 
+/* A short double pulse confirms an intentional entrance before the scene
+   changes. This is shared by “my space” and “ta's world”. */
+.entry-confirming {
+pointer-events: none !important;
+animation: entry-confirm-pulse 1.5s ease-in-out both !important;
+}
+
+@keyframes entry-confirm-pulse {
+0%, 100% { filter: brightness(1); }
+18%, 58% { filter: brightness(1.65) drop-shadow(0 0 13px rgba(255, 227, 149, .8)); }
+38%, 78% { filter: brightness(1.05) drop-shadow(0 0 3px rgba(255, 227, 149, .25)); }
+}
+
 .voice-bottle-character {
 position: absolute;
 left: 50%;
@@ -1034,6 +1196,83 @@ filter: drop-shadow(0 0 9px rgba(255, 235, 174, .72)) drop-shadow(0 0 18px rgba(
 animation: bottle-character-hold 4.2s ease var(--letter-delay) forwards;
 pointer-events: none;
 user-select: none;
+}
+
+/* Temporary Fengxin Rabbit emotion demo. Remove this block and the matching
+   playFengxinRabbitAngryDemo function when the test is finished. */
+.fengxin-rabbit-demo {
+position: absolute;
+left: 50%;
+top: -12px;
+z-index: 5;
+/* A larger transparent canvas plus a genuinely inset render keeps the
+   highest ear frames away from the canvas edge on narrow phone screens. */
+width: 92px;
+height: 92px;
+overflow: visible;
+object-fit: contain;
+opacity: 1;
+filter: drop-shadow(0 0 9px rgba(255, 235, 174, .72)) drop-shadow(0 0 18px rgba(111, 200, 255, .34));
+transform: translateX(-50%);
+transform-origin: 50% 92%;
+pointer-events: none;
+user-select: none;
+will-change: opacity, filter, transform;
+}
+
+.fengxin-rabbit-demo.is-near {
+opacity: 1;
+transform: translateX(-50%);
+}
+
+.fengxin-rabbit-demo.is-expanded-performance {
+position: absolute;
+left: 50%;
+top: 32%;
+z-index: 12;
+width: min(82vw, 340px);
+height: min(82vw, 340px);
+opacity: 1;
+pointer-events: auto;
+transform: translateX(-50%);
+filter: drop-shadow(0 0 18px rgba(255, 235, 174, .8)) drop-shadow(0 0 38px rgba(111, 200, 255, .48));
+transition: width .45s cubic-bezier(.2, .72, .2, 1), height .45s cubic-bezier(.2, .72, .2, 1), top .45s cubic-bezier(.2, .72, .2, 1), opacity .3s ease;
+}
+
+.fengxin-rabbit-demo.is-awakening {
+animation: fengxin-rabbit-wake 1.55s ease-in-out forwards;
+}
+
+@keyframes fengxin-rabbit-wake {
+0%,
+100% {
+transform: translateX(-50%) translateY(0) rotate(0) scale(1);
+}
+
+18% {
+transform: translateX(-50%) translateY(-4px) rotate(-5deg) scale(1.025);
+}
+
+36% {
+transform: translateX(-50%) translateY(-6px) rotate(5deg) scale(1.035);
+}
+
+54% {
+transform: translateX(-50%) translateY(-4px) rotate(-4deg) scale(1.025);
+}
+
+72% {
+transform: translateX(-50%) translateY(-2px) rotate(4deg) scale(1.015);
+}
+}
+
+.fengxin-rabbit-demo.is-leaving {
+opacity: 0;
+filter: drop-shadow(0 0 6px rgba(155, 210, 255, .12));
+transform: translateX(-50%) translateY(-24px) scale(.82);
+transition-duration: 1.6s;
+transition-timing-function: ease-in;
+transition-property: opacity, filter, transform;
 }
 
 @keyframes bottle-character-hold {
@@ -1482,6 +1721,70 @@ pointer-events: none;
 user-select: none;
 }
 
+/* First-visit identity: quiet enough to keep the star field breathable, but
+   clear enough to answer what this place is before the interaction begins. */
+.home-intro {
+position: fixed;
+left: 50%;
+top: max(88px, calc(env(safe-area-inset-top) + 72px));
+z-index: 2;
+width: min(calc(var(--stage-width) - 48px), 360px);
+opacity: 0;
+color: rgba(255, 248, 225, .96);
+font-family: "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+text-align: center;
+text-shadow: 0 0 14px rgba(255, 231, 163, .3), 0 0 34px rgba(93, 166, 255, .2);
+pointer-events: none;
+transform: translateX(-50%) translateY(10px);
+will-change: opacity, filter, transform;
+}
+
+.home-intro.is-visible {
+animation: home-intro-life 11s ease forwards;
+}
+
+.home-intro.is-dismissing {
+animation: home-intro-dismiss 1.2s ease forwards;
+}
+
+.home-intro-title {
+display: block;
+font-size: clamp(21px, 5.6vw, 28px);
+font-weight: 600;
+letter-spacing: .12em;
+line-height: 1.25;
+}
+
+.home-intro-subtitle {
+display: block;
+margin-top: 7px;
+color: rgba(221, 235, 255, .86);
+font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+font-size: clamp(11px, 3vw, 14px);
+font-weight: 300;
+letter-spacing: .18em;
+}
+
+.home-intro-copy {
+display: block;
+margin-top: 22px;
+color: rgba(255, 250, 235, .9);
+font-size: clamp(13px, 3.5vw, 16px);
+font-weight: 400;
+letter-spacing: .08em;
+line-height: 1.75;
+}
+
+@keyframes home-intro-life {
+0% { opacity: 0; filter: blur(5px); transform: translateX(-50%) translateY(10px); }
+12%, 88% { opacity: 1; filter: blur(0); transform: translateX(-50%) translateY(0); }
+100% { opacity: 0; filter: blur(3px); transform: translateX(-50%) translateY(-8px); }
+}
+
+@keyframes home-intro-dismiss {
+to { opacity: 0; filter: blur(4px); transform: translateX(-50%) translateY(-8px); }
+}
+
 .touch-guide {
 position: fixed;
 left: 50%;
@@ -1871,6 +2174,7 @@ cursor: pointer;
 transform: translateX(-50%);
 transition: transform .25s ease, background .25s ease, box-shadow .25s ease, border-color .25s ease;
 user-select: none;
+animation: my-space-invite 4.8s ease-in-out 12.5s infinite;
 }
 
 .my-space-button::after {
@@ -1973,6 +2277,26 @@ transform: translateY(calc(-50% - 7px));
 opacity: .6;
 transform: translateY(-50%);
 }
+}
+
+@keyframes place-mark-awaken {
+0%, 48%, 100% { filter: none; text-shadow: 0 0 12px rgba(255, 236, 184, .45); }
+72% { filter: drop-shadow(0 0 10px rgba(255, 214, 120, .66)); text-shadow: 0 0 18px rgba(255, 239, 194, .88), 0 0 32px rgba(102, 178, 255, .34); }
+}
+
+@keyframes bottle-invite {
+0%, 100% { filter: drop-shadow(0 0 4px rgba(117, 206, 255, .08)); }
+50% { filter: drop-shadow(0 0 12px rgba(144, 220, 255, .42)) drop-shadow(0 0 23px rgba(255, 215, 132, .32)); }
+}
+
+@keyframes world-button-invite {
+0%, 100% { transform: translateY(0) translateX(0) scale(1); box-shadow: 0 0 12px rgba(255, 160, 80, .16), inset 0 0 8px rgba(255, 255, 255, .04); }
+50% { transform: translateY(-1px) translateX(0) scale(1.025); box-shadow: 0 0 20px rgba(255, 190, 115, .32), inset 0 0 10px rgba(255, 255, 255, .08); }
+}
+
+@keyframes my-space-invite {
+0%, 100% { box-shadow: 0 0 30px rgba(140, 120, 255, .25), inset 0 0 20px rgba(255, 255, 255, .05); border-color: rgba(255, 255, 255, .24); }
+50% { box-shadow: 0 0 42px rgba(190, 151, 255, .4), inset 0 0 25px rgba(255, 255, 255, .1); border-color: rgba(255, 243, 221, .42); }
 }
 
 .my-space-modal {
@@ -2438,6 +2762,11 @@ opacity: 1;
 <img src="earth.webp" alt="">
 </div>
 </div>
+<section class="home-intro" aria-label="心域介绍">
+<span class="home-intro-title">泸沽湖·心域</span>
+<span class="home-intro-subtitle">情感文明共创空间</span>
+<span class="home-intro-copy">在这里，每一颗心星，<br>都藏着一个正在发生的生命故事。</span>
+</section>
 <div class="touch-guide" aria-hidden="true">
 <div class="guide-line">
 <span class="guide-part" style="--i: 0">轻</span>
@@ -2496,7 +2825,7 @@ opacity: 1;
 <p class="heart-star-card-voice" id="heartStarCardVoice">“希望世界因为爱重新连接。”</p>
 <a class="heart-star-card-link" id="heartStarCardLink" href="life-space-v1/index.html?mode=visitor&amp;id=demo-lugu&amp;v=20260728-6">进入TA的世界</a>
 </div>
-<div class="footer-signature">心域·情感文明共创</div>
+<div class="footer-signature">泸沽湖·心域 · 情感文明共创家园</div>
 <div id="audioControl">
 <button id="audioToggleBtn" type="button" aria-label="音乐开关">🔇</button>
 <input id="audioVolumeSlider" type="range" min="0" max="1" step="0.01" value="0.6" aria-label="背景音乐音量">
@@ -2610,6 +2939,389 @@ const sevenStarCharacters = [
 { id: "fengxin-rabbit", name: "风信兔", src: "assets/characters/seven-stars/fengxin-rabbit/main.png" },
 { id: "gongming-gull", name: "共鸣鸥", src: "assets/characters/seven-stars/gongming-gull/main.png" }
 ];
+
+// Temporary five-expression sequence. Each new bottle advances by one item
+// and only the current expression is decoded, keeping mobile memory bounded.
+const fengxinRabbitSequence = [
+{ id: "1", totalFrames: 73, sheetCount: 7 },
+{ id: "2", totalFrames: 91, sheetCount: 8 },
+{ id: "3", totalFrames: 109, sheetCount: 10 },
+{ id: "4", totalFrames: 181, sheetCount: 16 },
+{ id: "5", totalFrames: 91, sheetCount: 8 }
+].map((item) => ({
+...item,
+poster: `assets/video/fengxin-rabbit-sequence/${item.id}/poster.webp`,
+sprites: Array.from({ length: item.sheetCount }, (_, index) =>
+`assets/video/fengxin-rabbit-sequence/${item.id}/sheet-${String(index).padStart(2, "0")}.webp`
+)
+}));
+let fengxinRabbitSequenceIndex = 0;
+let fengxinRabbitPreloadedImages = null;
+let fengxinRabbitPreloadedId = null;
+// Temporary emotion copy library for the five rabbit videos.  Each video
+// keeps its own rotating set, so the expression and the bottle text stay in
+// step while repeated visits still receive a different voice.
+const fengxinRabbitEmotionCopies = {
+"1": [
+"今天有一点小小的开心，想偷偷放进瓶子里，漂到刚好愿意接住的人手中。",
+"原来认真生活时，连风都会替你鼓掌。愿你也收下一点轻轻的快乐。",
+"我把星光装进了瓶子，不是为了照亮宇宙，只是想照亮你今天的心情。"
+],
+"2": [
+"我没有说不开心，但其实很希望有人能看见，我已经努力很久了。",
+"不是所有沉默都代表没事。有些委屈，只是还没有找到可以放心说出来的地方。",
+"如果你也觉得有一点累，那就先不用坚强。在这里，安静一会儿也可以。"
+],
+"3": [
+"我不是脾气不好，我只是终于明白，有些事不该一直忍让。",
+"我可以温柔，但不代表谁都可以轻易越过我心里的界线。",
+"这一次我想为自己说话。不是为了争赢，只是为了不再弄丢自己。"
+],
+"4": [
+"今天的心有一点重。我不想解释太多，只想被轻轻抱一下。",
+"难过不是退步，它只是提醒你：你也需要被好好照顾。",
+"如果此刻没人听见你，就把难过放进这只瓶子里。星空会替你先保管一会儿。"
+],
+"5": [
+"有时候不是不想往前走，只是心里像下了一场很久的雨，暂时没有力气晴起来。",
+"你不需要马上变好。能撑到现在，已经说明你比自己想的更勇敢。",
+"今天可以什么都不完成。先喝一口水，看看天空。明天的光，会慢一点来到。"
+]
+};
+const fengxinRabbitCopyIndexes = Object.fromEntries(
+Object.keys(fengxinRabbitEmotionCopies).map((id) => [id, 0])
+);
+function getNextFengxinRabbitCopy() {
+const sequence = fengxinRabbitSequence[fengxinRabbitSequenceIndex];
+const copies = fengxinRabbitEmotionCopies[sequence.id] || [];
+const index = fengxinRabbitCopyIndexes[sequence.id] || 0;
+const copy = copies[index % copies.length] || "愿你此刻的心情，也能被温柔看见。";
+fengxinRabbitCopyIndexes[sequence.id] = (index + 1) % Math.max(1, copies.length);
+return copy;
+}
+function preloadFengxinRabbitAngryAssets(sequence = fengxinRabbitSequence[fengxinRabbitSequenceIndex]) {
+if (fengxinRabbitPreloadedId === sequence.id && fengxinRabbitPreloadedImages) return;
+fengxinRabbitPreloadedId = sequence.id;
+fengxinRabbitPreloadedImages = [
+sequence.poster,
+...sequence.sprites
+].map((src) => {
+const image = new Image();
+image.src = src;
+return image;
+});
+}
+let activeFengxinRabbitDemo = null;
+function playFengxinRabbitAngryDemo(container, existingCanvas = null, wakeDelay = 0, loopCount = 1) {
+// A new bottle must never inherit the previous bottle's playback lock.
+// Detaching the old canvas also lets its own timer clean itself up safely.
+if (activeFengxinRabbitDemo && activeFengxinRabbitDemo !== existingCanvas) {
+activeFengxinRabbitDemo.remove();
+activeFengxinRabbitDemo = null;
+}
+const canvas = existingCanvas || document.createElement("canvas");
+const context = canvas.getContext("2d");
+const sequence = fengxinRabbitSequence[fengxinRabbitSequenceIndex];
+fengxinRabbitSequenceIndex = (fengxinRabbitSequenceIndex + 1) % fengxinRabbitSequence.length;
+preloadFengxinRabbitAngryAssets(sequence);
+const frameSize = 540;
+const framesPerSheet = 12;
+const totalFrames = sequence.totalFrames;
+const frameRate = 18;
+// The source animation brings the ear tips very close to its upper edge.
+// Inset the full frame (instead of only enlarging the canvas) so that the
+// visible rabbit has real clearance throughout both playback loops.
+const renderSize = 375;
+const renderX = 83;
+const renderY = 69;
+const sprites = sequence.sprites.map((src) => {
+const sprite = new Image();
+sprite.src = src;
+return sprite;
+});
+const spritesReady = Promise.all(sprites.map((sprite) => new Promise((resolve, reject) => {
+if (sprite.complete && sprite.naturalWidth) {
+if (sprite.decode) sprite.decode().then(resolve).catch(resolve);
+else resolve();
+return;
+}
+sprite.addEventListener("load", () => {
+if (sprite.decode) sprite.decode().then(resolve).catch(resolve);
+else resolve();
+}, { once: true });
+sprite.addEventListener("error", reject, { once: true });
+})));
+const poster = new Image();
+let animationFrame = 0;
+let frameTimer = 0;
+let wakeTimer = 0;
+let animationStarted = false;
+let thirdStepReached = false;
+let restartPlayback = null;
+let bottleLoopBatchActive = false;
+let bottleLoopsRemaining = 0;
+let exitLoopBatchActive = false;
+let exitLoopsRemaining = 0;
+let returningToBottle = false;
+canvas.width = frameSize;
+canvas.height = frameSize;
+if (!existingCanvas) canvas.className = "fengxin-rabbit-demo";
+canvas.setAttribute("role", "img");
+canvas.setAttribute("aria-label", "生气的风信兔替代瓶中的心星使者");
+poster.addEventListener("load", () => {
+if (!animationStarted) context.drawImage(poster, renderX, renderY, renderSize, renderSize);
+}, { once: true });
+poster.src = sequence.poster;
+activeFengxinRabbitDemo = canvas;
+if (!existingCanvas) (container || stage || document.body).appendChild(canvas);
+const bottleVisual = container?.querySelector(".voice-bottle-visual") || canvas.parentElement;
+
+function removeDemo() {
+cancelAnimationFrame(animationFrame);
+clearTimeout(frameTimer);
+clearTimeout(wakeTimer);
+if (container) container.removeEventListener("click", keepRabbitPlaying, true);
+canvas.removeEventListener("click", keepExpandedPlayback);
+canvas.remove();
+if (activeFengxinRabbitDemo === canvas) activeFengxinRabbitDemo = null;
+}
+
+function keepRabbitPlaying(event) {
+if (event.target.closest("button, a, input")) return;
+if (returningToBottle) return;
+const currentZoomLevel = Number(container?.dataset.zoomLevel || 0);
+if (currentZoomLevel === 0) startLargeBottlePlayback();
+if (currentZoomLevel === 2) expandRabbitPerformance();
+}
+
+if (container) container.addEventListener("click", keepRabbitPlaying, true);
+
+function returnRabbitToBottle({ becomeStarAtBottle = false } = {}) {
+if (!canvas.isConnected) return;
+canvas.removeEventListener("click", keepExpandedPlayback);
+if (!bottleVisual?.isConnected) {
+canvas.classList.remove("is-expanded-performance");
+container?.classList.remove("rabbit-expanded");
+return;
+}
+returningToBottle = true;
+const startRect = canvas.getBoundingClientRect();
+container?.style.removeProperty("--bottle-zoom-x");
+container?.style.removeProperty("--bottle-zoom-y");
+if (container) {
+container.dataset.zoomLevel = "0";
+container.classList.remove("zoom-level-2");
+container.classList.remove("rabbit-expanded");
+container.classList.remove("is-rabbit-releasing");
+}
+canvas.style.position = "fixed";
+canvas.style.left = `${startRect.left}px`;
+canvas.style.top = `${startRect.top}px`;
+canvas.style.width = `${startRect.width}px`;
+canvas.style.height = `${startRect.height}px`;
+canvas.style.transform = "none";
+canvas.style.zIndex = "60";
+canvas.style.pointerEvents = "none";
+requestAnimationFrame(() => {
+setTimeout(() => {
+if (!canvas.isConnected || !bottleVisual?.isConnected) {
+returningToBottle = false;
+return;
+}
+// Measure a real, unexpanded rabbit in the restored bottle.  The bottle has
+// responsive transforms on phones, so fixed pixel maths can land beside it.
+const targetProbe = document.createElement("canvas");
+targetProbe.className = "fengxin-rabbit-demo";
+targetProbe.setAttribute("aria-hidden", "true");
+targetProbe.style.cssText = "visibility:hidden; pointer-events:none;";
+bottleVisual.appendChild(targetProbe);
+const targetRect = targetProbe.getBoundingClientRect();
+targetProbe.remove();
+const targetWidth = targetRect.width;
+const targetHeight = targetRect.height;
+const targetLeft = targetRect.left;
+const targetTop = targetRect.top;
+const returnAnimation = canvas.animate([
+{
+left: `${startRect.left}px`,
+top: `${startRect.top}px`,
+width: `${startRect.width}px`,
+height: `${startRect.height}px`,
+opacity: 1,
+filter: "drop-shadow(0 0 18px rgba(255, 235, 174, .8)) drop-shadow(0 0 38px rgba(111, 200, 255, .48))"
+},
+{
+left: `${targetLeft}px`,
+top: `${targetTop}px`,
+width: `${targetWidth}px`,
+height: `${targetHeight}px`,
+opacity: 1,
+filter: "drop-shadow(0 0 9px rgba(255, 235, 174, .72)) drop-shadow(0 0 18px rgba(111, 200, 255, .34))"
+}
+], {
+duration: 4200,
+easing: "cubic-bezier(.18, .68, .18, 1)",
+fill: "forwards"
+});
+returnAnimation.onfinish = () => {
+// A fill-forwards Web Animation continues to own left/top after it finishes.
+// Cancel it before restoring the bottle CSS; otherwise its old stage-based
+// coordinates are reapplied inside the bottle and push the rabbit away.
+returnAnimation.cancel();
+if (becomeStarAtBottle) {
+const star = document.createElement("span");
+star.className = "fengxin-rabbit-farewell-star";
+star.style.left = `${targetLeft + targetWidth / 2}px`;
+star.style.top = `${targetTop + targetHeight / 2}px`;
+(stage || document.body).appendChild(star);
+removeDemo();
+if (container) {
+container.dataset.cardFrozen = "0";
+container.dispatchEvent(new Event("rabbit-returned-to-bottle"));
+}
+returningToBottle = false;
+return;
+}
+canvas.classList.remove("is-expanded-performance");
+canvas.removeAttribute("style");
+// Reparent and restore the default bottle placement as one synchronous change,
+// so there is no frame in which the rabbit can appear at the stage origin.
+bottleVisual.appendChild(canvas);
+// The card is now intentionally independent.  Rabbit playback can return to
+// the bottle without moving a card that the visitor has placed by hand.
+if (container) {
+container.dataset.cardFrozen = "0";
+container.dispatchEvent(new Event("rabbit-returned-to-bottle"));
+}
+returningToBottle = false;
+};
+returnAnimation.oncancel = () => {
+returningToBottle = false;
+};
+}, 480);
+});
+}
+
+function keepExpandedPlayback(event) {
+event.stopPropagation();
+// One final-stage click owns the complete three-loop batch. Further clicks in
+// that batch are intentionally ignored and never extend the exit point.
+if (exitLoopBatchActive) return;
+}
+
+function startLargeBottlePlayback() {
+if (thirdStepReached || bottleLoopBatchActive) return;
+bottleLoopBatchActive = true;
+bottleLoopsRemaining = 2;
+exitLoopBatchActive = false;
+if (restartPlayback) {
+clearTimeout(frameTimer);
+restartPlayback();
+}
+}
+
+function expandRabbitPerformance() {
+if (thirdStepReached || !canvas.isConnected) return;
+thirdStepReached = true;
+// During the foreground performance, keep the independent card exactly where
+// it was. Moving it with the shrinking bottle would put it behind the rabbit.
+if (container) container.dataset.cardFrozen = "1";
+bottleLoopBatchActive = false;
+exitLoopBatchActive = true;
+exitLoopsRemaining = 3;
+canvas.classList.remove("is-awakening");
+canvas.classList.add("is-expanded-performance");
+container?.classList.add("rabbit-expanded");
+(stage || document.body).appendChild(canvas);
+canvas.addEventListener("click", keepExpandedPlayback);
+if (restartPlayback) {
+clearTimeout(frameTimer);
+restartPlayback();
+}
+}
+
+function leaveDemo() {
+if (!canvas.isConnected) {
+removeDemo();
+return;
+}
+canvas.classList.remove("is-near");
+canvas.classList.remove("is-awakening");
+canvas.classList.add("is-leaving");
+setTimeout(removeDemo, 1650);
+}
+
+function playSpriteFrames() {
+animationStarted = true;
+let frameIndex = 0;
+let completedLoops = 0;
+function drawFrame() {
+if (!canvas.isConnected) {
+removeDemo();
+return;
+}
+const sheetIndex = Math.floor(frameIndex / framesPerSheet);
+const localIndex = frameIndex % framesPerSheet;
+const sourceX = (localIndex % 4) * frameSize;
+const sourceY = Math.floor(localIndex / 4) * frameSize;
+context.clearRect(0, 0, frameSize, frameSize);
+context.drawImage(
+sprites[sheetIndex],
+sourceX, sourceY, frameSize, frameSize,
+renderX, renderY, renderSize, renderSize
+);
+if (frameIndex < totalFrames - 1) {
+frameIndex += 1;
+frameTimer = setTimeout(drawFrame, 1000 / frameRate);
+return;
+}
+completedLoops += 1;
+if (exitLoopBatchActive) {
+exitLoopsRemaining -= 1;
+if (exitLoopsRemaining > 0) {
+frameIndex = 0;
+frameTimer = setTimeout(drawFrame, 1000 / frameRate);
+return;
+}
+exitLoopBatchActive = false;
+returnRabbitToBottle();
+// Restore the original ending state: after the foreground performance, the
+// rabbit follows the slow return path and remains in the small bottle.
+return;
+}
+if (bottleLoopBatchActive) {
+bottleLoopsRemaining -= 1;
+if (bottleLoopsRemaining > 0) {
+frameIndex = 0;
+frameTimer = setTimeout(drawFrame, 1000 / frameRate);
+return;
+}
+bottleLoopBatchActive = false;
+}
+// Initial size stops after one loop. The large-bottle stage stops after its
+// two-loop batch. Neither state exits until the next explicit click.
+}
+restartPlayback = () => {
+frameIndex = 0;
+completedLoops = 0;
+frameTimer = setTimeout(drawFrame, 1000 / frameRate);
+};
+animationFrame = requestAnimationFrame(drawFrame);
+}
+
+canvas.classList.add("is-near");
+wakeTimer = setTimeout(() => {
+if (!canvas.isConnected) {
+removeDemo();
+return;
+}
+canvas.classList.add("is-awakening");
+frameTimer = setTimeout(() => {
+spritesReady.then(playSpriteFrames).catch(removeDemo);
+}, 1550);
+}, wakeDelay);
+}
+window.playFengxinRabbitAngryDemo = playFengxinRabbitAngryDemo;
 const backgroundMusicSrc = "assets/music/piano-earth-loop-6s.mp3";
 const voiceMusicList = [
 "assets/music/native-american-flute.m4a",
@@ -2630,6 +3342,9 @@ let musicForceAudible = false;
 let musicVolume = .6;
 window.earthMusicEnabled = true;
 try { window.earthMusicEnabled = localStorage.getItem("lugu_earth_music_enabled") !== "0"; } catch (error) {}
+let earthSoundUnlocked = false;
+let openingLaughAudio = null;
+const earthEffectAudios = new Set();
 let voiceMusicIndex = 0;
 let voiceMusicFadeFrame = 0;
 let voiceMusicStartTimer = 0;
@@ -2647,6 +3362,27 @@ const typingKeyVolume = .32;
 const typingKeyStartAt = 0;
 let typingKeyAudio = null;
 let activeVoiceExperience = null;
+
+function canPlayEarthSound() {
+return Boolean(window.earthMusicEnabled && !embeddedSpaceOverlay);
+}
+
+function stopEarthEffectAudio(audio) {
+if (!audio) return;
+audio.pause();
+audio.removeAttribute("src");
+audio.load();
+earthEffectAudios.delete(audio);
+}
+
+function stopEarthEffects() {
+clearTimeout(backgroundMusicTimer);
+if (openingLaughAudio) stopEarthEffectAudio(openingLaughAudio);
+openingLaughAudio = null;
+earthEffectAudios.forEach(stopEarthEffectAudio);
+openingAfterLaughScheduled = false;
+if (typeof stopTypingKeySound === "function") stopTypingKeySound();
+}
 let worldMaintenanceDialog = null;
 let worldMaintenanceTimer = 0;
 let worldMaintenanceRemoveTimer = 0;
@@ -2721,6 +3457,26 @@ audio.removeAttribute("src");
 audio.load();
 }
 
+function setHomeAudioControlVisible(visible) {
+const control = document.getElementById("audioControl");
+if (control) control.hidden = !visible;
+}
+
+function disposeEmbeddedSpace() {
+clearTimeout(embeddedSpaceStartTimer);
+embeddedSpaceStartTimer = 0;
+destroyEmbeddedAudio(embeddedPreviewAudio);
+embeddedPreviewAudio = null;
+destroyEmbeddedAudio(embeddedSpaceAudio);
+embeddedSpaceAudio = null;
+resumeSpaceAfterPreview = false;
+if (embeddedSpaceOverlay) embeddedSpaceOverlay.remove();
+embeddedSpaceOverlay = null;
+embeddedSpaceFrame = null;
+embeddedSpaceMusicButton = null;
+embeddedSpaceSource = "";
+}
+
 function stopAllSpaceAudio(source = embeddedSpaceFrame && embeddedSpaceFrame.contentWindow) {
 clearTimeout(embeddedSpaceStartTimer);
 resumeSpaceAfterPreview = false;
@@ -2754,97 +3510,35 @@ resumeSpaceAfterPreview = false;
 }
 
 function closeEmbeddedSpace() {
-clearTimeout(embeddedSpaceStartTimer);
-if (embeddedSpaceOverlay) embeddedSpaceOverlay.remove();
-embeddedSpaceOverlay = null;
-embeddedSpaceFrame = null;
-embeddedSpaceMusicButton = null;
-destroyEmbeddedAudio(embeddedSpaceAudio);
-embeddedSpaceAudio = null;
-stopEmbeddedPreview(false, null);
+disposeEmbeddedSpace();
+setHomeAudioControlVisible(true);
 if (typeof window.startMusic === "function") window.startMusic();
 }
 
 function openEmbeddedSpace(href) {
-if (embeddedSpaceOverlay) embeddedSpaceOverlay.remove();
+disposeEmbeddedSpace();
+setHomeAudioControlVisible(false);
 const separator = href.includes("?") ? "&" : "?";
 const overlay = document.createElement("div");
-overlay.style.cssText = "position:fixed;inset:0;z-index:99999;background:#050712";
+// A neutral fade bridges the earth and a life space without bringing back the
+// former gold burst. It keeps the change of scene calm rather than abrupt.
+overlay.style.cssText = "position:fixed;inset:0;z-index:99999;background:#050712;opacity:0;transition:opacity .65s ease";
 const frame = document.createElement("iframe");
 frame.src = `${href}${separator}embedded=1`;
 frame.title = "空间";
 frame.allow = "autoplay";
-frame.style.cssText = "display:block;width:100%;height:100%;border:0;background:#050712";
+frame.style.cssText = "display:block;width:100%;height:100%;border:0;background:#050712;opacity:0;transition:opacity .7s ease";
+frame.addEventListener("load", () => requestAnimationFrame(() => { frame.style.opacity = "1"; }), { once: true });
 overlay.appendChild(frame);
 const musicButton = document.createElement("button");
 musicButton.type = "button";
-musicButton.textContent = "🔊";
+musicButton.textContent = "🔇";
 musicButton.setAttribute("aria-label", "空间音乐开关");
-musicButton.title = "轻点开关音乐，按住可拖动";
-musicButton.style.cssText = "position:absolute;z-index:3;width:46px;height:46px;padding:0;border:1px solid rgba(210,226,255,.38);border-radius:50%;background:rgba(12,18,42,.92);color:#fff;font-size:18px;box-shadow:0 10px 32px rgba(0,0,0,.4);cursor:grab;pointer-events:auto;touch-action:none;user-select:none";
-const musicButtonPositionKey = "lugu_space_music_button_position";
-let savedMusicButtonPosition = null;
-try { savedMusicButtonPosition = JSON.parse(localStorage.getItem(musicButtonPositionKey) || "null"); } catch (error) {}
-const initialMusicLeft = savedMusicButtonPosition && Number.isFinite(savedMusicButtonPosition.x)
-? savedMusicButtonPosition.x * Math.max(0, window.innerWidth - 46)
-: Math.max(14, window.innerWidth - 60);
-const initialMusicTop = savedMusicButtonPosition && Number.isFinite(savedMusicButtonPosition.y)
-? savedMusicButtonPosition.y * Math.max(0, window.innerHeight - 46)
-: Math.max(70, window.innerHeight * .7);
-musicButton.style.left = `${Math.max(8, Math.min(window.innerWidth - 54, initialMusicLeft))}px`;
-musicButton.style.top = `${Math.max(68, Math.min(window.innerHeight - 62, initialMusicTop))}px`;
-let musicButtonDrag = null;
-let suppressMusicButtonClick = false;
-musicButton.addEventListener("pointerdown", (event) => {
-const rect = musicButton.getBoundingClientRect();
-musicButtonDrag = {
-pointerId: event.pointerId,
-startX: event.clientX,
-startY: event.clientY,
-left: rect.left,
-top: rect.top,
-moved: false
-};
-musicButton.setPointerCapture(event.pointerId);
-musicButton.style.cursor = "grabbing";
-});
-musicButton.addEventListener("pointermove", (event) => {
-if (!musicButtonDrag || musicButtonDrag.pointerId !== event.pointerId) return;
-const deltaX = event.clientX - musicButtonDrag.startX;
-const deltaY = event.clientY - musicButtonDrag.startY;
-if (Math.hypot(deltaX, deltaY) > 5) musicButtonDrag.moved = true;
-if (!musicButtonDrag.moved) return;
-event.preventDefault();
-const nextLeft = Math.max(8, Math.min(window.innerWidth - 54, musicButtonDrag.left + deltaX));
-const nextTop = Math.max(68, Math.min(window.innerHeight - 62, musicButtonDrag.top + deltaY));
-musicButton.style.left = `${nextLeft}px`;
-musicButton.style.top = `${nextTop}px`;
-});
-function finishMusicButtonDrag(event) {
-if (!musicButtonDrag || musicButtonDrag.pointerId !== event.pointerId) return;
-suppressMusicButtonClick = musicButtonDrag.moved;
-musicButton.style.cursor = "grab";
-if (musicButtonDrag.moved) {
-const left = parseFloat(musicButton.style.left) || 0;
-const top = parseFloat(musicButton.style.top) || 0;
-try {
-localStorage.setItem(musicButtonPositionKey, JSON.stringify({
-x: left / Math.max(1, window.innerWidth - 46),
-y: top / Math.max(1, window.innerHeight - 46)
-}));
-} catch (error) {}
-}
-musicButtonDrag = null;
-}
-musicButton.addEventListener("pointerup", finishMusicButtonDrag);
-musicButton.addEventListener("pointercancel", finishMusicButtonDrag);
+musicButton.title = "空间音乐开关";
+musicButton.style.cssText = "position:absolute;right:18px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:3;width:46px;height:46px;padding:0;border:1px solid rgba(210,226,255,.38);border-radius:50%;background:rgba(12,18,42,.92);color:#fff;font-size:18px;box-shadow:0 10px 32px rgba(0,0,0,.4);cursor:pointer;pointer-events:auto";
 musicButton.addEventListener("click", (event) => {
 event.preventDefault();
 event.stopPropagation();
-if (suppressMusicButtonClick) {
-suppressMusicButtonClick = false;
-return;
-}
 const isPlaying = Boolean(embeddedSpaceAudio && !embeddedSpaceAudio.paused);
 if (isPlaying || embeddedSpaceStartTimer) {
 clearTimeout(embeddedSpaceStartTimer);
@@ -2873,6 +3567,7 @@ musicButton.textContent = "🔇";
 });
 overlay.appendChild(musicButton);
 document.body.appendChild(overlay);
+requestAnimationFrame(() => { overlay.style.opacity = "1"; });
 embeddedSpaceOverlay = overlay;
 embeddedSpaceFrame = frame;
 embeddedSpaceMusicButton = musicButton;
@@ -2882,7 +3577,6 @@ return frame;
 function enterSpaceWithMusic(event, href, data, isMyStar = true) {
 if (event) event.preventDefault();
 sessionStorage.setItem("lugu_space_autoplay", "1");
-localStorage.setItem("lugu_space_music_enabled", "1");
 if (!isMyStar && data) sessionStorage.setItem("lugu_public_space", JSON.stringify(data));
 
 const previousEarthAudio = window.audio;
@@ -2905,7 +3599,10 @@ if (data && data.created) {
 postToSpace(frame.contentWindow, { type: "lugu-load-space-data", data: data });
 }
 if (!data || (isMyStar && !data.created)) {
-if (embeddedSpaceMusicButton) embeddedSpaceMusicButton.textContent = "🔇";
+if (embeddedSpaceMusicButton) {
+embeddedSpaceMusicButton.textContent = "🔇";
+embeddedSpaceMusicButton.hidden = true;
+}
 postToSpace(frame.contentWindow, { type: "lugu-space-music-state", playing: false });
 return;
 }
@@ -3203,41 +3900,20 @@ worldMaintenanceDialog = null;
 }, 5000);
 }
 
+// Curated examples, not real user spaces. Each visit advances to the next
+// complete sample so people can see several ways a life space can be made.
+const showcaseWorldIds = ["demo-lugu", "demo-city", "demo-mountain", "demo-studio"];
+let showcaseWorldIndex = 0;
 function playWorldHouseEnter(anchor) {
 if (!anchor) return;
-anchor.classList.add("is-entering");
-
-const overlay = document.createElement("div");
-overlay.className = "world-house-overlay";
-(stage || document.body).appendChild(overlay);
-requestAnimationFrame(() => overlay.classList.add("is-visible"));
-
-const houseStars = [];
-for (let index = 0; index < 36; index += 1) {
-const star = document.createElement("span");
-star.className = "world-house-star";
-star.style.left = `${Math.random() * 100}%`;
-star.style.top = `${Math.random() * 100}%`;
-star.style.setProperty("--star-duration", `${(1.5 + Math.random() * 2).toFixed(2)}s`);
-(stage || document.body).appendChild(star);
-houseStars.push(star);
-}
-
-const ripple = document.createElement("span");
-ripple.className = "world-house-ripple";
-(stage || document.body).appendChild(ripple);
-
+if (anchor.classList.contains("entry-confirming")) return;
+anchor.classList.add("entry-confirming");
+const showcaseId = showcaseWorldIds[showcaseWorldIndex % showcaseWorldIds.length];
+showcaseWorldIndex += 1;
 setTimeout(() => {
-showWorldMaintenanceDialog(anchor);
-}, 1200);
-
-setTimeout(() => {
-anchor.classList.remove("is-entering");
-overlay.classList.remove("is-visible");
-ripple.remove();
-houseStars.forEach((star) => star.remove());
-setTimeout(() => overlay.remove(), 1200);
-}, 1900);
+anchor.classList.remove("entry-confirming");
+enterSpaceWithMusic(null, `life-space-v1/index.html?mode=visitor&id=${encodeURIComponent(showcaseId)}`, null, false);
+}, 1500);
 }
 
 function getLifeSpaceV1TestEntry() {
@@ -3267,7 +3943,13 @@ enterSpaceWithMusic(event, "my-v13.html?v=20260723-4", null, true);
 });
 
 if (mySpaceButton) mySpaceButton.addEventListener("click", (event) => {
-enterSpaceWithMusic(event, "life-space-v1/index.html?v=20260728-6", null, true);
+event.preventDefault();
+if (mySpaceButton.classList.contains("entry-confirming")) return;
+mySpaceButton.classList.add("entry-confirming");
+setTimeout(() => {
+mySpaceButton.classList.remove("entry-confirming");
+enterSpaceWithMusic(null, "life-space-v1/index.html?v=20260728-6", null, true);
+}, 1500);
 });
 
 if (mySpaceStyle) mySpaceStyle.addEventListener("click", () => {
@@ -3384,10 +4066,12 @@ musicVolume = clamp(Number(volume), 0, 1);
 if (voiceAudio) voiceAudio.volume = musicVolume;
 if (window.audio) {
 window.audio.volume = musicVolume;
-if (musicVolume > 0 && window.audio.paused) {
+if (window.earthMusicEnabled && musicVolume > 0 && window.audio.paused) {
 window.audio.play().then(syncMusicMotion).catch(() => {});
 }
 }
+if (openingLaughAudio) openingLaughAudio.volume = Math.min(.72, musicVolume);
+if (typingKeyAudio) typingKeyAudio.volume = Math.min(typingKeyVolume, musicVolume);
 syncMusicMotion();
 }
 
@@ -3396,9 +4080,12 @@ return musicVolume;
 }
 
 function playStarClickSound() {
+if (!canPlayEarthSound()) return;
 const audio = new Audio(starClickSoundSrc);
-audio.volume = .64;
-audio.play().catch(() => {});
+audio.volume = Math.min(.64, musicVolume);
+earthEffectAudios.add(audio);
+audio.addEventListener("ended", () => stopEarthEffectAudio(audio), { once: true });
+audio.play().catch(() => stopEarthEffectAudio(audio));
 }
 
 let touchGuideTimer = 0;
@@ -3411,6 +4098,15 @@ const touchGuideCompleteDelay = 11000;
 const touchGuideHoldDuration = 2000;
 const touchGuideDismissDuration = 1600;
 const touchGuideEnglishDelay = 8200;
+const homeIntroDisplayDelay = 12200;
+
+function showHomeIntro() {
+const homeIntro = document.querySelector(".home-intro");
+if (!homeIntro) return;
+homeIntro.classList.remove("is-dismissing", "is-visible");
+void homeIntro.offsetWidth;
+homeIntro.classList.add("is-visible");
+}
 
 function showTouchGuide() {
 if (touchGuideShown) return;
@@ -3436,11 +4132,17 @@ touchGuideTimer = setTimeout(showTouchGuide, delay);
 
 function dismissTouchGuide() {
 const guide = document.querySelector(".touch-guide");
+const homeIntro = document.querySelector(".home-intro");
 clearTimeout(touchGuideTimer);
 clearTimeout(touchGuideDismissTimer);
 clearTimeout(backgroundMusicTimer);
 touchGuideShown = true;
 touchGuideScheduled = false;
+if (homeIntro && !homeIntro.classList.contains("is-dismissing")) {
+homeIntro.classList.remove("is-visible");
+void homeIntro.offsetWidth;
+homeIntro.classList.add("is-dismissing");
+}
 if (!guide || guide.classList.contains("is-dismissing")) {
 scheduleVoiceStarsAfterGuideRetreat();
 return;
@@ -3474,27 +4176,37 @@ setTimeout(spawnVoiceStar, index * random(760, 1280));
 function scheduleOpeningBackgroundMusic(delay = 1000) {
 clearTimeout(backgroundMusicTimer);
 backgroundMusicTimer = setTimeout(() => {
-startMusic({ forceAudible: true });
+if (canPlayEarthSound()) startMusic();
 }, delay);
 }
 
 function scheduleOpeningAfterLaugh(delay = 1000) {
 if (openingAfterLaughScheduled) return;
 openingAfterLaughScheduled = true;
-scheduleTouchGuide(delay);
 scheduleOpeningBackgroundMusic(delay);
 }
 
-function playOpeningLaughSound(){
-window.l=1;
+function playOpeningLaughSound() {
+if (!earthSoundUnlocked || !canPlayEarthSound() || openingAfterLaughScheduled || openingLaughAudio) return;
 const audio = new Audio(openingLaughSoundSrc);
-const fallbackDelay = 7400;
-
-audio.addEventListener("ended", () => scheduleOpeningAfterLaugh(1000), { once: true });
+audio.preload = "auto";
+audio.volume = Math.min(.72, musicVolume);
+openingLaughAudio = audio;
+earthEffectAudios.add(audio);
+audio.addEventListener("ended", () => {
+if (openingLaughAudio === audio) openingLaughAudio = null;
+earthEffectAudios.delete(audio);
+if (canPlayEarthSound()) scheduleOpeningAfterLaugh(900);
+}, { once: true });
 audio.play().catch(() => {
-scheduleOpeningAfterLaugh(fallbackDelay);
+if (openingLaughAudio === audio) openingLaughAudio = null;
+earthEffectAudios.delete(audio);
 });
-setTimeout(() => scheduleOpeningAfterLaugh(0), fallbackDelay);
+}
+
+function unlockEarthSounds() {
+earthSoundUnlocked = true;
+playOpeningLaughSound();
 }
 
 function armBackgroundLoop(audio, session, forceAudible = false) {
@@ -3753,7 +4465,13 @@ if (window.fadingAudio) earthAudios.add(window.fadingAudio);
 if (voiceAudio) earthAudios.add(voiceAudio);
 if (fadingVoiceAudio) earthAudios.add(fadingVoiceAudio);
 earthAudios.forEach((audio) => { audio.muted = !window.earthMusicEnabled; });
-if (typingKeyAudio) typingKeyAudio.muted = !window.earthMusicEnabled;
+if (!window.earthMusicEnabled) {
+stopEarthEffects();
+stopMusic({ immediate: true });
+stopVoiceMusic({ immediate: true });
+} else if (earthSoundUnlocked) {
+unlockEarthSounds();
+}
 if (window.syncAudioUI) window.syncAudioUI();
 };
 window.destroyAudioNow = destroyAudioNow;
@@ -3770,30 +4488,32 @@ typingKeyAudio.load();
 }
 
 function unlockTypingKeySounds() {
+if (!canPlayEarthSound()) return;
 prepareTypingKeySounds();
 if (!typingKeyAudio) return;
 
 typingKeyAudio.muted = false;
-typingKeyAudio.volume = typingKeyVolume;
+typingKeyAudio.volume = Math.min(typingKeyVolume, musicVolume);
 typingKeyAudio.currentTime = 0;
 typingKeyAudio.play().then(() => {
 setTimeout(() => {
 typingKeyAudio.pause();
 typingKeyAudio.currentTime = 0;
-typingKeyAudio.volume = typingKeyVolume;
+typingKeyAudio.volume = Math.min(typingKeyVolume, musicVolume);
 }, 180);
 }).catch(() => {
-typingKeyAudio.muted = false;
+typingKeyAudio.muted = !canPlayEarthSound();
 });
 }
 
 function playTypingKeySound() {
+if (!canPlayEarthSound()) return;
 prepareTypingKeySounds();
 if (!typingKeyAudio) return;
 
 typingKeyAudio.pause();
 typingKeyAudio.currentTime = typingKeyStartAt;
-typingKeyAudio.volume = typingKeyVolume;
+typingKeyAudio.volume = Math.min(typingKeyVolume, musicVolume);
 typingKeyAudio.muted = false;
 typingKeyAudio.loop = true;
 typingKeyAudio.playbackRate = 1;
@@ -3914,16 +4634,18 @@ if (!activeVoiceExperience) return;
 activeVoiceExperience.close();
 }
 
-function openVoiceBottle(star){if(star.clicked)return;if(!window.l){playOpeningLaughSound();return}dismissTouchGuide();closeActiveVoiceExperience();stopMusic();playStarClickSound();scheduleVoiceMusicStart();unlockTypingKeySounds();star.clicked=true;star.element.classList.add("is-touched");
+function openVoiceBottle(star){if(star.clicked)return;const beganSoundSession=!earthSoundUnlocked;unlockEarthSounds();dismissTouchGuide();closeActiveVoiceExperience();stopMusic();if(!beganSoundSession)playStarClickSound();scheduleVoiceMusicStart();unlockTypingKeySounds();star.clicked=true;star.element.classList.add("is-touched");
 
 let bottle = null;
 let typeTimer = 0;
 let startTypewriter = 0;
+let cardDetachTimer = 0;
+let letterNode = null;
 let closed = false;
 function stopTyping() {
 clearInterval(typeTimer);
-if (bottle) {
-const textNode = bottle.querySelector(".voice-letter-text");
+if (letterNode) {
+const textNode = letterNode.querySelector(".voice-letter-text");
 if (textNode) textNode.classList.remove("is-typing");
 }
 stopTypingKeySound();
@@ -3933,8 +4655,13 @@ if (closed) return;
 closed = true;
 clearTimeout(cardTimer);
 clearTimeout(startTypewriter);
+clearTimeout(cardDetachTimer);
 stopTyping();
 stopVoiceMusic();
+if (activeFengxinRabbitDemo) {
+activeFengxinRabbitDemo.remove();
+activeFengxinRabbitDemo = null;
+}
 star.element.remove();
 stars.delete(star);
 if (activeVoiceExperience && activeVoiceExperience.close === closeCard) {
@@ -3942,6 +4669,8 @@ activeVoiceExperience = null;
 }
 if (!bottle) return;
 
+const floatingCard = document.querySelector(".voice-letter.is-floating-card");
+if (floatingCard) floatingCard.remove();
 bottle.classList.add("is-closing");
 setTimeout(() => {
 bottle.remove();
@@ -3953,7 +4682,8 @@ activeVoiceExperience = { close: closeCard };
 const cardTimer = setTimeout(() => {
 if (closed) return;
 bottle = document.createElement("div");
-const safeMessage = star.message.replace(/[&<>"']/g, (char) => ({
+const rabbitMessage = getNextFengxinRabbitCopy();
+const safeMessage = rabbitMessage.replace(/[&<>"']/g, (char) => ({
 "&": "&amp;",
 "<": "&lt;",
 ">": "&gt;",
@@ -4007,11 +4737,13 @@ bottle.style.setProperty("--flower-sway-duration", `${random(3.2, 4.8).toFixed(2
 const flowerClass = flowerClasses[Math.floor(Math.random() * flowerClasses.length)];
 bottle.innerHTML = `
 <button class="voice-bottle-close" type="button" aria-label="关闭卡片并结束体验">×</button>
+<div class="voice-bottle-visual">
 <div class="voice-bottle-glass"></div>
 <div class="voice-bottle-shine"></div>
 <span class="voice-bottle-sparkle one"></span>
 <span class="voice-bottle-sparkle two"></span>
-<span class="voice-letter-rose ${flowerClass}"><i></i></span>
+<canvas class="fengxin-rabbit-demo" width="540" height="540" role="img" aria-label="风信兔情绪表演"></canvas>
+</div>
 <div class="voice-letter">
 <span class="voice-letter-text" aria-label="${safeMessage}"></span>
 <span class="voice-letter-footer">
@@ -4019,23 +4751,97 @@ bottle.innerHTML = `
 <span class="voice-letter-footer-line">${safeOrigin} · ${safeTime}</span>
 </span>
 <button class="voice-world-button" type="button" aria-label="进入ta的世界">
-<span class="world-house-icon" aria-hidden="true"></span>
+<span class="voice-world-flower" aria-hidden="true"><span class="voice-letter-rose ${flowerClass}"><i></i></span></span>
 <span class="world-house-title">进入ta的世界</span>
 </button>
 </div>
-<div class="voice-bottle-heart-rays"></div>
-<img class="voice-bottle-character" src="${star.character.src}" alt="${star.character.name}">
-<div class="voice-bottle-tie"></div>`;
+`;
 (stage || document.body).appendChild(bottle);
+preloadFengxinRabbitAngryAssets();
+bottle.addEventListener("click", (event) => {
+if (closed || event.target.closest("button, a, input")) return;
+const currentZoomLevel = Number(bottle.dataset.zoomLevel || 0);
+if (currentZoomLevel === 0) {
+const stageRect = (stage || document.documentElement).getBoundingClientRect();
+const bottleRect = bottle.getBoundingClientRect();
+const glassNode = bottle.querySelector(".voice-bottle-glass");
+const focusRect = glassNode ? glassNode.getBoundingClientRect() : bottleRect;
+const originX = bottleRect.left + bottleRect.width / 2;
+const originY = bottleRect.top + bottleRect.height / 2;
+const focusX = focusRect.left + focusRect.width / 2;
+const focusY = focusRect.top + focusRect.height / 2;
+const scaleRatio = 2;
+const projectedX = originX + (focusX - originX) * scaleRatio;
+const projectedY = originY + (focusY - originY) * scaleRatio;
+const screenDeltaX = stageRect.left + stageRect.width / 2 - projectedX;
+const screenDeltaY = stageRect.top + stageRect.height / 2 - projectedY;
+const parentMatrix = new DOMMatrix(getComputedStyle(bottle).transform);
+const determinant = parentMatrix.a * parentMatrix.d - parentMatrix.b * parentMatrix.c;
+const localDeltaX = determinant ? (parentMatrix.d * screenDeltaX - parentMatrix.c * screenDeltaY) / determinant : screenDeltaX;
+const localDeltaY = determinant ? (-parentMatrix.b * screenDeltaX + parentMatrix.a * screenDeltaY) / determinant : screenDeltaY;
+bottle.style.setProperty("--bottle-zoom-x", `${localDeltaX.toFixed(2)}px`);
+bottle.style.setProperty("--bottle-zoom-y", `${localDeltaY.toFixed(2)}px`);
+bottle.dataset.zoomLevel = "2";
+bottle.classList.add("zoom-level-2");
+return;
+}
+});
 
-const letterNode = bottle.querySelector(".voice-letter");
+const bottleCharacter = bottle.querySelector(".fengxin-rabbit-demo");
+if (bottleCharacter) {
+playFengxinRabbitAngryDemo(
+bottle,
+bottleCharacter,
+(arriveSeconds + .32) * 1000,
+2
+);
+}
+
+letterNode = bottle.querySelector(".voice-letter");
 const textNode = bottle.querySelector(".voice-letter-text");
 const footerNode = bottle.querySelector(".voice-letter-footer");
 const worldButton = bottle.querySelector(".voice-world-button");
 const prevButton = bottle.querySelector(".voice-page-prev");
 const nextButton = bottle.querySelector(".voice-page-next");
 const pageStatus = bottle.querySelector(".voice-page-status");
-const messageChars = Array.from(star.message);
+function makeCardIndependent() {
+if (!letterNode || letterNode.classList.contains("is-floating-card") || closed) return;
+const stageNode = stage || document.body;
+stageNode.appendChild(letterNode);
+letterNode.classList.add("is-floating-card");
+bottle._floatingLetter = letterNode;
+positionCardFromBottle();
+const visualNode = bottle?.querySelector(".voice-bottle-visual");
+visualNode?.addEventListener("transitionend", positionCardFromBottle);
+}
+function positionCardFromBottle() {
+if (!letterNode?.isConnected || !letterNode.classList.contains("is-floating-card") || !bottle?.isConnected) return;
+if (bottle.dataset.cardFrozen === "1") return;
+const stageNode = stage || document.body;
+const stageRect = stageNode.getBoundingClientRect();
+const glassNode = bottle.querySelector(".voice-bottle-glass");
+if (!glassNode) return;
+// Restore the original card anchor: the writing sits one text line below the
+// actual visible glass bottle, rather than being pinned to the earth.
+const bottleRect = glassNode.getBoundingClientRect();
+const cardRect = letterNode.getBoundingClientRect();
+const textRect = textNode?.getBoundingClientRect();
+const left = Math.max(10, Math.min(
+stageRect.width - cardRect.width - 10,
+bottleRect.left - stageRect.left + (bottleRect.width - cardRect.width) / 2
+));
+const firstCharacter = textNode?.firstElementChild;
+const currentTextTop = firstCharacter?.getBoundingClientRect().top ?? textRect?.top ?? cardRect.top;
+const textLineHeight = parseFloat(getComputedStyle(textNode).lineHeight) || 20;
+const top = cardRect.top - stageRect.top + (bottleRect.bottom + textLineHeight - currentTextTop);
+letterNode.style.left = `${left}px`;
+letterNode.style.top = `${top}px`;
+}
+bottle.addEventListener("rabbit-returned-to-bottle", positionCardFromBottle);
+// Let the original bottle-opening animation finish, then permanently detach
+// the card at exactly the position where it arrived.
+cardDetachTimer = setTimeout(makeCardIndependent, (arriveSeconds + 1.95) * 1000);
+const messageChars = Array.from(rabbitMessage);
 const pageSize = 36;
 const pages = [];
 for (let index = 0; index < messageChars.length; index += pageSize) {
@@ -4067,6 +4873,7 @@ charSpan.style.setProperty("--char-x", `${random(-.8, .8).toFixed(2)}px`);
 charSpan.style.setProperty("--char-y", `${random(-1.2, 1.2).toFixed(2)}px`);
 charSpan.style.setProperty("--char-rotate", `${random(-2.2, 2.2).toFixed(2)}deg`);
 textNode.appendChild(charSpan);
+positionCardFromBottle();
 typeIndex += 1;
 if (typeIndex >= pageChars.length) {
 stopTyping();
@@ -4143,7 +4950,14 @@ star.element.style.filter = `brightness(${(1.12 + breathe * 1.02).toFixed(2)}) s
 requestAnimationFrame(updateVoiceStars);
 }
 
-setTimeout(playOpeningLaughSound, 500);
+// Let the identity appear with the arriving earth, rather than waiting for
+// the opening sound. The interaction guide starts only after it has faded.
+setTimeout(showHomeIntro, 280);
+setTimeout(() => scheduleTouchGuide(0), homeIntroDisplayDelay);
+document.addEventListener("pointerdown", (event) => {
+if (event.target.closest && event.target.closest(".voice-star")) return;
+unlockEarthSounds();
+}, { passive: true });
 requestAnimationFrame(updateVoiceStars);
 })();
 </script>
