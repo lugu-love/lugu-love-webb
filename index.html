@@ -479,14 +479,23 @@ transform-origin: center center;
 scale: 1;
 translate: var(--bottle-zoom-x, 0px) var(--bottle-zoom-y, 0px);
 transition:
-scale .45s cubic-bezier(.2, .72, .2, 1),
-translate .45s cubic-bezier(.2, .72, .2, 1);
-animation: bottle-invite 3.8s ease-in-out var(--letter-delay) infinite;
+scale 3s cubic-bezier(.2, .72, .2, 1),
+translate 3s cubic-bezier(.2, .72, .2, 1);
 }
 
 .voice-bottle.zoom-level-2 .voice-bottle-visual {
 scale: 2;
 z-index: 7;
+}
+
+/* Once the rabbit leaves, the empty glass should not remain on screen. It
+   reappears only for the last part of the return flight. */
+.voice-bottle-visual > :not(.fengxin-rabbit-demo) {
+transition: opacity 2.2s ease;
+}
+
+.voice-bottle.is-rabbit-releasing .voice-bottle-visual > :not(.fengxin-rabbit-demo) {
+opacity: 0;
 }
 
 .voice-bottle.rabbit-expanded .voice-letter-text {
@@ -510,6 +519,16 @@ overflow: visible;
 transform: none;
 animation: none;
 transition: left .55s cubic-bezier(.2, .72, .2, 1), top .55s cubic-bezier(.2, .72, .2, 1);
+}
+
+/* During the small-to-large bottle transition the card travels on the same
+   calm tempo, so the enlarged bottle never covers its first lines. */
+.voice-letter.is-floating-card.is-following-large-bottle {
+transition: left 3s cubic-bezier(.2, .72, .2, 1), top 3s cubic-bezier(.2, .72, .2, 1);
+}
+
+.voice-letter.is-floating-card.is-following-rabbit-return {
+transition: left 4.2s cubic-bezier(.18, .68, .18, 1), top 4.2s cubic-bezier(.18, .68, .18, 1);
 }
 
 .voice-letter.is-floating-card .voice-letter-text {
@@ -700,6 +719,51 @@ right: 22px;
 bottom: 78px;
 transform: scale(.72);
 opacity: .7;
+}
+
+.voice-bottle-emotion-tag {
+position: absolute;
+left: 50%;
+bottom: 18px;
+z-index: 8;
+width: max-content;
+padding: 5px 12px;
+border: 1px solid rgba(255, 232, 180, .25);
+border-radius: 999px;
+background: linear-gradient(90deg, rgba(12, 22, 43, .16), rgba(63, 47, 52, .23), rgba(12, 22, 43, .16));
+box-shadow: inset 0 0 8px rgba(255, 244, 218, .06), 0 2px 10px rgba(0, 0, 0, .12);
+color: rgba(255, 242, 213, .92);
+font-weight: 500;
+line-height: 1.18;
+text-align: center;
+text-shadow: 0 1px 5px rgba(0, 0, 0, .48);
+transform: translateX(-50%);
+pointer-events: none;
+opacity: 0;
+animation: bottle-emotion-intro var(--emotion-tag-duration) ease var(--emotion-tag-delay) forwards;
+}
+
+.voice-bottle-emotion-tag span {
+display: block;
+}
+
+.voice-bottle-emotion-tag span:first-child {
+font-size: 8px;
+letter-spacing: .2em;
+opacity: .72;
+}
+
+.voice-bottle-emotion-tag span:last-child {
+margin-top: 2px;
+font-family: "STKaiti", "Kaiti SC", serif;
+font-size: 11px;
+letter-spacing: .14em;
+}
+
+@keyframes bottle-emotion-intro {
+0% { opacity: 0; transform: translateX(-50%) translateY(3px); }
+8%, 90% { opacity: .96; transform: translateX(-50%) translateY(0); }
+100% { opacity: 0; transform: translateX(-50%) translateY(-2px); }
 }
 
 .voice-bottle-origin {
@@ -2940,13 +3004,12 @@ const sevenStarCharacters = [
 { id: "gongming-gull", name: "共鸣鸥", src: "assets/characters/seven-stars/gongming-gull/main.png" }
 ];
 
-// Temporary five-expression sequence. Each new bottle advances by one item
-// and only the current expression is decoded, keeping mobile memory bounded.
+// Temporary full-body expression sequence. Each new bottle advances by one
+// item and only the current expression is decoded, keeping mobile memory bounded.
 const fengxinRabbitSequence = [
 { id: "1", totalFrames: 73, sheetCount: 7 },
 { id: "2", totalFrames: 91, sheetCount: 8 },
 { id: "3", totalFrames: 109, sheetCount: 10 },
-{ id: "4", totalFrames: 181, sheetCount: 16 },
 { id: "5", totalFrames: 91, sheetCount: 8 }
 ].map((item) => ({
 ...item,
@@ -3057,11 +3120,9 @@ let frameTimer = 0;
 let wakeTimer = 0;
 let animationStarted = false;
 let thirdStepReached = false;
-let restartPlayback = null;
-let bottleLoopBatchActive = false;
-let bottleLoopsRemaining = 0;
-let exitLoopBatchActive = false;
-let exitLoopsRemaining = 0;
+let playbackRun = 0;
+let largeBottleExitTimer = 0;
+let bottleRevealTimer = 0;
 let returningToBottle = false;
 canvas.width = frameSize;
 canvas.height = frameSize;
@@ -3080,21 +3141,17 @@ function removeDemo() {
 cancelAnimationFrame(animationFrame);
 clearTimeout(frameTimer);
 clearTimeout(wakeTimer);
-if (container) container.removeEventListener("click", keepRabbitPlaying, true);
+clearTimeout(largeBottleExitTimer);
+clearTimeout(bottleRevealTimer);
+playbackRun += 1;
 canvas.removeEventListener("click", keepExpandedPlayback);
+if (container) {
+container.removeEventListener("fengxin-large-bottle-opened", armLargeBottleRelease);
+delete container._releaseRabbit;
+}
 canvas.remove();
 if (activeFengxinRabbitDemo === canvas) activeFengxinRabbitDemo = null;
 }
-
-function keepRabbitPlaying(event) {
-if (event.target.closest("button, a, input")) return;
-if (returningToBottle) return;
-const currentZoomLevel = Number(container?.dataset.zoomLevel || 0);
-if (currentZoomLevel === 0) startLargeBottlePlayback();
-if (currentZoomLevel === 2) expandRabbitPerformance();
-}
-
-if (container) container.addEventListener("click", keepRabbitPlaying, true);
 
 function returnRabbitToBottle({ becomeStarAtBottle = false } = {}) {
 if (!canvas.isConnected) return;
@@ -3105,6 +3162,7 @@ container?.classList.remove("rabbit-expanded");
 return;
 }
 returningToBottle = true;
+clearTimeout(bottleRevealTimer);
 const startRect = canvas.getBoundingClientRect();
 container?.style.removeProperty("--bottle-zoom-x");
 container?.style.removeProperty("--bottle-zoom-y");
@@ -3112,7 +3170,7 @@ if (container) {
 container.dataset.zoomLevel = "0";
 container.classList.remove("zoom-level-2");
 container.classList.remove("rabbit-expanded");
-container.classList.remove("is-rabbit-releasing");
+container.dataset.cardFrozen = "0";
 }
 canvas.style.position = "fixed";
 canvas.style.left = `${startRect.left}px`;
@@ -3128,6 +3186,9 @@ if (!canvas.isConnected || !bottleVisual?.isConnected) {
 returningToBottle = false;
 return;
 }
+// This is the real beginning of the rabbit's visible return flight. The card
+// receives its signal here, then deliberately waits .8 seconds.
+container?.dispatchEvent(new Event("rabbit-return-start"));
 // Measure a real, unexpanded rabbit in the restored bottle.  The bottle has
 // responsive transforms on phones, so fixed pixel maths can land beside it.
 const targetProbe = document.createElement("canvas");
@@ -3163,6 +3224,11 @@ duration: 4200,
 easing: "cubic-bezier(.18, .68, .18, 1)",
 fill: "forwards"
 });
+// The glass returns only near the end of the shrinking flight, immediately
+// before the rabbit is placed back inside it.
+bottleRevealTimer = setTimeout(() => {
+if (canvas.isConnected && container?.isConnected) container.classList.remove("is-rabbit-releasing");
+}, 3400);
 returnAnimation.onfinish = () => {
 // A fill-forwards Web Animation continues to own left/top after it finishes.
 // Cancel it before restoring the bottle CSS; otherwise its old stage-based
@@ -3182,6 +3248,8 @@ container.dispatchEvent(new Event("rabbit-returned-to-bottle"));
 returningToBottle = false;
 return;
 }
+clearTimeout(bottleRevealTimer);
+container?.classList.remove("is-rabbit-releasing");
 canvas.classList.remove("is-expanded-performance");
 canvas.removeAttribute("style");
 // Reparent and restore the default bottle placement as one synchronous change,
@@ -3196,6 +3264,8 @@ container.dispatchEvent(new Event("rabbit-returned-to-bottle"));
 returningToBottle = false;
 };
 returnAnimation.oncancel = () => {
+clearTimeout(bottleRevealTimer);
+container?.classList.remove("is-rabbit-releasing");
 returningToBottle = false;
 };
 }, 480);
@@ -3204,110 +3274,117 @@ returningToBottle = false;
 
 function keepExpandedPlayback(event) {
 event.stopPropagation();
-// One final-stage click owns the complete three-loop batch. Further clicks in
-// that batch are intentionally ignored and never extend the exit point.
-if (exitLoopBatchActive) return;
 }
 
-function startLargeBottlePlayback() {
-if (thirdStepReached || bottleLoopBatchActive) return;
-bottleLoopBatchActive = true;
-bottleLoopsRemaining = 2;
-exitLoopBatchActive = false;
-if (restartPlayback) {
-clearTimeout(frameTimer);
-restartPlayback();
-}
-}
-
-function expandRabbitPerformance() {
-if (thirdStepReached || !canvas.isConnected) return;
-thirdStepReached = true;
-// During the foreground performance, keep the independent card exactly where
-// it was. Moving it with the shrinking bottle would put it behind the rabbit.
-if (container) container.dataset.cardFrozen = "1";
-bottleLoopBatchActive = false;
-exitLoopBatchActive = true;
-exitLoopsRemaining = 3;
-canvas.classList.remove("is-awakening");
-canvas.classList.add("is-expanded-performance");
-container?.classList.add("rabbit-expanded");
-(stage || document.body).appendChild(canvas);
-canvas.addEventListener("click", keepExpandedPlayback);
-if (restartPlayback) {
-clearTimeout(frameTimer);
-restartPlayback();
-}
-}
-
-function leaveDemo() {
-if (!canvas.isConnected) {
-removeDemo();
-return;
-}
-canvas.classList.remove("is-near");
-canvas.classList.remove("is-awakening");
-canvas.classList.add("is-leaving");
-setTimeout(removeDemo, 1650);
-}
-
-function playSpriteFrames() {
-animationStarted = true;
+// One continuous renderer owns every rabbit stage.  It is deliberately based
+// on requestAnimationFrame instead of a chain of short timers: mobile browsers
+// can coalesce timers during transforms, leaving a sprite stuck on one frame.
+function runSpritePlayback(mode, loops = Infinity) {
+const run = ++playbackRun;
 let frameIndex = 0;
 let completedLoops = 0;
-function drawFrame() {
-if (!canvas.isConnected) {
-removeDemo();
-return;
-}
+let lastFrameAt = 0;
+const frameDuration = 1000 / frameRate;
+animationStarted = true;
+clearTimeout(frameTimer);
+cancelAnimationFrame(animationFrame);
+
+function paintFrame() {
 const sheetIndex = Math.floor(frameIndex / framesPerSheet);
 const localIndex = frameIndex % framesPerSheet;
 const sourceX = (localIndex % 4) * frameSize;
 const sourceY = Math.floor(localIndex / 4) * frameSize;
 context.clearRect(0, 0, frameSize, frameSize);
-context.drawImage(
-sprites[sheetIndex],
-sourceX, sourceY, frameSize, frameSize,
-renderX, renderY, renderSize, renderSize
-);
-if (frameIndex < totalFrames - 1) {
-frameIndex += 1;
-frameTimer = setTimeout(drawFrame, 1000 / frameRate);
-return;
+context.drawImage(sprites[sheetIndex], sourceX, sourceY, frameSize, frameSize, renderX, renderY, renderSize, renderSize);
 }
+
+function drawFrame(now) {
+if (!canvas.isConnected || run !== playbackRun) return;
+if (!lastFrameAt) lastFrameAt = now;
+if (now - lastFrameAt >= frameDuration) {
+const advance = Math.max(1, Math.floor((now - lastFrameAt) / frameDuration));
+lastFrameAt += advance * frameDuration;
+frameIndex += advance;
+while (frameIndex >= totalFrames) {
+frameIndex -= totalFrames;
 completedLoops += 1;
-if (exitLoopBatchActive) {
-exitLoopsRemaining -= 1;
-if (exitLoopsRemaining > 0) {
-frameIndex = 0;
-frameTimer = setTimeout(drawFrame, 1000 / frameRate);
+if (completedLoops >= loops) {
+paintFrame();
+if (mode === "large") expandRabbitPerformance();
+if (mode === "expanded") returnRabbitToBottle();
 return;
 }
-exitLoopBatchActive = false;
-returnRabbitToBottle();
-// Restore the original ending state: after the foreground performance, the
-// rabbit follows the slow return path and remains in the small bottle.
-return;
 }
-if (bottleLoopBatchActive) {
-bottleLoopsRemaining -= 1;
-if (bottleLoopsRemaining > 0) {
-frameIndex = 0;
-frameTimer = setTimeout(drawFrame, 1000 / frameRate);
-return;
 }
-bottleLoopBatchActive = false;
-}
-// Initial size stops after one loop. The large-bottle stage stops after its
-// two-loop batch. Neither state exits until the next explicit click.
-}
-restartPlayback = () => {
-frameIndex = 0;
-completedLoops = 0;
-frameTimer = setTimeout(drawFrame, 1000 / frameRate);
-};
+paintFrame();
 animationFrame = requestAnimationFrame(drawFrame);
 }
+paintFrame();
+animationFrame = requestAnimationFrame(drawFrame);
+}
+
+function startLargeBottlePlayback() {
+if (thirdStepReached || !canvas.isConnected) return;
+clearTimeout(largeBottleExitTimer);
+spritesReady.then(() => {
+if (thirdStepReached || !canvas.isConnected) return;
+// Keep the enlarged bottle alive until its own release signal arrives.
+runSpritePlayback("large");
+}).catch(removeDemo);
+}
+
+function expandRabbitPerformance() {
+if (thirdStepReached || !canvas.isConnected) return;
+thirdStepReached = true;
+clearTimeout(largeBottleExitTimer);
+if (container) {
+container.dataset.cardFrozen = "1";
+container.dataset.rabbitReleased = "1";
+container.classList.add("is-rabbit-releasing");
+}
+canvas.classList.remove("is-awakening");
+canvas.classList.add("is-expanded-performance");
+container?.classList.add("rabbit-expanded");
+(stage || document.body).appendChild(canvas);
+// Write the foreground geometry inline as well as through CSS. Some mobile
+// webviews occasionally keep the old bottle-relative computed geometry after
+// a canvas is reparented, which makes a successful jump look invisible.
+canvas.style.position = "fixed";
+canvas.style.left = "50%";
+canvas.style.top = "32%";
+canvas.style.width = "min(82vw, 340px)";
+canvas.style.height = "min(82vw, 340px)";
+canvas.style.transform = "translateX(-50%)";
+canvas.style.zIndex = "60";
+canvas.style.opacity = "1";
+canvas.style.pointerEvents = "auto";
+canvas.addEventListener("click", keepExpandedPlayback);
+if (container) {
+container.dataset.zoomLevel = "0";
+container.classList.remove("zoom-level-2");
+container.style.removeProperty("--bottle-zoom-x");
+container.style.removeProperty("--bottle-zoom-y");
+}
+
+spritesReady.then(() => runSpritePlayback("expanded", 2)).catch(removeDemo);
+}
+
+// The enlarged bottle owns its automatic exit.  This listener sits beside the
+// rabbit canvas and calls expandRabbitPerformance() in the same closure; it
+// does not depend on an outer click handler, animation frame or proxy method.
+function armLargeBottleRelease() {
+if (thirdStepReached || !canvas.isConnected) return;
+clearTimeout(largeBottleExitTimer);
+largeBottleExitTimer = setTimeout(() => {
+if (!thirdStepReached && canvas.isConnected) expandRabbitPerformance();
+}, 5000);
+}
+
+if (container) container._releaseRabbit = expandRabbitPerformance;
+if (container) container.addEventListener("fengxin-large-bottle-opened", () => {
+startLargeBottlePlayback();
+armLargeBottleRelease();
+});
 
 canvas.classList.add("is-near");
 wakeTimer = setTimeout(() => {
@@ -3317,7 +3394,7 @@ return;
 }
 canvas.classList.add("is-awakening");
 frameTimer = setTimeout(() => {
-spritesReady.then(playSpriteFrames).catch(removeDemo);
+spritesReady.then(() => runSpritePlayback("initial")).catch(removeDemo);
 }, 1550);
 }, wakeDelay);
 }
@@ -3949,7 +4026,7 @@ mySpaceButton.classList.add("entry-confirming");
 setTimeout(() => {
 mySpaceButton.classList.remove("entry-confirming");
 enterSpaceWithMusic(null, "life-space-v1/index.html?v=20260728-6", null, true);
-}, 1500);
+}, 800);
 });
 
 if (mySpaceStyle) mySpaceStyle.addEventListener("click", () => {
@@ -4079,13 +4156,22 @@ function getMusicVolume() {
 return musicVolume;
 }
 
-function playStarClickSound() {
-if (!canPlayEarthSound()) return;
+function playStarClickSound(onEnded) {
+if (!canPlayEarthSound()) {
+if (onEnded) onEnded();
+return;
+}
 const audio = new Audio(starClickSoundSrc);
 audio.volume = Math.min(.64, musicVolume);
 earthEffectAudios.add(audio);
-audio.addEventListener("ended", () => stopEarthEffectAudio(audio), { once: true });
-audio.play().catch(() => stopEarthEffectAudio(audio));
+audio.addEventListener("ended", () => {
+if (onEnded) onEnded();
+stopEarthEffectAudio(audio);
+}, { once: true });
+audio.play().catch(() => {
+if (onEnded) onEnded();
+stopEarthEffectAudio(audio);
+});
 }
 
 let touchGuideTimer = 0;
@@ -4357,7 +4443,26 @@ syncMusicMotion();
 if (window.syncAudioUI) window.syncAudioUI();
 }
 
-function startVoiceMusic() {
+function revealVoiceMusic(audio = voiceAudio) {
+if (!audio || voiceAudio !== audio) return;
+if (audio.paused) {
+audio.dataset.revealOnPlay = "true";
+return;
+}
+cancelAnimationFrame(voiceMusicFadeFrame);
+const startVolume = audio.volume;
+const startTime = performance.now();
+function fadeIn(now) {
+const progress = clamp((now - startTime) / 2000, 0, 1);
+audio.volume = startVolume + (musicVolume - startVolume) * progress;
+if (progress < 1 && voiceAudio === audio) {
+voiceMusicFadeFrame = requestAnimationFrame(fadeIn);
+}
+}
+voiceMusicFadeFrame = requestAnimationFrame(fadeIn);
+}
+
+function startVoiceMusic(options = {}) {
 if (voiceMusicList.length === 0) return;
 if (!window.earthMusicEnabled) return;
 stopMusic({ immediate: true });
@@ -4380,17 +4485,7 @@ audio.muted = !window.earthMusicEnabled;
 audio.volume = 0;
 audio.play().then(() => {
 syncMusicMotion();
-const startTime = performance.now();
-
-function fadeIn(now) {
-const progress = clamp((now - startTime) / 2000, 0, 1);
-audio.volume = musicVolume * progress;
-if (progress < 1 && voiceAudio === audio) {
-voiceMusicFadeFrame = requestAnimationFrame(fadeIn);
-}
-}
-
-voiceMusicFadeFrame = requestAnimationFrame(fadeIn);
+if (!options.startSilent || audio.dataset.revealOnPlay === "true") revealVoiceMusic(audio);
 if (window.syncAudioUI) window.syncAudioUI();
 }).catch(() => {
 if (voiceAudio === audio) voiceAudio = null;
@@ -4399,6 +4494,7 @@ destroyAudioNow(audio);
 syncMusicMotion();
 if (window.syncAudioUI) window.syncAudioUI();
 });
+return audio;
 }
 
 function scheduleVoiceMusicStart(delay = voiceMusicStartDelay) {
@@ -4634,12 +4730,14 @@ if (!activeVoiceExperience) return;
 activeVoiceExperience.close();
 }
 
-function openVoiceBottle(star){if(star.clicked)return;const beganSoundSession=!earthSoundUnlocked;unlockEarthSounds();dismissTouchGuide();closeActiveVoiceExperience();stopMusic();if(!beganSoundSession)playStarClickSound();scheduleVoiceMusicStart();unlockTypingKeySounds();star.clicked=true;star.element.classList.add("is-touched");
+function openVoiceBottle(star){if(star.clicked)return;const beganSoundSession=!earthSoundUnlocked;unlockEarthSounds();dismissTouchGuide();closeActiveVoiceExperience();stopMusic();if(!beganSoundSession){const primedVoiceAudio=startVoiceMusic({startSilent:true});playStarClickSound(()=>revealVoiceMusic(primedVoiceAudio));}else{scheduleVoiceMusicStart();}unlockTypingKeySounds();star.clicked=true;star.element.classList.add("is-touched");
 
 let bottle = null;
 let typeTimer = 0;
 let startTypewriter = 0;
 let cardDetachTimer = 0;
+let enlargeBottleTimer = 0;
+let cardReturnTimer = 0;
 let letterNode = null;
 let closed = false;
 function stopTyping() {
@@ -4656,6 +4754,8 @@ closed = true;
 clearTimeout(cardTimer);
 clearTimeout(startTypewriter);
 clearTimeout(cardDetachTimer);
+clearTimeout(enlargeBottleTimer);
+clearTimeout(cardReturnTimer);
 stopTyping();
 stopVoiceMusic();
 if (activeFengxinRabbitDemo) {
@@ -4720,6 +4820,10 @@ bottle.style.setProperty("--bottle-y", `${bottleStartY}px`);
 const arriveSeconds = random(6, 8);
 bottle.style.setProperty("--bottle-arrive", `${arriveSeconds.toFixed(2)}s`);
 bottle.style.setProperty("--letter-delay", `${(arriveSeconds + .32).toFixed(2)}s`);
+// The name appears halfway through the bottle's journey and remains until
+// just before the card begins its own text.
+bottle.style.setProperty("--emotion-tag-delay", `${(arriveSeconds * .5).toFixed(2)}s`);
+bottle.style.setProperty("--emotion-tag-duration", `${(arriveSeconds * .5 + 3.5).toFixed(2)}s`);
 bottle.style.setProperty("--letter-tilt", "24deg");
 bottle.style.setProperty("--hand-font", handFonts[Math.floor(Math.random() * handFonts.length)]);
 bottle.style.setProperty("--hand-letter-spacing", `${random(.01, .09).toFixed(3)}em`);
@@ -4743,6 +4847,10 @@ bottle.innerHTML = `
 <span class="voice-bottle-sparkle one"></span>
 <span class="voice-bottle-sparkle two"></span>
 <canvas class="fengxin-rabbit-demo" width="540" height="540" role="img" aria-label="风信兔情绪表演"></canvas>
+<div class="voice-bottle-emotion-tag" aria-hidden="true">
+<span>七星使者</span>
+<span>风信兔</span>
+</div>
 </div>
 <div class="voice-letter">
 <span class="voice-letter-text" aria-label="${safeMessage}"></span>
@@ -4758,10 +4866,9 @@ bottle.innerHTML = `
 `;
 (stage || document.body).appendChild(bottle);
 preloadFengxinRabbitAngryAssets();
-bottle.addEventListener("click", (event) => {
-if (closed || event.target.closest("button, a, input")) return;
-const currentZoomLevel = Number(bottle.dataset.zoomLevel || 0);
-if (currentZoomLevel === 0) {
+
+function enterLargeBottle() {
+if (closed || !bottle?.isConnected || Number(bottle.dataset.zoomLevel || 0) !== 0) return;
 const stageRect = (stage || document.documentElement).getBoundingClientRect();
 const bottleRect = bottle.getBoundingClientRect();
 const glassNode = bottle.querySelector(".voice-bottle-glass");
@@ -4783,7 +4890,29 @@ bottle.style.setProperty("--bottle-zoom-x", `${localDeltaX.toFixed(2)}px`);
 bottle.style.setProperty("--bottle-zoom-y", `${localDeltaY.toFixed(2)}px`);
 bottle.dataset.zoomLevel = "2";
 bottle.classList.add("zoom-level-2");
+positionCardForLargeBottle();
+// This event is received by the rabbit component itself, where the only
+// automatic transition is armed and the large-bottle animation is started.
+// startLargeBottlePlayback belongs to that component's private scope, so it
+// must never be called from this outer bottle controller.
+bottle.dispatchEvent(new Event("fengxin-large-bottle-opened"));
+}
+
+bottle.addEventListener("click", (event) => {
+if (closed || bottle.dataset.rabbitReleased === "1" || event.target.closest("button, a, input")) return;
+const currentZoomLevel = Number(bottle.dataset.zoomLevel || 0);
+if (currentZoomLevel === 0) {
+enterLargeBottle();
 return;
+}
+if (currentZoomLevel === 2) {
+// Manual fallback: a second touch always advances the rabbit immediately.
+bottle._releaseRabbit?.();
+}
+});
+bottle.addEventListener("pointerup", () => {
+if (!closed && Number(bottle.dataset.zoomLevel || 0) === 2) {
+bottle._releaseRabbit?.();
 }
 });
 
@@ -4837,7 +4966,46 @@ const top = cardRect.top - stageRect.top + (bottleRect.bottom + textLineHeight -
 letterNode.style.left = `${left}px`;
 letterNode.style.top = `${top}px`;
 }
-bottle.addEventListener("rabbit-returned-to-bottle", positionCardFromBottle);
+function positionCardForLargeBottle() {
+if (!letterNode?.isConnected || !letterNode.classList.contains("is-floating-card") || !bottle?.isConnected) return;
+const stageNode = stage || document.body;
+const stageRect = stageNode.getBoundingClientRect();
+const glassNode = bottle.querySelector(".voice-bottle-glass");
+if (!glassNode) return;
+const glassRect = glassNode.getBoundingClientRect();
+const cardRect = letterNode.getBoundingClientRect();
+const textRect = textNode?.getBoundingClientRect();
+const firstCharacter = textNode?.firstElementChild;
+const currentTextTop = firstCharacter?.getBoundingClientRect().top ?? textRect?.top ?? cardRect.top;
+const textLineHeight = parseFloat(getComputedStyle(textNode).lineHeight) || 20;
+// The bottle transition intentionally centres the enlarged glass in the
+// stage. Its final bottom is therefore one unscaled glass-height below that
+// centre (the visual itself scales to 2×).
+const finalGlassBottom = stageRect.top + stageRect.height / 2 + glassRect.height;
+const left = Math.max(10, Math.min(
+stageRect.width - cardRect.width - 10,
+stageRect.width / 2 - cardRect.width / 2
+));
+const top = cardRect.top - stageRect.top + (finalGlassBottom + textLineHeight - currentTextTop);
+letterNode.classList.add("is-following-large-bottle");
+letterNode.style.left = `${left}px`;
+letterNode.style.top = `${top}px`;
+}
+bottle.addEventListener("rabbit-returned-to-bottle", () => {
+clearTimeout(cardReturnTimer);
+letterNode?.classList.remove("is-following-large-bottle");
+letterNode?.classList.remove("is-following-rabbit-return");
+positionCardFromBottle();
+});
+bottle.addEventListener("rabbit-return-start", () => {
+clearTimeout(cardReturnTimer);
+cardReturnTimer = setTimeout(() => {
+if (!letterNode?.isConnected || !letterNode.classList.contains("is-floating-card") || closed) return;
+letterNode.classList.remove("is-following-large-bottle");
+letterNode.classList.add("is-following-rabbit-return");
+positionCardFromBottle();
+}, 800);
+});
 // Let the original bottle-opening animation finish, then permanently detach
 // the card at exactly the position where it arrived.
 cardDetachTimer = setTimeout(makeCardIndependent, (arriveSeconds + 1.95) * 1000);
@@ -4850,7 +5018,8 @@ pages.push(messageChars.slice(index, index + pageSize).join(""));
 if (pages.length > 1) {
 letterNode.classList.add("has-pages");
 }
-const typeStart = (arriveSeconds + 1.55) * 1000;
+// Let the identity title breathe on its own before the card begins speaking.
+const typeStart = (arriveSeconds + 3.9) * 1000;
 let typeIndex = 0;
 let currentPage = 0;
 function renderPage(pageIndex) {
@@ -4879,6 +5048,15 @@ if (typeIndex >= pageChars.length) {
 stopTyping();
 if (footerNode) footerNode.classList.add("is-visible");
 if (worldButton) worldButton.classList.add("is-visible");
+// Five seconds after the small-bottle letter has finished, perform exactly
+// the same transition as the first bottle tap. If it was tapped already,
+// leave the visitor's current stage untouched.
+if (currentPage === 0) {
+clearTimeout(enlargeBottleTimer);
+enlargeBottleTimer = setTimeout(() => {
+enterLargeBottle();
+}, 5000);
+}
 }
 }, 300);
 }
