@@ -1,0 +1,10 @@
+{
+  "characterId": "rabbit",
+  "emotionId": "E01",
+  "sourceFile": "happy.mp4",
+  "width": 720,
+  "height": 960,
+  "fps": 15,
+  "duration": 10.079,
+  "codec": "h264"
+}

@@ -1,0 +1,14 @@
+{
+  "characterId": "rabbit",
+  "emotionId": "E01",
+  "generatedFrom": "master/happy.mp4",
+  "assetPath": "assets/video/seven-stars-despill-v1/rabbit-happy",
+  "frameRate": 15,
+  "totalFrames": 151,
+  "sheetCount": 13,
+  "spriteFrameSize": 540,
+  "spriteExtension": "png",
+  "renderSize": 480,
+  "renderX": 30,
+  "renderY": 30
+}

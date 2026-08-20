@@ -1,0 +1,158 @@
+{
+  "version": 3,
+  "characters": [
+    {
+      "characterId": "rabbit",
+      "order": 1,
+      "animal": "rabbit",
+      "displayName": {
+        "zh-CN": "风信兔",
+        "en": "Windletter Rabbit"
+      }
+    },
+    {
+      "characterId": "deer",
+      "order": 2,
+      "animal": "deer",
+      "displayName": {
+        "zh-CN": "星语鹿",
+        "en": "Starwhisper Deer"
+      }
+    },
+    {
+      "characterId": "fox",
+      "order": 3,
+      "animal": "fox",
+      "displayName": {
+        "zh-CN": "光尾狐",
+        "en": "Light-Tail Fox"
+      }
+    },
+    {
+      "characterId": "bear",
+      "order": 4,
+      "animal": "bear",
+      "displayName": {
+        "zh-CN": "暖山熊",
+        "en": "Warm-Mountain Bear"
+      }
+    },
+    {
+      "characterId": "crane",
+      "order": 5,
+      "animal": "crane",
+      "displayName": {
+        "zh-CN": "霁心鹤",
+        "en": "Clear-Heart Crane"
+      }
+    },
+    {
+      "characterId": "cat",
+      "order": 6,
+      "animal": "cat",
+      "displayName": {
+        "zh-CN": "光尾猫",
+        "en": "Light-Tail Cat"
+      }
+    },
+    {
+      "characterId": "gull",
+      "order": 7,
+      "animal": "gull",
+      "displayName": {
+        "zh-CN": "共鸣鸥",
+        "en": "Resonance Gull"
+      }
+    }
+  ],
+  "emotions": [
+    {
+      "emotionId": "E01",
+      "emotionSlug": "happy",
+      "displayName": {
+        "zh-CN": "开心",
+        "en": "Happy"
+      }
+    },
+    {
+      "emotionId": "E02",
+      "emotionSlug": "aggrieved",
+      "displayName": {
+        "zh-CN": "委屈",
+        "en": "Wronged"
+      }
+    },
+    {
+      "emotionId": "E03",
+      "emotionSlug": "angry",
+      "displayName": {
+        "zh-CN": "生气",
+        "en": "Angry"
+      }
+    },
+    {
+      "emotionId": "E04",
+      "emotionSlug": "sad",
+      "displayName": {
+        "zh-CN": "难过",
+        "en": "Sad"
+      }
+    },
+    {
+      "emotionId": "E05",
+      "emotionSlug": "surprised",
+      "displayName": {
+        "zh-CN": "惊讶",
+        "en": "Surprised"
+      }
+    },
+    {
+      "emotionId": "E06",
+      "emotionSlug": "tired",
+      "displayName": {
+        "zh-CN": "疲惫",
+        "en": "Tired"
+      }
+    },
+    {
+      "emotionId": "E07",
+      "emotionSlug": "shy",
+      "displayName": {
+        "zh-CN": "害羞",
+        "en": "Shy"
+      }
+    },
+    {
+      "emotionId": "E08",
+      "emotionSlug": "playful",
+      "displayName": {
+        "zh-CN": "调皮",
+        "en": "Playful"
+      }
+    },
+    {
+      "emotionId": "E09",
+      "emotionSlug": "proud",
+      "displayName": {
+        "zh-CN": "得意",
+        "en": "Proud"
+      }
+    },
+    {
+      "emotionId": "E10",
+      "emotionSlug": "hopeful",
+      "displayName": {
+        "zh-CN": "期待",
+        "en": "Hopeful"
+      }
+    },
+    {
+      "emotionId": "E11",
+      "emotionSlug": "furious",
+      "displayName": {
+        "zh-CN": "愤怒",
+        "en": "Furious"
+      }
+    }
+  ]
+}

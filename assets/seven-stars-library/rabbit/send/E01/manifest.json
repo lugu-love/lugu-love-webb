@@ -1,0 +1,19 @@
+{
+  "characterId": "rabbit",
+  "emotionId": "E01",
+  "generatedFrom": "master/happy.mp4",
+  "assetPath": "assets/seven-stars-library/rabbit/send/E01/E01.mp4",
+  "format": "mp4",
+  "width": 720,
+  "height": 1280,
+  "fps": 24,
+  "duration": 10.0,
+  "videoBitrate": 1600,
+  "audio": {
+    "engine": "local-apple",
+    "voice": "Tingting",
+    "language": "zh-CN"
+  },
+  "defaultCopy": "今天先开心，其他事情都给我排队。",
+  "textStyle": "warm-white"
+}
