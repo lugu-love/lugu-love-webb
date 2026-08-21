@@ -3140,6 +3140,23 @@ font-size: 12px;
 }
 
 </style>
+<style>
+  .emotion-entry {
+    position: fixed; left: 50%; bottom: 156px; transform: translateX(-50%);
+    z-index: 4; display: inline-flex; align-items: center; gap: 10px;
+    padding: 11px 18px 11px 14px; border: 1px solid rgba(255,255,255,.28);
+    border-radius: 999px; background: linear-gradient(180deg, rgba(125,139,255,.22), rgba(160,107,255,.16));
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 0 30px rgba(140,120,255,.30), inset 0 0 18px rgba(255,255,255,.06);
+    color: #fff; text-decoration: none;
+    font-family: "PingFang SC","Microsoft YaHei",Arial,sans-serif;
+  }
+  .emotion-entry:active { transform: translateX(-50%) scale(.98); }
+  .emotion-entry-emoji { font-size: 22px; line-height: 1; filter: drop-shadow(0 0 8px rgba(255,210,140,.5)); }
+  .emotion-entry-text { display: flex; flex-direction: column; line-height: 1.2; }
+  .emotion-entry-title { font-size: 15px; font-weight: 650; letter-spacing: .04em; }
+  .emotion-entry-sub { font-size: 11px; opacity: .78; letter-spacing: .08em; margin-top: 2px; }
+</style>
 </head>
 <body>
 <main class="phone-stage" id="phoneStage" aria-label="地球首页手机竖屏舞台">
@@ -3212,6 +3229,13 @@ font-size: 12px;
 <span class="guide-sub">Gently touch a “heart star”, meet a “world”.</span>
 </div>
 <div class="guide-final-heart" aria-hidden="true">♥</div>
+<a class="emotion-entry" href="emotion-hub.html" aria-label="七星使者·情绪表达，说出此刻的心情">
+<span class="emotion-entry-emoji" aria-hidden="true">🐰</span>
+<span class="emotion-entry-text">
+<span class="emotion-entry-title">七星使者·情绪表达</span>
+<span class="emotion-entry-sub">说出此刻的心情</span>
+</span>
+</a>
 <button class="my-space-button" type="button" aria-label="选择我的空间 My Space">
 <span class="my-space-button-icon" aria-hidden="true">🏠</span>
 <span class="my-space-button-label">我的空间</span>

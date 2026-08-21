@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0c18">
+<title>七星使者·情绪表达</title>
+<style>
+  :root { --bg:#0b0c18; --card:#16192e; --ink:#eef0ff; --muted:#9aa0c3; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin:0; padding:0; min-height:100%; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased; }
+  .app { width:min(100vw,430px); margin:0 auto; padding:calc(env(safe-area-inset-top,0px)+26px) 20px calc(env(safe-area-inset-bottom,0px)+26px); }
+  .brand { margin:0; font-size:24px; letter-spacing:.02em; }
+  .brand-sub { margin:8px 0 26px; font-size:13px; color:var(--muted); }
+  .cards { display:grid; gap:14px; }
+  .card { display:block; border:1px solid rgba(255,255,255,.12); border-radius:20px; background:linear-gradient(180deg, rgba(125,139,255,.14), rgba(160,107,255,.10)); padding:20px 18px; color:var(--ink); text-decoration:none; box-shadow:0 12px 40px rgba(0,0,0,.30); }
+  .card:active { transform:scale(.985); }
+  .card .emoji { font-size:30px; line-height:1; }
+  .card .name { margin-top:12px; font-size:19px; font-weight:650; }
+  .card .desc { margin-top:6px; font-size:13px; line-height:1.6; color:var(--muted); }
+  .card .arrow { margin-top:12px; font-size:13px; color:#b8c0ff; }
+  .reserved { margin-top:18px; padding:14px; border:1px dashed rgba(255,255,255,.14); border-radius:16px; font-size:13px; color:var(--muted); text-align:center; }
+</style>
+</head>
+<body>
+<main class="app">
+  <h1 class="brand">七星使者·情绪表达</h1>
+  <p class="brand-sub">说出此刻的心情，把它交给想发的人</p>
+
+  <div class="cards">
+    <a class="card" href="pure-emotion.html">
+      <div class="emoji">🐰</div>
+      <div class="name">A｜纯情绪表达</div>
+      <div class="desc">选情绪 → 编辑文字 → 预览 → 分享。快速、直接、极简。</div>
+      <div class="arrow">进入 →</div>
+    </a>
+    <a class="card" href="index.html">
+      <div class="emoji">🌊</div>
+      <div class="name">B｜情绪漂流瓶</div>
+      <div class="desc">把心情放进漂流瓶，漂向愿意接住它的人。</div>
+      <div class="arrow">进入 →</div>
+    </a>
+  </div>
+
+  <div class="reserved">C｜全球共创接力 · 即将开启</div>
+</main>
+</body>
+</html>
