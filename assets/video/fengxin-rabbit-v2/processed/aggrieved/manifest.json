@@ -1,0 +1,21 @@
+{
+  "id": "fengxin-rabbit-aggrieved-v2",
+  "characterId": "fengxin-rabbit",
+  "emotionId": "aggrieved",
+  "duration": 10.079,
+  "frameRate": 15,
+  "totalFrames": 151,
+  "sheetCount": 13,
+  "spriteFrameSize": 540,
+  "spriteExtension": "png",
+  "poster": "poster.png",
+  "sheetPattern": "sheet-%02d.png",
+  "stage": {
+    "canvasSize": 540,
+    "renderSize": 300,
+    "renderX": 120,
+    "renderY": 120,
+    "align": "center-bottom"
+  },
+  "enabled": true
+}

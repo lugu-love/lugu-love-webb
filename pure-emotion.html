@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0c18">
+<title>情绪表达</title>
+<style>
+  :root {
+    --bg: #0b0c18;
+    --card: #17192e;
+    --ink: #eef0ff;
+    --muted: #9aa0c3;
+    --accent: #7d8bff;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+    overflow: hidden;
+  }
+  .app {
+    display: flex; flex-direction: column;
+    height: 100dvh;
+    padding: calc(env(safe-area-inset-top, 0px) + 14px) 16px calc(env(safe-area-inset-bottom, 0px) + 14px);
+  }
+  header h1 { font-size: 21px; margin: 0; letter-spacing: 1px; }
+  header p { font-size: 12px; color: var(--muted); margin: 4px 0 0; }
+
+  .emotions { display: flex; gap: 8px; margin: 14px 0 4px; }
+  .emotion {
+    flex: 1; padding: 10px 0; border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: var(--card); color: var(--muted);
+    font-size: 14px; cursor: pointer; text-align: center;
+  }
+  .emotion.active {
+    color: #fff; border-color: var(--accent);
+    background: rgba(125, 139, 255, .16);
+  }
+
+  .stage-wrap { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; }
+  #stage { width: min(88vw, 430px); height: auto; border-radius: 18px; }
+
+  .preview-text {
+    text-align: center; font-size: 17px; line-height: 1.6;
+    min-height: 28px; margin: 8px 0 4px; white-space: pre-wrap; color: #fff;
+  }
+  .editor textarea {
+    width: 100%; min-height: 74px; border-radius: 14px;
+    background: var(--card); color: var(--ink);
+    border: 1px solid rgba(255,255,255,.12); padding: 12px;
+    font-size: 15px; line-height: 1.5; resize: none; outline: none;
+  }
+  .editor textarea:focus { border-color: var(--accent); }
+
+  .actions { display: flex; gap: 10px; margin-top: 12px; }
+  button {
+    flex: 1; height: 48px; border-radius: 14px; border: none;
+    font-size: 16px; font-weight: 600; cursor: pointer;
+  }
+  .btn-preview { background: rgba(255,255,255,.08); color: var(--ink); border: 1px solid rgba(255,255,255,.14); }
+  .btn-share { background: linear-gradient(135deg, #7d8bff, #a06bff); color: #fff; }
+
+  /* 预览模式：隐藏编辑控件，只留情绪画面 + 文字 + 分享 */
+  body.preview header,
+  body.preview .emotions,
+  body.preview .editor,
+  body.preview .btn-preview { display: none; }
+  body.preview .preview-text { font-size: 19px; margin-top: 14px; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%);
+    z-index: 9; padding: 9px 14px; border-radius: 999px;
+    background: rgba(20, 22, 40, .88); border: 1px solid rgba(255,255,255,.16);
+    color: rgba(255,255,255,.95); font-size: 12px; pointer-events: none;
+    opacity: 0; transition: opacity .25s ease; max-width: 80vw; text-align: center;
+  }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>情绪表达</h1>
+      <p>选一个情绪，写一句话，发给想发的人</p>
+    </header>
+
+    <div class="emotions" id="emotions"></div>
+
+    <div class="stage-wrap">
+      <canvas id="stage" width="540" height="540"></canvas>
+    </div>
+
+    <div class="preview-text" id="previewText"></div>
+
+    <div class="editor">
+      <textarea id="textInput" maxlength="60" placeholder="写一句话…"></textarea>
+    </div>
+
+    <div class="actions">
+      <button class="btn-preview" id="btnPreview" type="button">预览</button>
+      <button class="btn-share" id="btnShare" type="button">分享</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  // 共享现有正式情绪素材（与 B 路径共用同一套风信兔透明帧序列）
+  var EMOTIONS = [
+    { id: "1", name: "开心", totalFrames: 73, sheetCount: 7 },
+    { id: "2", name: "委屈", totalFrames: 91, sheetCount: 8 },
+    { id: "3", name: "生气", totalFrames: 109, sheetCount: 10 },
+    { id: "8", name: "惊讶", totalFrames: 91, sheetCount: 8 }
+  ];
+
+  var FRAME_SIZE = 540;
+  var FRAMES_PER_SHEET = 12;   // 4 列 × 3 行
+  var COLS = 4;
+  var FRAME_RATE = 18;
+  var RENDER_SIZE = 375;
+  var RENDER_X = Math.round((540 - RENDER_SIZE) / 2);
+  var RENDER_Y = 69;
+
+  var canvas = document.getElementById("stage");
+  var ctx = canvas.getContext("2d");
+  var emotionsEl = document.getElementById("emotions");
+  var textInput = document.getElementById("textInput");
+  var previewTextEl = document.getElementById("previewText");
+  var btnPreview = document.getElementById("btnPreview");
+  var btnShare = document.getElementById("btnShare");
+  var toastEl = document.getElementById("toast");
+
+  var current = EMOTIONS[0];
+  var sheets = [];
+  var loaded = 0;
+  var frameIndex = 0;
+  var lastFrameAt = 0;
+  var animId = null;
+
+  // 情绪按钮
+  EMOTIONS.forEach(function (emotion) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "emotion";
+    b.textContent = emotion.name;
+    b.addEventListener("click", function () { selectEmotion(emotion.id, false); });
+    emotionsEl.appendChild(b);
+  });
+
+  function refreshEmotionUI() {
+    Array.prototype.forEach.call(emotionsEl.children, function (b, i) {
+      b.classList.toggle("active", EMOTIONS[i].id === current.id);
+    });
+  }
+
+  function selectEmotion(id, updateUrl) {
+    var next = EMOTIONS.find(function (e) { return e.id === id; }) || EMOTIONS[0];
+    if (next.id !== current.id) {
+      current = next;
+      refreshEmotionUI();
+      loadSheets();
+    } else {
+      refreshEmotionUI();
+    }
+    if (updateUrl !== false) syncShareUrl();
+  }
+
+  function basePath() {
+    return "assets/video/fengxin-rabbit-sequence/" + current.id + "/";
+  }
+
+  function loadSheets() {
+    cancelAnimationFrame(animId);
+    sheets = [];
+    loaded = 0;
+    for (var i = 0; i < current.sheetCount; i++) {
+      var img = new Image();
+      img.onload = function () {
+        loaded++;
+        if (loaded === current.sheetCount) startLoop();
+      };
+      img.src = basePath() + "sheet-" + String(i).padStart(2, "0") + ".webp";
+      sheets.push(img);
+    }
+  }
+
+  function paintFrame() {
+    var sheetIndex = Math.floor(frameIndex / FRAMES_PER_SHEET);
+    var local = frameIndex % FRAMES_PER_SHEET;
+    var sx = (local % COLS) * FRAME_SIZE;
+    var sy = Math.floor(local / COLS) * FRAME_SIZE;
+    ctx.clearRect(0, 0, 540, 540);
+    var img = sheets[sheetIndex];
+    if (img && img.complete) {
+      ctx.drawImage(img, sx, sy, FRAME_SIZE, FRAME_SIZE, RENDER_X, RENDER_Y, RENDER_SIZE, RENDER_SIZE);
+    }
+  }
+
+  function startLoop() {
+    frameIndex = 0;
+    lastFrameAt = 0;
+    paintFrame();
+    cancelAnimationFrame(animId);
+    animId = requestAnimationFrame(loop);
+  }
+
+  function loop(now) {
+    if (!lastFrameAt) lastFrameAt = now;
+    if (now - lastFrameAt >= 1000 / FRAME_RATE) {
+      lastFrameAt = now;
+      frameIndex = (frameIndex + 1) % current.totalFrames;
+      paintFrame();
+    }
+    animId = requestAnimationFrame(loop);
+  }
+
+  // 文字同步
+  function syncText() {
+    previewTextEl.textContent = textInput.value;
+  }
+  textInput.addEventListener("input", function () {
+    syncText();
+    syncShareUrl();
+  });
+
+  // 分享链接
+  function shareUrl() {
+    var base = location.origin + location.pathname;
+    return base + "?e=" + encodeURIComponent(current.id) + "&t=" + encodeURIComponent(textInput.value);
+  }
+  function syncShareUrl() {
+    try { history.replaceState(null, "", shareUrl()); } catch (e) {}
+  }
+
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(function () { toastEl.classList.remove("show"); }, 1800);
+  }
+
+  function copyText(text, okMsg) {
+    var done = function () { showToast(okMsg || "链接已复制"); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text, done); });
+    } else {
+      fallbackCopy(text, done);
+    }
+  }
+  function fallbackCopy(text, done) {
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    try { document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta); done();
+  }
+
+  function doShare() {
+    var url = shareUrl();
+    var text = textInput.value || "想说的话";
+    if (navigator.share) {
+      navigator.share({ title: "情绪表达", text: text, url: url }).catch(function () {});
+    } else {
+      copyText(url, "已复制链接，可粘贴发送");
+    }
+  }
+
+  btnShare.addEventListener("click", doShare);
+  btnPreview.addEventListener("click", function () {
+    document.body.classList.toggle("preview");
+    btnPreview.textContent = document.body.classList.contains("preview") ? "返回" : "预览";
+  });
+
+  // 打开时读取分享参数
+  function initFromUrl() {
+    var p = new URLSearchParams(location.search);
+    var e = p.get("e");
+    var t = p.get("t");
+    if (e) selectEmotion(e, false);
+    if (t) { textInput.value = t; }
+    syncText();
+  }
+
+  initFromUrl();
+  refreshEmotionUI();
+  loadSheets();
+})();
+</script>
+</body>
+</html>
