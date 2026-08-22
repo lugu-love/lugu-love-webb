@@ -237,6 +237,14 @@
     try { history.replaceState(null, "", shareUrl()); } catch (e) {}
   }
 
+  function makeId() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+  function receiverUrl() {
+    var base = location.origin + location.pathname.replace(/[^/]*$/, "share.html");
+    return base + "?id=" + makeId() + "&c=fengxin-rabbit&e=" + encodeURIComponent(current.id) + "&t=" + encodeURIComponent(textInput.value) + "&n=1";
+  }
+
   function showToast(msg) {
     toastEl.textContent = msg;
     toastEl.classList.add("show");
@@ -261,7 +269,7 @@
   }
 
   function doShare() {
-    var url = shareUrl();
+    var url = receiverUrl();
     var text = textInput.value || "想说的话";
     if (navigator.share) {
       navigator.share({ title: "情绪表达", text: text, url: url }).catch(function () {});

@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0c18">
+<title>收到一份情绪表达</title>
+<style>
+  :root { --bg:#0b0c18; --card:#17192e; --ink:#eef0ff; --muted:#9aa0c3; --accent:#7d8bff; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin:0; padding:0; height:100%; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased; overflow:hidden; }
+  .app { display:flex; flex-direction:column; height:100dvh; padding:calc(env(safe-area-inset-top,0px)+16px) 18px calc(env(safe-area-inset-bottom,0px)+14px); }
+  header { text-align:center; }
+  header .from { font-size:13px; color:var(--muted); }
+  header h1 { font-size:20px; margin:6px 0 0; letter-spacing:.02em; }
+  .stage-wrap { flex:1; display:flex; align-items:center; justify-content:center; min-height:0; }
+  #stage { width:min(88vw,430px); height:auto; border-radius:18px; }
+  .message { text-align:center; font-size:19px; line-height:1.6; white-space:pre-wrap; margin:10px 0 4px; min-height:30px; }
+  .meta { text-align:center; font-size:11px; color:var(--muted); margin:2px 0 12px; }
+  .actions { display:flex; gap:10px; }
+  button { flex:1; height:50px; border-radius:14px; border:none; font-size:16px; font-weight:650; cursor:pointer; }
+  .btn-forward { background:linear-gradient(135deg,#7d8bff,#a06bff); color:#fff; }
+  .btn-reply { background:rgba(255,255,255,.08); color:var(--ink); border:1px solid rgba(255,255,255,.14); }
+  .toast { position:fixed; left:50%; bottom:96px; transform:translateX(-50%); z-index:9; padding:9px 14px; border-radius:999px;
+    background:rgba(20,22,40,.88); border:1px solid rgba(255,255,255,.16); color:#fff; font-size:12px; opacity:0; transition:opacity .25s; max-width:80vw; text-align:center; }
+  .toast.show { opacity:1; }
+</style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="from">有人发来一份情绪表达</div>
+      <h1>请查收</h1>
+    </header>
+
+    <div class="stage-wrap"><canvas id="stage" width="540" height="540"></canvas></div>
+
+    <div class="message" id="message"></div>
+    <div class="meta" id="meta"></div>
+
+    <div class="actions">
+      <button class="btn-reply" id="btnReply" type="button">回应TA</button>
+      <button class="btn-forward" id="btnForward" type="button">继续转发</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  var EMOTIONS = {
+    "1": { name: "开心", totalFrames: 73, sheetCount: 7 },
+    "2": { name: "委屈", totalFrames: 91, sheetCount: 8 },
+    "3": { name: "生气", totalFrames: 109, sheetCount: 10 },
+    "8": { name: "惊讶", totalFrames: 91, sheetCount: 8 }
+  };
+  var FRAME_SIZE = 540, FRAMES_PER_SHEET = 12, COLS = 4, FRAME_RATE = 18;
+  var RENDER_SIZE = 375, RENDER_X = Math.round((540-RENDER_SIZE)/2), RENDER_Y = 69;
+
+  var canvas = document.getElementById("stage");
+  var ctx = canvas.getContext("2d");
+  var messageEl = document.getElementById("message");
+  var metaEl = document.getElementById("meta");
+  var btnForward = document.getElementById("btnForward");
+  var btnReply = document.getElementById("btnReply");
+  var toastEl = document.getElementById("toast");
+
+  var p = new URLSearchParams(location.search);
+  var shareId = p.get("id") || "unknown";
+  var characterId = p.get("c") || "fengxin-rabbit";
+  var emotionId = p.get("e") || "1";
+  var text = p.get("t") || "";
+  var parentId = p.get("p") || "";
+  var shareCount = parseInt(p.get("n") || "1", 10) || 1;
+
+  var emotion = EMOTIONS[emotionId] || EMOTIONS["1"];
+
+  messageEl.textContent = text || "（这句心情，没有留下文字）";
+  metaEl.textContent = "情绪：" + emotion.name + (parentId ? " · 接力转发" : "") + " · 已传播 " + shareCount + " 次";
+
+  var sheets = [], loaded = 0, frameIndex = 0, lastFrameAt = 0, animId = null;
+  function basePath(){ return "assets/video/fengxin-rabbit-sequence/" + emotionId + "/"; }
+  function loadSheets(){
+    for (var i=0;i<emotion.sheetCount;i++){
+      var im = new Image();
+      im.onload = function(){ loaded++; if(loaded===emotion.sheetCount) startLoop(); };
+      im.src = basePath() + "sheet-" + String(i).padStart(2,"0") + ".webp";
+      sheets.push(im);
+    }
+  }
+  function paintFrame(){
+    var sheetIndex = Math.floor(frameIndex / FRAMES_PER_SHEET);
+    var local = frameIndex % FRAMES_PER_SHEET;
+    var sx = (local % COLS) * FRAME_SIZE;
+    var sy = Math.floor(local / COLS) * FRAME_SIZE;
+    ctx.clearRect(0,0,540,540);
+    var img = sheets[sheetIndex];
+    if (img && img.complete) ctx.drawImage(img, sx, sy, FRAME_SIZE, FRAME_SIZE, RENDER_X, RENDER_Y, RENDER_SIZE, RENDER_SIZE);
+  }
+  function startLoop(){ frameIndex=0; lastFrameAt=0; paintFrame(); cancelAnimationFrame(animId); animId=requestAnimationFrame(loop); }
+  function loop(now){ if(!lastFrameAt) lastFrameAt=now; if(now-lastFrameAt >= 1000/FRAME_RATE){ lastFrameAt=now; frameIndex=(frameIndex+1)%emotion.totalFrames; paintFrame(); } animId=requestAnimationFrame(loop); }
+
+  function makeId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+  function receiverUrl(){
+    var base = location.origin + location.pathname;  // share.html
+    return base + "?id=" + makeId() + "&c=" + encodeURIComponent(characterId) + "&e=" + encodeURIComponent(emotionId) + "&t=" + encodeURIComponent(text) + "&p=" + encodeURIComponent(shareId) + "&n=" + (shareCount + 1);
+  }
+
+  function showToast(msg){ toastEl.textContent=msg; toastEl.classList.add("show"); clearTimeout(showToast._t); showToast._t=setTimeout(function(){toastEl.classList.remove("show");},1800); }
+  function copyText(t, ok){ var done=function(){showToast(ok||"链接已复制");}; if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(done, function(){fallbackCopy(t,done);}); } else { fallbackCopy(t,done); } }
+  function fallbackCopy(t, done){ var ta=document.createElement("textarea"); ta.value=t; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.focus(); ta.select(); try{document.execCommand("copy");}catch(e){} document.body.removeChild(ta); done(); }
+
+  function doForward(){
+    var url = receiverUrl();
+    if (navigator.share) { navigator.share({ title:"情绪表达", text: text || "想说的话", url: url }).catch(function(){}); }
+    else { copyText(url, "已复制链接，可粘贴转发"); }
+  }
+
+  btnForward.addEventListener("click", doForward);
+  btnReply.addEventListener("click", function(){ showToast("回应功能即将上线，先转发给想回应的人吧"); });
+
+  loadSheets();
+})();
+</script>
+</body>
+</html>
