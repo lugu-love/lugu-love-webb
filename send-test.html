@@ -14,9 +14,9 @@
   .app { display:flex; flex-direction:column; height:100dvh; padding:calc(env(safe-area-inset-top,0px)+14px) 16px calc(env(safe-area-inset-bottom,0px)+14px); }
   header h1 { font-size:20px; margin:0; }
   header p { font-size:12px; color:var(--muted); margin:4px 0 0; }
-  .emotions { display:flex; gap:10px; margin:20px 0 12px; position:relative; z-index:30; }
-  .emotion { flex:1; padding:10px 0; border-radius:14px; border:1px solid rgba(255,255,255,.12); background:var(--card); color:var(--muted); font-size:14px; cursor:pointer; text-align:center; }
-  .emotion.active { color:#fff; border-color:var(--accent); background:rgba(125,139,255,.16); }
+  .emotions { display:flex; justify-content:center; gap:10px; margin:38px 0 14px; position:relative; z-index:30; }
+  .emotion { flex:0 1 auto; padding:10px 22px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:var(--muted); font-size:13px; font-weight:600; cursor:pointer; text-align:center; white-space:nowrap; }
+  .emotion.active { color:#fff; border-color:var(--accent); background:rgba(125,139,255,.22); box-shadow:0 0 16px rgba(125,139,255,.28); }
   .stage-wrap { display:flex; align-items:center; justify-content:center; min-height:0; pointer-events:none; }
   #stage { width:min(78vw,320px); height:auto; border-radius:18px; pointer-events:none; }
   .preview-text { text-align:center; font-size:17px; line-height:1.6; min-height:28px; margin:8px 0 4px; white-space:pre-wrap; color:#fff; }
