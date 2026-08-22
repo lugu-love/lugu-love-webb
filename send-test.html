@@ -14,11 +14,11 @@
   .app { display:flex; flex-direction:column; height:100dvh; padding:calc(env(safe-area-inset-top,0px)+14px) 16px calc(env(safe-area-inset-bottom,0px)+14px); }
   header h1 { font-size:20px; margin:0; }
   header p { font-size:12px; color:var(--muted); margin:4px 0 0; }
-  .emotions { display:flex; gap:8px; margin:12px 0 4px; }
+  .emotions { display:flex; gap:8px; margin:12px 0 4px; position:relative; z-index:30; }
   .emotion { flex:1; padding:10px 0; border-radius:14px; border:1px solid rgba(255,255,255,.12); background:var(--card); color:var(--muted); font-size:14px; cursor:pointer; text-align:center; }
   .emotion.active { color:#fff; border-color:var(--accent); background:rgba(125,139,255,.16); }
-  .stage-wrap { display:flex; align-items:center; justify-content:center; min-height:0; }
-  #stage { width:min(78vw,320px); height:auto; border-radius:18px; }
+  .stage-wrap { display:flex; align-items:center; justify-content:center; min-height:0; pointer-events:none; }
+  #stage { width:min(78vw,320px); height:auto; border-radius:18px; pointer-events:none; }
   .preview-text { text-align:center; font-size:17px; line-height:1.6; min-height:28px; margin:8px 0 4px; white-space:pre-wrap; color:#fff; }
   .editor textarea { width:100%; min-height:60px; border-radius:14px; background:var(--card); color:var(--ink); border:1px solid rgba(255,255,255,.12); padding:12px; font-size:15px; line-height:1.5; resize:none; outline:none; }
   .status { min-height:20px; margin:8px 0 0; text-align:center; font-size:13px; color:#ffd47f; }
@@ -52,6 +52,7 @@
     <div class="hint" id="hint"></div>
     <div class="diag" id="diag">诊断信息…</div>
     <div class="diag" id="preloadDiag">预加载：…</div>
+    <div class="diag" id="tapDiag">点击命中：—</div>
     <video id="videoPreview" controls playsinline hidden></video>
 
     <div class="actions">
@@ -85,6 +86,7 @@
   var videoEl=document.getElementById("videoPreview");
   var diagEl=document.getElementById("diag");
   var preloadDiagEl=document.getElementById("preloadDiag");
+  var tapDiagEl=document.getElementById("tapDiag");
   var genCount=0;
   var NO_PRELOAD = new URLSearchParams(location.search).get("nopreload") === "1";
   var lastTiming=null;
@@ -305,6 +307,12 @@
   btnOpen.addEventListener("click", openVideo);
   btnSave.addEventListener("click", saveVideo);
   btnSend.addEventListener("click", sendVideo);
+
+  document.addEventListener("click", function(e){
+    var el = document.elementFromPoint(e.clientX, e.clientY);
+    var desc = el ? (el.tagName + "." + (typeof el.className === "string" ? el.className : "").split(" ")[0]) : "null";
+    if(tapDiagEl) tapDiagEl.innerHTML = "点击命中: " + desc;
+  }, true);
 
   refreshUI();
   loadSheets();
