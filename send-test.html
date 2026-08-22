@@ -11,8 +11,9 @@
     font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;
     -webkit-font-smoothing:antialiased; overflow:hidden; }
   .app { display:flex; flex-direction:column; height:100dvh; padding:calc(env(safe-area-inset-top,0px)+12px) 16px calc(env(safe-area-inset-bottom,0px)+10px); }
-  .brand { margin:6px 0 0 22px; font-size:21px; font-weight:500; letter-spacing:.02em; color:var(--ink); }
-  .brand .heart { color:var(--ink); margin-right:6px; font-weight:400; }
+  .brand { margin:8px 0 0 20px; font-size:17px; font-weight:450; letter-spacing:.02em; color:rgba(238,240,255,.82); }
+  .brand .heart { color:rgba(238,240,255,.82); margin-right:5px; font-weight:400; }
+  .brand .heart svg { width:17px; height:15px; }
   .guide { margin:6px 0 0 2px; font-size:13px; color:rgba(238,240,255,.62); transition:opacity .2s ease; }
   .stage-wrap { display:flex; align-items:center; justify-content:center; min-height:0; pointer-events:none; margin-top:8px; }
   #stage { width:min(68vw,300px); height:auto; border-radius:18px; pointer-events:none; }
@@ -20,15 +21,18 @@
   .emotion { flex:0 1 auto; padding:10px 20px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:var(--muted); font-size:13px; font-weight:600; cursor:pointer; text-align:center; white-space:nowrap; }
   .emotion.active { color:#fff; border-color:var(--accent); background:rgba(125,139,255,.22); box-shadow:0 0 16px rgba(125,139,255,.28); }
   .suggest { align-self:flex-start; margin-top:8px; padding:6px 12px; border:1px solid rgba(255,255,255,.16); border-radius:999px; background:rgba(255,255,255,.06); color:#b8c0ff; font-size:12px; cursor:pointer; }
-  .suggest-box { display:flex; flex-direction:column; gap:6px; margin-top:8px; max-height:142px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
-  .suggest-chip { text-align:left; padding:9px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.05); color:var(--ink); font-size:13px; line-height:1.5; cursor:pointer; }
-  .suggest-chip:active { background:rgba(125,139,255,.16); }
+  .suggest-box { display:flex; flex-direction:column; margin-top:6px; max-height:132px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+  .suggest-chip { text-align:left; padding:7px 4px; border:none; background:transparent; border-bottom:1px solid rgba(255,255,255,.06); color:rgba(238,240,255,.80); font-size:13px; line-height:1.4; cursor:pointer; }
+  .suggest-chip:last-child { border-bottom:none; }
+  .suggest-chip:active { color:#fff; background:rgba(125,139,255,.10); }
+  .suggest-chip.selected { color:#fff; background:rgba(125,139,255,.12); }
   .editor textarea { width:100%; min-height:60px; border-radius:14px; background:var(--card); color:var(--ink); border:1px solid rgba(255,255,255,.12); padding:12px; font-size:15px; line-height:1.5; resize:none; outline:none; }
   .preview-text { text-align:center; font-size:14px; line-height:1.5; min-height:22px; margin:6px 0 0; white-space:pre-wrap; color:#fff; }
-  .actions { display:flex; gap:8px; margin-top:16px; flex-wrap:wrap; }
+  .cta { display:flex; justify-content:center; margin-top:18px; }
+  .success-actions { display:flex; gap:8px; margin-top:10px; }
   button { flex:1; min-width:82px; height:44px; border-radius:14px; border:none; font-size:14px; font-weight:650; cursor:pointer; }
   .btn-primary { background:linear-gradient(135deg,#7d8bff,#a06bff); color:#fff; }
-  #btnGenerate { flex:1 1 100%; height:48px; font-size:16px; }
+  #btnGenerate { width:64%; height:46px; font-size:15px; border-radius:999px; }
   .btn-secondary { background:rgba(255,255,255,.08); color:var(--ink); border:1px solid rgba(255,255,255,.14); }
   button:disabled { opacity:.55; }
   .status { min-height:18px; margin:8px 0 0; text-align:center; font-size:13px; color:#ffd47f; }
@@ -57,8 +61,10 @@
     <div class="suggest-box" id="suggestBox" hidden></div>
     <div class="preview-text" id="previewText"></div>
 
-    <div class="actions">
-      <button class="btn-primary" id="btnGenerate" type="button">生成视频</button>
+    <div class="cta">
+      <button class="btn-primary" id="btnGenerate" type="button">生成视频 →</button>
+    </div>
+    <div class="success-actions">
       <button class="btn-primary" id="btnOpen" type="button" hidden>打开视频</button>
       <button class="btn-secondary" id="btnSend" type="button" hidden>发送视频</button>
       <button class="btn-secondary" id="btnSave" type="button" hidden>保存到手机</button>
@@ -172,6 +178,7 @@
       b.type = "button";
       b.className = "suggest-chip";
       b.textContent = txt;
+      if(txt === textInput.value) b.className = "suggest-chip selected";
       b.addEventListener("click", function(){
         textInput.value = txt;
         previewTextEl.textContent = txt;
