@@ -101,7 +101,10 @@ func drawFrame(pixelBuffer: CVPixelBuffer, char: CGImage) {
 }
 
 let writer = try! AVAssetWriter(outputURL: output, fileType: .mp4)
-let vsettings: [String: Any] = [AVVideoCodecKey: AVVideoCodecType.h264, AVVideoWidthKey: W, AVVideoHeightKey: H]
+let bitrateKbps = Int(ProcessInfo.processInfo.environment["BITRATE_KBPS"] ?? "") ?? 0
+var compression: [String: Any] = [AVVideoExpectedSourceFrameRateKey: fps]
+if bitrateKbps > 0 { compression[AVVideoAverageBitRateKey] = bitrateKbps * 1000 }
+let vsettings: [String: Any] = [AVVideoCodecKey: AVVideoCodecType.h264, AVVideoWidthKey: W, AVVideoHeightKey: H, AVVideoCompressionPropertiesKey: compression]
 let vinput = AVAssetWriterInput(mediaType: .video, outputSettings: vsettings)
 let adaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: vinput, sourcePixelBufferAttributes: [
   kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32ARGB,

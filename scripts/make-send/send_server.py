@@ -20,6 +20,8 @@ MASTERS = {
 }
 
 MAX_CONCURRENT = int(os.environ.get("MAX_CONCURRENT", "2"))
+FPS = os.environ.get("FPS", "24")
+BITRATE_KBPS = os.environ.get("BITRATE_KBPS", "")
 SEM = threading.BoundedSemaphore(MAX_CONCURRENT)
 
 RATE_WINDOW = float(os.environ.get("RATE_WINDOW", "60"))
@@ -103,8 +105,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             video = fresh(".mp4"); raw = fresh(".m4a"); aac = fresh(".m4a"); final = fresh(".mp4")
 
             t0 = time.time()
-            r1 = subprocess.run([BIN_VIDEO, master, video, text, emotion_name, "720", "1280", "24", "10"],
-                                capture_output=True, text=True, timeout=240)
+            env = dict(os.environ)
+            if BITRATE_KBPS:
+                env["BITRATE_KBPS"] = BITRATE_KBPS
+            r1 = subprocess.run([BIN_VIDEO, master, video, text, emotion_name, "720", "1280", FPS, "10"],
+                                capture_output=True, text=True, timeout=240, env=env)
             log("VIDEO item=%s rc=%d took=%.2fs" % (item, r1.returncode, time.time() - t0))
             if r1.returncode != 0:
                 raise RuntimeError("video synth rc=%d" % r1.returncode)
