@@ -14,6 +14,10 @@
   .brand { margin:8px 0 0 20px; font-size:17px; font-weight:450; letter-spacing:.02em; color:rgba(238,240,255,.82); }
   .brand .heart { color:rgba(238,240,255,.82); margin-right:5px; font-weight:400; }
   .brand .heart svg { width:17px; height:15px; }
+  .brand-sub { opacity:.66; font-weight:350; margin-left:3px; }
+  .brand-a { font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; font-weight:500; letter-spacing:.02em; }
+  .brand-b { font-family:"Kaiti SC","STKaiti","KaiTi",serif; font-weight:400; letter-spacing:.01em; }
+  .brand-c { font-family:"Avenir Next","PingFang SC","Hiragino Sans GB",sans-serif; font-weight:450; letter-spacing:.015em; }
   .guide { margin:6px 0 0 2px; font-size:13px; color:rgba(238,240,255,.62); transition:opacity .2s ease; }
   .stage-wrap { display:flex; align-items:center; justify-content:center; min-height:0; pointer-events:none; margin-top:8px; }
   #stage { width:min(68vw,300px); height:auto; border-radius:18px; pointer-events:none; }
@@ -49,7 +53,7 @@
 </head>
 <body>
   <div class="app">
-    <div class="brand"><span class="heart"><svg viewBox="0 0 48 44" width="22" height="20" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M24 40.2C19.5 35.8 7.2 27.1 4.6 17.8 2.5 10.2 7.1 4.3 14 4.3c4.5 0 7.8 2.7 10 6.5 2.2-3.8 5.5-6.5 10-6.5 6.9 0 11.5 5.9 9.4 13.5C40.8 27.1 28.5 35.8 24 40.2Z"/></svg></span>七星使者 · 情绪表达</div>
+    <div class="brand" id="brand"><span class="heart"><svg viewBox="0 0 48 44" width="22" height="20" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M24 40.2C19.5 35.8 7.2 27.1 4.6 17.8 2.5 10.2 7.1 4.3 14 4.3c4.5 0 7.8 2.7 10 6.5 2.2-3.8 5.5-6.5 10-6.5 6.9 0 11.5 5.9 9.4 13.5C40.8 27.1 28.5 35.8 24 40.2Z"/></svg></span><span class="brand-main">七星使者</span><span class="brand-sub">· 情绪表达</span></div>
 
     <div class="stage-wrap"><canvas id="stage" width="540" height="540"></canvas></div>
 
@@ -140,6 +144,9 @@
   var tapDiagEl=document.getElementById("tapDiag");
   var genCount=0;
   var NO_PRELOAD = new URLSearchParams(location.search).get("nopreload") === "1";
+  var brandEl=document.getElementById("brand");
+  var brandParam = new URLSearchParams(location.search).get("brand");
+  if(brandEl && brandParam){ brandEl.classList.add("brand-" + brandParam); }
   var lastTiming=null;
   var guideEl=document.getElementById("guide");
   var btnSuggest=document.getElementById("btnSuggest");
