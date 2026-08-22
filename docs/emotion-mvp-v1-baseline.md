@@ -49,7 +49,7 @@
 
 ## 10. 回滚方式
 - 前端 Pages 仓库：`lugu-love-webb`，tag `emotion-mvp-v1`（对应 commit `8c40b3f`）。
-- 后端/脚本仓库：`lugu-love-web`，tag `emotion-mvp-v1`（含 `scripts/make-send` 与本文档）。
+- 后端/脚本仓库：同一仓库 `lugu-love-webb`，tag `emotion-mvp-v1-backend`（含 `scripts/make-send` 与本文档）。
 - 回滚命令示例：
   - Pages：`git checkout emotion-mvp-v1`
-  - 后端：`git checkout emotion-mvp-v1`
+  - 后端：`git checkout emotion-mvp-v1-backend`
