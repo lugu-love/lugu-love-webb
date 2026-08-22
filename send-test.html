@@ -17,16 +17,18 @@
   .emotions { display:flex; gap:8px; margin:14px 0 4px; }
   .emotion { flex:1; padding:10px 0; border-radius:14px; border:1px solid rgba(255,255,255,.12); background:var(--card); color:var(--muted); font-size:14px; cursor:pointer; text-align:center; }
   .emotion.active { color:#fff; border-color:var(--accent); background:rgba(125,139,255,.16); }
-  .stage-wrap { flex:1; display:flex; align-items:center; justify-content:center; min-height:0; }
-  #stage { width:min(88vw,430px); height:auto; border-radius:18px; }
+  .stage-wrap { display:flex; align-items:center; justify-content:center; min-height:0; }
+  #stage { width:min(82vw,360px); height:auto; border-radius:18px; }
   .preview-text { text-align:center; font-size:17px; line-height:1.6; min-height:28px; margin:8px 0 4px; white-space:pre-wrap; color:#fff; }
-  .editor textarea { width:100%; min-height:74px; border-radius:14px; background:var(--card); color:var(--ink); border:1px solid rgba(255,255,255,.12); padding:12px; font-size:15px; line-height:1.5; resize:none; outline:none; }
-  .editor textarea:focus { border-color:var(--accent); }
-  .progress { min-height:20px; margin:8px 0 0; text-align:center; font-size:13px; color:#ffd47f; }
-  .actions { display:flex; gap:10px; margin-top:12px; }
-  button { flex:1; height:48px; border-radius:14px; border:none; font-size:16px; font-weight:650; cursor:pointer; }
-  .btn-send { background:linear-gradient(135deg,#7d8bff,#a06bff); color:#fff; }
-  .btn-save { background:rgba(255,255,255,.08); color:var(--ink); border:1px solid rgba(255,255,255,.14); }
+  .editor textarea { width:100%; min-height:64px; border-radius:14px; background:var(--card); color:var(--ink); border:1px solid rgba(255,255,255,.12); padding:12px; font-size:15px; line-height:1.5; resize:none; outline:none; }
+  .status { min-height:20px; margin:8px 0 0; text-align:center; font-size:13px; color:#ffd47f; }
+  .status.ok { color:#a9e3a0; }
+  .status.err { color:#ff9aa6; }
+  video { width:100%; max-height:30vh; border-radius:14px; margin-top:8px; background:#000; }
+  .actions { display:flex; gap:10px; margin-top:10px; }
+  button { flex:1; height:48px; border-radius:14px; border:none; font-size:15px; font-weight:650; cursor:pointer; }
+  .btn-primary { background:linear-gradient(135deg,#7d8bff,#a06bff); color:#fff; }
+  .btn-secondary { background:rgba(255,255,255,.08); color:var(--ink); border:1px solid rgba(255,255,255,.14); }
   button:disabled { opacity:.55; }
   .toast { position:fixed; left:50%; bottom:96px; transform:translateX(-50%); z-index:9; padding:9px 14px; border-radius:999px; background:rgba(20,22,40,.88); border:1px solid rgba(255,255,255,.16); color:#fff; font-size:12px; opacity:0; transition:opacity .25s; max-width:80vw; text-align:center; }
   .toast.show { opacity:1; }
@@ -36,18 +38,20 @@
   <div class="app">
     <header>
       <h1>情绪表达 · 发送测试</h1>
-      <p>选择情绪 → 写一句话 → 生成视频 → 发送</p>
+      <p>选择情绪 → 写一句话 → 生成视频 → 预览 / 发送 / 保存</p>
     </header>
 
     <div class="emotions" id="emotions"></div>
     <div class="stage-wrap"><canvas id="stage" width="540" height="540"></canvas></div>
     <div class="preview-text" id="previewText"></div>
     <div class="editor"><textarea id="textInput" maxlength="40" placeholder="写一句话…"></textarea></div>
-    <div class="progress" id="progress"></div>
+    <div class="status" id="status"></div>
+    <video id="videoPreview" controls playsinline hidden></video>
 
     <div class="actions">
-      <button class="btn-save" id="btnSave" type="button" hidden>保存视频</button>
-      <button class="btn-send" id="btnSend" type="button">生成并发送</button>
+      <button class="btn-primary" id="btnGenerate" type="button">生成视频</button>
+      <button class="btn-secondary" id="btnSend" type="button" hidden>发送视频</button>
+      <button class="btn-secondary" id="btnSave" type="button" hidden>保存视频</button>
     </div>
   </div>
   <div class="toast" id="toast"></div>
@@ -69,14 +73,16 @@
   var emotionsEl=document.getElementById("emotions");
   var textInput=document.getElementById("textInput");
   var previewTextEl=document.getElementById("previewText");
-  var progressEl=document.getElementById("progress");
+  var statusEl=document.getElementById("status");
+  var videoEl=document.getElementById("videoPreview");
+  var btnGenerate=document.getElementById("btnGenerate");
   var btnSend=document.getElementById("btnSend");
   var btnSave=document.getElementById("btnSave");
   var toastEl=document.getElementById("toast");
 
   var current=EMOTIONS[0];
   var sheets=[], loaded=0, frameIndex=0, lastFrameAt=0, animId=null;
-  var lastFileUrl=null, lastFile=null;
+  var lastBlob=null, lastFile=null, lastUrl=null;
 
   EMOTIONS.forEach(function(e){
     var b=document.createElement("button"); b.type="button"; b.className="emotion"; b.textContent=e.name;
@@ -85,11 +91,7 @@
   });
 
   function refreshUI(){ Array.prototype.forEach.call(emotionsEl.children, function(b,i){ b.classList.toggle("active", EMOTIONS[i].id===current.id); }); }
-
-  function selectEmotion(id){
-    current = EMOTIONS.find(function(e){return e.id===id;}) || EMOTIONS[0];
-    refreshUI(); loadSheets();
-  }
+  function selectEmotion(id){ current = EMOTIONS.find(function(e){return e.id===id;}) || EMOTIONS[0]; refreshUI(); loadSheets(); }
 
   function basePath(){ return "assets/video/fengxin-rabbit-sequence/" + current.id + "/"; }
   function loadSheets(){
@@ -109,60 +111,78 @@
 
   textInput.addEventListener("input", function(){ previewTextEl.textContent=textInput.value; });
 
+  function setStatus(msg, cls){ statusEl.textContent=msg; statusEl.className="status" + (cls ? " "+cls : ""); }
   function showToast(msg){ toastEl.textContent=msg; toastEl.classList.add("show"); clearTimeout(showToast._t); showToast._t=setTimeout(function(){toastEl.classList.remove("show");},1800); }
 
-  function setProgress(msg){ progressEl.textContent=msg; }
-  function setBusy(busy){ btnSend.disabled=busy; btnSend.textContent = busy ? "生成中…" : "生成并发送"; }
-
-  function downloadFile(blob, name){
-    if(lastFileUrl) URL.revokeObjectURL(lastFileUrl);
-    lastFileUrl=URL.createObjectURL(blob);
-    var a=document.createElement("a"); a.href=lastFileUrl; a.download=name; document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function(){ URL.revokeObjectURL(lastFileUrl); }, 60000);
+  function clearGenerated(){
+    if(lastUrl) URL.revokeObjectURL(lastUrl);
+    lastBlob=null; lastFile=null; lastUrl=null;
+    videoEl.src=""; videoEl.hidden=true;
+    btnSend.hidden=true; btnSave.hidden=true;
   }
 
-  function saveVideo(){
-    if(!lastFile){ showToast("请先生成视频"); return; }
-    downloadFile(lastFile, "七星使者-" + current.name + ".mp4");
-    showToast("已保存视频，保存后可从微信发送给好友");
-  }
-
-  async function generateAndSend(){
+  async function generateVideo(){
     var text=(textInput.value||"").trim();
     if(!text){ showToast("请先写一句话"); return; }
 
-    setBusy(true); btnSave.hidden=true;
+    clearGenerated();
+    btnGenerate.disabled=true; btnGenerate.textContent="生成中…";
     var msgs=["正在生成你的情绪视频…","正在加入你的文字…","正在生成声音…","视频马上好了…"];
-    var mi=0; setProgress(msgs[0]);
-    var timer=setInterval(function(){ mi=(mi+1)%msgs.length; setProgress(msgs[mi]); }, 2600);
+    var mi=0; setStatus(msgs[0]);
+    var timer=setInterval(function(){ mi=(mi+1)%msgs.length; setStatus(msgs[mi]); }, 2600);
 
     try{
       var url=MAKE_SEND_API + "/make-send?text=" + encodeURIComponent(text) + "&item=" + encodeURIComponent(current.item);
-      var resp=await fetch(url, { cache:"no-store" });
+      var resp=await fetch(url, { cache:"no-store", mode:"cors" });
       if(!resp.ok) throw new Error("HTTP "+resp.status);
       var blob=await resp.blob();
-      if(!blob || blob.size===0) throw new Error("empty");
+      if(!blob || blob.size===0) throw new Error("empty blob");
       var file=new File([blob], "七星使者-" + current.name + ".mp4", { type:"video/mp4" });
-      lastFile=blob;
-
-      if(navigator.canShare && navigator.canShare({files:[file]})){
-        setProgress("已生成，正在打开系统分享…");
-        await navigator.share({ files:[file], title:"情绪表达", text:text });
-        setProgress("已调起系统分享，请选择微信");
-      } else {
-        setProgress("当前浏览器不支持直接发送视频文件，请点“保存视频”");
-        btnSave.hidden=false;
-      }
+      lastBlob=blob; lastFile=file;
+      lastUrl=URL.createObjectURL(blob);
+      videoEl.src=lastUrl; videoEl.hidden=false;
+      setStatus("视频生成成功", "ok");
+      btnSend.hidden=false; btnSave.hidden=false;
     } catch(err){
-      setProgress("生成或分享失败，请重试");
-      showToast("生成失败，请重试");
+      console.error("generate error:", err);
+      setStatus("视频生成失败，请重试", "err");
+      showToast("视频生成失败，请重试");
     } finally {
       clearInterval(timer);
-      setBusy(false);
+      btnGenerate.disabled=false; btnGenerate.textContent="生成视频";
     }
   }
 
-  btnSend.addEventListener("click", generateAndSend);
+  function downloadBlob(blob, name){
+    var u=URL.createObjectURL(blob);
+    var a=document.createElement("a"); a.href=u; a.download=name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(u); }, 60000);
+  }
+
+  function sendVideo(){
+    if(!lastFile){ showToast("请先生成视频"); return; }
+    if(navigator.canShare && navigator.canShare({files:[lastFile]})){
+      navigator.share({ files:[lastFile], title:"情绪表达", text:textInput.value }).then(function(){
+        setStatus("已调起系统分享，请选择微信", "ok");
+      }).catch(function(e){
+        console.error("share error:", e);
+        setStatus("视频已生成，但系统分享失败", "err");
+        showToast("视频已生成，但系统分享失败");
+      });
+    } else {
+      setStatus("当前浏览器不支持直接发送视频文件，请点“保存视频”", "err");
+      showToast("当前浏览器不支持直接发送视频文件");
+    }
+  }
+
+  function saveVideo(){
+    if(!lastBlob){ showToast("请先生成视频"); return; }
+    downloadBlob(lastBlob, "七星使者-" + current.name + ".mp4");
+    showToast("已保存视频，保存后可从微信发送给好友");
+  }
+
+  btnGenerate.addEventListener("click", generateVideo);
+  btnSend.addEventListener("click", sendVideo);
   btnSave.addEventListener("click", saveVideo);
 
   refreshUI();
