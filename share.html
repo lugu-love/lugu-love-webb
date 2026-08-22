@@ -74,6 +74,7 @@
   var text = p.get("t") || "";
   var parentId = p.get("p") || "";
   var shareCount = parseInt(p.get("n") || "1", 10) || 1;
+  var createdAt = p.get("ts") || "";
 
   var emotion = EMOTIONS[emotionId] || EMOTIONS["1"];
 
@@ -105,7 +106,7 @@
   function makeId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
   function receiverUrl(){
     var base = location.origin + location.pathname;  // share.html
-    return base + "?id=" + makeId() + "&c=" + encodeURIComponent(characterId) + "&e=" + encodeURIComponent(emotionId) + "&t=" + encodeURIComponent(text) + "&p=" + encodeURIComponent(shareId) + "&n=" + (shareCount + 1);
+    return base + "?id=" + makeId() + "&c=" + encodeURIComponent(characterId) + "&e=" + encodeURIComponent(emotionId) + "&t=" + encodeURIComponent(text) + "&p=" + encodeURIComponent(shareId) + "&n=" + (shareCount + 1) + "&ts=" + encodeURIComponent(createdAt || Date.now());
   }
 
   function showToast(msg){ toastEl.textContent=msg; toastEl.classList.add("show"); clearTimeout(showToast._t); showToast._t=setTimeout(function(){toastEl.classList.remove("show");},1800); }

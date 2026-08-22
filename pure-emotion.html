@@ -242,7 +242,7 @@
   }
   function receiverUrl() {
     var base = location.origin + location.pathname.replace(/[^/]*$/, "share.html");
-    return base + "?id=" + makeId() + "&c=fengxin-rabbit&e=" + encodeURIComponent(current.id) + "&t=" + encodeURIComponent(textInput.value) + "&n=1";
+    return base + "?id=" + makeId() + "&c=fengxin-rabbit&e=" + encodeURIComponent(current.id) + "&t=" + encodeURIComponent(textInput.value) + "&ts=" + Date.now() + "&n=1";
   }
 
   function showToast(msg) {
