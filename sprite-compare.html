@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>委屈素材减重对比</title>
+<style>
+  :root{--bg:#0b0c18;--card:#17192e;--ink:#eef0ff;--muted:#9aa0c3;}
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",Arial,sans-serif;}
+  .wrap{width:min(100vw,430px);margin:0 auto;padding:16px 12px calc(16px + env(safe-area-inset-bottom));}
+  h1{font-size:19px;margin:0 0 4px;} .sub{font-size:12px;color:var(--muted);margin:0 0 16px;}
+  .item{background:var(--card);border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:12px;margin-bottom:14px;}
+  .item h2{font-size:15px;margin:0 0 6px;} .meta{font-size:12px;color:var(--muted);margin:0 0 10px;}
+  canvas{width:100%;height:auto;border-radius:12px;background:#000;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>委屈素材减重对比</h1>
+  <p class="sub">同一情绪、同一动画，仅 sprite 分辨率 / WebP 质量不同</p>
+
+  <div class="item"><h2>A｜2160×1620（基线）</h2><p class="meta">约4.68MB</p><canvas id="cA" width="540" height="540"></canvas></div>
+  <div class="item"><h2>B｜1080×810</h2><p class="meta">约1.76MB</p><canvas id="cB" width="540" height="540"></canvas></div>
+  <div class="item"><h2>C｜720×540</h2><p class="meta">约1.03MB</p><canvas id="cC" width="540" height="540"></canvas></div>
+  <div class="item"><h2>D｜720×540 · 低质量</h2><p class="meta">约0.88MB</p><canvas id="cD" width="540" height="540"></canvas></div>
+</div>
+
+<script>
+(function(){
+  var COLS=4, ROWS=3, FRAMES_PER_SHEET=12, FRAME_RATE=18;
+  var RENDER_SIZE=375, RENDER_X=Math.round((540-RENDER_SIZE)/2), RENDER_Y=69;
+  var TOTAL_FRAMES=91, SHEET_COUNT=8;
+
+  function player(canvasId, dir, frameSize){
+    var canvas=document.getElementById(canvasId), ctx=canvas.getContext("2d");
+    var sheets=[], loaded=0, fi=0, last=0, anim=null;
+    for(var i=0;i<SHEET_COUNT;i++){
+      (function(i){ var im=new Image(); im.onload=function(){ loaded++; if(loaded===SHEET_COUNT) start(); }; im.src="assets/video/fengxin-rabbit-sequence/"+dir+"/sheet-"+String(i).padStart(2,"0")+".webp"; sheets.push(im); })(i);
+    }
+    function paint(){
+      var si=Math.floor(fi/FRAMES_PER_SHEET), li=fi%FRAMES_PER_SHEET;
+      var sx=(li%COLS)*frameSize, sy=Math.floor(li/COLS)*frameSize;
+      ctx.clearRect(0,0,540,540); var im=sheets[si];
+      if(im&&im.complete) ctx.drawImage(im,sx,sy,frameSize,frameSize,RENDER_X,RENDER_Y,RENDER_SIZE,RENDER_SIZE);
+    }
+    function start(){ fi=0; last=0; paint(); anim=requestAnimationFrame(loop); }
+    function loop(now){ if(!last) last=now; if(now-last>=1000/FRAME_RATE){ last=now; fi=(fi+1)%TOTAL_FRAMES; paint(); } anim=requestAnimationFrame(loop); }
+  }
+
+  player("cA", "2", 540);
+  player("cB", "2-b", 270);
+  player("cC", "2-c", 180);
+  player("cD", "2-cq", 180);
+})();
+</script>
+</body>
+</html>
