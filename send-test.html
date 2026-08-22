@@ -86,6 +86,7 @@
   var diagEl=document.getElementById("diag");
   var preloadDiagEl=document.getElementById("preloadDiag");
   var genCount=0;
+  var NO_PRELOAD = new URLSearchParams(location.search).get("nopreload") === "1";
   var lastTiming=null;
   var btnGenerate=document.getElementById("btnGenerate");
   var btnOpen=document.getElementById("btnOpen");
@@ -153,7 +154,7 @@
       sheets = sheetsReady;
       startLoop();
       activeUserLoad = false;
-      if(!preloadStarted){ preloadStarted = true; setTimeout(preloadNext, 800); }
+      if(!NO_PRELOAD && !preloadStarted){ preloadStarted = true; setTimeout(preloadNext, 800); }
     }, function(){
       activeUserLoad = false;
       setStatus("情绪素材加载失败，点击该情绪重试", "err");

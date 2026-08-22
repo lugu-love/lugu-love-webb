@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>委屈单独测试</title>
+<style>
+  body{margin:0;padding:0;background:#0b0c18;color:#eef0ff;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",Arial,sans-serif;}
+  .wrap{width:min(100vw,430px);margin:0 auto;padding:16px;}
+  canvas{width:100%;height:auto;background:#000;border-radius:14px;}
+  .diag{margin-top:10px;font-size:12px;color:#9aa0c3;line-height:1.7;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 style="font-size:18px">委屈单独测试</h1>
+  <canvas id="stage" width="540" height="540"></canvas>
+  <div class="diag" id="diag">加载中…</div>
+</div>
+<script>
+(function(){
+  var DIR="assets/video/fengxin-rabbit-sequence/mobile/2";
+  var FRAME_SIZE=270, FRAMES_PER_SHEET=12, COLS=4, FRAME_RATE=18;
+  var RENDER_SIZE=375, RENDER_X=Math.round((540-RENDER_SIZE)/2), RENDER_Y=69;
+  var TOTAL_FRAMES=91, SHEET_COUNT=8;
+
+  var canvas=document.getElementById("stage"), ctx=canvas.getContext("2d");
+  var diag=document.getElementById("diag");
+  var sheets=[], loaded=0, fi=0, last=0, drawCount=0, lastDraw=0, anim=null;
+
+  function renderDiag(){
+    var si=Math.floor(fi/FRAMES_PER_SHEET), li=fi%FRAMES_PER_SHEET;
+    diag.innerHTML =
+      "状态: loaded=" + loaded + "/" + SHEET_COUNT +
+      "<br>frameIndex=" + fi + " sheetIndex=" + si + " frameInSheet=" + li +
+      "<br>drawCount=" + drawCount + " 最近绘制=" + (lastDraw? (Date.now()-lastDraw)+"ms前" : "无");
+  }
+
+  function paint(){
+    var si=Math.floor(fi/FRAMES_PER_SHEET), li=fi%FRAMES_PER_SHEET;
+    var sx=(li%COLS)*FRAME_SIZE, sy=Math.floor(li/COLS)*FRAME_SIZE;
+    ctx.clearRect(0,0,540,540);
+    var im=sheets[si];
+    if(im && im.complete){
+      try{ ctx.drawImage(im, sx, sy, FRAME_SIZE, FRAME_SIZE, RENDER_X, RENDER_Y, RENDER_SIZE, RENDER_SIZE); drawCount++; lastDraw=Date.now(); }
+      catch(e){ diag.innerHTML += "<br><b>drawImage异常:</b> " + e; }
+    }
+  }
+
+  function loop(now){
+    if(!last) last=now;
+    if(now-last >= 1000/FRAME_RATE){ last=now; paint(); fi=(fi+1)%TOTAL_FRAMES; renderDiag(); }
+    anim=requestAnimationFrame(loop);
+  }
+
+  for(var i=0;i<SHEET_COUNT;i++){
+    (function(i){
+      var im=new Image();
+      im.onload=function(){ loaded++; renderDiag(); if(loaded===SHEET_COUNT){ fi=0; last=0; paint(); anim=requestAnimationFrame(loop); } };
+      im.onerror=function(){ diag.innerHTML += "<br><b>加载失败:</b> sheet-" + String(i).padStart(2,"0") + ".webp"; };
+      im.src=DIR+"/sheet-"+String(i).padStart(2,"0")+".webp";
+      sheets.push(im);
+    })(i);
+  }
+  renderDiag();
+})();
+</script>
+</body>
+</html>
