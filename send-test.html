@@ -73,7 +73,7 @@
     { id:"3", name:"生气", item:"rabbit-angry", totalFrames:109, sheetCount:10 }
   ];
 
-  var FRAME_SIZE=540, FRAMES_PER_SHEET=12, COLS=4, FRAME_RATE=18;
+  var FRAME_SIZE=270, FRAMES_PER_SHEET=12, COLS=4, FRAME_RATE=18;   // 移动端轻量 B 规格
   var RENDER_SIZE=375, RENDER_X=Math.round((540-RENDER_SIZE)/2), RENDER_Y=69;
 
   var canvas=document.getElementById("stage"), ctx=canvas.getContext("2d");
@@ -107,7 +107,7 @@
   function refreshUI(){ Array.prototype.forEach.call(emotionsEl.children, function(b,i){ b.classList.toggle("active", EMOTIONS[i].id===current.id); }); }
   function selectEmotion(id){ current = EMOTIONS.find(function(e){return e.id===id;}) || EMOTIONS[0]; refreshUI(); clearGenerated(); loadSheets(); renderDiag(); renderPreloadDiag(); }
 
-  function sheetUrl(id, i){ return "assets/video/fengxin-rabbit-sequence/" + id + "/sheet-" + String(i).padStart(2,"0") + ".webp"; }
+  function sheetUrl(id, i){ return "assets/video/fengxin-rabbit-sequence/mobile/" + id + "/sheet-" + String(i).padStart(2,"0") + ".webp"; }
 
   function ensureSheets(id, cb, errCb){
     var e = EMOTIONS.find(function(x){ return x.id === id; });
