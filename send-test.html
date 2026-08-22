@@ -14,7 +14,7 @@
   .app { display:flex; flex-direction:column; height:100dvh; padding:calc(env(safe-area-inset-top,0px)+14px) 16px calc(env(safe-area-inset-bottom,0px)+14px); }
   header h1 { font-size:20px; margin:0; }
   header p { font-size:12px; color:var(--muted); margin:4px 0 0; }
-  .emotions { display:flex; gap:8px; margin:12px 0 4px; position:relative; z-index:30; }
+  .emotions { display:flex; gap:10px; margin:20px 0 12px; position:relative; z-index:30; }
   .emotion { flex:1; padding:10px 0; border-radius:14px; border:1px solid rgba(255,255,255,.12); background:var(--card); color:var(--muted); font-size:14px; cursor:pointer; text-align:center; }
   .emotion.active { color:#fff; border-color:var(--accent); background:rgba(125,139,255,.16); }
   .stage-wrap { display:flex; align-items:center; justify-content:center; min-height:0; pointer-events:none; }
@@ -44,8 +44,8 @@
       <p>选择情绪 → 写一句话 → 生成视频</p>
     </header>
 
-    <div class="emotions" id="emotions"></div>
     <div class="stage-wrap"><canvas id="stage" width="540" height="540"></canvas></div>
+    <div class="emotions" id="emotions"></div>
     <div class="preview-text" id="previewText"></div>
     <div class="editor"><textarea id="textInput" maxlength="40" placeholder="写一句话…"></textarea></div>
     <div class="status" id="status"></div>
