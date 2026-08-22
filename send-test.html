@@ -51,6 +51,7 @@
     <div class="status" id="status"></div>
     <div class="hint" id="hint"></div>
     <div class="diag" id="diag">诊断信息…</div>
+    <div class="diag" id="preloadDiag">预加载：…</div>
     <video id="videoPreview" controls playsinline hidden></video>
 
     <div class="actions">
@@ -83,6 +84,7 @@
   var hintEl=document.getElementById("hint");
   var videoEl=document.getElementById("videoPreview");
   var diagEl=document.getElementById("diag");
+  var preloadDiagEl=document.getElementById("preloadDiag");
   var genCount=0;
   var lastTiming=null;
   var btnGenerate=document.getElementById("btnGenerate");
@@ -92,6 +94,7 @@
   var toastEl=document.getElementById("toast");
 
   var current=EMOTIONS[0];
+  var cache={}, preloadOrder=["2","3"], preloadStarted=false, activeUserLoad=false;
   var sheets=[], loaded=0, frameIndex=0, lastFrameAt=0, animId=null;
   var lastBlob=null, lastFile=null, lastUrl=null;
 
@@ -102,14 +105,67 @@
   });
 
   function refreshUI(){ Array.prototype.forEach.call(emotionsEl.children, function(b,i){ b.classList.toggle("active", EMOTIONS[i].id===current.id); }); }
-  function selectEmotion(id){ current = EMOTIONS.find(function(e){return e.id===id;}) || EMOTIONS[0]; refreshUI(); clearGenerated(); loadSheets(); renderDiag(); }
+  function selectEmotion(id){ current = EMOTIONS.find(function(e){return e.id===id;}) || EMOTIONS[0]; refreshUI(); clearGenerated(); loadSheets(); renderDiag(); renderPreloadDiag(); }
 
-  function basePath(){ return "assets/video/fengxin-rabbit-sequence/" + current.id + "/"; }
-  function loadSheets(){
-    cancelAnimationFrame(animId); sheets=[]; loaded=0;
-    for(var i=0;i<current.sheetCount;i++){
-      (function(i){ var im=new Image(); im.onload=function(){ loaded++; if(loaded===current.sheetCount) startLoop(); }; im.src=basePath()+"sheet-"+String(i).padStart(2,"0")+".webp"; sheets.push(im); })(i);
+  function sheetUrl(id, i){ return "assets/video/fengxin-rabbit-sequence/" + id + "/sheet-" + String(i).padStart(2,"0") + ".webp"; }
+
+  function ensureSheets(id, cb){
+    var e = EMOTIONS.find(function(x){ return x.id === id; });
+    var c = cache[id];
+    if(c && c.loaded){ cb(c.sheets); return; }
+    if(!c){ c = { sheets:[], loaded:false, loading:false, waiting:[] }; cache[id]=c; }
+    c.waiting.push(cb);
+    if(c.loading) return;
+    c.loading = true;
+    var done = 0;
+    for(var i=0;i<e.sheetCount;i++){
+      (function(i){
+        var im = new Image();
+        im.onload = function(){
+          c.sheets[i] = im;
+          done++;
+          if(done === e.sheetCount){
+            c.loaded = true; c.loading = false;
+            var ws = c.waiting; c.waiting = [];
+            ws.forEach(function(f){ f(c.sheets); });
+            renderPreloadDiag();
+          }
+        };
+        im.src = sheetUrl(id, i);
+      })(i);
     }
+  }
+
+  function loadSheets(){
+    cancelAnimationFrame(animId);
+    activeUserLoad = true;
+    ensureSheets(current.id, function(sheetsReady){
+      sheets = sheetsReady;
+      startLoop();
+      activeUserLoad = false;
+      if(!preloadStarted){ preloadStarted = true; setTimeout(preloadNext, 800); }
+    });
+  }
+
+  function preloadNext(){
+    if(activeUserLoad) return;
+    if(preloadOrder.length === 0) return;
+    var id = preloadOrder.shift();
+    renderPreloadDiag();
+    ensureSheets(id, function(){
+      renderPreloadDiag();
+      preloadNext();
+    });
+  }
+
+  function renderPreloadDiag(){
+    var parts = ["<b>预加载:</b>"];
+    EMOTIONS.forEach(function(e){
+      var c = cache[e.id];
+      var st = (e.id === current.id) ? "显示中" : (c && c.loaded ? "ready" : (c && c.loading ? "loading" : "等待"));
+      parts.push(e.name + "=" + st);
+    });
+    if(preloadDiagEl) preloadDiagEl.innerHTML = parts.join(" ");
   }
   function paintFrame(){
     var sheetIndex=Math.floor(frameIndex/FRAMES_PER_SHEET), local=frameIndex%FRAMES_PER_SHEET;
@@ -238,6 +294,7 @@
   refreshUI();
   loadSheets();
   renderDiag();
+  renderPreloadDiag();
 })();
 </script>
 </body>
