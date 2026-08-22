@@ -18,7 +18,9 @@ def _ffmpeg_path():
 
 
 os.environ.setdefault("FFMPEG_BIN", _ffmpeg_path())
-os.environ.setdefault("FONT_PATH", os.environ.get("TEST_FONT", "/tmp/noto/NotoSansCJKsc-Regular.otf"))
+os.environ.setdefault("FONT_FILE", os.environ.get("TEST_FONT", "/tmp/noto/NotoSansCJKsc-Regular.otf"))
+os.environ.setdefault("FONT_INDEX", "0")
+os.environ.pop("FONT_FC", None)
 
 import server  # noqa: E402
 

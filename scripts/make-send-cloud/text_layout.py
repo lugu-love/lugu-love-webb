@@ -1,7 +1,6 @@
 """按真实字体宽度进行中文/混合文本自动换行与排版。"""
 from PIL import ImageFont
 
-# 本轮明确不支持的字符：emoji / 旗帜 / 变体选择符 / ZWJ / tag 字符
 EMOJI_RANGES = [
     (0x1F000, 0x1FAFF),
     (0x1F1E6, 0x1F1FF),
@@ -45,16 +44,17 @@ def wrap_text(text, font, max_width):
     return lines
 
 
-def layout_lines(text, font_path, base_size, safe_width, max_height, line_spacing, min_size=34):
+def layout_lines(text, font_path, base_size, safe_width, max_height, line_spacing,
+                 min_size=34, font_index=0):
     size = base_size
     while size >= min_size:
-        font = load_font(font_path, size)
+        font = load_font(font_path, size, font_index)
         lines = wrap_text(text, font, safe_width)
         block_h = len(lines) * size + (len(lines) - 1) * line_spacing
         if block_h <= max_height:
             return lines, size, block_h
         size -= 2
-    font = load_font(font_path, size)
+    font = load_font(font_path, size, font_index)
     lines = wrap_text(text, font, safe_width)
     block_h = len(lines) * size + (len(lines) - 1) * line_spacing
     return lines, size, block_h

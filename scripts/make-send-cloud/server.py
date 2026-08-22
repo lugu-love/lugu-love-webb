@@ -21,7 +21,9 @@ from tts_provider import make_tts_provider
 ROOT = os.path.dirname(os.path.abspath(__file__))
 MASTERS_DIR = os.path.join(ROOT, "masters")
 FFMPEG = os.environ.get("FFMPEG_BIN", "ffmpeg")
-FONT_PATH = os.environ.get("FONT_PATH", "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc")
+FONT_FILE = os.environ.get("FONT_FILE", "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc")
+FONT_INDEX = int(os.environ.get("FONT_INDEX", "2"))
+FONT_FC = os.environ.get("FONT_FC", "Noto Sans CJK SC")
 
 # 当前 MVP 三情绪白名单；母版文件名与情绪名称
 MASTERS = {
@@ -68,17 +70,25 @@ def rate_ok(ip):
     return True
 
 
+def _font_selector():
+    fc = os.environ.get("FONT_FC", "")
+    if fc:
+        return "font='%s'" % fc
+    return "fontfile='%s'" % FONT_FILE
+
+
 def _build_filter(line_files, font_size, y_top):
     parts = []
     n = len(line_files)
+    sel = _font_selector()
     for i, lf in enumerate(line_files):
         y = y_top + i * (font_size + LINE_SPACING)
         in_label = "[0:v]" if i == 0 else "[v%d]" % (i - 1)
         out_label = "[v%d]" % i
         parts.append(
-            "%sdrawtext=fontfile='%s':textfile='%s':fontcolor=0xFFF2DB:fontsize=%d:"
+            "%sdrawtext=%s:textfile='%s':fontcolor=0xFFF2DB:fontsize=%d:"
             "x=(w-text_w)/2:y=%d:bordercolor=0x2A1608@0.7:borderw=2%s"
-            % (in_label, FONT_PATH, lf, font_size, y, out_label)
+            % (in_label, sel, lf, font_size, y, out_label)
         )
     return ";".join(parts), "[v%d]" % (n - 1)
 
@@ -93,7 +103,8 @@ def generate(item, text, workdir, tts=None):
     # 1) 真实字体测量 + 自动换行 + 自动缩号
     t0 = time.time()
     lines, font_size, block_h = layout_lines(
-        text, FONT_PATH, BASE_FONT_SIZE, SAFE_WIDTH, MAX_HEIGHT, LINE_SPACING
+        text, FONT_FILE, BASE_FONT_SIZE, SAFE_WIDTH, MAX_HEIGHT, LINE_SPACING,
+        font_index=FONT_INDEX
     )
     y_top = H - COPY_TOP
     line_files = []
@@ -228,7 +239,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
 def main():
     port = int(os.environ.get("PORT", "8000"))
     log("start port=%d concurrent=%d masters=%s font=%s ffmpeg=%s"
-        % (port, MAX_CONCURRENT, MASTERS_DIR, FONT_PATH, FFMPEG))
+        % (port, MAX_CONCURRENT, MASTERS_DIR, FONT_FILE, FFMPEG))
     httpd = http.server.ThreadingHTTPServer(("0.0.0.0", port), Handler)
     httpd.serve_forever()
 

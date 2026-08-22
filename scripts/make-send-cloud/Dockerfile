@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         fonts-noto-cjk \
         fontconfig \
         libfreetype6 \
+    && fc-cache -f \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -16,7 +17,9 @@ COPY server.py tts_provider.py text_layout.py ./
 COPY masters/ ./masters/
 
 ENV PORT=8000 \
-    FONT_PATH=/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc \
+    FONT_FILE=/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc \
+    FONT_INDEX=2 \
+    FONT_FC="Noto Sans CJK SC" \
     FFMPEG_BIN=ffmpeg \
     TTS_PROVIDER=edge-tts \
     FPS=18 \
