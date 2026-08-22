@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0c18">
+<title>七星使者 · 情绪表达</title>
+<style>  :root { --bg:#0b0c18; --card:#17192e; --ink:#eef0ff; --muted:#9aa0c3; --accent:#7d8bff; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { margin:0; padding:0; height:100%; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased; overflow:hidden; }
+  .app { display:flex; flex-direction:column; height:100dvh; padding:calc(env(safe-area-inset-top,0px)+12px) 16px calc(env(safe-area-inset-bottom,0px)+10px); }
+  .brand { margin:8px 0 0 20px; font-size:17px; font-weight:450; letter-spacing:.02em; color:rgba(238,240,255,.82); }
+  .brand .heart { color:rgba(238,240,255,.82); margin-right:5px; font-weight:400; }
+  .brand .heart svg { width:17px; height:15px; }
+  .brand-sub { opacity:.66; font-weight:350; margin-left:3px; }
+  .brand-a { font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; font-weight:500; letter-spacing:.02em; }
+  .brand-b { font-family:"Kaiti SC","STKaiti","KaiTi",serif; font-weight:400; letter-spacing:.01em; }
+  .brand-c { font-family:"Avenir Next","PingFang SC","Hiragino Sans GB",sans-serif; font-weight:450; letter-spacing:.015em; }
+  .guide { margin:6px 0 0 16px; font-size:13px; color:rgba(207,198,235,.58); transition:opacity .2s ease; }
+  .stage-wrap { display:flex; align-items:center; justify-content:center; min-height:0; pointer-events:none; margin-top:8px; }
+  #stage { width:min(68vw,300px); height:auto; border-radius:18px; pointer-events:none; }
+  .emotions { display:flex; justify-content:center; gap:20px; margin:18px 0 10px; position:relative; z-index:30; }
+  .emotion { flex:0 1 auto; padding:10px 20px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:var(--muted); font-size:13px; font-weight:600; cursor:pointer; text-align:center; white-space:nowrap; }
+  .emotion.active { color:#fff; border-color:var(--accent); background:rgba(125,139,255,.22); box-shadow:0 0 16px rgba(125,139,255,.28); }
+  .suggest { align-self:flex-start; margin-top:8px; margin-left:16px; padding:6px 12px; border:1px solid rgba(255,255,255,.16); border-radius:999px; background:rgba(255,255,255,.06); color:#b8c0ff; font-size:12px; cursor:pointer; }
+  .suggest-box { display:flex; flex-direction:column; margin-top:6px; padding:0 16px; max-height:132px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+  .suggest-chip { display:flex; align-items:flex-start; gap:9px; text-align:left; padding:11px 0; border:none; background:transparent; border-bottom:1px solid rgba(255,255,255,.06); color:rgba(224,218,240,.82); font-size:13px; line-height:1.4; cursor:pointer; }
+  .suggest-chip:last-child { border-bottom:none; }
+  .suggest-chip:active { color:#fff; background:rgba(125,139,255,.10); }
+  .suggest-chip.selected { color:#fff; background:rgba(125,139,255,.10); }
+  .suggest-chip .star { color:rgba(150,140,190,.48); font-size:11px; line-height:1.5; transform:translateY(1px); flex:0 0 auto; }
+  .suggest-chip .txt { flex:1; }
+  .editor textarea { width:100%; min-height:60px; border-radius:14px; background:#12142a; color:#fff; border:1px solid rgba(255,255,255,.10); padding:12px 12px 12px 18px; font-size:15px; line-height:1.5; resize:none; outline:none; }
+  .preview-text { text-align:center; font-size:14px; line-height:1.5; min-height:22px; margin:6px 0 0; white-space:pre-wrap; color:#fff; }
+  .cta { display:flex; justify-content:center; margin-top:18px; }
+  .success-actions { display:flex; gap:8px; margin-top:10px; }
+  button { flex:1; min-width:82px; height:44px; border-radius:14px; border:none; font-size:14px; font-weight:650; cursor:pointer; }
+  .btn-primary { background:linear-gradient(135deg,#7d8bff,#a06bff); color:#fff; }
+  #btnGenerate { width:50%; height:44px; font-size:15px; border-radius:14px; background:rgba(125,139,255,.16); color:rgba(238,240,255,.92); border:1px solid rgba(125,139,255,.20); box-shadow:none; }
+  .btn-secondary { background:rgba(255,255,255,.08); color:var(--ink); border:1px solid rgba(255,255,255,.14); }
+  button:disabled { opacity:.55; }
+  .status { min-height:18px; margin:8px 0 0; text-align:center; font-size:13px; color:#ffd47f; }
+  .status.ok { color:#a9e3a0; }
+  .status.err { color:#ff9aa6; }
+  .hint { min-height:14px; margin:4px 0 0; text-align:center; font-size:12px; color:var(--muted); }
+  video { width:100%; max-height:30vh; border-radius:14px; margin-top:8px; background:#000; }
+  .toast { position:fixed; left:50%; bottom:90px; transform:translateX(-50%); z-index:9; padding:9px 14px; border-radius:999px; background:rgba(20,22,40,.88); border:1px solid rgba(255,255,255,.16); color:#fff; font-size:12px; opacity:0; transition:opacity .25s; max-width:80vw; text-align:center; }
+  .toast.show { opacity:1; }
+  .debug { margin-top:8px; font-size:11px; color:rgba(255,255,255,.35); border-top:1px solid rgba(255,255,255,.06); padding-top:4px; }
+  .debug summary { cursor:pointer; padding:3px 0; font-size:11px; color:rgba(255,255,255,.35); }
+  .diag { margin-top:6px; padding:8px 10px; border:1px solid rgba(255,255,255,.12); border-radius:10px; background:rgba(0,0,0,.22); font-size:11px; color:var(--muted); line-height:1.6; word-break:break-all; }
+  .diag b { color:#b8c0ff; }</style>
+</head>
+<body>
+  <div class="app">
+    <div class="brand" id="brand"><span class="heart"><svg viewBox="0 0 48 44" width="22" height="20" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M24 40.2C19.5 35.8 7.2 27.1 4.6 17.8 2.5 10.2 7.1 4.3 14 4.3c4.5 0 7.8 2.7 10 6.5 2.2-3.8 5.5-6.5 10-6.5 6.9 0 11.5 5.9 9.4 13.5C40.8 27.1 28.5 35.8 24 40.2Z"/></svg></span><span class="brand-main">七星使者</span><span class="brand-sub">· 情绪表达</span></div>
+
+    <div class="stage-wrap"><canvas id="stage" width="540" height="540"></canvas></div>
+
+    <div class="emotions" id="emotions"></div>
+
+    <div class="editor"><textarea id="textInput" maxlength="40" placeholder="写一句话…"></textarea></div>
+    <div class="guide" id="guide"></div>
+    <button class="suggest" id="btnSuggest" type="button">✨ 帮我选一句</button>
+    <div class="suggest-box" id="suggestBox" hidden></div>
+    <div class="preview-text" id="previewText"></div>
+
+    <div class="cta">
+      <button class="btn-primary" id="btnGenerate" type="button">生成视频 →</button>
+    </div>
+    <div class="success-actions">
+      <button class="btn-primary" id="btnOpen" type="button" hidden>打开视频</button>
+      <button class="btn-secondary" id="btnSend" type="button" hidden>发送视频</button>
+      <button class="btn-secondary" id="btnSave" type="button" hidden>保存到手机</button>
+    </div>
+
+    <div class="status" id="status"></div>
+    <div class="hint" id="hint"></div>
+    <video id="videoPreview" controls playsinline hidden></video>
+
+    <details class="debug" id="debugDetails">
+      <summary>调试</summary>
+      <div class="diag" id="diag">诊断信息…</div>
+      <div class="diag" id="preloadDiag">预加载：…</div>
+      <div class="diag" id="tapDiag">点击命中：—</div>
+    </details>
+  </div>
+  <div class="toast" id="toast"></div>
+
+
+
+<script>
+(function () {
+  var MAKE_SEND_API = "https://lugu-love-webb-production.up.railway.app";
+
+  var EMOTIONS = [
+    { id:"1", name:"开心", item:"rabbit-happy", totalFrames:73, sheetCount:7 },
+    { id:"2", name:"委屈", item:"rabbit-aggrieved", totalFrames:91, sheetCount:8 },
+    { id:"3", name:"生气", item:"rabbit-angry", totalFrames:109, sheetCount:10 }
+  ];
+
+  var GUIDES = {
+    "1": "把这份开心，说给你想分享的人。",
+    "2": "有些委屈，不知道怎么说也没关系。",
+    "3": "把不开心说出来，也是一种表达。"
+  };
+
+  var SUGGESTIONS = {
+    "1": [
+      "今天心情不错，想把这份开心也分给你。",
+      "今天有点开心，忍不住想告诉你。",
+      "嘿，今天的快乐有点藏不住了。",
+      "没什么大事，就是突然觉得今天挺美好。",
+      "今天想笑，也想让你跟着笑一下。"
+    ],
+    "2": [
+      "我没事，就是有一点想被抱抱。",
+      "嘴上说没事，其实还是有一点难过。",
+      "今天不想讲道理，只想被哄一下。",
+      "我不是生气，我只是有点委屈。",
+      "如果你愿意，抱抱我就好了。"
+    ],
+    "3": [
+      "我现在真的有点生气，让我缓一缓。",
+      "这次我是真的不开心了。",
+      "我不是故意凶，我只是现在有点气。",
+      "有些话我不想憋着，这次真的让我不舒服。",
+      "我先气一会儿，等我消消气再说。"
+    ]
+  };
+
+  var FRAME_SIZE=270, FRAMES_PER_SHEET=12, COLS=4, FRAME_RATE=18;   // 移动端轻量 B 规格
+  var RENDER_SIZE=375, RENDER_X=Math.round((540-RENDER_SIZE)/2), RENDER_Y=69;
+
+  var canvas=document.getElementById("stage"), ctx=canvas.getContext("2d");
+  var emotionsEl=document.getElementById("emotions");
+  var textInput=document.getElementById("textInput");
+  var previewTextEl=document.getElementById("previewText");
+  var statusEl=document.getElementById("status");
+  var hintEl=document.getElementById("hint");
+  var videoEl=document.getElementById("videoPreview");
+  var diagEl=document.getElementById("diag");
+  var preloadDiagEl=document.getElementById("preloadDiag");
+  var tapDiagEl=document.getElementById("tapDiag");
+  var genCount=0;
+  var NO_PRELOAD = new URLSearchParams(location.search).get("nopreload") === "1";
+  var brandEl=document.getElementById("brand");
+  var brandParam = new URLSearchParams(location.search).get("brand");
+  if(brandEl && brandParam){ brandEl.classList.add("brand-" + brandParam); }
+  var lastTiming=null;
+  var guideEl=document.getElementById("guide");
+  var btnSuggest=document.getElementById("btnSuggest");
+  var suggestBox=document.getElementById("suggestBox");
+  var btnGenerate=document.getElementById("btnGenerate");
+  var btnOpen=document.getElementById("btnOpen");
+  var btnSave=document.getElementById("btnSave");
+  var btnSend=document.getElementById("btnSend");
+  var toastEl=document.getElementById("toast");
+
+  var current=EMOTIONS[0];
+  var cache={}, preloadOrder=["2","3"], preloadStarted=false, activeUserLoad=false;
+  var sheets=[], loaded=0, frameIndex=0, lastFrameAt=0, animId=null;
+  var lastBlob=null, lastFile=null, lastUrl=null;
+
+  EMOTIONS.forEach(function(e){
+    var b=document.createElement("button"); b.type="button"; b.className="emotion"; b.textContent=e.name;
+    b.addEventListener("click", function(){ selectEmotion(e.id); });
+    emotionsEl.appendChild(b);
+  });
+
+  function refreshUI(){ Array.prototype.forEach.call(emotionsEl.children, function(b,i){ b.classList.toggle("active", EMOTIONS[i].id===current.id); }); }
+  function selectEmotion(id){ current = EMOTIONS.find(function(e){return e.id===id;}) || EMOTIONS[0]; refreshUI(); clearGenerated(); loadSheets(); renderDiag(); renderPreloadDiag(); renderSuggest(); renderGuide(); }
+
+  function renderGuide(){
+    var txt = GUIDES[current.id] || "";
+    guideEl.style.opacity = 0;
+    setTimeout(function(){ guideEl.textContent = txt; guideEl.style.opacity = 1; }, 80);
+  }
+
+  function renderSuggest(){
+    var list = SUGGESTIONS[current.id] || [];
+    suggestBox.innerHTML = "";
+    list.forEach(function(txt){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "suggest-chip";
+      b.innerHTML = '<span class="star">✦</span><span class="txt"></span>';
+      b.querySelector(".txt").textContent = txt;
+      if(txt === textInput.value) b.className = "suggest-chip selected";
+      b.addEventListener("click", function(){
+        textInput.value = txt;
+        previewTextEl.textContent = txt;
+        suggestBox.hidden = true;
+      });
+      suggestBox.appendChild(b);
+    });
+  }
+
+  function sheetUrl(id, i){ return "assets/video/fengxin-rabbit-sequence/mobile/" + id + "/sheet-" + String(i).padStart(2,"0") + ".webp"; }
+
+  function ensureSheets(id, cb, errCb){
+    var e = EMOTIONS.find(function(x){ return x.id === id; });
+    var c = cache[id];
+    if(c && c.state === "ready"){ cb(c.sheets); return; }
+    if(!c){ c = { sheets:[], state:"idle", sheetState:[], waiting:[], errWaiting:[], done:0 }; cache[id]=c; }
+    c.waiting.push(cb);
+    if(errCb) c.errWaiting.push(errCb);
+    if(c.state === "loading") return;
+
+    // error 或 idle 都允许重新加载（用户点击可重试）
+    c.state = "loading"; c.done = 0; c.sheets = []; c.sheetState = [];
+    for(var i=0;i<e.sheetCount;i++){
+      c.sheetState[i] = "loading";
+      (function(i){
+        var im = new Image();
+        im.onload = function(){
+          c.sheets[i] = im; c.sheetState[i] = "ready"; c.done++;
+          if(c.done === e.sheetCount){ c.state = "ready"; flushSheets(c, true); }
+        };
+        im.onerror = function(){
+          c.sheetState[i] = "error"; c.state = "error"; flushSheets(c, false);
+        };
+        im.src = sheetUrl(id, i);
+      })(i);
+    }
+    clearTimeout(c.timer);
+    c.timer = setTimeout(function(){ if(c.state === "loading"){ c.state = "error"; flushSheets(c, false); } }, 30000);
+  }
+
+  function flushSheets(c, ok){
+    var ws = c.waiting; c.waiting = [];
+    var es = c.errWaiting; c.errWaiting = [];
+    if(ok){ ws.forEach(function(f){ f(c.sheets); }); }
+    else { es.forEach(function(f){ f(); }); }
+    renderPreloadDiag();
+  }
+
+  function loadSheets(){
+    cancelAnimationFrame(animId);
+    activeUserLoad = true;
+    ensureSheets(current.id, function(sheetsReady){
+      sheets = sheetsReady;
+      startLoop();
+      activeUserLoad = false;
+      if(!NO_PRELOAD && !preloadStarted){ preloadStarted = true; setTimeout(preloadNext, 800); }
+    }, function(){
+      activeUserLoad = false;
+      setStatus("情绪素材加载失败，点击该情绪重试", "err");
+    });
+  }
+
+  function preloadNext(){
+    if(activeUserLoad) return;
+    if(preloadOrder.length === 0) return;
+    var id = preloadOrder.shift();
+    ensureSheets(id, function(){ preloadNext(); }, function(){ preloadNext(); });
+  }
+
+  function renderPreloadDiag(){
+    var parts = ["<b>预加载:</b>"];
+    EMOTIONS.forEach(function(e){
+      var c = cache[e.id];
+      var st = (e.id === current.id) ? "显示中" : (c ? c.state : "等待");
+      parts.push(e.name + "=" + st);
+    });
+    // 当前情绪的逐张状态
+    var cur = cache[current.id];
+    if(cur && cur.sheetState && cur.sheetState.length){
+      parts.push("&nbsp;·&nbsp;" + current.name + "明细:[" + cur.sheetState.join(" ") + "]");
+    }
+    if(preloadDiagEl) preloadDiagEl.innerHTML = parts.join(" ");
+  }
+  function paintFrame(){
+    var sheetIndex=Math.floor(frameIndex/FRAMES_PER_SHEET), local=frameIndex%FRAMES_PER_SHEET;
+    var sx=(local%COLS)*FRAME_SIZE, sy=Math.floor(local/COLS)*FRAME_SIZE;
+    ctx.clearRect(0,0,540,540); var img=sheets[sheetIndex];
+    if(img&&img.complete) ctx.drawImage(img,sx,sy,FRAME_SIZE,FRAME_SIZE,RENDER_X,RENDER_Y,RENDER_SIZE,RENDER_SIZE);
+  }
+  function startLoop(){ frameIndex=0; lastFrameAt=0; paintFrame(); cancelAnimationFrame(animId); animId=requestAnimationFrame(loop); }
+  function loop(now){ if(!lastFrameAt) lastFrameAt=now; if(now-lastFrameAt>=1000/FRAME_RATE){ lastFrameAt=now; frameIndex=(frameIndex+1)%current.totalFrames; paintFrame(); } animId=requestAnimationFrame(loop); }
+
+  textInput.addEventListener("input", function(){ previewTextEl.textContent=textInput.value; });
+
+  function setStatus(msg, cls){ statusEl.textContent=msg; statusEl.className="status" + (cls ? " "+cls : ""); }
+  function setHint(msg){ hintEl.textContent=msg || ""; }
+  function showToast(msg){ toastEl.textContent=msg; toastEl.classList.add("show"); clearTimeout(showToast._t); showToast._t=setTimeout(function(){toastEl.classList.remove("show");},1800); }
+
+  function renderDiag(){
+    var ua = navigator.userAgent || "";
+    var lines = [
+      "<b>UA:</b> " + ua,
+      "<b>情绪:</b> " + current.name + " (id=" + current.id + ", item=" + current.item + ")",
+      "<b>生成次数:</b> " + genCount,
+      "<b>预览src:</b> " + (lastUrl ? "(Blob MP4)" : "无")
+    ];
+    if(lastTiming){
+      lines.push("<b>耗时:</b> fetch=" + lastTiming.fetchMs + "ms blob=" + lastTiming.blobMs + "ms 总=" + lastTiming.totalMs + "ms");
+    }
+    diagEl.innerHTML = lines.join("<br>");
+  }
+
+  function clearGenerated(){
+    if(lastUrl){ URL.revokeObjectURL(lastUrl); lastUrl=null; }
+    lastBlob=null; lastFile=null;
+    videoEl.pause();
+    videoEl.removeAttribute("src");
+    videoEl.load();
+    videoEl.hidden=true;
+    btnOpen.hidden=true; btnSave.hidden=true; btnSend.hidden=true;
+    setHint("");
+  }
+
+  async function generateVideo(){
+    var text=(textInput.value||"").trim();
+    if(!text){ showToast("请先写一句话"); return; }
+
+    clearGenerated();
+    genCount++;
+    var tClick = performance.now();
+    btnGenerate.disabled=true; btnGenerate.textContent="生成中…";
+    var msgs=["正在生成你的情绪视频…","正在加入你的文字…","正在生成声音…","视频马上好了…"];
+    var mi=0; setStatus(msgs[0]); setHint("");
+    var timer=setInterval(function(){ mi=(mi+1)%msgs.length; setStatus(msgs[mi]); }, 2600);
+
+    try{
+      var tFetchStart = performance.now();
+      var url=MAKE_SEND_API + "/make-send?text=" + encodeURIComponent(text) + "&item=" + encodeURIComponent(current.item);
+      var resp=await fetch(url, { cache:"no-store", mode:"cors" });
+      var tHeaders = performance.now();
+      if(!resp.ok) throw new Error("HTTP "+resp.status);
+      var blob=await resp.blob();
+      var tBlob = performance.now();
+      if(!blob || blob.size===0) throw new Error("empty blob");
+      var file=new File([blob], "七星使者-" + current.name + ".mp4", { type:"video/mp4" });
+      lastBlob=blob; lastFile=file;
+      lastUrl=URL.createObjectURL(blob);
+      videoEl.src=lastUrl; videoEl.hidden=false;
+      var tDone = performance.now();
+      lastTiming = { fetchMs: Math.round(tHeaders-tFetchStart), blobMs: Math.round(tBlob-tHeaders), totalMs: Math.round(tDone-tClick) };
+      setStatus("视频生成成功", "ok");
+      setHint("视频已生成，保存后可从微信选择该视频发送。");
+      btnOpen.hidden=false; btnSave.hidden=false;
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        btnSend.hidden=false;
+      }
+    } catch(err){
+      console.error("generate error:", err);
+      setStatus("视频生成失败，请重试", "err");
+      showToast("视频生成失败，请重试");
+    } finally {
+      clearInterval(timer);
+      btnGenerate.disabled=false; btnGenerate.textContent="生成视频";
+      renderDiag();
+    }
+  }
+
+  function openVideo(){
+    if(!lastUrl){ showToast("请先生成视频"); return; }
+    videoEl.hidden=false; videoEl.play && videoEl.play().catch(function(){});
+    setHint("可直接在上方播放查看；如需发送，请保存到手机后从微信选择该视频。");
+  }
+
+  function downloadBlob(blob, name){
+    var u=URL.createObjectURL(blob);
+    var a=document.createElement("a"); a.href=u; a.download=name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(u); }, 60000);
+  }
+
+  function saveVideo(){
+    if(!lastBlob){ showToast("请先生成视频"); return; }
+    downloadBlob(lastBlob, "七星使者-" + current.name + ".mp4");
+    setStatus("视频已保存", "ok");
+    setHint("已保存到手机；若找不到，可在浏览器下载记录中打开。");
+  }
+
+  function sendVideo(){
+    if(!lastFile){ showToast("请先生成视频"); return; }
+    if(navigator.canShare && navigator.canShare({files:[lastFile]})){
+      navigator.share({ files:[lastFile], title:"情绪表达", text:textInput.value }).then(function(){
+        setStatus("已调起系统分享", "ok");
+      }).catch(function(e){
+        console.error("share error:", e);
+        setStatus("视频已生成，但系统分享失败", "err");
+        setHint("请点“保存到手机”后从微信发送。");
+      });
+    } else {
+      setStatus("当前浏览器不支持直接发送视频文件", "err");
+      setHint("请点“保存到手机”后从微信发送。");
+    }
+  }
+
+  btnSuggest.addEventListener("click", function(){
+    if(suggestBox.hidden){
+      renderSuggest();
+      suggestBox.hidden = false;
+    } else {
+      suggestBox.hidden = true;
+    }
+  });
+
+  btnGenerate.addEventListener("click", generateVideo);
+  btnOpen.addEventListener("click", openVideo);
+  btnSave.addEventListener("click", saveVideo);
+  btnSend.addEventListener("click", sendVideo);
+
+  document.addEventListener("click", function(e){
+    var el = document.elementFromPoint(e.clientX, e.clientY);
+    var desc = el ? (el.tagName + "." + (typeof el.className === "string" ? el.className : "").split(" ")[0]) : "null";
+    if(tapDiagEl) tapDiagEl.innerHTML = "点击命中: " + desc;
+  }, true);
+
+  refreshUI();
+  loadSheets();
+  renderDiag();
+  renderPreloadDiag();
+  renderGuide();
+})();
+</script>
+</body>
+</html>
