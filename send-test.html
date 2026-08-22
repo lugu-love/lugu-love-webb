@@ -102,7 +102,7 @@
   });
 
   function refreshUI(){ Array.prototype.forEach.call(emotionsEl.children, function(b,i){ b.classList.toggle("active", EMOTIONS[i].id===current.id); }); }
-  function selectEmotion(id){ current = EMOTIONS.find(function(e){return e.id===id;}) || EMOTIONS[0]; refreshUI(); loadSheets(); renderDiag(); }
+  function selectEmotion(id){ current = EMOTIONS.find(function(e){return e.id===id;}) || EMOTIONS[0]; refreshUI(); clearGenerated(); loadSheets(); renderDiag(); }
 
   function basePath(){ return "assets/video/fengxin-rabbit-sequence/" + current.id + "/"; }
   function loadSheets(){
@@ -141,9 +141,12 @@
   }
 
   function clearGenerated(){
-    if(lastUrl) URL.revokeObjectURL(lastUrl);
-    lastBlob=null; lastFile=null; lastUrl=null;
-    videoEl.src=""; videoEl.hidden=true;
+    if(lastUrl){ URL.revokeObjectURL(lastUrl); lastUrl=null; }
+    lastBlob=null; lastFile=null;
+    videoEl.pause();
+    videoEl.removeAttribute("src");
+    videoEl.load();
+    videoEl.hidden=true;
     btnOpen.hidden=true; btnSave.hidden=true; btnSend.hidden=true;
     setHint("");
   }
