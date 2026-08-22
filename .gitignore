@@ -1,1 +1,4 @@
 .DS_Store
+
+# compiled make-send binaries (rebuild with swiftc)
+scripts/make-send/bin/
