@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>视频参数对比</title>
+<style>
+  :root { --bg:#0b0c18; --card:#17192e; --ink:#eef0ff; --muted:#9aa0c3; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; padding:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",Arial,sans-serif; }
+  .wrap { width:min(100vw,430px); margin:0 auto; padding:18px 14px calc(18px + env(safe-area-inset-bottom)); }
+  h1 { font-size:20px; margin:0 0 4px; }
+  p.sub { font-size:12px; color:var(--muted); margin:0 0 18px; }
+  .item { background:var(--card); border:1px solid rgba(255,255,255,.10); border-radius:16px; padding:12px; margin-bottom:14px; }
+  .item h2 { font-size:17px; margin:0 0 6px; }
+  .meta { font-size:12px; color:var(--muted); margin:0 0 10px; line-height:1.5; }
+  video { width:100%; border-radius:12px; background:#000; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>视频参数对比</h1>
+  <p class="sub">同一情绪、同一文字、同一配音，仅 fps / 码率不同</p>
+
+  <div class="item">
+    <h2>A｜24fps 基线</h2>
+    <p class="meta">fps：24 · 码率：约4.0Mbps · 大小：约4.79MB · 服务端耗时：10.62s</p>
+    <video src="assets/video-compare/A-24fps.mp4" controls playsinline preload="metadata"></video>
+  </div>
+
+  <div class="item">
+    <h2>B｜18fps / 3Mbps</h2>
+    <p class="meta">fps：18 · 码率：约2.69Mbps · 大小：约3.20MB · 服务端耗时：6.32s</p>
+    <video src="assets/video-compare/B-18fps-3mbps.mp4" controls playsinline preload="metadata"></video>
+  </div>
+
+  <div class="item">
+    <h2>C｜20fps / 3Mbps</h2>
+    <p class="meta">fps：20 · 码率：约2.66Mbps · 大小：约3.17MB · 服务端耗时：7.04s</p>
+    <video src="assets/video-compare/C-20fps-3mbps.mp4" controls playsinline preload="metadata"></video>
+  </div>
+
+  <div class="item">
+    <h2>D｜18fps / 2.5Mbps</h2>
+    <p class="meta">fps：18 · 码率：约2.29Mbps · 大小：约2.74MB · 服务端耗时：6.33s</p>
+    <video src="assets/video-compare/D-18fps-25mbps.mp4" controls playsinline preload="metadata"></video>
+  </div>
+</div>
+</body>
+</html>
