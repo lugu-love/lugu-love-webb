@@ -33,6 +33,7 @@ MASTERS = {
 }
 
 FPS = int(os.environ.get("FPS", "18"))
+FFMPEG_THREADS = int(os.environ.get("FFMPEG_THREADS", "2"))  # 防止多核机器 x264 自动开大量线程 OOM
 BITRATE_KBPS = int(os.environ.get("BITRATE_KBPS", "2500"))
 W, H = 720, 1280
 DURATION = 10
@@ -129,6 +130,7 @@ def generate(item, text, workdir, tts=None):
         FFMPEG, "-y", "-i", master, "-i", tts_path,
         "-filter_complex", filtergraph,
         "-map", vlabel, "-map", "1:a",
+        "-threads", str(FFMPEG_THREADS),
         "-c:v", "libx264", "-pix_fmt", "yuv420p",
         "-r", str(FPS), "-b:v", "%dk" % BITRATE_KBPS,
         "-c:a", "aac", "-ar", "44100", "-b:a", "96k",

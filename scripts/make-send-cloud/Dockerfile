@@ -21,6 +21,7 @@ ENV PORT=8000 \
     FONT_INDEX=2 \
     FONT_FC="Noto Sans CJK SC" \
     FFMPEG_BIN=ffmpeg \
+    FFMPEG_THREADS=2 \
     TTS_PROVIDER=edge-tts \
     FPS=18 \
     BITRATE_KBPS=2500 \
