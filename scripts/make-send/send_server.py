@@ -102,27 +102,31 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             master = os.path.join(BASE, master_rel)
             video = fresh(".mp4"); raw = fresh(".m4a"); aac = fresh(".m4a"); final = fresh(".mp4")
 
+            t0 = time.time()
             r1 = subprocess.run([BIN_VIDEO, master, video, text, emotion_name, "720", "1280", "24", "10"],
                                 capture_output=True, text=True, timeout=240)
-            log("VIDEO item=%s rc=%d" % (item, r1.returncode))
+            log("VIDEO item=%s rc=%d took=%.2fs" % (item, r1.returncode, time.time() - t0))
             if r1.returncode != 0:
                 raise RuntimeError("video synth rc=%d" % r1.returncode)
 
+            t0 = time.time()
             r2 = subprocess.run(["/usr/bin/say", "-v", voice, "-o", raw, text],
                                 capture_output=True, text=True, timeout=60)
-            log("TTS item=%s rc=%d" % (item, r2.returncode))
+            log("TTS item=%s rc=%d took=%.2fs" % (item, r2.returncode, time.time() - t0))
             if r2.returncode != 0:
                 raise RuntimeError("tts rc=%d" % r2.returncode)
 
+            t0 = time.time()
             r3 = subprocess.run(["/usr/bin/afconvert", "-f", "m4af", "-d", "aac@44100", "-b", "96000", "-c", "1", raw, aac],
                                 capture_output=True, text=True, timeout=60)
-            log("AFCONVERT item=%s rc=%d" % (item, r3.returncode))
+            log("AFCONVERT item=%s rc=%d took=%.2fs" % (item, r3.returncode, time.time() - t0))
             if r3.returncode != 0:
                 raise RuntimeError("afconvert rc=%d" % r3.returncode)
 
+            t0 = time.time()
             r4 = subprocess.run([BIN_MUX, video, aac, final],
                                 capture_output=True, text=True, timeout=120)
-            log("MUX item=%s rc=%d" % (item, r4.returncode))
+            log("MUX item=%s rc=%d took=%.2fs" % (item, r4.returncode, time.time() - t0))
             if r4.returncode != 0:
                 raise RuntimeError("mux rc=%d" % r4.returncode)
 
