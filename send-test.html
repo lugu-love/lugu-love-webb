@@ -5,64 +5,73 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b0c18">
 <title>情绪表达 · 发送测试</title>
-<style>
-  :root { --bg:#0b0c18; --card:#17192e; --ink:#eef0ff; --muted:#9aa0c3; --accent:#7d8bff; }
+<style>  :root { --bg:#0b0c18; --card:#17192e; --ink:#eef0ff; --muted:#9aa0c3; --accent:#7d8bff; }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   html,body { margin:0; padding:0; height:100%; background:var(--bg); color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;
     -webkit-font-smoothing:antialiased; overflow:hidden; }
-  .app { display:flex; flex-direction:column; height:100dvh; padding:calc(env(safe-area-inset-top,0px)+14px) 16px calc(env(safe-area-inset-bottom,0px)+14px); }
-  header h1 { font-size:20px; margin:0; }
+  .app { display:flex; flex-direction:column; height:100dvh; padding:calc(env(safe-area-inset-top,0px)+12px) 16px calc(env(safe-area-inset-bottom,0px)+10px); }
+  header h1 { font-size:19px; margin:0; }
   header p { font-size:12px; color:var(--muted); margin:4px 0 0; }
-  .emotions { display:flex; justify-content:center; gap:10px; margin:38px 0 14px; position:relative; z-index:30; }
-  .emotion { flex:0 1 auto; padding:10px 22px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:var(--muted); font-size:13px; font-weight:600; cursor:pointer; text-align:center; white-space:nowrap; }
+  .stage-wrap { display:flex; align-items:center; justify-content:center; min-height:0; pointer-events:none; margin-top:8px; }
+  #stage { width:min(68vw,300px); height:auto; border-radius:18px; pointer-events:none; }
+  .emotions { display:flex; justify-content:center; gap:10px; margin:18px 0 10px; position:relative; z-index:30; }
+  .emotion { flex:0 1 auto; padding:10px 20px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:var(--muted); font-size:13px; font-weight:600; cursor:pointer; text-align:center; white-space:nowrap; }
   .emotion.active { color:#fff; border-color:var(--accent); background:rgba(125,139,255,.22); box-shadow:0 0 16px rgba(125,139,255,.28); }
-  .stage-wrap { display:flex; align-items:center; justify-content:center; min-height:0; pointer-events:none; }
-  #stage { width:min(78vw,320px); height:auto; border-radius:18px; pointer-events:none; }
-  .preview-text { text-align:center; font-size:17px; line-height:1.6; min-height:28px; margin:8px 0 4px; white-space:pre-wrap; color:#fff; }
   .editor textarea { width:100%; min-height:60px; border-radius:14px; background:var(--card); color:var(--ink); border:1px solid rgba(255,255,255,.12); padding:12px; font-size:15px; line-height:1.5; resize:none; outline:none; }
-  .status { min-height:20px; margin:8px 0 0; text-align:center; font-size:13px; color:#ffd47f; }
-  .status.ok { color:#a9e3a0; }
-  .status.err { color:#ff9aa6; }
-  .hint { min-height:16px; margin:4px 0 0; text-align:center; font-size:12px; color:var(--muted); }
-  video { width:100%; max-height:30vh; border-radius:14px; margin-top:8px; background:#000; }
+  .preview-text { text-align:center; font-size:14px; line-height:1.5; min-height:22px; margin:6px 0 0; white-space:pre-wrap; color:#fff; }
   .actions { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
-  button { flex:1; min-width:88px; height:46px; border-radius:14px; border:none; font-size:14px; font-weight:650; cursor:pointer; }
+  button { flex:1; min-width:82px; height:44px; border-radius:14px; border:none; font-size:14px; font-weight:650; cursor:pointer; }
   .btn-primary { background:linear-gradient(135deg,#7d8bff,#a06bff); color:#fff; }
   .btn-secondary { background:rgba(255,255,255,.08); color:var(--ink); border:1px solid rgba(255,255,255,.14); }
   button:disabled { opacity:.55; }
-  .toast { position:fixed; left:50%; bottom:96px; transform:translateX(-50%); z-index:9; padding:9px 14px; border-radius:999px; background:rgba(20,22,40,.88); border:1px solid rgba(255,255,255,.16); color:#fff; font-size:12px; opacity:0; transition:opacity .25s; max-width:80vw; text-align:center; }
+  .status { min-height:18px; margin:8px 0 0; text-align:center; font-size:13px; color:#ffd47f; }
+  .status.ok { color:#a9e3a0; }
+  .status.err { color:#ff9aa6; }
+  .hint { min-height:14px; margin:4px 0 0; text-align:center; font-size:12px; color:var(--muted); }
+  video { width:100%; max-height:30vh; border-radius:14px; margin-top:8px; background:#000; }
+  .toast { position:fixed; left:50%; bottom:90px; transform:translateX(-50%); z-index:9; padding:9px 14px; border-radius:999px; background:rgba(20,22,40,.88); border:1px solid rgba(255,255,255,.16); color:#fff; font-size:12px; opacity:0; transition:opacity .25s; max-width:80vw; text-align:center; }
   .toast.show { opacity:1; }
-  .diag { margin-top:8px; padding:8px 10px; border:1px solid rgba(255,255,255,.12); border-radius:10px; background:rgba(0,0,0,.22); font-size:11px; color:var(--muted); line-height:1.6; word-break:break-all; }
-  .diag b { color:#b8c0ff; }
-</style>
+  .debug { margin-top:10px; font-size:11px; color:var(--muted); border-top:1px solid rgba(255,255,255,.08); padding-top:6px; }
+  .debug summary { cursor:pointer; padding:4px 0; }
+  .diag { margin-top:6px; padding:8px 10px; border:1px solid rgba(255,255,255,.12); border-radius:10px; background:rgba(0,0,0,.22); font-size:11px; color:var(--muted); line-height:1.6; word-break:break-all; }
+  .diag b { color:#b8c0ff; }</style>
 </head>
 <body>
   <div class="app">
     <header>
       <h1>情绪表达 · 发送测试</h1>
-      <p>选择情绪 → 写一句话 → 生成视频</p>
+      <p>选情绪 → 写一句话 → 生成视频</p>
     </header>
 
     <div class="stage-wrap"><canvas id="stage" width="540" height="540"></canvas></div>
+
     <div class="emotions" id="emotions"></div>
-    <div class="preview-text" id="previewText"></div>
+
     <div class="editor"><textarea id="textInput" maxlength="40" placeholder="写一句话…"></textarea></div>
-    <div class="status" id="status"></div>
-    <div class="hint" id="hint"></div>
-    <div class="diag" id="diag">诊断信息…</div>
-    <div class="diag" id="preloadDiag">预加载：…</div>
-    <div class="diag" id="tapDiag">点击命中：—</div>
-    <video id="videoPreview" controls playsinline hidden></video>
+    <div class="preview-text" id="previewText"></div>
 
     <div class="actions">
       <button class="btn-primary" id="btnGenerate" type="button">生成视频</button>
       <button class="btn-primary" id="btnOpen" type="button" hidden>打开视频</button>
-      <button class="btn-secondary" id="btnSave" type="button" hidden>保存到手机</button>
       <button class="btn-secondary" id="btnSend" type="button" hidden>发送视频</button>
+      <button class="btn-secondary" id="btnSave" type="button" hidden>保存到手机</button>
     </div>
+
+    <div class="status" id="status"></div>
+    <div class="hint" id="hint"></div>
+    <video id="videoPreview" controls playsinline hidden></video>
+
+    <details class="debug" id="debugDetails">
+      <summary>调试信息</summary>
+      <div class="diag" id="diag">诊断信息…</div>
+      <div class="diag" id="preloadDiag">预加载：…</div>
+      <div class="diag" id="tapDiag">点击命中：—</div>
+    </details>
   </div>
   <div class="toast" id="toast"></div>
+
+
 
 <script>
 (function () {
