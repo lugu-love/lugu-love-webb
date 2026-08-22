@@ -109,31 +109,41 @@
 
   function sheetUrl(id, i){ return "assets/video/fengxin-rabbit-sequence/" + id + "/sheet-" + String(i).padStart(2,"0") + ".webp"; }
 
-  function ensureSheets(id, cb){
+  function ensureSheets(id, cb, errCb){
     var e = EMOTIONS.find(function(x){ return x.id === id; });
     var c = cache[id];
-    if(c && c.loaded){ cb(c.sheets); return; }
-    if(!c){ c = { sheets:[], loaded:false, loading:false, waiting:[] }; cache[id]=c; }
+    if(c && c.state === "ready"){ cb(c.sheets); return; }
+    if(!c){ c = { sheets:[], state:"idle", sheetState:[], waiting:[], errWaiting:[], done:0 }; cache[id]=c; }
     c.waiting.push(cb);
-    if(c.loading) return;
-    c.loading = true;
-    var done = 0;
+    if(errCb) c.errWaiting.push(errCb);
+    if(c.state === "loading") return;
+
+    // error 或 idle 都允许重新加载（用户点击可重试）
+    c.state = "loading"; c.done = 0; c.sheets = []; c.sheetState = [];
     for(var i=0;i<e.sheetCount;i++){
+      c.sheetState[i] = "loading";
       (function(i){
         var im = new Image();
         im.onload = function(){
-          c.sheets[i] = im;
-          done++;
-          if(done === e.sheetCount){
-            c.loaded = true; c.loading = false;
-            var ws = c.waiting; c.waiting = [];
-            ws.forEach(function(f){ f(c.sheets); });
-            renderPreloadDiag();
-          }
+          c.sheets[i] = im; c.sheetState[i] = "ready"; c.done++;
+          if(c.done === e.sheetCount){ c.state = "ready"; flushSheets(c, true); }
+        };
+        im.onerror = function(){
+          c.sheetState[i] = "error"; c.state = "error"; flushSheets(c, false);
         };
         im.src = sheetUrl(id, i);
       })(i);
     }
+    clearTimeout(c.timer);
+    c.timer = setTimeout(function(){ if(c.state === "loading"){ c.state = "error"; flushSheets(c, false); } }, 30000);
+  }
+
+  function flushSheets(c, ok){
+    var ws = c.waiting; c.waiting = [];
+    var es = c.errWaiting; c.errWaiting = [];
+    if(ok){ ws.forEach(function(f){ f(c.sheets); }); }
+    else { es.forEach(function(f){ f(); }); }
+    renderPreloadDiag();
   }
 
   function loadSheets(){
@@ -144,6 +154,9 @@
       startLoop();
       activeUserLoad = false;
       if(!preloadStarted){ preloadStarted = true; setTimeout(preloadNext, 800); }
+    }, function(){
+      activeUserLoad = false;
+      setStatus("情绪素材加载失败，点击该情绪重试", "err");
     });
   }
 
@@ -151,20 +164,21 @@
     if(activeUserLoad) return;
     if(preloadOrder.length === 0) return;
     var id = preloadOrder.shift();
-    renderPreloadDiag();
-    ensureSheets(id, function(){
-      renderPreloadDiag();
-      preloadNext();
-    });
+    ensureSheets(id, function(){ preloadNext(); }, function(){ preloadNext(); });
   }
 
   function renderPreloadDiag(){
     var parts = ["<b>预加载:</b>"];
     EMOTIONS.forEach(function(e){
       var c = cache[e.id];
-      var st = (e.id === current.id) ? "显示中" : (c && c.loaded ? "ready" : (c && c.loading ? "loading" : "等待"));
+      var st = (e.id === current.id) ? "显示中" : (c ? c.state : "等待");
       parts.push(e.name + "=" + st);
     });
+    // 当前情绪的逐张状态
+    var cur = cache[current.id];
+    if(cur && cur.sheetState && cur.sheetState.length){
+      parts.push("&nbsp;·&nbsp;" + current.name + "明细:[" + cur.sheetState.join(" ") + "]");
+    }
     if(preloadDiagEl) preloadDiagEl.innerHTML = parts.join(" ");
   }
   function paintFrame(){
