@@ -36,6 +36,7 @@
   .preview-text { text-align:center; font-size:14px; line-height:1.5; min-height:22px; margin:6px 0 0; white-space:pre-wrap; color:#fff; }
   .cta { display:flex; justify-content:center; margin-top:18px; }
   .success-actions { display:flex; gap:8px; margin-top:10px; }
+  html.is-ios #btnOpen, html.is-ios #btnSend { display:none !important; }
   button { flex:1; min-width:82px; height:44px; border-radius:14px; border:none; font-size:14px; font-weight:650; cursor:pointer; }
   .btn-primary { background:linear-gradient(135deg,#7d8bff,#a06bff); color:#fff; }
   #btnGenerate { width:50%; height:44px; font-size:15px; border-radius:14px; background:rgba(125,139,255,.16); color:rgba(238,240,255,.92); border:1px solid rgba(125,139,255,.20); box-shadow:none; }
@@ -81,7 +82,7 @@
       <button class="btn-primary" id="btnGenerate" type="button">生成视频 →</button>
     </div>
     <div class="success-actions">
-      <button class="btn-primary" id="btnOpen" type="button" hidden>打开并分享</button>
+      <button class="btn-primary" id="btnOpen" type="button" hidden>打开视频</button>
       <button class="btn-secondary" id="btnSend" type="button" hidden>发送视频</button>
       <button class="btn-secondary" id="btnSave" type="button" hidden>保存到手机</button>
     </div>
@@ -199,6 +200,8 @@ window.__MAIN__ = function () {
   var btnSave=document.getElementById("btnSave");
   var btnSend=document.getElementById("btnSend");
   var toastEl=document.getElementById("toast");
+  var isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent || "") || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  if(isIOS){ document.documentElement.classList.add("is-ios"); btnSave.textContent="打开并分享"; }
 
   var current=EMOTIONS[0];
   var cache={}, preloadOrder=["2","3"], preloadStarted=false, activeUserLoad=false;
