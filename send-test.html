@@ -450,16 +450,8 @@ window.__MAIN__ = function () {
     videoEl.hidden=false;
     if(isIOS){
       setHint("打开后，点右上角“…”即可分享");
-      var enterFullscreen=function(){
-        try{
-          var fn=videoEl.webkitEnterFullscreen || videoEl.webkitEnterFullScreen;
-          if(fn){ fn.call(videoEl); }
-          else if(videoEl.requestFullscreen){ videoEl.requestFullscreen().catch(function(){}); }
-        } catch(e){ console.error("fullscreen error:", e); }
-      };
-      var playResult=videoEl.play && videoEl.play();
-      enterFullscreen();
-      if(playResult && playResult.then){ playResult.then(enterFullscreen).catch(function(){}); }
+      var opened=window.open(lastUrl, "_blank");
+      if(!opened){ window.location.href=lastUrl; }
       return;
     }
     videoEl.play && videoEl.play().catch(function(){});
