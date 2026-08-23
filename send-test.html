@@ -447,13 +447,7 @@ window.__MAIN__ = function () {
 
   function openVideo(){
     if(!lastUrl){ showToast("请先生成视频"); return; }
-    videoEl.hidden=false;
-    if(isIOS){
-      videoEl.play && videoEl.play().catch(function(){});
-      setHint("打开后，点右上角“…”即可分享");
-      return;
-    }
-    videoEl.play && videoEl.play().catch(function(){});
+    videoEl.hidden=false; videoEl.play && videoEl.play().catch(function(){});
     setHint("可直接在上方播放查看；如需发送，请保存到手机后从微信选择该视频。");
   }
 
