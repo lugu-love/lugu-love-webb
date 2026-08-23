@@ -199,6 +199,7 @@ window.__MAIN__ = function () {
   var btnSave=document.getElementById("btnSave");
   var btnSend=document.getElementById("btnSend");
   var toastEl=document.getElementById("toast");
+  var isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent || "") || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
   var current=EMOTIONS[0];
   var cache={}, preloadOrder=["2","3"], preloadStarted=false, activeUserLoad=false;
@@ -410,10 +411,19 @@ window.__MAIN__ = function () {
       lastTiming = { clickToFetchMs: Math.round(tFetchStart-tClick), fetchMs: Math.round(tHeaders-tFetchStart), blobMs: Math.round(tBlob-tHeaders), totalMs: Math.round(tDone-tClick) };
       generatePhase="success";
       setStatus("视频生成成功", "ok");
-      setHint("视频已生成，保存后可从微信选择该视频发送。");
-      btnOpen.hidden=false; btnSave.hidden=false;
-      if(navigator.canShare && navigator.canShare({files:[file]})){
-        btnSend.hidden=false;
+      btnOpen.hidden=false;
+      if(isIOS){
+        btnOpen.textContent="打开并分享";
+        btnSend.hidden=true;
+        btnSave.hidden=true;
+        setHint("打开后，点右上角“…”即可分享");
+      } else {
+        btnOpen.textContent="打开视频";
+        btnSave.hidden=false;
+        setHint("视频已生成，保存后可从微信选择该视频发送。");
+        if(navigator.canShare && navigator.canShare({files:[file]})){
+          btnSend.hidden=false;
+        }
       }
     } catch(err){
       console.error("generate error:", err);
@@ -437,7 +447,22 @@ window.__MAIN__ = function () {
 
   function openVideo(){
     if(!lastUrl){ showToast("请先生成视频"); return; }
-    videoEl.hidden=false; videoEl.play && videoEl.play().catch(function(){});
+    videoEl.hidden=false;
+    if(isIOS){
+      setHint("打开后，点右上角“…”即可分享");
+      var enterFullscreen=function(){
+        try{
+          var fn=videoEl.webkitEnterFullscreen || videoEl.webkitEnterFullScreen;
+          if(fn){ fn.call(videoEl); }
+          else if(videoEl.requestFullscreen){ videoEl.requestFullscreen().catch(function(){}); }
+        } catch(e){ console.error("fullscreen error:", e); }
+      };
+      var playResult=videoEl.play && videoEl.play();
+      enterFullscreen();
+      if(playResult && playResult.then){ playResult.then(enterFullscreen).catch(function(){}); }
+      return;
+    }
+    videoEl.play && videoEl.play().catch(function(){});
     setHint("可直接在上方播放查看；如需发送，请保存到手机后从微信选择该视频。");
   }
 
