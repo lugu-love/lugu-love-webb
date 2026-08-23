@@ -101,14 +101,27 @@
 <script src="test-site-config.js"></script>
 <script>
 (function () {
-  var internal = /[?&]internal=1/.test(location.search);
-  window.__SITE_PAUSED__ = (window.TEST_SITE_ENABLED === false) && !internal;
-  if (window.__SITE_PAUSED__) {
+  var app = document.querySelector('.app');
+  var staticOn = window.TEST_SITE_ENABLED !== false;
+  function pause() {
+    window.__SITE_PAUSED__ = true;
     var ps = document.getElementById('pauseScreen');
     if (ps) ps.className += ' show';
-    var app = document.querySelector('.app');
     if (app) app.style.display = 'none';
   }
+  function start() {
+    window.__SITE_PAUSED__ = false;
+    if (app) app.style.display = '';
+    if (typeof window.__MAIN__ === 'function') window.__MAIN__();
+  }
+  if (!staticOn) { pause(); return; }
+  if (app) app.style.display = 'none';
+  try {
+    fetch('https://api.lugu.love/status', { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
+      .then(function (d) { if (d && d.enabled === false) { pause(); } else { start(); } })
+      .catch(function () { start(); });
+  } catch (e) { start(); }
 })();
 </script>
 
@@ -116,8 +129,7 @@
 
 
 <script>
-(function () {
-  if (window.__SITE_PAUSED__) { return; }
+window.__MAIN__ = function () {
   var MAKE_SEND_API = "https://api.lugu.love";
 
   var EMOTIONS = [
@@ -441,7 +453,7 @@
   renderDiag();
   renderPreloadDiag();
   renderGuide();
-})();
+};
 </script>
 </body>
 </html>
