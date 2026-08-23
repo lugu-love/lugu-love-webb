@@ -23,6 +23,7 @@ ENV PORT=8000 \
     FFMPEG_BIN=ffmpeg \
     FFMPEG_THREADS=2 \
     TTS_PROVIDER=edge-tts \
+    SERVICE_ENABLED=true \
     FPS=18 \
     BITRATE_KBPS=2500 \
     MAX_CONCURRENT=2 \

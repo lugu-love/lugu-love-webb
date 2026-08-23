@@ -33,6 +33,7 @@ MASTERS = {
 }
 
 FPS = int(os.environ.get("FPS", "18"))
+SERVICE_ENABLED = os.environ.get("SERVICE_ENABLED", "true").lower() in ("1", "true", "yes", "on")
 FFMPEG_THREADS = int(os.environ.get("FFMPEG_THREADS", "2"))  # 防止多核机器 x264 自动开大量线程 OOM
 BITRATE_KBPS = int(os.environ.get("BITRATE_KBPS", "2500"))
 W, H = 720, 1280
@@ -201,6 +202,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self._serve(text, item)
 
     def _serve(self, text, item):
+        if not SERVICE_ENABLED:
+            return self._send_json(503, {"error": "service temporarily unavailable"})
         start = time.time()
         text = (text or DEFAULT_TEXT)[:TEXT_MAX]
         if item not in MASTERS:
