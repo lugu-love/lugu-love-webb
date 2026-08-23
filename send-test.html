@@ -416,7 +416,7 @@ window.__MAIN__ = function () {
         btnOpen.textContent="打开并分享";
         btnSend.hidden=true;
         btnSave.hidden=true;
-        setHint("点击后可选择微信或其他应用分享");
+        setHint("打开后，点右上角“…”即可分享");
       } else {
         btnOpen.textContent="打开视频";
         btnSave.hidden=false;
@@ -449,25 +449,8 @@ window.__MAIN__ = function () {
     if(!lastUrl){ showToast("请先生成视频"); return; }
     videoEl.hidden=false;
     if(isIOS){
-      if(lastFile && navigator.canShare && navigator.canShare({files:[lastFile]})){
-        navigator.share({ files:[lastFile], title:"情绪表达", text:textInput.value }).then(function(){
-          setStatus("已打开系统分享", "ok");
-          setHint("可选择微信或其他应用发送视频");
-        }).catch(function(e){
-          if(e && e.name === "AbortError"){
-            setStatus("视频已生成", "ok");
-            setHint("点击“打开并分享”可再次选择分享应用");
-            return;
-          }
-          console.error("iOS share error:", e);
-          videoEl.play && videoEl.play().catch(function(){});
-          setStatus("视频已生成", "ok");
-          setHint("当前浏览器未能打开分享面板，可先播放查看视频");
-        });
-      } else {
-        videoEl.play && videoEl.play().catch(function(){});
-        setHint("当前浏览器不支持文件分享，可先播放查看视频");
-      }
+      videoEl.play && videoEl.play().catch(function(){});
+      setHint("打开后，点右上角“…”即可分享");
       return;
     }
     videoEl.play && videoEl.play().catch(function(){});
