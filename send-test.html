@@ -414,7 +414,7 @@ window.__MAIN__ = function () {
       lastTiming = { clickToFetchMs: Math.round(tFetchStart-tClick), fetchMs: Math.round(tHeaders-tFetchStart), blobMs: Math.round(tBlob-tHeaders), totalMs: Math.round(tDone-tClick) };
       generatePhase="success";
       setStatus("视频生成成功", "ok");
-      setHint("视频已生成，保存后可从微信选择该视频发送。");
+      setHint(isIOS ? "打开后，点击右上角‘…’即可分享" : "视频已生成，保存后可从微信选择该视频发送。");
       btnOpen.hidden=false; btnSave.hidden=false;
       if(navigator.canShare && navigator.canShare({files:[file]})){
         btnSend.hidden=false;
@@ -454,8 +454,13 @@ window.__MAIN__ = function () {
   function saveVideo(){
     if(!lastBlob){ showToast("请先生成视频"); return; }
     downloadBlob(lastBlob, "七星使者-" + current.name + ".mp4");
-    setStatus("视频已保存", "ok");
-    setHint("已保存到手机；若找不到，可在浏览器下载记录中打开。");
+    if(isIOS){
+      setStatus("");
+      setHint("打开后，点击右上角‘…’即可分享");
+    } else {
+      setStatus("视频已保存", "ok");
+      setHint("已保存到手机；若找不到，可在浏览器下载记录中打开。");
+    }
   }
 
   function sendVideo(){
