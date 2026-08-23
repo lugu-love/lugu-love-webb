@@ -130,7 +130,8 @@
 
 <script>
 window.__MAIN__ = function () {
-  var MAKE_SEND_API = "https://anybody-extension-virtually-border.trycloudflare.com";
+  var MAKE_SEND_API = "https://api.lugu.love";
+  var GENERATE_TIMEOUT_MS = 55000;
 
   var EMOTIONS = [
     { id:"1", name:"开心", item:"rabbit-happy", totalFrames:73, sheetCount:7 },
@@ -187,6 +188,9 @@ window.__MAIN__ = function () {
   var brandParam = new URLSearchParams(location.search).get("brand");
   if(brandEl && brandParam){ brandEl.classList.add("brand-" + brandParam); }
   var lastTiming=null;
+  var generatePhase="idle";
+  var isGenerating=false;
+  var activeController=null;
   var guideEl=document.getElementById("guide");
   var btnSuggest=document.getElementById("btnSuggest");
   var suggestBox=document.getElementById("suggestBox");
@@ -328,12 +332,13 @@ window.__MAIN__ = function () {
     var ua = navigator.userAgent || "";
     var lines = [
       "<b>UA:</b> " + ua,
+      "<b>请求阶段:</b> " + generatePhase,
       "<b>情绪:</b> " + current.name + " (id=" + current.id + ", item=" + current.item + ")",
       "<b>生成次数:</b> " + genCount,
       "<b>预览src:</b> " + (lastUrl ? "(Blob MP4)" : "无")
     ];
     if(lastTiming){
-      lines.push("<b>耗时:</b> fetch=" + lastTiming.fetchMs + "ms blob=" + lastTiming.blobMs + "ms 总=" + lastTiming.totalMs + "ms");
+      lines.push("<b>耗时:</b> 点击→请求=" + lastTiming.clickToFetchMs + "ms fetch=" + lastTiming.fetchMs + "ms blob=" + lastTiming.blobMs + "ms 总=" + lastTiming.totalMs + "ms");
     }
     diagEl.innerHTML = lines.join("<br>");
   }
@@ -350,22 +355,49 @@ window.__MAIN__ = function () {
   }
 
   async function generateVideo(){
+    if(isGenerating){
+      showToast("视频正在生成，请稍候");
+      return;
+    }
     var text=(textInput.value||"").trim();
     if(!text){ showToast("请先写一句话"); return; }
 
+    isGenerating=true;
     clearGenerated();
     genCount++;
     var tClick = performance.now();
-    btnGenerate.disabled=true; btnGenerate.textContent="生成中…";
+    btnGenerate.disabled=true; btnGenerate.textContent="正在生成…";
     var msgs=["正在生成你的情绪视频…","正在加入你的文字…","正在生成声音…","视频马上好了…"];
     var mi=0; setStatus(msgs[0]); setHint("");
+    generatePhase="feedback-visible";
+    lastTiming={ clickToFetchMs:"—", fetchMs:"—", blobMs:"—", totalMs:"—" };
+    renderDiag();
     var timer=setInterval(function(){ mi=(mi+1)%msgs.length; setStatus(msgs[mi]); }, 2600);
+    var timeoutId=null;
+    var didTimeout=false;
 
     try{
+      await new Promise(function(resolve){
+        requestAnimationFrame(function(){ setTimeout(resolve, 0); });
+      });
       var tFetchStart = performance.now();
+      lastTiming.clickToFetchMs=Math.round(tFetchStart-tClick);
       var url=MAKE_SEND_API + "/make-send?text=" + encodeURIComponent(text) + "&item=" + encodeURIComponent(current.item);
-      var resp=await fetch(url, { cache:"no-store", mode:"cors" });
+      activeController = typeof AbortController === "function" ? new AbortController() : null;
+      generatePhase="request-sent";
+      renderDiag();
+      console.info("[send-test] request sent", { item:current.item, clickToFetchMs:lastTiming.clickToFetchMs });
+      var request = fetch(url, { cache:"no-store", mode:"cors", signal:activeController ? activeController.signal : undefined });
+      var timeout = new Promise(function(_, reject){
+        timeoutId=setTimeout(function(){
+          didTimeout=true;
+          if(activeController) activeController.abort();
+          reject(new Error("generate timeout"));
+        }, GENERATE_TIMEOUT_MS);
+      });
+      var resp=await Promise.race([request, timeout]);
       var tHeaders = performance.now();
+      generatePhase="response-headers";
       if(!resp.ok) throw new Error("HTTP "+resp.status);
       var blob=await resp.blob();
       var tBlob = performance.now();
@@ -375,7 +407,8 @@ window.__MAIN__ = function () {
       lastUrl=URL.createObjectURL(blob);
       videoEl.src=lastUrl; videoEl.hidden=false;
       var tDone = performance.now();
-      lastTiming = { fetchMs: Math.round(tHeaders-tFetchStart), blobMs: Math.round(tBlob-tHeaders), totalMs: Math.round(tDone-tClick) };
+      lastTiming = { clickToFetchMs: Math.round(tFetchStart-tClick), fetchMs: Math.round(tHeaders-tFetchStart), blobMs: Math.round(tBlob-tHeaders), totalMs: Math.round(tDone-tClick) };
+      generatePhase="success";
       setStatus("视频生成成功", "ok");
       setHint("视频已生成，保存后可从微信选择该视频发送。");
       btnOpen.hidden=false; btnSave.hidden=false;
@@ -384,10 +417,19 @@ window.__MAIN__ = function () {
       }
     } catch(err){
       console.error("generate error:", err);
-      setStatus("视频生成失败，请重试", "err");
-      showToast("视频生成失败，请重试");
+      generatePhase=didTimeout || (err && err.name === "AbortError") ? "timeout" : "error";
+      if(generatePhase === "timeout"){
+        setStatus("生成时间有点久，请再试一次。", "err");
+        showToast("生成时间有点久，请再试一次。");
+      } else {
+        setStatus("视频生成失败，请重试", "err");
+        showToast("视频生成失败，请重试");
+      }
     } finally {
+      clearTimeout(timeoutId);
       clearInterval(timer);
+      activeController=null;
+      isGenerating=false;
       btnGenerate.disabled=false; btnGenerate.textContent="生成视频";
       renderDiag();
     }
