@@ -51,9 +51,19 @@
   .debug { margin-top:8px; font-size:11px; color:rgba(255,255,255,.35); border-top:1px solid rgba(255,255,255,.06); padding-top:4px; }
   .debug summary { cursor:pointer; padding:3px 0; font-size:11px; color:rgba(255,255,255,.35); }
   .diag { margin-top:6px; padding:8px 10px; border:1px solid rgba(255,255,255,.12); border-radius:10px; background:rgba(0,0,0,.22); font-size:11px; color:var(--muted); line-height:1.6; word-break:break-all; }
-  .diag b { color:#b8c0ff; }</style>
+  .diag b { color:#b8c0ff; }
+  .site-paused-overlay { display:none; position:fixed; inset:0; z-index:9999; background:var(--bg); align-items:center; justify-content:center; flex-direction:column; padding:0 34px; text-align:center; }
+  .site-paused-overlay.show { display:flex; }
+  .site-paused-overlay .t1 { font-size:18px; font-weight:500; letter-spacing:.02em; color:rgba(238,240,255,.92); }
+  .site-paused-overlay .t2 { margin-top:14px; font-size:13px; color:rgba(154,160,195,.8); line-height:1.7; }
+</style>
 </head>
 <body>
+<div class="site-paused-overlay" id="pauseScreen">
+  <div class="t1">七星使者 · 情绪表达</div>
+  <div class="t2">当前正在内部测试中。<br>正式开放后再见。</div>
+</div>
+
   <div class="app">
     <div class="brand" id="brand"><span class="heart"><svg viewBox="0 0 48 44" width="22" height="20" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M24 40.2C19.5 35.8 7.2 27.1 4.6 17.8 2.5 10.2 7.1 4.3 14 4.3c4.5 0 7.8 2.7 10 6.5 2.2-3.8 5.5-6.5 10-6.5 6.9 0 11.5 5.9 9.4 13.5C40.8 27.1 28.5 35.8 24 40.2Z"/></svg></span><span class="brand-main">七星使者</span><span class="brand-sub">· 情绪表达</span></div>
 
@@ -88,11 +98,26 @@
     </details>
   </div>
   <div class="toast" id="toast"></div>
+<script src="test-site-config.js"></script>
+<script>
+(function () {
+  var internal = /[?&]internal=1/.test(location.search);
+  window.__SITE_PAUSED__ = (window.TEST_SITE_ENABLED === false) && !internal;
+  if (window.__SITE_PAUSED__) {
+    var ps = document.getElementById('pauseScreen');
+    if (ps) ps.className += ' show';
+    var app = document.querySelector('.app');
+    if (app) app.style.display = 'none';
+  }
+})();
+</script>
+
 
 
 
 <script>
 (function () {
+  if (window.__SITE_PAUSED__) { return; }
   var MAKE_SEND_API = "https://anybody-extension-virtually-border.trycloudflare.com";
 
   var EMOTIONS = [
