@@ -15,6 +15,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY server.py tts_provider.py text_layout.py ./
 COPY masters/ ./masters/
+COPY poc/ ./poc/
 
 ENV PORT=8000 \
     FONT_FILE=/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc \

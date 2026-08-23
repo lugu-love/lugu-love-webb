@@ -22,6 +22,7 @@ from tts_provider import make_tts_provider
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 MASTERS_DIR = os.path.join(ROOT, "masters")
+POC_SAMPLE_FILE = os.path.join(ROOT, "poc", "sample.mp4")
 FFMPEG = os.environ.get("FFMPEG_BIN", "ffmpeg")
 FONT_FILE = os.environ.get("FONT_FILE", "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc")
 FONT_INDEX = int(os.environ.get("FONT_INDEX", "2"))
@@ -323,6 +324,21 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _send_poc_sample(self):
+        try:
+            with open(POC_SAMPLE_FILE, "rb") as f:
+                body = f.read()
+        except OSError:
+            return self._send_json(404, {"error": "poc sample not found"})
+        self.send_response(200)
+        self._cors()
+        self.send_header("Content-Type", "video/mp4")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Content-Disposition", 'inline; filename="sample.mp4"')
+        self.send_header("Cache-Control", "public, max-age=3600")
+        self.end_headers()
+        self.wfile.write(body)
+
     def _read_json_body(self):
         try:
             length = int(self.headers.get("Content-Length", "0") or 0)
@@ -349,6 +365,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
         path = parsed.path
         if path == "/status":
             return self._send_json(200, {"enabled": read_enabled()})
+        if path == "/poc/sample.mp4":
+            return self._send_poc_sample()
         if path == "/admin":
             return self._send_html(ADMIN_HTML)
         if path == "/make-send":
