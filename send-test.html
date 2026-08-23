@@ -450,8 +450,7 @@ window.__MAIN__ = function () {
     videoEl.hidden=false;
     if(isIOS){
       setHint("打开后，点右上角“…”即可分享");
-      var opened=window.open(lastUrl, "_blank");
-      if(!opened){ window.location.href=lastUrl; }
+      window.location.assign(lastUrl);
       return;
     }
     videoEl.play && videoEl.play().catch(function(){});
