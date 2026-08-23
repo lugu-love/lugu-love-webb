@@ -38,6 +38,12 @@
   .success-actions { display:flex; gap:8px; margin-top:10px; }
   html.is-ios #btnOpen, html.is-ios #btnSend { display:none !important; }
   html.is-ios #btnSave { background:linear-gradient(135deg,#9ca6ff,#b68cff); color:#fff; border:1px solid rgba(210,205,255,.28); }
+  html.is-android.can-file-share .success-actions { display:grid; grid-template-columns:1fr 1fr; gap:7px 10px; }
+  html.is-android.can-file-share #btnSend { grid-column:1 / -1; grid-row:1; height:44px; background:linear-gradient(135deg,#7d8bff,#a06bff); color:#fff; border:none; font-size:15px; }
+  html.is-android.can-file-share #btnOpen { grid-column:1; grid-row:2; }
+  html.is-android.can-file-share #btnSave { grid-column:2; grid-row:2; }
+  html.is-android #btnOpen, html.is-android #btnSave { height:34px; background:transparent; color:rgba(238,240,255,.68); border:1px solid rgba(255,255,255,.10); font-size:12px; font-weight:500; }
+  html.is-android.is-wechat #btnSend { display:none !important; }
   button { flex:1; min-width:82px; height:44px; border-radius:14px; border:none; font-size:14px; font-weight:650; cursor:pointer; }
   .btn-primary { background:linear-gradient(135deg,#7d8bff,#a06bff); color:#fff; }
   #btnGenerate { width:50%; height:44px; font-size:15px; border-radius:14px; background:rgba(125,139,255,.16); color:rgba(238,240,255,.92); border:1px solid rgba(125,139,255,.20); box-shadow:none; }
@@ -201,8 +207,13 @@ window.__MAIN__ = function () {
   var btnSave=document.getElementById("btnSave");
   var btnSend=document.getElementById("btnSend");
   var toastEl=document.getElementById("toast");
-  var isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent || "") || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var userAgent=navigator.userAgent || "";
+  var isIOS=/iPad|iPhone|iPod/.test(userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var isAndroid=/Android/i.test(userAgent);
+  var isWeChat=/MicroMessenger/i.test(userAgent);
   if(isIOS){ document.documentElement.classList.add("is-ios"); btnSave.textContent="打开并分享"; }
+  if(isAndroid){ document.documentElement.classList.add("is-android"); btnOpen.textContent="打开预览"; }
+  if(isWeChat){ document.documentElement.classList.add("is-wechat"); }
 
   var current=EMOTIONS[0];
   var cache={}, preloadOrder=["2","3"], preloadStarted=false, activeUserLoad=false;
@@ -348,6 +359,7 @@ window.__MAIN__ = function () {
   }
 
   function clearGenerated(){
+    document.documentElement.classList.remove("can-file-share");
     if(lastUrl){ URL.revokeObjectURL(lastUrl); lastUrl=null; }
     lastBlob=null; lastFile=null;
     videoEl.pause();
@@ -414,9 +426,10 @@ window.__MAIN__ = function () {
       lastTiming = { clickToFetchMs: Math.round(tFetchStart-tClick), fetchMs: Math.round(tHeaders-tFetchStart), blobMs: Math.round(tBlob-tHeaders), totalMs: Math.round(tDone-tClick) };
       generatePhase="success";
       setStatus("视频生成成功", "ok");
-      setHint(isIOS ? "打开后，点击右上角‘…’即可分享" : "视频已生成，保存后可从微信选择该视频发送。");
+      setHint(isIOS ? "打开后，点击右上角‘…’即可分享" : (isWeChat ? "请在浏览器中打开后发送视频" : "点击“发送视频”，可选择微信或其他应用。"));
       btnOpen.hidden=false; btnSave.hidden=false;
-      if(navigator.canShare && navigator.canShare({files:[file]})){
+      if(!isWeChat && navigator.canShare && navigator.canShare({files:[file]})){
+        if(isAndroid) document.documentElement.classList.add("can-file-share");
         btnSend.hidden=false;
       }
     } catch(err){
@@ -466,12 +479,18 @@ window.__MAIN__ = function () {
   function sendVideo(){
     if(!lastFile){ showToast("请先生成视频"); return; }
     if(navigator.canShare && navigator.canShare({files:[lastFile]})){
+      if(isAndroid) setStatus("正在打开系统分享…");
       navigator.share({ files:[lastFile], title:"情绪表达", text:textInput.value }).then(function(){
         setStatus("已调起系统分享", "ok");
       }).catch(function(e){
         console.error("share error:", e);
-        setStatus("视频已生成，但系统分享失败", "err");
-        setHint("请点“保存到手机”后从微信发送。");
+        if(isAndroid && e && e.name === "AbortError"){
+          setStatus("视频已生成", "ok");
+          setHint("已取消发送，可再次点击“发送视频”。");
+        } else {
+          setStatus("视频已生成，但系统分享失败", "err");
+          setHint("请点“保存到手机”后从微信发送。");
+        }
       });
     } else {
       setStatus("当前浏览器不支持直接发送视频文件", "err");
