@@ -36,6 +36,7 @@
   .preview-text { text-align:center; font-size:14px; line-height:1.5; min-height:22px; margin:6px 0 0; white-space:pre-wrap; color:#fff; }
   .cta { display:flex; justify-content:center; margin-top:18px; }
   .success-actions { display:flex; gap:8px; margin-top:10px; }
+  html.is-ios #btnSend, html.is-ios #btnSave { display:none !important; }
   button { flex:1; min-width:82px; height:44px; border-radius:14px; border:none; font-size:14px; font-weight:650; cursor:pointer; }
   .btn-primary { background:linear-gradient(135deg,#7d8bff,#a06bff); color:#fff; }
   #btnGenerate { width:50%; height:44px; font-size:15px; border-radius:14px; background:rgba(125,139,255,.16); color:rgba(238,240,255,.92); border:1px solid rgba(125,139,255,.20); box-shadow:none; }
@@ -200,6 +201,7 @@ window.__MAIN__ = function () {
   var btnSend=document.getElementById("btnSend");
   var toastEl=document.getElementById("toast");
   var isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent || "") || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  if(isIOS){ document.documentElement.classList.add("is-ios"); btnOpen.textContent="打开并分享"; }
 
   var current=EMOTIONS[0];
   var cache={}, preloadOrder=["2","3"], preloadStarted=false, activeUserLoad=false;
@@ -411,19 +413,10 @@ window.__MAIN__ = function () {
       lastTiming = { clickToFetchMs: Math.round(tFetchStart-tClick), fetchMs: Math.round(tHeaders-tFetchStart), blobMs: Math.round(tBlob-tHeaders), totalMs: Math.round(tDone-tClick) };
       generatePhase="success";
       setStatus("视频生成成功", "ok");
-      btnOpen.hidden=false;
-      if(isIOS){
-        btnOpen.textContent="打开并分享";
-        btnSend.hidden=true;
-        btnSave.hidden=true;
-        setHint("打开后，点右上角“…”即可分享");
-      } else {
-        btnOpen.textContent="打开视频";
-        btnSave.hidden=false;
-        setHint("视频已生成，保存后可从微信选择该视频发送。");
-        if(navigator.canShare && navigator.canShare({files:[file]})){
-          btnSend.hidden=false;
-        }
+      setHint(isIOS ? "打开后，点右上角“…”即可分享" : "视频已生成，保存后可从微信选择该视频发送。");
+      btnOpen.hidden=false; btnSave.hidden=false;
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        btnSend.hidden=false;
       }
     } catch(err){
       console.error("generate error:", err);
