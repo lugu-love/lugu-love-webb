@@ -16,9 +16,11 @@ import threading
 import time
 import urllib.parse
 from datetime import datetime
+import html
 
 from text_layout import layout_lines, has_unsupported
 from tts_provider import make_tts_provider
+import journey_store
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 MASTERS_DIR = os.path.join(ROOT, "masters")
@@ -70,6 +72,18 @@ _app_video_lock = threading.Lock()
 DEFAULT_TEXT = "今天先开心，其他事情都给我排队。"
 APP_VIDEO_TTL = int(os.environ.get("APP_VIDEO_TTL", "600"))
 APP_VIDEO_MAX_READS = int(os.environ.get("APP_VIDEO_MAX_READS", "3"))
+PUBLIC_BASE_URL = os.environ.get("PUBLIC_BASE_URL", "https://api.lugu.love").rstrip("/")
+ANDROID_PACKAGE = "love.lugu.videosharepoc"
+ANDROID_DEBUG_CERT_SHA256 = os.environ.get(
+    "ANDROID_APP_CERT_SHA256",
+    "3E:0B:BE:A2:D5:2C:BD:05:7E:84:FB:2D:E6:11:F9:6A:B5:AC:96:57:10:98:2E:A0:50:3F:AA:87:56:F1:2A:F7",
+)
+
+JOURNEY_META = {
+    "rabbit-happy": ("fengxin-rabbit", "happy"),
+    "rabbit-aggrieved": ("fengxin-rabbit", "wronged"),
+    "rabbit-angry": ("fengxin-rabbit", "angry"),
+}
 APP_VIDEO_DIR = os.environ.get("APP_VIDEO_DIR", "/tmp/app-video-cache")
 
 
@@ -349,7 +363,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Origin", CORS_ORIGIN)
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
-        self.send_header("Access-Control-Expose-Headers", "X-Video-Path, X-Video-Expires-In")
+        self.send_header(
+            "Access-Control-Expose-Headers",
+            "X-Video-Path, X-Video-Expires-In, X-Video-Id, X-Journey-Id, "
+            "X-Parent-Video-Id, X-Generation, X-Remix-Entry",
+        )
 
     def _send_json(self, code, obj):
         body = json.dumps(obj, ensure_ascii=False).encode("utf-8")
@@ -368,6 +386,33 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
+
+    def _send_assetlinks(self):
+        return self._send_json(200, [{
+            "relation": ["delegate_permission/common.handle_all_urls"],
+            "target": {
+                "namespace": "android_app",
+                "package_name": ANDROID_PACKAGE,
+                "sha256_cert_fingerprints": [ANDROID_DEBUG_CERT_SHA256],
+            },
+        }])
+
+    def _send_remix_landing(self, share_code):
+        if not share_code or any(c not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_" for c in share_code):
+            return self._not_found()
+        safe_code = html.escape(share_code, quote=True)
+        page = """<!doctype html><html lang=\"zh-CN\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>七星使者 · 我也做一条</title><style>
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c18;color:#eef0ff;font-family:-apple-system,'PingFang SC',sans-serif}.card{width:min(86vw,390px);padding:30px 22px;border:1px solid rgba(255,255,255,.1);border-radius:22px;background:#17192e;text-align:center}h1{margin:0;font-size:23px}p{margin:14px 0 24px;color:#aeb3d1;line-height:1.7}.btn{width:100%%;height:50px;border:0;border-radius:15px;background:linear-gradient(135deg,#7d8bff,#a06bff);color:#fff;font-size:16px;font-weight:650}.status{min-height:22px;margin-top:12px;color:#9aa0c3;font-size:13px}</style></head><body><main class=\"card\"><h1>七星使者</h1><p>喜欢这条情绪？<br>换成你的话，做一个自己的版本。</p><button class=\"btn\" id=\"open\">打开情绪编辑工具</button><div class=\"status\" id=\"status\"></div></main><script>
+var b=document.getElementById('open'),s=document.getElementById('status');b.onclick=async function(){b.disabled=true;s.textContent='正在打开…';try{var r=await fetch('/journey/remix-token',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({share_code:'%s'})});var d=await r.json();if(!r.ok)throw new Error(d.error||'failed');location.href=d.open_url}catch(e){s.textContent='暂时无法打开，请稍后重试。';b.disabled=false}};
+</script></body></html>""" % safe_code
+        self._send_html(page)
+
+    def _send_remix_open_fallback(self, token):
+        if not token or any(c not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_" for c in token):
+            return self._not_found()
+        safe_token = html.escape(token, quote=True)
+        page = """<!doctype html><html lang=\"zh-CN\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>打开情绪编辑工具</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c18;color:#eef0ff;font-family:-apple-system,'PingFang SC',sans-serif}.card{width:min(86vw,390px);padding:30px 22px;border-radius:22px;background:#17192e;text-align:center}p{color:#aeb3d1;line-height:1.7}.btn{display:grid;place-items:center;height:50px;border-radius:15px;background:linear-gradient(135deg,#7d8bff,#a06bff);color:#fff;text-decoration:none;font-weight:650}</style></head><body><main class=\"card\"><h2>继续制作这条开心视频</h2><p>如果编辑工具已安装，请点击下面的按钮继续。</p><a class=\"btn\" href=\"lugu://remix/%s\">打开情绪编辑工具</a></main></body></html>""" % safe_token
+        self._send_html(page)
 
     def _send_poc_sample(self):
         try:
@@ -433,6 +478,27 @@ class Handler(http.server.BaseHTTPRequestHandler):
         path = parsed.path
         if path == "/status":
             return self._send_json(200, {"enabled": read_enabled()})
+        if path == "/.well-known/assetlinks.json":
+            return self._send_assetlinks()
+        if path.startswith("/r/"):
+            return self._send_remix_landing(path[len("/r/"):])
+        if path.startswith("/remix/open/"):
+            return self._send_remix_open_fallback(path[len("/remix/open/"):])
+        if path.startswith("/journey/remix-token/"):
+            token = path[len("/journey/remix-token/"):]
+            try:
+                result = journey_store.resolve_remix_token(token, record_open=True, source_channel="android_editor")
+            except journey_store.JourneyUnavailable as error:
+                return self._send_json(503, {"error": str(error)})
+            if not result:
+                return self._send_json(410, {"error": "remix token expired or unavailable"})
+            return self._send_json(200, result)
+        if path.startswith("/journey/videos/"):
+            try:
+                result = journey_store.get_video(path[len("/journey/videos/"):])
+            except (journey_store.JourneyUnavailable, ValueError) as error:
+                return self._send_json(503 if isinstance(error, journey_store.JourneyUnavailable) else 400, {"error": str(error)})
+            return self._send_json(200, result) if result else self._not_found()
         if path == "/poc/sample.mp4":
             return self._send_poc_sample()
         if path.startswith("/app-video/") and path.endswith(".mp4"):
@@ -442,7 +508,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if path == "/make-send":
             qs = urllib.parse.parse_qs(parsed.query)
             app_bridge = qs.get("app_bridge", [""])[0] == "1"
-            return self._serve(qs.get("text", [""])[0], qs.get("item", ["rabbit-happy"])[0], app_bridge)
+            journey_v1 = qs.get("journey_v1", [""])[0] == "1"
+            return self._serve(
+                qs.get("text", [""])[0], qs.get("item", ["rabbit-happy"])[0], app_bridge,
+                journey_v1, qs.get("remix_token", [""])[0], qs.get("source_channel", ["h5"])[0],
+            )
         return self._not_found()
 
     def do_POST(self):
@@ -452,11 +522,39 @@ class Handler(http.server.BaseHTTPRequestHandler):
             return self._admin_login()
         if path == "/admin/toggle":
             return self._admin_toggle()
+        if path == "/journey/remix-token":
+            data = self._read_json_body()
+            if data is None:
+                return self._send_json(400, {"error": "bad request"})
+            try:
+                token = journey_store.create_remix_token(data.get("share_code", "") or "")
+            except journey_store.JourneyUnavailable as error:
+                return self._send_json(503, {"error": str(error)})
+            if not token:
+                return self._not_found()
+            return self._send_json(201, {
+                "remix_token": token,
+                "open_url": "%s/remix/open/%s" % (PUBLIC_BASE_URL, token),
+                "expires_in": journey_store.TOKEN_TTL_SECONDS,
+            })
+        if path == "/journey/events":
+            data = self._read_json_body()
+            if data is None:
+                return self._send_json(400, {"error": "bad request"})
+            try:
+                ok = journey_store.record_event(data.get("video_id", ""), data.get("event_type", ""), data.get("source_channel", "h5"))
+            except (journey_store.JourneyUnavailable, ValueError) as error:
+                return self._send_json(503 if isinstance(error, journey_store.JourneyUnavailable) else 400, {"error": str(error)})
+            return self._send_json(201, {"recorded": True}) if ok else self._not_found()
         if path == "/make-send":
             data = self._read_json_body()
             if data is None:
                 return self._send_json(400, {"error": "bad request"})
-            return self._serve(data.get("text", "") or "", data.get("item", "rabbit-happy") or "rabbit-happy", bool(data.get("app_bridge")))
+            return self._serve(
+                data.get("text", "") or "", data.get("item", "rabbit-happy") or "rabbit-happy",
+                bool(data.get("app_bridge")), bool(data.get("journey_v1")),
+                data.get("remix_token", "") or "", data.get("source_channel", "h5") or "h5",
+            )
         return self._not_found()
 
     def _admin_login(self):
@@ -492,7 +590,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         log("ADMIN-TOGGLE enabled=%s" % enabled)
         return self._send_json(200, {"enabled": enabled})
 
-    def _serve(self, text, item, app_bridge=False):
+    def _serve(self, text, item, app_bridge=False, journey_v1=False, remix_token="", source_channel="h5"):
         if not read_enabled():
             return self._send_json(503, {"error": "service temporarily unavailable"})
         start = time.time()
@@ -512,6 +610,17 @@ class Handler(http.server.BaseHTTPRequestHandler):
             final, meta = generate(item, text, workdir)
             with open(final, "rb") as f:
                 data = f.read()
+            journey_record = None
+            if journey_v1:
+                character_id, emotion_id = JOURNEY_META[item]
+                try:
+                    journey_record = journey_store.create_video(
+                        character_id, emotion_id, source_channel, remix_token=remix_token or None,
+                    )
+                except journey_store.InvalidRemixToken as error:
+                    return self._send_json(410, {"error": str(error)})
+                except journey_store.JourneyUnavailable as error:
+                    return self._send_json(503, {"error": str(error)})
             log("SUCCESS item=%s text_len=%d lines=%d font=%d tts=%.2fs ffmpeg=%.2fs total=%.2fs size=%d"
                 % (item, len(text), meta["lines"], meta["font_size"], meta["tts"], meta["ffmpeg"],
                    time.time() - start, len(data)))
@@ -525,6 +634,12 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 token = store_app_video(data)
                 self.send_header("X-Video-Path", "/app-video/%s.mp4" % token)
                 self.send_header("X-Video-Expires-In", str(APP_VIDEO_TTL))
+            if journey_record:
+                self.send_header("X-Video-Id", journey_record["video_id"])
+                self.send_header("X-Journey-Id", journey_record["journey_id"])
+                self.send_header("X-Parent-Video-Id", journey_record["parent_video_id"] or "")
+                self.send_header("X-Generation", str(journey_record["generation"]))
+                self.send_header("X-Remix-Entry", "%s/r/%s" % (PUBLIC_BASE_URL, journey_record["share_code"]))
             self.end_headers()
             self.wfile.write(data)
         except Exception as e:
