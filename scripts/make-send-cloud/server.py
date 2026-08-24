@@ -65,7 +65,12 @@ _sessions = {}
 _sessions_lock = threading.Lock()
 _login_fails = {}
 _login_lock = threading.Lock()
+_app_videos = {}
+_app_video_lock = threading.Lock()
 DEFAULT_TEXT = "今天先开心，其他事情都给我排队。"
+APP_VIDEO_TTL = int(os.environ.get("APP_VIDEO_TTL", "600"))
+APP_VIDEO_MAX_READS = int(os.environ.get("APP_VIDEO_MAX_READS", "3"))
+APP_VIDEO_DIR = os.environ.get("APP_VIDEO_DIR", "/tmp/app-video-cache")
 
 
 def log(msg):
@@ -146,6 +151,45 @@ def rate_ok(ip):
         ts.append(now)
         _rates[ip] = ts
     return True
+
+
+def store_app_video(data):
+    os.makedirs(APP_VIDEO_DIR, exist_ok=True)
+    now = time.time()
+    with _app_video_lock:
+        for token, record in list(_app_videos.items()):
+            if record["expires"] <= now or record["reads"] <= 0:
+                try:
+                    os.remove(record["path"])
+                except OSError:
+                    pass
+                _app_videos.pop(token, None)
+        token = secrets.token_urlsafe(24)
+        path = os.path.join(APP_VIDEO_DIR, token + ".mp4")
+        with open(path, "wb") as f:
+            f.write(data)
+        _app_videos[token] = {
+            "path": path,
+            "expires": now + APP_VIDEO_TTL,
+            "reads": APP_VIDEO_MAX_READS,
+        }
+    return token
+
+
+def take_app_video(token):
+    now = time.time()
+    with _app_video_lock:
+        record = _app_videos.get(token)
+        if not record or record["expires"] <= now or record["reads"] <= 0:
+            if record:
+                try:
+                    os.remove(record["path"])
+                except OSError:
+                    pass
+                _app_videos.pop(token, None)
+            return None
+        record["reads"] -= 1
+        return record["path"], record["expires"], record["reads"]
 
 
 def _font_selector():
@@ -305,6 +349,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Origin", CORS_ORIGIN)
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        self.send_header("Access-Control-Expose-Headers", "X-Video-Path, X-Video-Expires-In")
 
     def _send_json(self, code, obj):
         body = json.dumps(obj, ensure_ascii=False).encode("utf-8")
@@ -339,6 +384,29 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _send_app_video(self, token):
+        if not token or any(c not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_" for c in token):
+            return self._not_found()
+        result = take_app_video(token)
+        if not result:
+            return self._send_json(410, {"error": "video expired or unavailable"})
+        path, expires, reads_left = result
+        try:
+            with open(path, "rb") as f:
+                body = f.read()
+        except OSError:
+            return self._send_json(410, {"error": "video unavailable"})
+        self.send_response(200)
+        self._cors()
+        self.send_header("Content-Type", "video/mp4")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Content-Disposition", 'inline; filename="emotion-video.mp4"')
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Video-Expires-In", str(max(0, int(expires - time.time()))))
+        self.send_header("X-Video-Reads-Left", str(reads_left))
+        self.end_headers()
+        self.wfile.write(body)
+
     def _read_json_body(self):
         try:
             length = int(self.headers.get("Content-Length", "0") or 0)
@@ -367,11 +435,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
             return self._send_json(200, {"enabled": read_enabled()})
         if path == "/poc/sample.mp4":
             return self._send_poc_sample()
+        if path.startswith("/app-video/") and path.endswith(".mp4"):
+            return self._send_app_video(path[len("/app-video/"):-4])
         if path == "/admin":
             return self._send_html(ADMIN_HTML)
         if path == "/make-send":
             qs = urllib.parse.parse_qs(parsed.query)
-            return self._serve(qs.get("text", [""])[0], qs.get("item", ["rabbit-happy"])[0])
+            app_bridge = qs.get("app_bridge", [""])[0] == "1"
+            return self._serve(qs.get("text", [""])[0], qs.get("item", ["rabbit-happy"])[0], app_bridge)
         return self._not_found()
 
     def do_POST(self):
@@ -385,7 +456,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
             data = self._read_json_body()
             if data is None:
                 return self._send_json(400, {"error": "bad request"})
-            return self._serve(data.get("text", "") or "", data.get("item", "rabbit-happy") or "rabbit-happy")
+            return self._serve(data.get("text", "") or "", data.get("item", "rabbit-happy") or "rabbit-happy", bool(data.get("app_bridge")))
         return self._not_found()
 
     def _admin_login(self):
@@ -421,7 +492,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         log("ADMIN-TOGGLE enabled=%s" % enabled)
         return self._send_json(200, {"enabled": enabled})
 
-    def _serve(self, text, item):
+    def _serve(self, text, item, app_bridge=False):
         if not read_enabled():
             return self._send_json(503, {"error": "service temporarily unavailable"})
         start = time.time()
@@ -450,6 +521,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.send_header("Content-Length", str(len(data)))
             self.send_header("Content-Disposition", 'attachment; filename="%s.mp4"' % item)
             self.send_header("Cache-Control", "no-store")
+            if app_bridge:
+                token = store_app_video(data)
+                self.send_header("X-Video-Path", "/app-video/%s.mp4" % token)
+                self.send_header("X-Video-Expires-In", str(APP_VIDEO_TTL))
             self.end_headers()
             self.wfile.write(data)
         except Exception as e:
