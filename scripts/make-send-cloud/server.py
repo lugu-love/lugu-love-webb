@@ -493,6 +493,13 @@ var b=document.getElementById('open'),s=document.getElementById('status');b.oncl
             if not result:
                 return self._send_json(410, {"error": "remix token expired or unavailable"})
             return self._send_json(200, result)
+        if path.startswith("/journey/videos/") and path.endswith("/children"):
+            video_id = path[len("/journey/videos/"):-len("/children")]
+            try:
+                result = journey_store.get_children(video_id)
+            except (journey_store.JourneyUnavailable, ValueError) as error:
+                return self._send_json(503 if isinstance(error, journey_store.JourneyUnavailable) else 400, {"error": str(error)})
+            return self._send_json(200, {"parent_video_id": video_id, "children": result})
         if path.startswith("/journey/videos/"):
             try:
                 result = journey_store.get_video(path[len("/journey/videos/"):])

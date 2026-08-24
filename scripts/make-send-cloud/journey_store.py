@@ -266,3 +266,20 @@ def get_video(video_id):
     if not row:
         return None
     return {key: (str(value) if isinstance(value, uuid.UUID) else value.isoformat() if isinstance(value, datetime) else value) for key, value in row.items()}
+
+
+def get_children(parent_video_id):
+    ensure_schema()
+    with _connect() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """SELECT video_id, journey_id, parent_video_id, generation, character_id,
+                          emotion_id, source_channel, created_at
+                   FROM videos WHERE parent_video_id=%s ORDER BY created_at""",
+                (parent_video_id,),
+            )
+            rows = cur.fetchall()
+    return [
+        {key: (str(value) if isinstance(value, uuid.UUID) else value.isoformat() if isinstance(value, datetime) else value) for key, value in row.items()}
+        for row in rows
+    ]
