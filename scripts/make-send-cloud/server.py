@@ -19,7 +19,7 @@ from datetime import datetime
 import html
 
 from text_layout import layout_lines, has_unsupported
-from tts_provider import make_tts_provider
+from tts_provider import make_tts_provider, ElevenLabsProvider
 import journey_store
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -35,6 +35,24 @@ MASTERS = {
     "rabbit-aggrieved": ("wronged-master.mp4", "委屈"),
     "rabbit-angry":     ("angry-master.mp4", "生气"),
 }
+
+# 七星使者 · 测试声音池（ElevenLabs premade，voice_id 为稳定引用）
+VOICE_LIBRARY = {
+    "FGY2WhTYpPnrIDTdsKH5": "Laura",
+    "cgSgspJ2msm6clMCkdW9": "Jessica",
+    "EXAVITQu4vr4xnSDxMaL": "Sarah",
+    "pFZP5JQG7iQjIQuC4Bku": "Lily",
+    "hpp4J3VqNfWAUOO0d1Us": "Bella",
+    "Xb7hH8MSUJpSbSDYk0k2": "Alice",
+    "TX3LPaxmHKxFdv7VOQHJ": "Liam",
+    "bIHbv24MWmeRgasZH58o": "Will",
+    "pNInz6obpgDQGcFmaJgB": "Adam",
+    "JBFqnCBsd6RMkjVDRZzb": "George",
+    "cjVigY5qzO86Huf0OWal": "Eric",
+    "nPczCjzI2devNBz1zQrb": "Brian",
+    "pqHfZKP75CvOlQylNhV4": "Bill",
+}
+DEFAULT_VOICE_ID = "FGY2WhTYpPnrIDTdsKH5"  # Laura
 
 FPS = int(os.environ.get("FPS", "18"))
 SERVICE_ENABLED = os.environ.get("SERVICE_ENABLED", "true").lower() in ("1", "true", "yes", "on")
@@ -229,7 +247,7 @@ def _build_filter(line_files, font_size, y_top):
     return ";".join(parts), "[v%d]" % (n - 1)
 
 
-def generate(item, text, workdir, tts=None):
+def generate(item, text, workdir, tts=None, voice_id=None):
     master_rel, _emotion = MASTERS[item]
     master = os.path.join(MASTERS_DIR, master_rel)
     final = os.path.join(workdir, "final.mp4")
@@ -254,8 +272,23 @@ def generate(item, text, workdir, tts=None):
     meta["font_size"] = font_size
 
     t0 = time.time()
-    (tts or make_tts_provider()).synthesize(text, tts_path)
+    provider_used = "edge-tts"
+    if voice_id and voice_id in VOICE_LIBRARY:
+        try:
+            ElevenLabsProvider(voice_id).synthesize(text, tts_path)
+            provider_used = "elevenlabs"
+        except Exception as e:
+            log("ELEVENLABS-FALLBACK voice=%s err=%s" % (voice_id, "%s: %s" % (type(e).__name__, e)))
+            make_tts_provider("edge-tts").synthesize(text, tts_path)
+            provider_used = "edge-tts-fallback"
+    else:
+        if voice_id:
+            log("UNKNOWN-VOICE voice=%s fallback=edge-tts" % voice_id)
+            provider_used = "edge-tts-fallback"
+        (tts or make_tts_provider("edge-tts")).synthesize(text, tts_path)
     meta["tts"] = time.time() - t0
+    meta["tts_provider"] = provider_used
+    meta["voice_id"] = voice_id or ""
 
     t0 = time.time()
     cmd = [
@@ -518,9 +551,11 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             qs = urllib.parse.parse_qs(parsed.query)
             app_bridge = qs.get("app_bridge", [""])[0] == "1"
             journey_v1 = qs.get("journey_v1", [""])[0] == "1"
+            voice_id = (qs.get("voice") or qs.get("voiceId") or [""])[0] or None
             return self._serve(
                 qs.get("text", [""])[0], qs.get("item", ["rabbit-happy"])[0], app_bridge,
                 journey_v1, qs.get("remix_token", [""])[0], qs.get("source_channel", ["h5"])[0],
+                voice_id,
             )
         return self._not_found()
 
@@ -559,10 +594,12 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             data = self._read_json_body()
             if data is None:
                 return self._send_json(400, {"error": "bad request"})
+            voice_id = data.get("voice") or data.get("voiceId") or None
             return self._serve(
                 data.get("text", "") or "", data.get("item", "rabbit-happy") or "rabbit-happy",
                 bool(data.get("app_bridge")), bool(data.get("journey_v1")),
                 data.get("remix_token", "") or "", data.get("source_channel", "h5") or "h5",
+                voice_id,
             )
         return self._not_found()
 
@@ -599,7 +636,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         log("ADMIN-TOGGLE enabled=%s" % enabled)
         return self._send_json(200, {"enabled": enabled})
 
-    def _serve(self, text, item, app_bridge=False, journey_v1=False, remix_token="", source_channel="h5"):
+    def _serve(self, text, item, app_bridge=False, journey_v1=False, remix_token="", source_channel="h5", voice_id=None):
         if not read_enabled():
             return self._send_json(503, {"error": "service temporarily unavailable"})
         start = time.time()
@@ -616,7 +653,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         workdir = None
         try:
             workdir = tempfile.mkdtemp(prefix="make-send-")
-            final, meta = generate(item, text, workdir)
+            final, meta = generate(item, text, workdir, voice_id=voice_id)
             with open(final, "rb") as f:
                 data = f.read()
             journey_record = None
@@ -630,8 +667,8 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
                     return self._send_json(410, {"error": str(error)})
                 except journey_store.JourneyUnavailable as error:
                     return self._send_json(503, {"error": str(error)})
-            log("SUCCESS item=%s text_len=%d lines=%d font=%d tts=%.2fs ffmpeg=%.2fs total=%.2fs size=%d"
-                % (item, len(text), meta["lines"], meta["font_size"], meta["tts"], meta["ffmpeg"],
+            log("SUCCESS item=%s voice=%s tts_provider=%s text_len=%d lines=%d font=%d tts=%.2fs ffmpeg=%.2fs total=%.2fs size=%d"
+                % (item, meta.get("voice_id") or "-", meta.get("tts_provider") or "-", len(text), meta["lines"], meta["font_size"], meta["tts"], meta["ffmpeg"],
                    time.time() - start, len(data)))
             self.send_response(200)
             self._cors()
@@ -639,6 +676,8 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             self.send_header("Content-Length", str(len(data)))
             self.send_header("Content-Disposition", 'attachment; filename="%s.mp4"' % item)
             self.send_header("Cache-Control", "no-store")
+            self.send_header("X-TTS-Provider", meta.get("tts_provider", ""))
+            self.send_header("X-TTS-Voice", meta.get("voice_id", ""))
             if app_bridge:
                 token = store_app_video(data)
                 self.send_header("X-Video-Path", "/app-video/%s.mp4" % token)
