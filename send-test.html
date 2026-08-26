@@ -235,25 +235,15 @@ window.__MAIN__ = function () {
   var lastBlob=null, lastFile=null, lastUrl=null;
 
   var VOICES = [
-    {name:"Laura", label:"甜柔·俏皮", id:"FGY2WhTYpPnrIDTdsKH5"},
-    {name:"Jessica", label:"活泼·甜软", id:"cgSgspJ2msm6clMCkdW9"},
-    {name:"Sarah", label:"温柔·安抚", id:"EXAVITQu4vr4xnSDxMaL"},
-    {name:"Lily", label:"细腻·有质感", id:"pFZP5JQG7iQjIQuC4Bku"},
-    {name:"Bella", label:"知性·温暖", id:"hpp4J3VqNfWAUOO0d1Us"},
-    {name:"Alice", label:"清亮·知性", id:"Xb7hH8MSUJpSbSDYk0k2"},
-    {name:"Liam", label:"清朗·活力", id:"TX3LPaxmHKxFdv7VOQHJ"},
-    {name:"Will", label:"清朗·温柔", id:"bIHbv24MWmeRgasZH58o"},
-    {name:"Adam", label:"坚定·有力", id:"pNInz6obpgDQGcFmaJgB"},
-    {name:"George", label:"温暖·叙事", id:"JBFqnCBsd6RMkjVDRZzb"},
-    {name:"Eric", label:"稳重·可靠", id:"cjVigY5qzO86Huf0OWal"},
-    {name:"Brian", label:"厚实·治愈", id:"nPczCjzI2devNBz1zQrb"},
-    {name:"Bill", label:"长者·沉稳", id:"pqHfZKP75CvOlQylNhV4"}
+    {name:"Lulu", label:"测试默认", id:"ocZQ262SsZb9RIxcQBOj"},
+    {name:"Hina", label:"软萌", id:"lhTvHflPVOqgSWyuWQry"},
+    {name:"Chutki", label:"元气", id:"Jr72SE8p9OcJmr8hyX0D"}
   ];
   var voiceSelect=document.getElementById("voiceSelect");
   VOICES.forEach(function(v){
     var o=document.createElement("option"); o.value=v.id; o.textContent=v.name+"｜"+v.label; voiceSelect.appendChild(o);
   });
-  voiceSelect.value="FGY2WhTYpPnrIDTdsKH5";
+  voiceSelect.value="ocZQ262SsZb9RIxcQBOj";
 
   EMOTIONS.forEach(function(e){
     var b=document.createElement("button"); b.type="button"; b.className="emotion"; b.textContent=e.name;
