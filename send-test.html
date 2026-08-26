@@ -241,7 +241,7 @@ window.__MAIN__ = function () {
       previewTextEl.textContent = "";
       suggestBox.hidden = true;
     }
-    refreshUI(); clearGenerated(); loadSheets(); renderDiag(); renderPreloadDiag(); renderSuggest(); renderGuide();
+    refreshUI(); clearGenerated(); loadSheets(); renderDiag(); renderPreloadDiag(); renderSuggest(); renderGuide(); syncGenerateEnabled();
     if(prevId !== current.id){ try { textInput.focus(); } catch(e) {} }
   }
 
@@ -265,6 +265,7 @@ window.__MAIN__ = function () {
         textInput.value = txt;
         previewTextEl.textContent = txt;
         suggestBox.hidden = true;
+        syncGenerateEnabled();
       });
       suggestBox.appendChild(b);
     });
@@ -353,11 +354,16 @@ window.__MAIN__ = function () {
   function startLoop(){ frameIndex=0; lastFrameAt=0; paintFrame(); cancelAnimationFrame(animId); animId=requestAnimationFrame(loop); }
   function loop(now){ if(!lastFrameAt) lastFrameAt=now; if(now-lastFrameAt>=1000/FRAME_RATE){ lastFrameAt=now; frameIndex=(frameIndex+1)%current.totalFrames; paintFrame(); } animId=requestAnimationFrame(loop); }
 
-  textInput.addEventListener("input", function(){ previewTextEl.textContent=textInput.value; });
+  textInput.addEventListener("input", function(){ previewTextEl.textContent=textInput.value; syncGenerateEnabled(); });
 
   function setStatus(msg, cls){ statusEl.textContent=msg; statusEl.className="status" + (cls ? " "+cls : ""); }
   function setHint(msg){ hintEl.textContent=msg || ""; }
   function showToast(msg){ toastEl.textContent=msg; toastEl.classList.add("show"); clearTimeout(showToast._t); showToast._t=setTimeout(function(){toastEl.classList.remove("show");},1800); }
+
+  function syncGenerateEnabled(){
+    var hasText = textInput.value.trim().length > 0;
+    btnGenerate.disabled = !hasText || isGenerating;
+  }
 
   function renderDiag(){
     var ua = navigator.userAgent || "";
@@ -389,6 +395,7 @@ window.__MAIN__ = function () {
 
   function reEdit(){
     clearGenerated();
+    syncGenerateEnabled();
     try { textInput.focus(); } catch(e) {}
     try { textInput.scrollIntoView({ behavior:"smooth", block:"center" }); } catch(e) {}
   }
@@ -405,7 +412,7 @@ window.__MAIN__ = function () {
     clearGenerated();
     genCount++;
     var tClick = performance.now();
-    btnGenerate.disabled=true; btnGenerate.textContent="正在生成…";
+    btnGenerate.textContent="正在生成…"; syncGenerateEnabled();
     var msgs=["正在生成你的情绪视频…","正在加入你的文字…","正在生成声音…","视频马上好了…"];
     var mi=0; setStatus(msgs[0]); setHint("");
     generatePhase="feedback-visible";
@@ -470,7 +477,7 @@ window.__MAIN__ = function () {
       clearInterval(timer);
       activeController=null;
       isGenerating=false;
-      btnGenerate.disabled=false; btnGenerate.textContent="生成视频";
+      btnGenerate.textContent="生成视频"; syncGenerateEnabled();
       renderDiag();
     }
   }
@@ -547,6 +554,7 @@ window.__MAIN__ = function () {
   renderDiag();
   renderPreloadDiag();
   renderGuide();
+  syncGenerateEnabled();
 };
 
 if (window.__MAIN_PENDING__) {
