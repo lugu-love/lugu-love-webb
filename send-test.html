@@ -120,7 +120,11 @@
   function start() {
     window.__SITE_PAUSED__ = false;
     if (app) app.style.display = '';
-    if (typeof window.__MAIN__ === 'function') window.__MAIN__();
+    if (typeof window.__MAIN__ === 'function') {
+      window.__MAIN__();
+    } else {
+      window.__MAIN_PENDING__ = true;
+    }
   }
   if (!staticOn) { pause(); return; }
   if (app) app.style.display = 'none';
@@ -524,6 +528,11 @@ window.__MAIN__ = function () {
   renderPreloadDiag();
   renderGuide();
 };
+
+if (window.__MAIN_PENDING__) {
+  window.__MAIN_PENDING__ = false;
+  window.__MAIN__();
+}
 </script>
 </body>
 </html>
