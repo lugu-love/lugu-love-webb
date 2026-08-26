@@ -24,6 +24,9 @@
   .emotions { display:flex; justify-content:center; gap:20px; margin:18px 0 10px; position:relative; z-index:30; }
   .emotion { flex:0 1 auto; padding:10px 20px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:var(--muted); font-size:13px; font-weight:600; cursor:pointer; text-align:center; white-space:nowrap; }
   .emotion.active { color:#fff; border-color:var(--accent); background:rgba(125,139,255,.22); box-shadow:0 0 16px rgba(125,139,255,.28); }
+  .voice-row { display:flex; align-items:center; gap:10px; margin:0 0 12px; }
+  .voice-row .vlabel { font-size:13px; color:var(--muted); flex:0 0 auto; }
+  .voice-select { flex:1; height:40px; padding:0 12px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:#12142a; color:#fff; font-size:14px; outline:none; }
   .suggest { align-self:flex-start; margin-top:8px; margin-left:16px; padding:6px 12px; border:1px solid rgba(255,255,255,.16); border-radius:999px; background:rgba(255,255,255,.06); color:#b8c0ff; font-size:12px; cursor:pointer; }
   .suggest-box { display:flex; flex-direction:column; margin-top:6px; padding:0 16px; max-height:132px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
   .suggest-chip { display:flex; align-items:flex-start; gap:9px; text-align:left; padding:11px 0; border:none; background:transparent; border-bottom:1px solid rgba(255,255,255,.06); color:rgba(224,218,240,.82); font-size:13px; line-height:1.4; cursor:pointer; }
@@ -78,6 +81,11 @@
     <div class="stage-wrap"><canvas id="stage" width="540" height="540"></canvas></div>
 
     <div class="emotions" id="emotions"></div>
+
+    <div class="voice-row">
+      <span class="vlabel">声音</span>
+      <select id="voiceSelect" class="voice-select"></select>
+    </div>
 
     <div class="editor"><textarea id="textInput" maxlength="40" placeholder="写一句话…"></textarea></div>
     <div class="guide" id="guide"></div>
@@ -225,6 +233,27 @@ window.__MAIN__ = function () {
   var cache={}, preloadOrder=["2","3"], preloadStarted=false, activeUserLoad=false;
   var sheets=[], loaded=0, frameIndex=0, lastFrameAt=0, animId=null;
   var lastBlob=null, lastFile=null, lastUrl=null;
+
+  var VOICES = [
+    {name:"Laura", label:"甜柔·俏皮", id:"FGY2WhTYpPnrIDTdsKH5"},
+    {name:"Jessica", label:"活泼·甜软", id:"cgSgspJ2msm6clMCkdW9"},
+    {name:"Sarah", label:"温柔·安抚", id:"EXAVITQu4vr4xnSDxMaL"},
+    {name:"Lily", label:"细腻·有质感", id:"pFZP5JQG7iQjIQuC4Bku"},
+    {name:"Bella", label:"知性·温暖", id:"hpp4J3VqNfWAUOO0d1Us"},
+    {name:"Alice", label:"清亮·知性", id:"Xb7hH8MSUJpSbSDYk0k2"},
+    {name:"Liam", label:"清朗·活力", id:"TX3LPaxmHKxFdv7VOQHJ"},
+    {name:"Will", label:"清朗·温柔", id:"bIHbv24MWmeRgasZH58o"},
+    {name:"Adam", label:"坚定·有力", id:"pNInz6obpgDQGcFmaJgB"},
+    {name:"George", label:"温暖·叙事", id:"JBFqnCBsd6RMkjVDRZzb"},
+    {name:"Eric", label:"稳重·可靠", id:"cjVigY5qzO86Huf0OWal"},
+    {name:"Brian", label:"厚实·治愈", id:"nPczCjzI2devNBz1zQrb"},
+    {name:"Bill", label:"长者·沉稳", id:"pqHfZKP75CvOlQylNhV4"}
+  ];
+  var voiceSelect=document.getElementById("voiceSelect");
+  VOICES.forEach(function(v){
+    var o=document.createElement("option"); o.value=v.id; o.textContent=v.name+"｜"+v.label; voiceSelect.appendChild(o);
+  });
+  voiceSelect.value="FGY2WhTYpPnrIDTdsKH5";
 
   EMOTIONS.forEach(function(e){
     var b=document.createElement("button"); b.type="button"; b.className="emotion"; b.textContent=e.name;
@@ -428,7 +457,7 @@ window.__MAIN__ = function () {
       });
       var tFetchStart = performance.now();
       lastTiming.clickToFetchMs=Math.round(tFetchStart-tClick);
-      var url=MAKE_SEND_API + "/make-send?text=" + encodeURIComponent(text) + "&item=" + encodeURIComponent(current.item);
+      var url=MAKE_SEND_API + "/make-send?text=" + encodeURIComponent(text) + "&item=" + encodeURIComponent(current.item) + "&voiceId=" + encodeURIComponent(voiceSelect.value);
       activeController = typeof AbortController === "function" ? new AbortController() : null;
       generatePhase="request-sent";
       renderDiag();
