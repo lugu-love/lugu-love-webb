@@ -51,8 +51,12 @@ VOICE_LIBRARY = {
     "cjVigY5qzO86Huf0OWal": "Eric",
     "nPczCjzI2devNBz1zQrb": "Brian",
     "pqHfZKP75CvOlQylNhV4": "Bill",
+    # 风信兔 · 角色化测试候选（characters_animation，测试默认 Lulu，非最终角色声）
+    "ocZQ262SsZb9RIxcQBOj": "Lulu",
+    "lhTvHflPVOqgSWyuWQry": "Hina",
+    "Jr72SE8p9OcJmr8hyX0D": "Chutki",
 }
-DEFAULT_VOICE_ID = "FGY2WhTYpPnrIDTdsKH5"  # Laura
+DEFAULT_VOICE_ID = "ocZQ262SsZb9RIxcQBOj"  # Lulu（风信兔测试默认）
 
 FPS = int(os.environ.get("FPS", "18"))
 SERVICE_ENABLED = os.environ.get("SERVICE_ENABLED", "true").lower() in ("1", "true", "yes", "on")
