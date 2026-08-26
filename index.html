@@ -3158,6 +3158,22 @@ font-size: 12px;
   .emotion-entry-text { display: flex; flex-direction: column; line-height: 1.15; }
   .emotion-entry-title { font-size: 9px; font-weight: 650; letter-spacing: .01em; white-space: nowrap; }
   .emotion-entry-sub { display: none; }
+  .career-entry {
+    position: fixed; left: calc(50% - 124px); bottom: 52px;
+    z-index: 4; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2px; width: 50px; height: 44px; padding: 4px 3px;
+    border: 1px solid rgba(255,255,255,.22); border-radius: 12px;
+    background: rgba(255,255,255,.07);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 0 18px rgba(140,120,255,.20), inset 0 0 12px rgba(255,255,255,.04);
+    color: #fff; text-decoration: none;
+    font-family: "PingFang SC","Microsoft YaHei",Arial,sans-serif;
+    text-align: center;
+  }
+  .career-entry:active { transform: scale(.96); }
+  .career-entry-emoji { font-size: 14px; line-height: 1; filter: drop-shadow(0 0 6px rgba(255,210,140,.4)); }
+  .career-entry-text { display: flex; flex-direction: column; line-height: 1.15; }
+  .career-entry-title { font-size: 9px; font-weight: 650; letter-spacing: .01em; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -3231,7 +3247,12 @@ font-size: 12px;
 <span class="guide-sub">Gently touch a “heart star”, meet a “world”.</span>
 </div>
 <div class="guide-final-heart" aria-hidden="true">♥</div>
-<!-- 预留：左下方副入口（未来第二个重要入口，与右下方七星使者形成左右呼应） -->
+<a class="career-entry" href="co-create.html" aria-label="事业共创">
+<span class="career-entry-emoji" aria-hidden="true">🤝</span>
+<span class="career-entry-text">
+<span class="career-entry-title">事业共创</span>
+</span>
+</a>
 <a class="emotion-entry" href="send-test.html" aria-label="情绪表达">
 <span class="emotion-entry-emoji" aria-hidden="true">🐰</span>
 <span class="emotion-entry-text">
