@@ -92,6 +92,7 @@
       <button class="btn-primary" id="btnOpen" type="button" hidden>打开视频</button>
       <button class="btn-secondary" id="btnSend" type="button" hidden>发送视频</button>
       <button class="btn-secondary" id="btnSave" type="button" hidden>保存到手机</button>
+      <button class="btn-secondary" id="btnReEdit" type="button" hidden>← 返回编辑</button>
     </div>
 
     <div class="status" id="status"></div>
@@ -210,6 +211,7 @@ window.__MAIN__ = function () {
   var btnOpen=document.getElementById("btnOpen");
   var btnSave=document.getElementById("btnSave");
   var btnSend=document.getElementById("btnSend");
+  var btnReEdit=document.getElementById("btnReEdit");
   var toastEl=document.getElementById("toast");
   var userAgent=navigator.userAgent || "";
   var isIOS=/iPad|iPhone|iPod/.test(userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
@@ -370,8 +372,14 @@ window.__MAIN__ = function () {
     videoEl.removeAttribute("src");
     videoEl.load();
     videoEl.hidden=true;
-    btnOpen.hidden=true; btnSave.hidden=true; btnSend.hidden=true;
+    btnOpen.hidden=true; btnSave.hidden=true; btnSend.hidden=true; btnReEdit.hidden=true;
     setHint("");
+  }
+
+  function reEdit(){
+    clearGenerated();
+    try { textInput.focus(); } catch(e) {}
+    try { textInput.scrollIntoView({ behavior:"smooth", block:"center" }); } catch(e) {}
   }
 
   async function generateVideo(){
@@ -431,7 +439,7 @@ window.__MAIN__ = function () {
       generatePhase="success";
       setStatus("视频生成成功", "ok");
       setHint(isIOS ? "打开后，点击右上角‘…’即可分享" : (isWeChat ? "请在浏览器中打开后发送视频" : "点击“发送视频”，可选择微信或其他应用。"));
-      btnOpen.hidden=false; btnSave.hidden=false;
+      btnOpen.hidden=false; btnSave.hidden=false; btnReEdit.hidden=false;
       if(!isWeChat && navigator.canShare && navigator.canShare({files:[file]})){
         if(isAndroid) document.documentElement.classList.add("can-file-share");
         btnSend.hidden=false;
@@ -515,6 +523,7 @@ window.__MAIN__ = function () {
   btnOpen.addEventListener("click", openVideo);
   btnSave.addEventListener("click", saveVideo);
   btnSend.addEventListener("click", sendVideo);
+  btnReEdit.addEventListener("click", reEdit);
 
   document.addEventListener("click", function(e){
     var el = document.elementFromPoint(e.clientX, e.clientY);
