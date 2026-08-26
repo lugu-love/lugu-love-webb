@@ -233,7 +233,17 @@ window.__MAIN__ = function () {
   });
 
   function refreshUI(){ Array.prototype.forEach.call(emotionsEl.children, function(b,i){ b.classList.toggle("active", EMOTIONS[i].id===current.id); }); }
-  function selectEmotion(id){ current = EMOTIONS.find(function(e){return e.id===id;}) || EMOTIONS[0]; refreshUI(); clearGenerated(); loadSheets(); renderDiag(); renderPreloadDiag(); renderSuggest(); renderGuide(); }
+  function selectEmotion(id){
+    var prevId = current.id;
+    current = EMOTIONS.find(function(e){return e.id===id;}) || EMOTIONS[0];
+    if(prevId !== current.id){
+      textInput.value = "";
+      previewTextEl.textContent = "";
+      suggestBox.hidden = true;
+    }
+    refreshUI(); clearGenerated(); loadSheets(); renderDiag(); renderPreloadDiag(); renderSuggest(); renderGuide();
+    if(prevId !== current.id){ try { textInput.focus(); } catch(e) {} }
+  }
 
   function renderGuide(){
     var txt = GUIDES[current.id] || "";
