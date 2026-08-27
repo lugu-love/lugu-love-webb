@@ -87,7 +87,7 @@
       <select id="voiceSelect" class="voice-select"></select>
     </div>
 
-    <div class="editor"><textarea id="textInput" maxlength="40" placeholder="写一句话…"></textarea></div>
+    <div class="editor"><textarea id="textInput" maxlength="20" placeholder="写一句话…（20 字内）"></textarea></div>
     <div class="guide" id="guide"></div>
     <button class="suggest" id="btnSuggest" type="button">✨ 帮我选一句</button>
     <div class="suggest-box" id="suggestBox" hidden></div>
@@ -235,15 +235,15 @@ window.__MAIN__ = function () {
   var lastBlob=null, lastFile=null, lastUrl=null;
 
   var VOICES = [
-    {name:"Lulu", label:"测试默认", id:"ocZQ262SsZb9RIxcQBOj"},
+    {name:"Lulu", label:"甜脆", id:"ocZQ262SsZb9RIxcQBOj"},
     {name:"Hina", label:"软萌", id:"lhTvHflPVOqgSWyuWQry"},
-    {name:"Chutki", label:"元气", id:"Jr72SE8p9OcJmr8hyX0D"}
+    {name:"Chutki", label:"元气（默认）", id:"Jr72SE8p9OcJmr8hyX0D"}
   ];
   var voiceSelect=document.getElementById("voiceSelect");
   VOICES.forEach(function(v){
     var o=document.createElement("option"); o.value=v.id; o.textContent=v.name+"｜"+v.label; voiceSelect.appendChild(o);
   });
-  voiceSelect.value="ocZQ262SsZb9RIxcQBOj";
+  voiceSelect.value="Jr72SE8p9OcJmr8hyX0D";
 
   EMOTIONS.forEach(function(e){
     var b=document.createElement("button"); b.type="button"; b.className="emotion"; b.textContent=e.name;
