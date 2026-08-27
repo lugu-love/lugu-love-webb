@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>风信兔 · 生气 V2 视觉样板</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100dvh;
+    background: #020407;
+    color: #fff;
+    font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 18px; padding: 24px;
+  }
+  h1 { font-size: 17px; font-weight: 600; letter-spacing: .04em; text-align: center; }
+  video {
+    width: min(92vw, 360px);
+    max-height: 64vh;
+    border-radius: 14px;
+    background: #000;
+    box-shadow: 0 8px 32px rgba(0,0,0,.5);
+  }
+  a.back {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 16px;
+    border: 1px solid rgba(255,255,255,.24);
+    border-radius: 12px;
+    background: rgba(255,255,255,.08);
+    color: #fff; text-decoration: none; font-size: 13px;
+  }
+  a.back:active { transform: scale(.96); }
+</style>
+</head>
+<body>
+  <h1>风信兔 · 生气 V2 视觉样板</h1>
+  <video src="assets/video/angry-v2-sample.mp4" controls playsinline preload="metadata"></video>
+  <a class="back" href="index.html">← 返回</a>
+</body>
+</html>
