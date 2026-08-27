@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>节奏实战 · 生成试看</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { min-height:100dvh; background:#020407; color:#fff; font-family:"PingFang SC","Microsoft YaHei",Arial,sans-serif; padding:16px 16px 44px; }
+  .toolbar { position:sticky; top:0; background:#020407; padding:10px 0; display:flex; justify-content:space-between; align-items:center; z-index:5; }
+  .progress { font-size:15px; font-weight:650; color:rgba(255,214,140,.95); }
+  .btn { padding:9px 13px; border:1px solid rgba(255,255,255,.22); border-radius:10px; background:rgba(255,255,255,.06); color:#fff; font-size:13px; }
+  .btn.primary { background:linear-gradient(135deg,#7d8bff,#a06bff); border:none; font-weight:650; }
+  .clip { max-width:480px; margin:0 auto; }
+  .head { display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+  .num { font-size:12px; color:rgba(255,214,140,.9); } .name { font-size:16px; font-weight:650; } .src { font-size:11px; color:rgba(255,255,255,.45); }
+  video.src-video { width:100%; max-height:38vh; border-radius:14px; background:#000; }
+  .hint { font-size:11px; color:rgba(255,255,255,.4); margin-top:6px; }
+  .q { margin:14px 0 6px; font-size:13px; color:rgba(255,255,255,.65); }
+  .input { width:100%; padding:11px 12px; border:1px solid rgba(255,255,255,.18); border-radius:12px; background:#0e1020; color:#fff; font-size:15px; }
+  textarea.input { min-height:64px; resize:none; line-height:1.5; }
+  .chips { display:flex; flex-wrap:wrap; gap:7px; }
+  .chip { padding:7px 13px; border:1px solid rgba(255,255,255,.18); border-radius:18px; background:rgba(255,255,255,.05); color:rgba(255,255,255,.85); font-size:13px; }
+  .chip.on { border-color:rgba(150,140,255,.75); background:rgba(120,110,255,.2); color:#fff; }
+  .gen-wrap { margin-top:14px; display:flex; gap:10px; }
+  .gen-wrap .btn { flex:1; padding:13px; font-size:15px; text-align:center; }
+  .status { margin-top:10px; font-size:12px; color:rgba(255,214,140,.9); min-height:16px; }
+  video.out-video { width:100%; margin-top:12px; border-radius:14px; background:#000; }
+  .rate { margin-top:14px; }
+  .rate-row { display:flex; align-items:center; gap:8px; margin-top:8px; }
+  .rate-label { font-size:13px; color:rgba(255,255,255,.65); width:70px; flex:0 0 auto; }
+  .rate .chip { font-size:12px; padding:6px 11px; }
+  .nav { max-width:480px; margin:20px auto 0; display:flex; gap:10px; }
+  .nav .btn { flex:1; padding:13px; font-size:15px; text-align:center; }
+  .nav .btn:disabled { opacity:.4; }
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <span class="progress" id="progress">1 / 4</span>
+    <button class="btn" onclick="exportJSON()">导出 JSON</button>
+  </div>
+
+  <div class="clip">
+    <div class="head"><span class="num" id="num"></span><span class="name" id="name"></span><span class="src" id="src"></span></div>
+    <video class="src-video" id="srcVideo" muted autoplay loop playsinline></video>
+    <div class="hint">先纯看原视频（已静音）；下面写一句你觉得合适的话</div>
+
+    <div class="q">A. 我觉得它最适合说</div>
+    <textarea class="input" id="userText" placeholder="写一句你觉得最适合这句话…"></textarea>
+
+    <div class="q">B. 应该怎么说（多选，会参与生成）</div>
+    <div class="chips" id="rhythmChips"></div>
+
+    <div class="gen-wrap">
+      <button class="btn primary" id="btnGen" onclick="generate()">生成试看</button>
+    </div>
+    <div class="status" id="status"></div>
+    <video class="out-video" id="outVideo" controls playsinline hidden></video>
+
+    <div class="rate" id="rateBlock" hidden>
+      <div class="q">快速评分</div>
+      <div class="rate-row"><span class="rate-label">口型和声音</span><div class="chips" id="r1"></div></div>
+      <div class="rate-row"><span class="rate-label">内容和表情</span><div class="chips" id="r2"></div></div>
+      <div class="rate-row"><span class="rate-label">整体效果</span><div class="chips" id="r3"></div></div>
+      <div class="q">备注</div>
+      <textarea class="input" id="genNote" placeholder="这次生成哪里好/哪里不好…"></textarea>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="btn" id="prev" onclick="go(-1)">← 上一条</button>
+    <button class="btn" id="next" onclick="go(1)">保存并看下一条 →</button>
+  </div>
+
+<script>
+  var CLIPS = [
+    { num:"01", name:"开心", clip:"clip_happy_01", file:"assets/video/library/clip_happy_01.mp4", item:"rabbit-happy" },
+    { num:"02", name:"委屈难过", clip:"clip_wronged_02", file:"assets/video/library/clip_wronged_02.mp4", item:"rabbit-aggrieved" },
+    { num:"03", name:"生气愤怒", clip:"clip_angry_03", file:"assets/video/library/clip_angry_03.mp4", item:"rabbit-angry" },
+    { num:"04", name:"调皮幽默", clip:"clip_playful_05", file:"assets/video/library/clip_playful_05.mp4", item:"rabbit-happy" }
+  ];
+  var VOICE_ID = "Jr72SE8p9OcJmr8hyX0D";
+  var MAKE_SEND = "https://api.lugu.love/make-send";
+  var RHYTHM_OPTS = ["连续说","分两段","分三段","中间停顿","前面先不说话","后面留静默","加轻笑","加轻叹","加“嗯”"];
+  var RATE_OPTS = [["很自然","还可以","明显不配"],["很匹配","还可以","不匹配"],["满意","可用","不满意"]];
+
+  var records = [];
+  try { records = JSON.parse(localStorage.getItem('rhythm_live_records_v1') || '[]'); } catch(e){ records = []; }
+  var idx = 0;
+  var curRhythm = {};
+  var curRatings = [[],[],[]];
+
+  function saveState(){
+    var c = CLIPS[idx];
+    curRhythm.clipId = c.clip;
+    curRhythm.name = c.name;
+    curRhythm.userText = document.getElementById('userText').value;
+    curRhythm.userNonverbalNotes = document.getElementById('genNote').value;
+    var sel = [];
+    document.querySelectorAll('#rhythmChips .chip.on').forEach(function(x){ sel.push(x.textContent); });
+    curRhythm.rhythmOptions = sel;
+    curRhythm.ratings = curRatings;
+    localStorage.setItem('rhythm_live_state_v1', JSON.stringify({idx:idx, cur:curRhythm}));
+  }
+
+  function buildSpeechText(text, opts){
+    var t = text;
+    if(opts.indexOf("前面先不说话")>=0) t = "……" + t;
+    if(opts.indexOf("加“嗯”")>=0) t = "嗯，" + t;
+    if(opts.indexOf("分三段")>=0){
+      var n = Math.floor(t.length/2);
+      t = t.slice(0, Math.floor(t.length/3)) + "……" + t.slice(Math.floor(t.length/3), Math.floor(2*t.length/3)) + "……" + t.slice(Math.floor(2*t.length/3));
+    } else if(opts.indexOf("分两段")>=0 || opts.indexOf("中间停顿")>=0){
+      t = t.slice(0, Math.floor(t.length/2)) + "……" + t.slice(Math.floor(t.length/2));
+    }
+    if(opts.indexOf("加轻笑")>=0) t = t + "哈。";
+    if(opts.indexOf("加轻叹")>=0) t = t + "唉。";
+    if(opts.indexOf("后面留静默")>=0) t = t + "……";
+    return t;
+  }
+
+  function render(){
+    var c = CLIPS[idx];
+    document.getElementById('progress').textContent = (idx+1) + " / " + CLIPS.length;
+    document.getElementById('num').textContent = c.num;
+    document.getElementById('name').textContent = c.name;
+    document.getElementById('src').textContent = c.clip + " → " + c.item;
+    var sv = document.getElementById('srcVideo');
+    sv.pause(); sv.removeAttribute('src'); sv.load(); sv.src = c.file;
+    document.getElementById('userText').value = (curRhythm.clipId===c.clip ? curRhythm.userText : '') || '';
+    document.getElementById('genNote').value = (curRhythm.clipId===c.clip ? curRhythm.userNonverbalNotes : '') || '';
+    // rhythm chips
+    var rc = document.getElementById('rhythmChips'); rc.innerHTML = '';
+    RHYTHM_OPTS.forEach(function(opt){
+      var b = document.createElement('button');
+      b.className = 'chip' + ((curRhythm.clipId===c.clip && (curRhythm.rhythmOptions||[]).indexOf(opt)>=0) ? ' on' : '');
+      b.textContent = opt;
+      b.addEventListener('click', function(){ b.classList.toggle('on'); saveState(); });
+      rc.appendChild(b);
+    });
+    // ratings
+    RATE_OPTS.forEach(function(opts, gi){
+      var box = document.getElementById('r'+(gi+1)); box.innerHTML='';
+      opts.forEach(function(opt){
+        var b = document.createElement('button');
+        b.className = 'chip' + ((curRatings[gi]||[]).indexOf(opt)>=0 ? ' on' : '');
+        b.textContent = opt;
+        b.addEventListener('click', function(){
+          curRatings[gi] = [opt];
+          box.querySelectorAll('.chip').forEach(function(x){ x.classList.remove('on'); });
+          b.classList.add('on');
+          saveState();
+        });
+        box.appendChild(b);
+      });
+    });
+    document.getElementById('prev').disabled = (idx===0);
+    document.getElementById('next').textContent = (idx===CLIPS.length-1) ? "完成 · 从头" : "保存并看下一条 →";
+  }
+
+  function generate(){
+    var text = document.getElementById('userText').value.trim();
+    if(!text){ document.getElementById('status').textContent = "先写一句想说的话。"; return; }
+    var opts = [];
+    document.querySelectorAll('#rhythmChips .chip.on').forEach(function(x){ opts.push(x.textContent); });
+    var speech = buildSpeechText(text, opts);
+    var c = CLIPS[idx];
+    var btn = document.getElementById('btnGen');
+    btn.disabled = true;
+    document.getElementById('status').textContent = "生成中…（speechText：" + speech + "）";
+    var url = MAKE_SEND + "?text=" + encodeURIComponent(speech) + "&item=" + c.item + "&voiceId=" + VOICE_ID;
+    fetch(url).then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.blob(); }).then(function(blob){
+      var v = document.getElementById('outVideo');
+      v.src = URL.createObjectURL(blob); v.hidden = false;
+      document.getElementById('rateBlock').hidden = false;
+      document.getElementById('status').textContent = "生成好了，可试看/评分";
+      btn.disabled = false;
+      // 保存本次记录
+      var rec = { clipId:c.clip, name:c.name, userText:text, rhythmOptions:opts, speechText:speech, item:c.item, voiceId:VOICE_ID, generatedAt:Date.now(), ratings:curRatings.slice(), note:document.getElementById('genNote').value };
+      records.push(rec);
+      localStorage.setItem('rhythm_live_records_v1', JSON.stringify(records));
+    }).catch(function(e){ document.getElementById('status').textContent = "生成失败：" + e.message; btn.disabled = false; });
+  }
+
+  function go(d){
+    saveState();
+    idx = (idx + d + CLIPS.length) % CLIPS.length;
+    render();
+    window.scrollTo(0,0);
+  }
+
+  function exportJSON(){
+    saveState();
+    var blob = new Blob([JSON.stringify(records, null, 2)], {type:'application/json'});
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'rhythm-live-records.json'; a.click();
+  }
+
+  render();
+</script>
+</body>
+</html>
