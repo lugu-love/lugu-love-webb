@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>看视频 · 填内容</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { min-height:100dvh; background:#020407; color:#fff; font-family:"PingFang SC","Microsoft YaHei",Arial,sans-serif; padding:16px 16px 40px; }
+  .toolbar { position:sticky; top:0; background:#020407; padding:10px 0; display:flex; justify-content:space-between; align-items:center; z-index:5; }
+  .progress { font-size:15px; font-weight:650; color:rgba(255,214,140,.95); }
+  .btn { padding:9px 13px; border:1px solid rgba(255,255,255,.22); border-radius:10px; background:rgba(255,255,255,.06); color:#fff; font-size:13px; }
+  .clip { max-width:480px; margin:0 auto; }
+  .head { display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+  .num { font-size:12px; color:rgba(255,214,140,.9); }
+  .name { font-size:16px; font-weight:650; }
+  .src { font-size:11px; color:rgba(255,255,255,.45); }
+  video { width:100%; max-height:42vh; border-radius:14px; background:#000; }
+  .hint { font-size:11px; color:rgba(255,255,255,.4); margin-top:6px; }
+  .q { margin:16px 0 6px; font-size:13px; color:rgba(255,255,255,.65); }
+  .input { width:100%; padding:11px 12px; border:1px solid rgba(255,255,255,.18); border-radius:12px; background:#0e1020; color:#fff; font-size:15px; }
+  textarea.input { min-height:70px; resize:none; line-height:1.5; }
+  .chips { display:flex; flex-wrap:wrap; gap:7px; }
+  .chip { padding:7px 13px; border:1px solid rgba(255,255,255,.18); border-radius:18px; background:rgba(255,255,255,.05); color:rgba(255,255,255,.85); font-size:13px; }
+  .chip.on { border-color:rgba(150,140,255,.75); background:rgba(120,110,255,.2); color:#fff; }
+  .nav { max-width:480px; margin:20px auto 0; display:flex; gap:10px; }
+  .nav .btn { flex:1; padding:13px; font-size:15px; text-align:center; }
+  .nav .btn:disabled { opacity:.4; }
+  .saved { font-size:11px; color:rgba(120,220,160,.9); margin-top:8px; text-align:center; }
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <span class="progress" id="progress">1 / 4</span>
+    <button class="btn" onclick="exportJSON()">导出 JSON</button>
+  </div>
+
+  <div class="clip">
+    <div class="head">
+      <span class="num" id="num"></span>
+      <span class="name" id="name"></span>
+      <span class="src" id="src"></span>
+    </div>
+    <video id="video" muted autoplay loop playsinline></video>
+    <div class="hint">先纯看：表情 / 动作 / 嘴部节奏（已静音，无豆包原声）</div>
+
+    <div class="q">A. 我觉得它最适合说（自由输入）</div>
+    <textarea class="input" id="userText" placeholder="写一句你觉得最适合这句话…"></textarea>
+
+    <div class="q">B. 我觉得应该怎么说（可多选）</div>
+    <div class="chips" id="rhythmChips"></div>
+
+    <div class="q">C. 可选备注</div>
+    <textarea class="input" id="notes" placeholder="例如：这里应该停一下 / 后半句像内心话 / 最后只笑不说话…"></textarea>
+
+    <div class="saved" id="saved"></div>
+  </div>
+
+  <div class="nav">
+    <button class="btn" id="prev" onclick="go(-1)">← 上一条</button>
+    <button class="btn" id="next" onclick="go(1)">保存并看下一条 →</button>
+  </div>
+
+<script>
+  var CLIPS = [
+    { num:"01", name:"开心", clip:"clip_happy_01", file:"assets/video/library/clip_happy_01.mp4" },
+    { num:"02", name:"委屈难过", clip:"clip_wronged_02", file:"assets/video/library/clip_wronged_02.mp4" },
+    { num:"03", name:"生气愤怒", clip:"clip_angry_03", file:"assets/video/library/clip_angry_03.mp4" },
+    { num:"04", name:"调皮幽默", clip:"clip_playful_05", file:"assets/video/library/clip_playful_05.mp4" }
+  ];
+  var RHYTHM_OPTS = ["连续说","分两段","分三段","中间停顿","前面先不说话","后面留静默","加轻笑","加轻叹","加“嗯”","其他"];
+
+  var store = {};
+  try { store = JSON.parse(localStorage.getItem('video_rhythm_intuition_v1') || '{}'); } catch(e){ store = {}; }
+  var idx = 0;
+
+  function curState(){
+    var c = CLIPS[idx];
+    if(!store[c.clip]) store[c.clip] = { userText:"", userRhythmNotes:[], userNonverbalNotes:"", timestamp:0 };
+    return store[c.clip];
+  }
+
+  function save(){
+    var c = CLIPS[idx], s = curState();
+    s.userText = document.getElementById('userText').value;
+    s.userNonverbalNotes = document.getElementById('notes').value;
+    s.timestamp = Date.now();
+    // rhythm chips
+    var sel = [];
+    document.querySelectorAll('#rhythmChips .chip.on').forEach(function(x){ sel.push(x.textContent); });
+    s.userRhythmNotes = sel;
+    localStorage.setItem('video_rhythm_intuition_v1', JSON.stringify(store));
+  }
+
+  function render(){
+    var c = CLIPS[idx], s = curState();
+    document.getElementById('progress').textContent = (idx+1) + " / " + CLIPS.length;
+    document.getElementById('num').textContent = c.num;
+    document.getElementById('name').textContent = c.name;
+    document.getElementById('src').textContent = c.clip;
+    var v = document.getElementById('video');
+    v.pause(); v.removeAttribute('src'); v.load();
+    v.src = c.file;
+    document.getElementById('userText').value = s.userText || '';
+    document.getElementById('notes').value = s.userNonverbalNotes || '';
+    // rhythm chips
+    var rc = document.getElementById('rhythmChips');
+    rc.innerHTML = '';
+    RHYTHM_OPTS.forEach(function(opt){
+      var b = document.createElement('button');
+      b.className = 'chip' + ((s.userRhythmNotes||[]).indexOf(opt)>=0 ? ' on' : '');
+      b.textContent = opt;
+      b.addEventListener('click', function(){ b.classList.toggle('on'); save(); });
+      rc.appendChild(b);
+    });
+    document.getElementById('saved').textContent = s.timestamp ? "已保存" : "";
+    document.getElementById('prev').disabled = (idx===0);
+    document.getElementById('next').textContent = (idx===CLIPS.length-1) ? "完成 · 从头" : "保存并看下一条 →";
+  }
+
+  function go(d){
+    save();
+    idx = (idx + d + CLIPS.length) % CLIPS.length;
+    render();
+    window.scrollTo(0,0);
+  }
+
+  document.getElementById('userText').addEventListener('input', function(){ save(); });
+  document.getElementById('notes').addEventListener('input', function(){ save(); });
+
+  function exportJSON(){
+    save();
+    var out = CLIPS.map(function(c){
+      var s = store[c.clip] || {};
+      return { clipId:c.clip, name:c.name, userText:s.userText||"", userRhythmNotes:s.userRhythmNotes||[], userNonverbalNotes:s.userNonverbalNotes||"", timestamp:s.timestamp||0 };
+    });
+    var blob = new Blob([JSON.stringify(out, null, 2)], {type:'application/json'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'video-rhythm-intuition-result.json';
+    a.click();
+  }
+
+  render();
+</script>
+</body>
+</html>
