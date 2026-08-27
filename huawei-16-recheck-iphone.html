@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>华为实测 16 条原视频复看</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { min-height:100dvh; background:#020407; color:#fff; font-family:"PingFang SC","Microsoft YaHei",Arial,sans-serif; padding:16px 16px 40px; }
+  .toolbar { position:sticky; top:0; background:#020407; padding:10px 0; display:flex; justify-content:space-between; align-items:center; z-index:5; }
+  .progress { font-size:15px; font-weight:650; color:rgba(255,214,140,.95); }
+  .clip { max-width:480px; margin:0 auto; }
+  .num { font-size:12px; color:rgba(255,214,140,.9); }
+  .name { font-size:16px; font-weight:650; margin:2px 0; }
+  .meta { font-size:12px; color:rgba(255,255,255,.55); line-height:1.6; margin-bottom:10px; }
+  .meta .src { color:rgba(255,255,255,.7); }
+  video { width:100%; max-height:50vh; border-radius:14px; background:#000; }
+  .nav { max-width:480px; margin:20px auto 0; display:flex; gap:10px; }
+  .btn { flex:1; padding:13px; border:1px solid rgba(255,255,255,.22); border-radius:12px; background:rgba(255,255,255,.06); color:#fff; font-size:15px; text-align:center; }
+  .btn:disabled { opacity:.4; }
+</style>
+</head>
+<body>
+  <div class="toolbar"><span class="progress" id="progress">1 / 16</span></div>
+  <div class="clip">
+    <div class="num" id="num"></div>
+    <div class="name" id="name"></div>
+    <div class="meta">
+      <div id="srcLine"></div>
+      <div id="textLine"></div>
+    </div>
+    <video id="video" controls playsinline preload="metadata"></video>
+  </div>
+  <div class="nav">
+    <button class="btn" id="prev" onclick="go(-1)">← 上一条</button>
+    <button class="btn" id="next" onclick="go(1)">下一条 →</button>
+  </div>
+
+<script>
+  var SAMPLES = [
+    { num:"01", name:"开心", file:"assets/video/library/clip_happy_01.mp4", clip:"clip_happy_01", filename:"01开心.mp4", emo:"joy" },
+    { num:"02", name:"委屈难过", file:"assets/video/library/clip_wronged_02.mp4", clip:"clip_wronged_02", filename:"02委屈难过.mp4", emo:"sadness" },
+    { num:"03", name:"生气愤怒", file:"assets/video/library/clip_angry_03.mp4", clip:"clip_angry_03", filename:"03生气愤怒.mp4", emo:"anger" },
+    { num:"04", name:"撒娇", file:"assets/video/library/clip_sajiao_04.mp4", clip:"clip_sajiao_04", filename:"04撒娇.mp4", emo:"cute_closeness" },
+    { num:"05", name:"调皮幽默", file:"assets/video/library/clip_playful_05.mp4", clip:"clip_playful_05", filename:"05调皮幽默.mp4", emo:"playful" },
+    { num:"06", name:"吃醋", file:"assets/video/library/clip_jealous_06.mp4", clip:"clip_jealous_06", filename:"06吃醋.mp4", emo:"jealous" },
+    { num:"07", name:"嘴硬不服", file:"assets/video/library/clip_stubborn_07.mp4", clip:"clip_stubborn_07", filename:"07嘴硬不服.mp4", emo:"stubborn" },
+    { num:"08", name:"意外惊喜", file:"assets/video/library/clip_surprise_08.mp4", clip:"clip_surprise_08", filename:"08意外惊喜.mp4", emo:"surprise" },
+    { num:"09", name:"疑惑", file:"assets/video/library/clip_confused_09.mp4", clip:"clip_confused_09", filename:"09疑惑.mp4", emo:"confusion" },
+    { num:"10", name:"嫌弃", file:"assets/video/library/clip_disgust_10.mp4", clip:"clip_disgust_10", filename:"10嫌弃.mp4", emo:"disgust" },
+    { num:"11", name:"心虚", file:"assets/video/library/clip_guilty_11.mp4", clip:"clip_guilty_11", filename:"11心虚.mp4", emo:"guilty" },
+    { num:"12", name:"求原谅", file:"assets/video/library/clip_apology_12.mp4", clip:"clip_apology_12", filename:"12求原谅.mp4", emo:"apology" },
+    { num:"13", name:"躺平摆烂", file:"assets/video/library/clip_lowenergy_13.mp4", clip:"clip_lowenergy_13", filename:"13躺平摆烂.mp4", emo:"low_energy" },
+    { num:"14", name:"装酷", file:"assets/video/library/clip_cool_14.mp4", clip:"clip_cool_14", filename:"14装酷.mp4", emo:"cool" },
+    { num:"15", name:"幸灾乐祸", file:"assets/video/library/clip_gloat_15.mp4", clip:"clip_gloat_15", filename:"15幸灾乐祸.mp4", emo:"schadenfreude" },
+    { num:"16", name:"委屈难过(2)", file:"assets/video/library/clip_wronged_dup.mp4", clip:"clip_wronged_dup", filename:"委屈难过.mp4", emo:"sadness" }
+  ];
+  var idx = 0;
+  function render(){
+    var s = SAMPLES[idx];
+    document.getElementById('progress').textContent = (idx+1) + " / " + SAMPLES.length;
+    document.getElementById('num').textContent = s.num;
+    document.getElementById('name').textContent = s.name;
+    document.getElementById('srcLine').innerHTML = "clip：<span class='src'>" + s.clip + "</span> · 原文件：" + s.filename;
+    document.getElementById('textLine').textContent = "情绪：" + s.emo + " · displayText：无（原始素材）";
+    var v = document.getElementById('video');
+    v.pause(); v.removeAttribute('src'); v.load();
+    v.src = s.file;
+    document.getElementById('prev').disabled = (idx===0);
+    document.getElementById('next').disabled = (idx===SAMPLES.length-1);
+  }
+  function go(d){ idx = Math.max(0, Math.min(SAMPLES.length-1, idx+d)); render(); window.scrollTo(0,0); }
+  render();
+</script>
+</body>
+</html>
