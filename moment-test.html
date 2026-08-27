@@ -24,7 +24,8 @@
   .cand { padding:14px 15px; border:1px solid rgba(255,255,255,.16); border-radius:14px; background:rgba(255,255,255,.05); color:rgba(255,255,255,.92); font-size:15px; line-height:1.5; text-align:left; }
   .cand.on { border-color:rgba(150,140,255,.7); background:rgba(120,110,255,.16); }
 
-  .refine { margin-top:12px; padding:9px 14px; border:1px dashed rgba(255,255,255,.28); border-radius:12px; background:transparent; color:rgba(255,255,255,.72); font-size:13px; }
+  .context { margin-top:10px; font-size:12px; color:rgba(255,214,140,.85); min-height:16px; }
+  .refine { margin-top:10px; padding:9px 14px; border:1px dashed rgba(255,255,255,.28); border-radius:12px; background:transparent; color:rgba(255,255,255,.72); font-size:13px; }
   .refine.on { color:#fff; border-style:solid; border-color:rgba(150,140,255,.6); background:rgba(120,110,255,.10); }
   .refine-opts { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
   .refine-opts[hidden]{ display:none; }
@@ -51,7 +52,7 @@
     </button>
   </section>
 
-  <!-- 屏2：候选句（直接，无必选关系）+ 更贴合TA + 编辑 + 生成 -->
+  <!-- 屏2：候选句（隐式关系识别）+ 更贴合TA + 编辑 + 生成 -->
   <section class="screen" id="screen-candidates" hidden>
     <div class="top">
       <button class="back" onclick="show('moment')">‹</button>
@@ -59,13 +60,14 @@
     </div>
 
     <div class="cands" id="candidates"></div>
+    <div class="context" id="context"></div>
 
     <button class="refine" id="btnRefine" onclick="toggleRefine()">更贴合 TA</button>
     <div class="refine-opts" id="refineOpts" hidden>
-      <button class="ropt" data-rel="intimate">伴侣</button>
+      <button class="ropt" data-rel="partner">伴侣</button>
       <button class="ropt" data-rel="friend">朋友</button>
       <button class="ropt" data-rel="family">家人</button>
-      <button class="ropt" data-rel="workplace">同事</button>
+      <button class="ropt" data-rel="colleague">同事</button>
     </div>
 
     <textarea class="editor" id="editor" maxlength="40" placeholder="可以自己改…"></textarea>
@@ -81,32 +83,48 @@
   var VOICE_ID = "Jr72SE8p9OcJmr8hyX0D";
   var ITEM = "rabbit-happy";
 
-  // 每条候选句后台保留 relationTag + toneTag（前台默认不强制选关系）
+  // 每条候选句 = 文案选择器 + 隐形关系选择器 + 情绪表达入口（后台保留完整标签）
   var CANDIDATES = [
-    { text:"今天辛苦了，先歇一歇，我陪你。",   relation:"intimate",  tone:"心疼陪伴" },
-    { text:"今天辛苦了，好想替你分担一点。", relation:"intimate",  tone:"心疼" },
-    { text:"今天辛苦了，别太拼啦。",         relation:"friend",    tone:"轻松关心" },
-    { text:"辛苦啦，好好休息一下。",         relation:"friend",    tone:"轻松" },
-    { text:"今天辛苦了，别太累，身体要紧。", relation:"family",    tone:"叮嘱" },
-    { text:"今天辛苦了，真的不容易。",       relation:"workplace", tone:"得体" }
+    { text:"今天辛苦了，先歇一歇，我陪你。",   relationTag:"partner",  toneTag:"warm_care",         coreEmotion:"care", subtype:"close_warm", speechStyle:"soft_companion",  videoStyle:"gentle_care" },
+    { text:"今天辛苦了，好想替你分担一点。", relationTag:"partner",  toneTag:"warm_care",         coreEmotion:"care", subtype:"close_warm", speechStyle:"soft_companion",  videoStyle:"gentle_care" },
+    { text:"今天辛苦了，别太拼啦。",         relationTag:"friend",   toneTag:"light_care",        coreEmotion:"care", subtype:"close_warm", speechStyle:"relaxed_support", videoStyle:"friendly_care" },
+    { text:"辛苦啦，好好休息一下。",         relationTag:"friend",   toneTag:"light_care",        coreEmotion:"care", subtype:"close_warm", speechStyle:"relaxed_support", videoStyle:"friendly_care" },
+    { text:"今天辛苦了，别太累，身体要紧。", relationTag:"family",   toneTag:"concerned_care",    coreEmotion:"care", subtype:"close_warm", speechStyle:"gentle_concern",  videoStyle:"family_care" },
+    { text:"今天辛苦了，真的不容易。",       relationTag:"colleague",toneTag:"restrained_support", coreEmotion:"care", subtype:"close_warm", speechStyle:"restrained",      videoStyle:"polite_care" }
   ];
-  var REL_LABELS = { intimate:"伴侣", friend:"朋友", family:"家人", workplace:"同事" };
 
-  var relationFilter = null;   // null = 不筛选（显示全部）
+  // 通用兜底（用户完全不选候选句、直接自己写）
+  var GENERAL_CONTEXT = { relationTag:"general", toneTag:"warm_care", coreEmotion:"care", subtype:"close_warm", speechStyle:"gentle", videoStyle:"general_care" };
+
+  // 「更贴合 TA」关系 → 更新 speechStyle / videoStyle
+  var RELATION_META = {
+    partner:   { relationTag:"partner",   toneTag:"warm_care",         speechStyle:"soft_companion",  videoStyle:"gentle_care" },
+    friend:    { relationTag:"friend",    toneTag:"light_care",        speechStyle:"relaxed_support", videoStyle:"friendly_care" },
+    family:    { relationTag:"family",    toneTag:"concerned_care",    speechStyle:"gentle_concern",  videoStyle:"family_care" },
+    colleague: { relationTag:"colleague", toneTag:"restrained_support",speechStyle:"restrained",      videoStyle:"polite_care" }
+  };
+  var REL_LABELS = { partner:"伴侣", friend:"朋友", family:"家人", colleague:"同事" };
+
+  var currentContext = null;   // 当前隐式识别到的表达上下文（relation/tone/emotion/subtype/speechStyle/videoStyle）
   var lastBlob = null, lastFile = null;
 
   function show(id){ document.querySelectorAll('.screen').forEach(function(s){ s.hidden = (s.id !== id); }); }
-  function chooseMoment(){ renderCandidates(); show('candidates'); }
+  function chooseMoment(){
+    // 进入时不预设关系；只有用户选句或点「更贴合TA」才产生上下文
+    currentContext = null;
+    document.getElementById('editor').value = '';
+    renderCandidates();
+    show('candidates');
+  }
 
   function renderCandidates(){
     var box = document.getElementById('candidates');
     box.innerHTML = '';
     var list = CANDIDATES.slice();
-    // 选中关系时：该关系候选排最前，其余保留在后
-    if(relationFilter){
+    if(currentContext && currentContext.relationTag && currentContext.relationTag !== 'general'){
       list.sort(function(a,b){
-        var am = a.relation===relationFilter ? 0 : 1;
-        var bm = b.relation===relationFilter ? 0 : 1;
+        var am = a.relationTag===currentContext.relationTag ? 0 : 1;
+        var bm = b.relationTag===currentContext.relationTag ? 0 : 1;
         return am - bm;
       });
     }
@@ -115,16 +133,36 @@
       d.className = 'cand';
       d.textContent = c.text;
       d.addEventListener('click', function(){
+        // 选句 = 同时继承该句的关系/语气/情绪/视频表达
+        currentContext = {
+          relationTag: c.relationTag,
+          toneTag: c.toneTag,
+          coreEmotion: c.coreEmotion,
+          subtype: c.subtype,
+          speechStyle: c.speechStyle,
+          videoStyle: c.videoStyle
+        };
         document.querySelectorAll('.cand').forEach(function(x){ x.classList.remove('on'); });
         d.classList.add('on');
         document.getElementById('editor').value = c.text;
+        renderContext();
       });
       box.appendChild(d);
     });
     if(!document.getElementById('editor').value){
       document.getElementById('editor').value = list[0].text;
-      box.firstChild.classList.add('on');
+      if(box.firstChild) box.firstChild.classList.add('on');
     }
+  }
+
+  function renderContext(){
+    var el = document.getElementById('context');
+    if(!currentContext){
+      el.textContent = "选一句，我会自动知道你大概想对谁、用什么语气。";
+      return;
+    }
+    var rel = REL_LABELS[currentContext.relationTag] || "通用";
+    el.textContent = "已识别：· " + rel + " · " + currentContext.toneTag;
   }
 
   function toggleRefine(){
@@ -137,12 +175,27 @@
   document.getElementById('refineOpts').addEventListener('click', function(e){
     var b = e.target.closest('.ropt'); if(!b) return;
     var rel = b.dataset.rel;
-    // 再点一次 = 取消筛选
-    if(relationFilter === rel){ relationFilter = null; }
-    else { relationFilter = rel; }
-    document.querySelectorAll('.ropt').forEach(function(o){ o.classList.toggle('on', o.dataset.rel===relationFilter); });
+    var meta = RELATION_META[rel];
+    currentContext = {
+      relationTag: meta.relationTag,
+      toneTag: meta.toneTag,
+      coreEmotion: "care",
+      subtype: "close_warm",
+      speechStyle: meta.speechStyle,
+      videoStyle: meta.videoStyle
+    };
+    document.querySelectorAll('.ropt').forEach(function(o){ o.classList.toggle('on', o.dataset.rel===rel); });
     document.getElementById('editor').value = '';
     renderCandidates();
+    renderContext();
+  });
+
+  document.getElementById('editor').addEventListener('input', function(){
+    // 用户改字不清空原标签；只有换候选句 / 更贴合TA 才改变上下文
+    if(!currentContext){
+      currentContext = GENERAL_CONTEXT;
+      renderContext();
+    }
   });
 
   function resetFlow(){
@@ -157,9 +210,13 @@
   function generate(){
     var text = document.getElementById('editor').value.trim();
     if(!text){ document.getElementById('status').textContent = "先写一句想说的话。"; return; }
+    // 兜底：完全没选句也没选关系时，用通用上下文
+    if(!currentContext){ currentContext = GENERAL_CONTEXT; }
     var btn = document.getElementById('btnGenerate');
     btn.disabled = true;
     document.getElementById('status').textContent = "生成中…";
+    // 本轮视频暂用占位 item；隐式上下文已记录，供后续按 relation/videoStyle 匹配真实视频
+    console.log("moment context:", JSON.stringify({ text:text, context:currentContext }));
     var url = MAKE_SEND_API + "/make-send?text=" + encodeURIComponent(text) + "&item=" + ITEM + "&voiceId=" + VOICE_ID;
     fetch(url).then(function(r){
       if(!r.ok) throw new Error("HTTP " + r.status);
