@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>关系时刻 · 今天辛苦了</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { min-height:100dvh; background:#020407; color:#fff; font-family:"PingFang SC","Microsoft YaHei",Arial,sans-serif; }
+  .screen { max-width:420px; margin:0 auto; padding:28px 20px 40px; }
+  .screen[hidden]{ display:none !important; }
+  .top { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+  .back { width:36px; height:36px; border:1px solid rgba(255,255,255,.18); border-radius:10px; background:rgba(255,255,255,.06); color:#fff; font-size:16px; flex:0 0 auto; }
+  h1 { font-size:20px; font-weight:650; letter-spacing:.02em; }
+  h2 { font-size:18px; font-weight:650; letter-spacing:.02em; }
+  .sub { font-size:13px; color:rgba(255,255,255,.55); margin-top:4px; }
+
+  .moment-card { width:100%; padding:18px 16px; margin-top:20px; border:1px solid rgba(255,255,255,.16); border-radius:16px; background:rgba(255,255,255,.06); color:#fff; font-size:17px; font-weight:600; text-align:left; }
+  .moment-card small { display:block; font-size:12px; color:rgba(255,255,255,.45); font-weight:400; margin-top:4px; }
+  .moment-card:active { background:rgba(255,255,255,.12); }
+
+  .opts { display:flex; flex-direction:column; gap:10px; margin-top:20px; }
+  .opt { width:100%; padding:15px 16px; border:1px solid rgba(255,255,255,.16); border-radius:14px; background:rgba(255,255,255,.06); color:#fff; font-size:16px; font-weight:500; text-align:left; }
+  .opt:active { background:rgba(255,255,255,.12); }
+  .opt.on { border-color:rgba(150,140,255,.7); background:rgba(120,110,255,.16); }
+
+  .cands { display:flex; flex-direction:column; gap:10px; margin-top:16px; }
+  .cand { padding:14px 15px; border:1px solid rgba(255,255,255,.16); border-radius:14px; background:rgba(255,255,255,.05); color:rgba(255,255,255,.92); font-size:15px; line-height:1.5; text-align:left; }
+  .cand.on { border-color:rgba(150,140,255,.7); background:rgba(120,110,255,.16); }
+
+  .editor { width:100%; min-height:76px; margin-top:16px; padding:12px 14px; border:1px solid rgba(255,255,255,.18); border-radius:14px; background:#0e1020; color:#fff; font-size:16px; line-height:1.5; resize:none; font-family:inherit; }
+  .btn-primary { width:100%; margin-top:14px; padding:15px; border:none; border-radius:14px; background:linear-gradient(135deg,#7d8bff,#a06bff); color:#fff; font-size:16px; font-weight:650; }
+  .btn-primary:disabled { opacity:.5; }
+
+  video { width:100%; margin-top:18px; border-radius:14px; background:#000; }
+  .btn-secondary { width:100%; margin-top:10px; padding:13px; border:1px solid rgba(255,255,255,.22); border-radius:12px; background:rgba(255,255,255,.06); color:#fff; font-size:15px; }
+  .status { margin-top:12px; font-size:13px; color:rgba(255,214,140,.95); min-height:18px; }
+</style>
+</head>
+<body>
+
+  <!-- 屏1：选择时刻 -->
+  <section class="screen" id="screen-moment">
+    <h1>关系时刻</h1>
+    <p class="sub">帮你说一句，刚好适合 TA 的话。</p>
+    <button class="moment-card" onclick="chooseMoment()">
+      今天辛苦了
+      <small>日常关心 · 体谅 · 心疼</small>
+    </button>
+  </section>
+
+  <!-- 屏2：发给谁 -->
+  <section class="screen" id="screen-relation" hidden>
+    <div class="top">
+      <button class="back" onclick="show('moment')">‹</button>
+      <div><h2>发给谁？</h2><p class="sub">今天辛苦了</p></div>
+    </div>
+    <div class="opts" id="relationOpts">
+      <button class="opt" data-rel="partner">伴侣</button>
+      <button class="opt" data-rel="friend">朋友</button>
+      <button class="opt" data-rel="parent">父母</button>
+      <button class="opt" data-rel="colleague">同事</button>
+    </div>
+  </section>
+
+  <!-- 屏3：候选句 + 编辑 + 生成 -->
+  <section class="screen" id="screen-candidates" hidden>
+    <div class="top">
+      <button class="back" onclick="show('relation')">‹</button>
+      <div><h2>给你 3 句，点选可改</h2><p class="sub" id="relLabel"></p></div>
+    </div>
+    <div class="cands" id="candidates"></div>
+    <textarea class="editor" id="editor" maxlength="40" placeholder="可以自己改…"></textarea>
+    <button class="btn-primary" id="btnGenerate" onclick="generate()">生成</button>
+    <div class="status" id="status"></div>
+    <video id="video" controls playsinline hidden></video>
+    <button class="btn-secondary" id="btnShare" onclick="share()" hidden>分享</button>
+    <button class="btn-secondary" id="btnRedo" onclick="resetFlow()" hidden>再生成一次</button>
+  </section>
+
+<script>
+  var MAKE_SEND_API = "https://api.lugu.love";
+  var VOICE_ID = "Jr72SE8p9OcJmr8hyX0D";   // 风信兔默认候选 Chutki
+  var ITEM = "rabbit-happy";              // 关系时刻暂映射到现有生成链
+
+  var CANDIDATES = {
+    partner:   ["今天辛苦了，回来抱抱你。", "辛苦啦，先歇一歇，我陪你。", "今天辛苦了，好想帮你揉揉肩。"],
+    friend:    ["今天辛苦了，改天请你喝奶茶。", "辛苦啦，好好休息一下。", "今天辛苦了，别太拼啦。"],
+    parent:    ["今天辛苦了，别太累，身体要紧。", "辛苦了，早点休息，别硬撑。", "今天辛苦了，谢谢你们一直这么辛苦。"],
+    colleague: ["今天辛苦了，真的不容易。", "辛苦啦，一起加油。", "今天辛苦了，早点下班吧。"]
+  };
+  var REL_LABELS = { partner:"伴侣", friend:"朋友", parent:"父母", colleague:"同事" };
+
+  var relation = null;
+  var lastBlob = null, lastFile = null;
+
+  function show(id){ document.querySelectorAll('.screen').forEach(function(s){ s.hidden = (s.id !== id); }); }
+  function chooseMoment(){ show('relation'); }
+  function backTo(id){ show(id); }
+
+  document.getElementById('relationOpts').addEventListener('click', function(e){
+    var b = e.target.closest('.opt'); if(!b) return;
+    relation = b.dataset.rel;
+    document.querySelectorAll('#relationOpts .opt').forEach(function(o){ o.classList.toggle('on', o===b); });
+    renderCandidates();
+    show('candidates');
+  });
+
+  function renderCandidates(){
+    document.getElementById('relLabel').textContent = "发给" + REL_LABELS[relation];
+    var box = document.getElementById('candidates');
+    box.innerHTML = '';
+    CANDIDATES[relation].forEach(function(t, i){
+      var d = document.createElement('button');
+      d.className = 'cand' + (i===0 ? ' on' : '');
+      d.textContent = t;
+      d.addEventListener('click', function(){
+        document.querySelectorAll('.cand').forEach(function(x){ x.classList.remove('on'); });
+        d.classList.add('on');
+        document.getElementById('editor').value = t;
+      });
+      box.appendChild(d);
+    });
+    document.getElementById('editor').value = CANDIDATES[relation][0];
+  }
+
+  function resetFlow(){
+    document.getElementById('video').hidden = true;
+    document.getElementById('video').removeAttribute('src');
+    document.getElementById('btnShare').hidden = true;
+    document.getElementById('btnRedo').hidden = true;
+    document.getElementById('status').textContent = '';
+    document.getElementById('btnGenerate').disabled = false;
+  }
+
+  function generate(){
+    var text = document.getElementById('editor').value.trim();
+    if(!text){ document.getElementById('status').textContent = "先写一句想说的话。"; return; }
+    var btn = document.getElementById('btnGenerate');
+    btn.disabled = true;
+    document.getElementById('status').textContent = "生成中…";
+    var url = MAKE_SEND_API + "/make-send?text=" + encodeURIComponent(text) + "&item=" + ITEM + "&voiceId=" + VOICE_ID;
+    fetch(url).then(function(r){
+      if(!r.ok) throw new Error("HTTP " + r.status);
+      return r.blob();
+    }).then(function(blob){
+      lastBlob = blob;
+      lastFile = new File([blob], "七星使者-今天辛苦了.mp4", { type:"video/mp4" });
+      var u = URL.createObjectURL(blob);
+      var v = document.getElementById('video');
+      v.src = u; v.hidden = false;
+      document.getElementById('status').textContent = "生成好了";
+      document.getElementById('btnShare').hidden = false;
+      document.getElementById('btnRedo').hidden = false;
+      document.getElementById('btnGenerate').disabled = false;
+      document.getElementById('video').scrollIntoView({behavior:'smooth'});
+    }).catch(function(e){
+      document.getElementById('status').textContent = "生成失败，请重试";
+      btn.disabled = false;
+    });
+  }
+
+  function share(){
+    if(!lastFile){ return; }
+    if(navigator.canShare && navigator.canShare({files:[lastFile]})){
+      navigator.share({ files:[lastFile], title:"七星使者", text:document.getElementById('editor').value }).catch(function(){});
+    } else {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(lastBlob);
+      a.download = "七星使者-今天辛苦了.mp4";
+      a.click();
+    }
+  }
+</script>
+</body>
+</html>
