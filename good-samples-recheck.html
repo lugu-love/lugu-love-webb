@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>自然样片复看</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body { min-height:100dvh; background:#020407; color:#fff; font-family:"PingFang SC","Microsoft YaHei",Arial,sans-serif; padding:16px 16px 40px; }
+  .toolbar { position:sticky; top:0; background:#020407; padding:10px 0; display:flex; justify-content:space-between; align-items:center; z-index:5; }
+  .progress { font-size:15px; font-weight:650; color:rgba(255,214,140,.95); }
+  .clip { max-width:480px; margin:0 auto; }
+  .num { font-size:12px; color:rgba(255,214,140,.9); }
+  .name { font-size:17px; font-weight:650; margin:2px 0; }
+  .meta { font-size:12px; color:rgba(255,255,255,.55); line-height:1.6; margin-bottom:10px; }
+  .meta .src { color:rgba(255,255,255,.7); }
+  video { width:100%; max-height:46vh; border-radius:14px; background:#000; }
+  .nav { max-width:480px; margin:20px auto 0; display:flex; gap:10px; }
+  .btn { flex:1; padding:13px; border:1px solid rgba(255,255,255,.22); border-radius:12px; background:rgba(255,255,255,.06); color:#fff; font-size:15px; text-align:center; }
+  .btn:disabled { opacity:.4; }
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <span class="progress" id="progress">1 / 12</span>
+  </div>
+  <div class="clip">
+    <div class="num" id="num"></div>
+    <div class="name" id="name"></div>
+    <div class="meta">
+      <div id="srcLine"></div>
+      <div id="textLine"></div>
+    </div>
+    <video id="video" controls playsinline preload="metadata"></video>
+  </div>
+  <div class="nav">
+    <button class="btn" id="prev" onclick="go(-1)">← 上一条</button>
+    <button class="btn" id="next" onclick="go(1)">下一条 →</button>
+  </div>
+
+<script>
+  var SAMPLES = [
+    { num:"01", name:"委屈 A", file:"assets/video/wronged-A.mp4", src:"rabbit-aggrieved V1 母版（02委屈难过）", text:"我现在真的有点委屈，让我缓一缓。", from:"委屈三版", v:"V1" },
+    { num:"02", name:"委屈 B", file:"assets/video/wronged-B.mp4", src:"rabbit-aggrieved V1 母版（02委屈难过）", text:"我现在真的有点委屈，让我缓一缓。", from:"委屈三版", v:"V1" },
+    { num:"03", name:"委屈 C", file:"assets/video/wronged-C.mp4", src:"rabbit-aggrieved V1 母版（02委屈难过）", text:"我现在真的有点委屈，让我缓一缓。", from:"委屈三版", v:"V1" },
+    { num:"04", name:"编排 A", file:"assets/video/orch-A.mp4", src:"02委屈难过（V2 本地重排）", text:"我没事，其实我还是有点难过。", from:"声音编排", v:"V2" },
+    { num:"05", name:"编排 B", file:"assets/video/orch-B.mp4", src:"02委屈难过（V2 本地重排）", text:"我没事，其实我还是有点难过。", from:"声音编排", v:"V2" },
+    { num:"06", name:"编排 C", file:"assets/video/orch-C.mp4", src:"02委屈难过（V2 本地重排）", text:"我没事，其实我还是有点难过。", from:"声音编排", v:"V2" },
+    { num:"07", name:"开心 Chutki", file:"assets/video/happy-voice-Chutki.mp4", src:"rabbit-happy V1 母版", text:"今天的开心有点藏不住了。", from:"开心三声对比", v:"V1" },
+    { num:"08", name:"Chutki 开心", file:"assets/video/chutki-happy.mp4", src:"rabbit-happy V1 母版", text:"今天的开心有点藏不住了。", from:"Chutki 三情绪", v:"V1" },
+    { num:"09", name:"Chutki 委屈", file:"assets/video/chutki-wronged.mp4", src:"rabbit-aggrieved V1 母版", text:"有些委屈，不知道怎么说也没关系。", from:"Chutki 三情绪", v:"V1" },
+    { num:"10", name:"四情绪 开心", file:"assets/video/emo-happy.mp4", src:"01开心（V2）", text:"今天心情不错，想把这份开心也分给你。", from:"四情绪测试", v:"V2" },
+    { num:"11", name:"四情绪 委屈", file:"assets/video/emo-wronged.mp4", src:"02委屈难过（V2）", text:"我现在真的有点委屈，让我缓一缓。", from:"四情绪测试", v:"V2" },
+    { num:"12", name:"今天辛苦了 伴侣", file:"assets/video/today-tired-partner.mp4", src:"04撒娇（V2 临时）", text:"今天辛苦了，先歇一歇，我陪你。", from:"关系时刻", v:"V2" }
+  ];
+  var idx = 0;
+  function render(){
+    var s = SAMPLES[idx];
+    document.getElementById('progress').textContent = (idx+1) + " / " + SAMPLES.length;
+    document.getElementById('num').textContent = s.num;
+    document.getElementById('name').textContent = s.name;
+    document.getElementById('srcLine').innerHTML = "源：<span class='src'>" + s.src + "</span> · " + s.from + " · " + s.v;
+    document.getElementById('textLine').textContent = "文案：" + s.text;
+    var v = document.getElementById('video');
+    v.pause(); v.removeAttribute('src'); v.load();
+    v.src = s.file;
+    document.getElementById('prev').disabled = (idx===0);
+    document.getElementById('next').disabled = (idx===SAMPLES.length-1);
+  }
+  function go(d){
+    idx = Math.max(0, Math.min(SAMPLES.length-1, idx+d));
+    render();
+    window.scrollTo(0,0);
+  }
+  render();
+</script>
+</body>
+</html>
