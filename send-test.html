@@ -87,7 +87,7 @@
       <select id="voiceSelect" class="voice-select"></select>
     </div>
 
-    <div class="editor"><textarea id="textInput" maxlength="20" placeholder="写一句话…（20 字内）"></textarea></div>
+    <div class="editor"><textarea id="textInput" maxlength="40" placeholder="写一句话…（建议 20 字以内，效果更自然）"></textarea></div>
     <div class="guide" id="guide"></div>
     <button class="suggest" id="btnSuggest" type="button">✨ 帮我选一句</button>
     <div class="suggest-box" id="suggestBox" hidden></div>
@@ -426,6 +426,7 @@ window.__MAIN__ = function () {
     }
     var text=(textInput.value||"").trim();
     if(!text){ showToast("请先写一句话"); return; }
+    if(text.length > 20){ showToast("这句话有点长，建议缩短到 20 字以内，效果会更自然"); return; }
 
     isGenerating=true;
     clearGenerated();
