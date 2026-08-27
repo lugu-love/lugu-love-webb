@@ -669,9 +669,11 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         if not read_enabled():
             return self._send_json(503, {"error": "service temporarily unavailable"})
         start = time.time()
-        text = (text or DEFAULT_TEXT)[:TEXT_MAX]
+        text = (text or DEFAULT_TEXT).strip()
         if item not in MASTERS:
             item = "rabbit-happy"
+        if len(text) > TEXT_MAX:
+            return self._send_json(400, {"error": "TEXT_TOO_LONG", "message": "这句话有点长，当前版本建议缩短到 %d 字以内，效果会更自然。" % TEXT_MAX})
         if has_unsupported(text):
             return self._send_json(400, {"error": "暂不支持 emoji / 特殊符号，请使用文字、数字、标点"})
         if not rate_ok(self.client_address[0]):
