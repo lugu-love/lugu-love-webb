@@ -92,6 +92,21 @@
   var INTIMACIES = ["low","mid","high"];
   var STATUSES = ["preferred","usable","deprecated"];
 
+  // 前台显示用中文；后台字段/JSON/localStorage 仍用英文 ID（labelMap）
+  var LABELS = {
+    joy:"开心", excited:"兴奋", sadness:"难过", wronged:"委屈", anger:"生气", annoyed:"不爽",
+    comfort_seeking:"想被安慰", gentle_care:"温柔关心", cute_closeness:"亲昵/撒娇", playful:"调皮",
+    jealous:"吃醋", stubborn:"嘴硬", surprise:"惊喜", confusion:"疑惑", disgust:"嫌弃", guilty:"心虚",
+    apology:"求原谅/道歉", low_energy:"低能量", cool:"装酷", schadenfreude:"幸灾乐祸", tender:"温柔", warm:"温暖",
+    celebrate:"庆祝", frustrated:"受挫", teasing:"打趣", tsundere:"傲娇", wonder:"好奇", gentle:"柔和",
+    playful_disgust:"玩笑式嫌弃", nervous:"紧张", soft_apology:"轻声道歉", tired:"疲惫", humor:"幽默", restrained:"克制",
+    sad_soft:"轻难过", sad_clear:"明显难过", close_warm:"温暖亲近", close_missing:"想念", grateful:"感谢",
+    anxious_soft:"轻紧张", low_tired:"疲惫", surprise_delight:"惊喜",
+    partner:"伴侣", friend:"朋友", family:"家人", colleague:"同事", general:"通用",
+    low:"低", mid:"中", high:"高",
+    preferred:"优先", usable:"可用", deprecated:"暂缓"
+  };
+
   var store = {};
   try { store = JSON.parse(localStorage.getItem('clip_review_v1') || '{}'); } catch(e){ store = {}; }
   var idx = parseInt(localStorage.getItem('clip_review_idx') || '0', 10) || 0;
@@ -121,7 +136,7 @@
     options.forEach(function(opt){
       var b = document.createElement('button');
       b.className = 'chip' + (value.indexOf(opt) >= 0 ? ' on' : '');
-      b.textContent = opt;
+      b.textContent = LABELS[opt] || opt;   // 中文显示，值仍为英文 ID
       b.addEventListener('click', function(){ onPick(opt, !(value.indexOf(opt) >= 0)); });
       container.appendChild(b);
     });
@@ -132,7 +147,7 @@
     document.getElementById('progress').textContent = (idx+1) + " / " + CLIPS.length;
     document.getElementById('clipId').textContent = c.clipId;
     document.getElementById('clipFile').textContent = c.filename;
-    document.getElementById('badge').textContent = "原 primary: " + c.primary;
+    document.getElementById('badge').textContent = "原 primary: " + (LABELS[c.primary] || c.primary);
 
     var v = document.getElementById('video');
     v.src = PROXY + c.clipId + ".mp4";   // 只加载当前 1 条 proxy
