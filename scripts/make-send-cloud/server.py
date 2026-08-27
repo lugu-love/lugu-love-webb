@@ -31,9 +31,9 @@ FONT_INDEX = int(os.environ.get("FONT_INDEX", "2"))
 FONT_FC = os.environ.get("FONT_FC", "Noto Sans CJK SC")
 
 MASTERS = {
-    "rabbit-happy":     ("happy-master.mp4", "开心"),
-    "rabbit-aggrieved": ("wronged-master.mp4", "委屈"),
-    "rabbit-angry":     ("angry-master.mp4", "生气"),
+    "rabbit-happy":     ("happy-master-v2.mp4", "开心"),
+    "rabbit-aggrieved": ("wronged-master-v2.mp4", "委屈"),
+    "rabbit-angry":     ("angry-master-v2.mp4", "生气"),
 }
 
 # 七星使者 · 测试声音池（ElevenLabs premade，voice_id 为稳定引用）
@@ -56,7 +56,7 @@ VOICE_LIBRARY = {
     "lhTvHflPVOqgSWyuWQry": "Hina",
     "Jr72SE8p9OcJmr8hyX0D": "Chutki",
 }
-DEFAULT_VOICE_ID = "ocZQ262SsZb9RIxcQBOj"  # Lulu（风信兔测试默认）
+DEFAULT_VOICE_ID = "Jr72SE8p9OcJmr8hyX0D"  # Chutki（风信兔正式声音身份）
 
 FPS = int(os.environ.get("FPS", "18"))
 SERVICE_ENABLED = os.environ.get("SERVICE_ENABLED", "true").lower() in ("1", "true", "yes", "on")
@@ -69,7 +69,7 @@ FFMPEG_THREADS = int(os.environ.get("FFMPEG_THREADS", "2"))
 BITRATE_KBPS = int(os.environ.get("BITRATE_KBPS", "2500"))
 W, H = 720, 1280
 DURATION = 10
-TEXT_MAX = int(os.environ.get("TEXT_MAX", "40"))
+TEXT_MAX = int(os.environ.get("TEXT_MAX", "20"))
 SAFE_WIDTH = int(W * 0.90)
 BASE_FONT_SIZE = 52
 LINE_SPACING = 12
@@ -251,7 +251,24 @@ def _build_filter(line_files, font_size, y_top):
     return ";".join(parts), "[v%d]" % (n - 1)
 
 
-def generate(item, text, workdir, tts=None, voice_id=None):
+def build_speech_text(text, emotion):
+    """情绪声音编排基础规则（文本级；不宣称 lip-sync）。"""
+    t = text
+    mid = max(1, len(t) // 2)
+    if emotion == "委屈":
+        # spoken → inner_voice
+        t = t[:mid] + "……" + t[mid:]
+    elif emotion == "生气":
+        # leading silence → short spoken → pause → spoken → silence
+        t = "……" + t[:mid] + "……" + t[mid:] + "……"
+    elif emotion == "调皮":
+        # short spoken → pause → short spoken
+        t = t[:mid] + "……" + t[mid:]
+    # 开心：默认 spoken 为主，不额外处理
+    return t
+
+
+def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None):
     master_rel, _emotion = MASTERS[item]
     master = os.path.join(MASTERS_DIR, master_rel)
     final = os.path.join(workdir, "final.mp4")
@@ -276,20 +293,22 @@ def generate(item, text, workdir, tts=None, voice_id=None):
     meta["font_size"] = font_size
 
     t0 = time.time()
+    if speech_text is None:
+        speech_text = build_speech_text(text, _emotion)
     provider_used = "edge-tts"
     if voice_id and voice_id in VOICE_LIBRARY:
         try:
-            ElevenLabsProvider(voice_id).synthesize(text, tts_path)
+            ElevenLabsProvider(voice_id).synthesize(speech_text, tts_path)
             provider_used = "elevenlabs"
         except Exception as e:
             log("ELEVENLABS-FALLBACK voice=%s err=%s" % (voice_id, "%s: %s" % (type(e).__name__, e)))
-            make_tts_provider("edge-tts").synthesize(text, tts_path)
+            make_tts_provider("edge-tts").synthesize(speech_text, tts_path)
             provider_used = "edge-tts-fallback"
     else:
         if voice_id:
             log("UNKNOWN-VOICE voice=%s fallback=edge-tts" % voice_id)
             provider_used = "edge-tts-fallback"
-        (tts or make_tts_provider("edge-tts")).synthesize(text, tts_path)
+        (tts or make_tts_provider("edge-tts")).synthesize(speech_text, tts_path)
     meta["tts"] = time.time() - t0
     meta["tts_provider"] = provider_used
     meta["voice_id"] = voice_id or ""
@@ -555,11 +574,12 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             qs = urllib.parse.parse_qs(parsed.query)
             app_bridge = qs.get("app_bridge", [""])[0] == "1"
             journey_v1 = qs.get("journey_v1", [""])[0] == "1"
-            voice_id = (qs.get("voice") or qs.get("voiceId") or [""])[0] or None
+            voice_id = (qs.get("voice") or qs.get("voiceId") or [""])[0] or DEFAULT_VOICE_ID
+            speech_text = (qs.get("speechText") or qs.get("speech_text") or [""])[0] or None
             return self._serve(
                 qs.get("text", [""])[0], qs.get("item", ["rabbit-happy"])[0], app_bridge,
                 journey_v1, qs.get("remix_token", [""])[0], qs.get("source_channel", ["h5"])[0],
-                voice_id,
+                voice_id, speech_text,
             )
         return self._not_found()
 
@@ -598,12 +618,13 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             data = self._read_json_body()
             if data is None:
                 return self._send_json(400, {"error": "bad request"})
-            voice_id = data.get("voice") or data.get("voiceId") or None
+            voice_id = data.get("voice") or data.get("voiceId") or DEFAULT_VOICE_ID
+            speech_text = data.get("speechText") or data.get("speech_text") or None
             return self._serve(
                 data.get("text", "") or "", data.get("item", "rabbit-happy") or "rabbit-happy",
                 bool(data.get("app_bridge")), bool(data.get("journey_v1")),
                 data.get("remix_token", "") or "", data.get("source_channel", "h5") or "h5",
-                voice_id,
+                voice_id, speech_text,
             )
         return self._not_found()
 
@@ -640,7 +661,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         log("ADMIN-TOGGLE enabled=%s" % enabled)
         return self._send_json(200, {"enabled": enabled})
 
-    def _serve(self, text, item, app_bridge=False, journey_v1=False, remix_token="", source_channel="h5", voice_id=None):
+    def _serve(self, text, item, app_bridge=False, journey_v1=False, remix_token="", source_channel="h5", voice_id=None, speech_text=None):
         if not read_enabled():
             return self._send_json(503, {"error": "service temporarily unavailable"})
         start = time.time()
@@ -657,7 +678,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         workdir = None
         try:
             workdir = tempfile.mkdtemp(prefix="make-send-")
-            final, meta = generate(item, text, workdir, voice_id=voice_id)
+            final, meta = generate(item, text, workdir, voice_id=voice_id, speech_text=speech_text)
             with open(final, "rb") as f:
                 data = f.read()
             journey_record = None
