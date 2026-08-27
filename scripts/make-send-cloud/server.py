@@ -256,7 +256,9 @@ def _build_filter(line_files, font_size, y_top):
 def build_speech_text(text, emotion):
     """情绪声音编排基础规则（文本级；不宣称 lip-sync）。"""
     t = text
-    mid = max(1, len(t) // 2)
+    # 优先在标点处切分，避免把词切断
+    punct = max(t.rfind("，"), t.rfind("。"), t.rfind("！"), t.rfind("？"))
+    mid = punct + 1 if punct > 0 and punct < len(t) - 1 else max(1, len(t) // 2)
     if emotion == "委屈":
         # spoken → inner_voice
         t = t[:mid] + "……" + t[mid:]
