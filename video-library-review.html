@@ -4,62 +4,87 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<title>风信兔视频素材 · 人工看片复核</title>
+<title>风信兔视频素材 · 单条顺序复核</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  body { min-height:100dvh; background:#020407; color:#fff; font-family:"PingFang SC","Microsoft YaHei",Arial,sans-serif; padding:20px 16px 60px; }
-  h1 { font-size:18px; font-weight:650; text-align:center; }
-  .sub { font-size:12px; color:rgba(255,255,255,.55); text-align:center; margin:6px 0 14px; }
-  .toolbar { position:sticky; top:0; background:#020407; padding:10px 0; display:flex; gap:10px; align-items:center; z-index:5; }
-  .btn { padding:10px 16px; border:1px solid rgba(255,255,255,.24); border-radius:12px; background:rgba(255,255,255,.08); color:#fff; font-size:14px; }
+  body { min-height:100dvh; background:#020407; color:#fff; font-family:"PingFang SC","Microsoft YaHei",Arial,sans-serif; padding:16px 16px 40px; }
+  .toolbar { position:sticky; top:0; background:#020407; padding:10px 0; display:flex; justify-content:space-between; align-items:center; z-index:5; }
+  .progress { font-size:15px; font-weight:650; color:rgba(255,214,140,.95); }
+  .btn { padding:9px 14px; border:1px solid rgba(255,255,255,.24); border-radius:12px; background:rgba(255,255,255,.08); color:#fff; font-size:13px; }
   .btn.primary { background:linear-gradient(135deg,#7d8bff,#a06bff); border:none; font-weight:650; }
-  .progress { font-size:13px; color:rgba(255,214,140,.9); }
 
-  .clip { border:1px solid rgba(255,255,255,.14); border-radius:16px; padding:14px; margin-bottom:18px; background:rgba(255,255,255,.03); }
-  .clip.reviewed { border-color:rgba(120,220,160,.5); }
-  .clip-head { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; flex-wrap:wrap; gap:6px; }
-  .clip-id { font-size:14px; font-weight:650; }
-  .clip-file { font-size:11px; color:rgba(255,255,255,.45); }
+  .clip { max-width:480px; margin:0 auto; }
+  .clip-head { display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
+  .clip-id { font-size:15px; font-weight:650; }
+  .clip-file { font-size:12px; color:rgba(255,255,255,.5); }
   .badge { font-size:11px; padding:2px 8px; border-radius:10px; background:rgba(255,255,255,.08); color:rgba(255,255,255,.7); }
-  video { width:100%; max-height:320px; border-radius:12px; background:#000; margin-bottom:10px; }
+  .video-wrap { position:relative; }
+  video { width:100%; max-height:46vh; border-radius:14px; background:#000; }
+  .orig-link { display:inline-block; margin-top:6px; font-size:12px; color:rgba(255,255,255,.45); text-decoration:underline; }
 
-  .q { margin:12px 0 4px; font-size:12px; color:rgba(255,255,255,.55); }
+  .q { margin:16px 0 6px; font-size:13px; color:rgba(255,255,255,.6); }
   .chips { display:flex; flex-wrap:wrap; gap:6px; }
-  .chip { padding:6px 12px; border:1px solid rgba(255,255,255,.18); border-radius:18px; background:rgba(255,255,255,.05); color:rgba(255,255,255,.85); font-size:13px; }
+  .chip { padding:7px 13px; border:1px solid rgba(255,255,255,.18); border-radius:18px; background:rgba(255,255,255,.05); color:rgba(255,255,255,.85); font-size:13px; }
   .chip.on { border-color:rgba(150,140,255,.75); background:rgba(120,110,255,.2); color:#fff; }
-  .notes { width:100%; margin-top:10px; padding:8px 10px; border:1px solid rgba(255,255,255,.16); border-radius:10px; background:#0e1020; color:#fff; font-size:13px; }
+  .notes { width:100%; margin-top:12px; padding:9px 11px; border:1px solid rgba(255,255,255,.16); border-radius:10px; background:#0e1020; color:#fff; font-size:13px; }
+
+  .nav { max-width:480px; margin:22px auto 0; display:flex; gap:10px; }
+  .nav .btn { flex:1; padding:13px; font-size:15px; text-align:center; }
+  .nav .btn:disabled { opacity:.4; }
 </style>
 </head>
 <body>
-  <h1>风信兔视频素材 · 人工看片复核</h1>
-  <p class="sub">只看「它实际像什么」，不看原文件名。一条可多标签。改完自动保存。</p>
-
   <div class="toolbar">
-    <button class="btn primary" onclick="exportJSON()">导出复核结果 JSON</button>
-    <span class="progress" id="progress"></span>
+    <span class="progress" id="progress">1 / 16</span>
+    <button class="btn primary" onclick="exportJSON()">导出复核 JSON</button>
   </div>
 
-  <div id="list"></div>
+  <div class="clip">
+    <div class="clip-head">
+      <span class="clip-id" id="clipId"></span>
+      <span class="clip-file" id="clipFile"></span>
+      <span class="badge" id="badge"></span>
+    </div>
+    <div class="video-wrap">
+      <video id="video" muted autoplay loop playsinline></video>
+    </div>
+    <a class="orig-link" id="origLink" href="#" target="_blank">查看原视频</a>
+
+    <div class="q">1. 第一感觉最像什么？（单选）</div><div class="chips" id="c-primary"></div>
+    <div class="q">2. 还像哪些次级情绪？（多选）</div><div class="chips" id="c-secondary"></div>
+    <div class="q">3. 更适合什么关系？（多选）</div><div class="chips" id="c-relation"></div>
+    <div class="q">4. 动作能量</div><div class="chips" id="c-energy"></div>
+    <div class="q">5. 亲密度</div><div class="chips" id="c-intimacy"></div>
+    <div class="q">6. 整体可用性</div><div class="chips" id="c-status"></div>
+    <input class="notes" id="notes" placeholder="备注（可选）">
+  </div>
+
+  <div class="nav">
+    <button class="btn" id="prev" onclick="go(-1)">← 上一条</button>
+    <button class="btn primary" id="next" onclick="go(1)">保存并看下一条 →</button>
+  </div>
 
 <script>
   var CLIPS = [
-    { clipId:"clip_happy_01",   file:"assets/video/library/clip_happy_01.mp4",   filename:"01开心.mp4",      primary:"joy",        secondary:["excited","celebrate"], relation:["friend","family","colleague"] },
-    { clipId:"clip_wronged_02", file:"assets/video/library/clip_wronged_02.mp4", filename:"02委屈难过.mp4",  primary:"sadness",    secondary:["comfort_seeking","gentle_care"], relation:["partner","friend","family"] },
-    { clipId:"clip_angry_03",   file:"assets/video/library/clip_angry_03.mp4",  filename:"03生气愤怒.mp4",  primary:"anger",      secondary:["annoyed","frustrated"], relation:["general"] },
-    { clipId:"clip_sajiao_04",  file:"assets/video/library/clip_sajiao_04.mp4", filename:"04撒娇.mp4",      primary:"cute_closeness", secondary:["gentle_care","comfort_seeking"], relation:["partner","friend"] },
-    { clipId:"clip_playful_05", file:"assets/video/library/clip_playful_05.mp4",filename:"05调皮幽默.mp4",  primary:"playful",    secondary:["joy","teasing"], relation:["friend"] },
-    { clipId:"clip_jealous_06", file:"assets/video/library/clip_jealous_06.mp4",filename:"06吃醋.mp4",      primary:"jealous",    secondary:["wronged","cute_closeness"], relation:["partner"] },
-    { clipId:"clip_stubborn_07",file:"assets/video/library/clip_stubborn_07.mp4",filename:"07嘴硬不服.mp4", primary:"stubborn",   secondary:["anger","tsundere"], relation:["partner","friend"] },
-    { clipId:"clip_surprise_08",file:"assets/video/library/clip_surprise_08.mp4",filename:"08意外惊喜.mp4", primary:"surprise",   secondary:["joy","excited"], relation:["friend","family"] },
-    { clipId:"clip_confused_09",file:"assets/video/library/clip_confused_09.mp4",filename:"09疑惑.mp4",      primary:"confusion",  secondary:["wonder","gentle"], relation:["general"] },
-    { clipId:"clip_disgust_10", file:"assets/video/library/clip_disgust_10.mp4",filename:"10嫌弃.mp4",      primary:"disgust",    secondary:["playful_disgust","annoyed"], relation:["friend"] },
-    { clipId:"clip_guilty_11",  file:"assets/video/library/clip_guilty_11.mp4", filename:"11心虚.mp4",      primary:"guilty",     secondary:["nervous","soft_apology"], relation:["partner","friend"] },
-    { clipId:"clip_apology_12", file:"assets/video/library/clip_apology_12.mp4",filename:"12求原谅.mp4",    primary:"apology",    secondary:["comfort_seeking","sadness"], relation:["partner","friend","family"] },
-    { clipId:"clip_lowenergy_13",file:"assets/video/library/clip_lowenergy_13.mp4",filename:"13躺平摆烂.mp4",primary:"low_energy", secondary:["tired","humor"], relation:["friend","colleague"] },
-    { clipId:"clip_cool_14",    file:"assets/video/library/clip_cool_14.mp4",   filename:"14装酷.mp4",      primary:"cool",       secondary:["restrained","playful"], relation:["friend"] },
-    { clipId:"clip_gloat_15",   file:"assets/video/library/clip_gloat_15.mp4",  filename:"15幸灾乐祸.mp4", primary:"schadenfreude", secondary:["playful","teasing"], relation:["friend"] },
-    { clipId:"clip_wronged_dup",file:"assets/video/library/clip_wronged_dup.mp4",filename:"委屈难过.mp4",   primary:"sadness",    secondary:["comfort_seeking"], relation:["partner","friend"] }
+    { clipId:"clip_happy_01",   filename:"01开心.mp4",      primary:"joy",        secondary:["excited","celebrate"], relation:["friend","family","colleague"] },
+    { clipId:"clip_wronged_02", filename:"02委屈难过.mp4",  primary:"sadness",    secondary:["comfort_seeking","gentle_care"], relation:["partner","friend","family"] },
+    { clipId:"clip_angry_03",   filename:"03生气愤怒.mp4",  primary:"anger",      secondary:["annoyed","frustrated"], relation:["general"] },
+    { clipId:"clip_sajiao_04",  filename:"04撒娇.mp4",      primary:"cute_closeness", secondary:["gentle_care","comfort_seeking"], relation:["partner","friend"] },
+    { clipId:"clip_playful_05", filename:"05调皮幽默.mp4",  primary:"playful",    secondary:["joy","teasing"], relation:["friend"] },
+    { clipId:"clip_jealous_06", filename:"06吃醋.mp4",      primary:"jealous",    secondary:["wronged","cute_closeness"], relation:["partner"] },
+    { clipId:"clip_stubborn_07",filename:"07嘴硬不服.mp4",  primary:"stubborn",   secondary:["anger","tsundere"], relation:["partner","friend"] },
+    { clipId:"clip_surprise_08",filename:"08意外惊喜.mp4",  primary:"surprise",   secondary:["joy","excited"], relation:["friend","family"] },
+    { clipId:"clip_confused_09",filename:"09疑惑.mp4",      primary:"confusion",  secondary:["wonder","gentle"], relation:["general"] },
+    { clipId:"clip_disgust_10", filename:"10嫌弃.mp4",      primary:"disgust",    secondary:["playful_disgust","annoyed"], relation:["friend"] },
+    { clipId:"clip_guilty_11",  filename:"11心虚.mp4",      primary:"guilty",     secondary:["nervous","soft_apology"], relation:["partner","friend"] },
+    { clipId:"clip_apology_12", filename:"12求原谅.mp4",    primary:"apology",    secondary:["comfort_seeking","sadness"], relation:["partner","friend","family"] },
+    { clipId:"clip_lowenergy_13",filename:"13躺平摆烂.mp4", primary:"low_energy", secondary:["tired","humor"], relation:["friend","colleague"] },
+    { clipId:"clip_cool_14",    filename:"14装酷.mp4",      primary:"cool",       secondary:["restrained","playful"], relation:["friend"] },
+    { clipId:"clip_gloat_15",   filename:"15幸灾乐祸.mp4",  primary:"schadenfreude", secondary:["playful","teasing"], relation:["friend"] },
+    { clipId:"clip_wronged_dup",filename:"委屈难过.mp4",    primary:"sadness",    secondary:["comfort_seeking"], relation:["partner","friend"] }
   ];
+  var PROXY = "assets/video/library-review-proxy/";
+  var ORIG = "assets/video/library/";
 
   var EMOTIONS = ["joy","excited","sadness","wronged","anger","annoyed","comfort_seeking","gentle_care","cute_closeness","playful","jealous","stubborn","surprise","confusion","disgust","guilty","apology","low_energy","cool","schadenfreude","tender","warm"];
   var RELATIONS = ["partner","friend","family","colleague","general"];
@@ -69,115 +94,104 @@
 
   var store = {};
   try { store = JSON.parse(localStorage.getItem('clip_review_v1') || '{}'); } catch(e){ store = {}; }
+  var idx = parseInt(localStorage.getItem('clip_review_idx') || '0', 10) || 0;
+  if(idx >= CLIPS.length) idx = 0;
 
-  function save(){ localStorage.setItem('clip_review_v1', JSON.stringify(store)); renderProgress(); }
-
-  function renderProgress(){
-    var done = CLIPS.filter(function(c){ return store[c.clipId] && store[c.clipId].reviewed; }).length;
-    document.getElementById('progress').textContent = "已复核 " + done + " / " + CLIPS.length;
-  }
+  function save(){ localStorage.setItem('clip_review_v1', JSON.stringify(store)); }
+  function saveIdx(){ localStorage.setItem('clip_review_idx', String(idx)); }
 
   function getClip(id){
     if(!store[id]) store[id] = { reviewed:false };
     return store[id];
   }
+  function cur(){ return CLIPS[idx]; }
+  function curState(){
+    var c = cur(), s = getClip(c.clipId);
+    if(!s.finalPrimary) s.finalPrimary = c.primary;
+    if(!s.finalSecondary) s.finalSecondary = c.secondary.slice();
+    if(!s.finalRelation) s.finalRelation = c.relation.slice();
+    if(!s.energy) s.energy = 'mid';
+    if(!s.intimacy) s.intimacy = 'mid';
+    if(!s.status) s.status = 'usable';
+    return s;
+  }
 
-  function chipGroup(container, options, value, single, onPick){
+  function chips(container, options, value, single, onPick){
     container.innerHTML = '';
     options.forEach(function(opt){
       var b = document.createElement('button');
       b.className = 'chip' + (value.indexOf(opt) >= 0 ? ' on' : '');
       b.textContent = opt;
-      b.addEventListener('click', function(){
-        onPick(opt, !(value.indexOf(opt) >= 0));
-      });
+      b.addEventListener('click', function(){ onPick(opt, !(value.indexOf(opt) >= 0)); });
       container.appendChild(b);
     });
   }
 
-  function build(){
-    var list = document.getElementById('list');
-    list.innerHTML = '';
-    CLIPS.forEach(function(clip){
-      var s = getClip(clip.clipId);
-      // defaults
-      if(!s.finalPrimary) s.finalPrimary = clip.primary;
-      if(!s.finalSecondary) s.finalSecondary = clip.secondary.slice();
-      if(!s.finalRelation) s.finalRelation = clip.relation.slice();
-      if(!s.energy) s.energy = 'mid';
-      if(!s.intimacy) s.intimacy = 'mid';
-      if(!s.status) s.status = 'usable';
+  function render(){
+    var c = cur(), s = curState();
+    document.getElementById('progress').textContent = (idx+1) + " / " + CLIPS.length;
+    document.getElementById('clipId').textContent = c.clipId;
+    document.getElementById('clipFile').textContent = c.filename;
+    document.getElementById('badge').textContent = "原 primary: " + c.primary;
 
-      var card = document.createElement('div');
-      card.className = 'clip' + (s.reviewed ? ' reviewed' : '');
-      card.id = 'card_' + clip.clipId;
+    var v = document.getElementById('video');
+    v.src = PROXY + c.clipId + ".mp4";   // 只加载当前 1 条 proxy
+    v.play().catch(function(){});
 
-      card.innerHTML =
-        '<div class="clip-head"><span class="clip-id">' + clip.clipId + '</span>' +
-        '<span class="clip-file">' + clip.filename + '</span>' +
-        '<span class="badge">原 primary: ' + clip.primary + '</span></div>' +
-        '<video src="' + clip.file + '" muted autoplay loop playsinline></video>' +
-        '<div class="q">1. 第一感觉最像什么？（单选）</div><div class="chips" data-c="primary"></div>' +
-        '<div class="q">2. 还像哪些次级情绪？（多选）</div><div class="chips" data-c="secondary"></div>' +
-        '<div class="q">3. 更适合什么关系？（多选）</div><div class="chips" data-c="relation"></div>' +
-        '<div class="q">4. 动作能量</div><div class="chips" data-c="energy"></div>' +
-        '<div class="q">5. 亲密度</div><div class="chips" data-c="intimacy"></div>' +
-        '<div class="q">6. 整体可用性</div><div class="chips" data-c="status"></div>' +
-        '<input class="notes" placeholder="备注（可选）" value="' + (s.notes||'') + '">';
+    document.getElementById('origLink').href = ORIG + c.clipId + ".mp4";
 
-      list.appendChild(card);
-
-      // primary (single)
-      var pc = card.querySelector('[data-c=primary]');
-      chipGroup(pc, EMOTIONS, [s.finalPrimary], true, function(opt, on){
-        if(on){ s.finalPrimary = opt; s.reviewed = true; }
-        save(); build();
-      });
-      // secondary (multi)
-      var sc = card.querySelector('[data-c=secondary]');
-      chipGroup(sc, EMOTIONS, s.finalSecondary, false, function(opt, on){
-        var i = s.finalSecondary.indexOf(opt);
-        if(on && i<0){ s.finalSecondary.push(opt); } else if(!on && i>=0){ s.finalSecondary.splice(i,1); }
-        s.reviewed = true; save(); build();
-      });
-      // relation (multi)
-      var rc = card.querySelector('[data-c=relation]');
-      chipGroup(rc, RELATIONS, s.finalRelation, false, function(opt, on){
-        var i = s.finalRelation.indexOf(opt);
-        if(on && i<0){ s.finalRelation.push(opt); } else if(!on && i>=0){ s.finalRelation.splice(i,1); }
-        s.reviewed = true; save(); build();
-      });
-      // energy (single)
-      var ec = card.querySelector('[data-c=energy]');
-      chipGroup(ec, ENERGIES, [s.energy], true, function(opt,on){ if(on){ s.energy=opt; s.reviewed=true; save(); build(); } });
-      // intimacy (single)
-      var ic = card.querySelector('[data-c=intimacy]');
-      chipGroup(ic, INTIMACIES, [s.intimacy], true, function(opt,on){ if(on){ s.intimacy=opt; s.reviewed=true; save(); build(); } });
-      // status (single)
-      var tc = card.querySelector('[data-c=status]');
-      chipGroup(tc, STATUSES, [s.status], true, function(opt,on){ if(on){ s.status=opt; s.reviewed=true; save(); build(); } });
-
-      var noteInput = card.querySelector('.notes');
-      noteInput.addEventListener('change', function(){ s.notes = noteInput.value; s.reviewed = true; save(); });
+    chips(document.getElementById('c-primary'), EMOTIONS, [s.finalPrimary], true, function(opt,on){
+      if(on){ s.finalPrimary = opt; s.reviewed = true; save(); render(); }
     });
-    renderProgress();
+    chips(document.getElementById('c-secondary'), EMOTIONS, s.finalSecondary, false, function(opt,on){
+      var i = s.finalSecondary.indexOf(opt);
+      if(on && i<0) s.finalSecondary.push(opt); else if(!on && i>=0) s.finalSecondary.splice(i,1);
+      s.reviewed = true; save(); render();
+    });
+    chips(document.getElementById('c-relation'), RELATIONS, s.finalRelation, false, function(opt,on){
+      var i = s.finalRelation.indexOf(opt);
+      if(on && i<0) s.finalRelation.push(opt); else if(!on && i>=0) s.finalRelation.splice(i,1);
+      s.reviewed = true; save(); render();
+    });
+    chips(document.getElementById('c-energy'), ENERGIES, [s.energy], true, function(opt,on){
+      if(on){ s.energy=opt; s.reviewed=true; save(); render(); }
+    });
+    chips(document.getElementById('c-intimacy'), INTIMACIES, [s.intimacy], true, function(opt,on){
+      if(on){ s.intimacy=opt; s.reviewed=true; save(); render(); }
+    });
+    chips(document.getElementById('c-status'), STATUSES, [s.status], true, function(opt,on){
+      if(on){ s.status=opt; s.reviewed=true; save(); render(); }
+    });
+
+    var n = document.getElementById('notes');
+    n.value = s.notes || '';
+    n.onchange = function(){ s.notes = n.value; s.reviewed = true; save(); };
+
+    document.getElementById('prev').disabled = (idx === 0);
+    document.getElementById('next').textContent = (idx === CLIPS.length-1) ? "完成 · 从头" : "保存并看下一条 →";
+  }
+
+  function go(dir){
+    // 释放当前视频资源
+    var v = document.getElementById('video');
+    v.pause(); v.removeAttribute('src'); v.load();
+    idx = (idx + dir + CLIPS.length) % CLIPS.length;
+    saveIdx();
+    render();
+    window.scrollTo(0,0);
   }
 
   function exportJSON(){
     var out = CLIPS.map(function(clip){
       var s = getClip(clip.clipId);
       return {
-        clipId: clip.clipId,
-        filename: clip.filename,
+        clipId: clip.clipId, filename: clip.filename,
         sourcePrimaryEmotion: clip.primary,
         reviewed: !!s.reviewed,
         finalPrimaryEmotion: s.finalPrimary,
         finalSecondaryEmotions: s.finalSecondary || [],
         relationTags: s.finalRelation || [],
-        energy: s.energy,
-        intimacyLevel: s.intimacy,
-        status: s.status,
-        notes: s.notes || ''
+        energy: s.energy, intimacyLevel: s.intimacy, status: s.status, notes: s.notes || ''
       };
     });
     var blob = new Blob([JSON.stringify(out, null, 2)], {type:'application/json'});
@@ -187,7 +201,7 @@
     a.click();
   }
 
-  build();
+  render();
 </script>
 </body>
 </html>
