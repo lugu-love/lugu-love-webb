@@ -34,6 +34,7 @@ MASTERS = {
     "rabbit-happy":     ("happy-master-v2.mp4", "开心"),
     "rabbit-aggrieved": ("wronged-master-v2.mp4", "委屈"),
     "rabbit-angry":     ("angry-master-v2.mp4", "生气"),
+    "rabbit-playful":   ("playful-master-v2.mp4", "调皮"),
 }
 
 # 七星使者 · 测试声音池（ElevenLabs premade，voice_id 为稳定引用）
@@ -105,6 +106,7 @@ JOURNEY_META = {
     "rabbit-happy": ("fengxin-rabbit", "happy"),
     "rabbit-aggrieved": ("fengxin-rabbit", "wronged"),
     "rabbit-angry": ("fengxin-rabbit", "angry"),
+    "rabbit-playful": ("fengxin-rabbit", "playful"),
 }
 APP_VIDEO_DIR = os.environ.get("APP_VIDEO_DIR", "/tmp/app-video-cache")
 
