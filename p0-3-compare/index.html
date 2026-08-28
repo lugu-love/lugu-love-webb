@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0c18">
+<title>10/20/30/40 字动态时长 · 代表样片</title>
+<style>
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { margin:0; background:#0b0c18; color:#eef0ff;
+    font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; }
+  header { padding:22px 18px 6px; }
+  h1 { font-size:18px; margin:0 0 6px; font-weight:650; }
+  .sub { font-size:12.5px; color:#9aa0c3; line-height:1.6; }
+  .tag { display:inline-block; margin:2px 4px 2px 0; padding:2px 8px; border-radius:999px;
+    background:rgba(125,139,255,.16); color:#b8c0ff; font-size:11px; }
+  .warn { margin:12px 18px 4px; padding:10px 12px; border-radius:12px; background:rgba(255,170,80,.10);
+    border:1px solid rgba(255,170,80,.25); color:#ffd9a8; font-size:12px; line-height:1.6; }
+  .card { margin:14px 14px 0; padding:12px; border-radius:16px; background:#17192e;
+    border:1px solid rgba(255,255,255,.07); }
+  .card .head { display:flex; align-items:baseline; gap:8px; margin:0 0 8px; }
+  .card .name { font-size:15px; font-weight:650; }
+  .card .tier { font-size:12px; color:#9aa0c3; }
+  .card .flag { margin-left:auto; font-size:11px; color:#a9e3a0; }
+  .card video { width:100%; border-radius:12px; background:#000; display:block; }
+  .meta { display:flex; flex-wrap:wrap; gap:4px 12px; margin-top:8px; font-size:12px; color:#9aa0c3; }
+  .meta b { color:#eef0ff; font-weight:600; }
+  .note { margin:14px 14px 26px; font-size:11.5px; color:#7f86a8; line-height:1.7; }
+</style>
+</head>
+<body>
+<header>
+  <h1>10 / 20 / 30 / 40 字动态时长 · 代表样片</h1>
+  <div class="sub">
+    3 情绪 × 4 长度档共 12 条真实 ElevenLabs 测试，这里选出 6 条代表：
+    开心四档完整展示「文字 → TTS → 视频时长」曲线，委屈 40 字展示最慢最长，生气 30 字展示第二情绪延长。
+  </div>
+  <div>
+    <span class="tag">ElevenLabs 真实 TTS</span>
+    <span class="tag">Chutki 固定声音</span>
+    <span class="tag">3 行字幕</span>
+    <span class="tag">动态时长</span>
+  </div>
+</header>
+<div class="warn">⚠️ 30/40 字档视频总长超过母版 10 秒，尾部使用尾帧静帧延长。当前实验链在「延长段」存在画面抖动/错乱（已单独登记为技术问题，未修复）。10/20 字档不涉及延长，无此问题。请重点感受时长节奏与字幕，并留意 30/40 档收尾画面。</div>
+
+<div class="card">
+  <div class="head"><span class="name">开心 · 10 字</span><span class="tier">短句基线</span><span class="flag">✓ 稳定</span></div>
+  <video controls preload="metadata" poster="posters/happy-10.jpg" src="videos/happy-10.mp4"></video>
+  <div class="meta"><span>TTS <b>3.97s</b></span><span>视频 <b>6.00s</b></span><span>2 行字幕 · 安全</span><span>1.8MB</span></div>
+</div>
+
+<div class="card">
+  <div class="head"><span class="name">开心 · 20 字</span><span class="tier">常规表达</span><span class="flag">✓ 稳定</span></div>
+  <video controls preload="metadata" poster="posters/happy-20.jpg" src="videos/happy-20.mp4"></video>
+  <div class="meta"><span>TTS <b>5.49s</b></span><span>视频 <b>7.50s</b></span><span>2 行字幕 · 安全</span><span>2.3MB</span></div>
+</div>
+
+<div class="card">
+  <div class="head"><span class="name">开心 · 30 字</span><span class="tier">明显更长</span><span class="flag">⚠️ 延长段抖动</span></div>
+  <video controls preload="metadata" poster="posters/happy-30.jpg" src="videos/happy-30.mp4"></video>
+  <div class="meta"><span>TTS <b>8.52s</b></span><span>视频 <b>10.52s</b></span><span>3 行字幕 · 安全</span><span>3.0MB</span></div>
+</div>
+
+<div class="card">
+  <div class="head"><span class="name">开心 · 40 字</span><span class="tier">第一阶段上限</span><span class="flag">⚠️ 延长段抖动</span></div>
+  <video controls preload="metadata" poster="posters/happy-40.jpg" src="videos/happy-40.mp4"></video>
+  <div class="meta"><span>TTS <b>10.61s</b></span><span>视频 <b>12.61s</b></span><span>3 行字幕 · 安全</span><span>3.1MB</span></div>
+</div>
+
+<div class="card">
+  <div class="head"><span class="name">委屈 · 40 字</span><span class="tier">最慢最长</span><span class="flag">⚠️ 延长段抖动</span></div>
+  <video controls preload="metadata" poster="posters/aggrieved-40.jpg" src="videos/aggrieved-40.mp4"></video>
+  <div class="meta"><span>TTS <b>13.32s</b></span><span>视频 <b>15.33s</b></span><span>3 行字幕 · 安全</span><span>3.2MB</span></div>
+</div>
+
+<div class="card">
+  <div class="head"><span class="name">生气 · 30 字</span><span class="tier">第二情绪延长</span><span class="flag">⚠️ 延长段抖动</span></div>
+  <video controls preload="metadata" poster="posters/angry-30.jpg" src="videos/angry-30.mp4"></video>
+  <div class="meta"><span>TTS <b>9.25s</b></span><span>视频 <b>11.25s</b></span><span>3 行字幕 · 安全</span><span>2.9MB</span></div>
+</div>
+
+<div class="note">
+  完整 12 条数据表见本轮对话汇报。本页 6 条为：开心 10/20/30/40 + 委屈 40 + 生气 30。<br>
+  测试链：api.lugu.love（实验分支 codex/p3-cloud）· 生成时间 2026-08-28/29。
+</div>
+</body>
+</html>
