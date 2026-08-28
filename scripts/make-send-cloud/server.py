@@ -386,7 +386,7 @@ def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None):
     extra = []
     map_video = vlabel
     if final_duration > master_dur + 0.05:
-        extra.append("%s,tpad=stop_mode=clone:stop_duration=%.3f[vout]" % (vlabel, final_duration - master_dur))
+        extra.append("%stpad=stop_mode=clone:stop_duration=%.3f[vout]" % (vlabel, final_duration - master_dur))
         map_video = "[vout]"
     # 音频：apad 补尾段静音，保证收尾预留存在
     extra.append("[1:a]apad[aout]")
