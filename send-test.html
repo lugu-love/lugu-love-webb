@@ -47,6 +47,12 @@
   html.is-android.can-file-share #btnSave { grid-column:2; grid-row:2; }
   html.is-android #btnOpen, html.is-android #btnSave { height:34px; background:transparent; color:rgba(238,240,255,.68); border:1px solid rgba(255,255,255,.10); font-size:12px; font-weight:500; }
   html.is-android.is-wechat #btnSend { display:none !important; }
+  html.is-app-bridge #btnOpen, html.is-app-bridge #btnSend, html.is-app-bridge #btnSave { display:none !important; }
+  html.is-app-bridge .success-actions { display:grid; grid-template-columns:1fr; gap:8px; }
+  html.is-app-bridge #btnSendWeChat { width:100%; height:50px; background:linear-gradient(135deg,#7d8bff,#a06bff); color:#fff; border:none; font-size:16px; }
+  html.is-app-bridge #btnSendWeChat:disabled { opacity:.6; }
+  html.is-app-bridge #btnReEdit { width:100%; height:38px; background:transparent; color:rgba(238,240,255,.6); border:1px solid rgba(255,255,255,.12); font-size:13px; }
+  html.is-app-bridge.show-save-fallback #btnSave { display:inline-flex !important; }
   button { flex:1; min-width:82px; height:44px; border-radius:14px; border:none; font-size:14px; font-weight:650; cursor:pointer; }
   .btn-primary { background:linear-gradient(135deg,#7d8bff,#a06bff); color:#fff; }
   #btnGenerate { width:50%; height:44px; font-size:15px; border-radius:14px; background:rgba(125,139,255,.16); color:rgba(238,240,255,.92); border:1px solid rgba(125,139,255,.20); box-shadow:none; }
@@ -97,6 +103,7 @@
       <button class="btn-primary" id="btnGenerate" type="button">生成视频 →</button>
     </div>
     <div class="success-actions">
+      <button class="btn-primary" id="btnSendWeChat" type="button" hidden>发给微信好友</button>
       <button class="btn-primary" id="btnOpen" type="button" hidden>打开视频</button>
       <button class="btn-secondary" id="btnSend" type="button" hidden>发送视频</button>
       <button class="btn-secondary" id="btnSave" type="button" hidden>保存到手机</button>
@@ -249,6 +256,7 @@ window.__MAIN__ = function () {
   var btnSave=document.getElementById("btnSave");
   var btnSend=document.getElementById("btnSend");
   var btnReEdit=document.getElementById("btnReEdit");
+  var btnSendWeChat=document.getElementById("btnSendWeChat");
   var toastEl=document.getElementById("toast");
   var userAgent=navigator.userAgent || "";
   var isIOS=/iPad|iPhone|iPod/.test(userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
@@ -257,6 +265,9 @@ window.__MAIN__ = function () {
   if(isIOS){ document.documentElement.classList.add("is-ios"); btnSave.textContent="打开并分享"; }
   if(isAndroid){ document.documentElement.classList.add("is-android"); btnOpen.textContent="打开预览"; }
   if(isWeChat){ document.documentElement.classList.add("is-wechat"); }
+  var isAppBridge = !!(window.AndroidShare && typeof window.AndroidShare.prepareVideo === "function" && typeof window.AndroidShare.sharePreparedVideo === "function");
+  var nativeReady=false, nativeVideoPath="";
+  if(isAppBridge){ document.documentElement.classList.add("is-app-bridge"); }
 
   var current=EMOTIONS[0];
   var cache={}, preloadOrder=["2","3"], preloadStarted=false, activeUserLoad=false;
@@ -424,6 +435,17 @@ window.__MAIN__ = function () {
   textInput.addEventListener("input", function(){ previewTextEl.textContent=textInput.value; var n=textInput.value.trim().length; if(n>30 && !longTextHintShown){ showToast("文字较长，生成视频会相应更长。"); } longTextHintShown=n>30; syncGenerateEnabled(); });
 
   function setStatus(msg, cls){ statusEl.textContent=msg; statusEl.className="status" + (cls ? " "+cls : ""); }
+  window.onNativeStatus = function(ev){
+    try {
+      var phase = ev && ev.phase;
+      if(phase === "preparing"){ nativeReady=false; btnSendWeChat.disabled=true; btnSendWeChat.textContent="发给微信好友"; setStatus("视频已生成，正在准备发送…", "ok"); }
+      else if(phase === "ready"){ nativeReady=true; btnSendWeChat.disabled=false; btnSendWeChat.textContent="发给微信好友"; setStatus("准备完成，可以发送了", "ok"); }
+      else if(phase === "busy"){ setStatus(ev.message || "请先完成当前分享", ""); }
+      else if(phase === "error"){ nativeReady=false; btnSendWeChat.disabled=true; btnSendWeChat.textContent="发给微信好友"; setStatus(ev.message || "视频准备失败，请重新生成后再试", "err"); document.documentElement.classList.add("show-save-fallback"); }
+      else if(phase === "sharing"){ setStatus("正在打开系统分享…", ""); }
+      else if(phase === "video_share_returned"){ setStatus(ev.message || "视频已发送", "ok"); }
+    } catch(err){ console.error("onNativeStatus error:", err); }
+  };
   function setHint(msg){ hintEl.textContent=msg || ""; }
   function showToast(msg){ toastEl.textContent=msg; toastEl.classList.add("show"); clearTimeout(showToast._t); showToast._t=setTimeout(function(){toastEl.classList.remove("show");},1800); }
 
@@ -439,7 +461,8 @@ window.__MAIN__ = function () {
       "<b>请求阶段:</b> " + generatePhase,
       "<b>情绪:</b> " + current.name + " (id=" + current.id + ", item=" + current.item + ")",
       "<b>生成次数:</b> " + genCount,
-      "<b>预览src:</b> " + (lastUrl ? "(Blob MP4)" : "无")
+      "<b>预览src:</b> " + (lastUrl ? "(Blob MP4)" : "无"),
+      "<b>Bridge:</b> " + (isAppBridge ? "APK Native" : "Web")
     ];
     if(lastTiming){
       lines.push("<b>耗时:</b> 点击→请求=" + lastTiming.clickToFetchMs + "ms fetch=" + lastTiming.fetchMs + "ms blob=" + lastTiming.blobMs + "ms 总=" + lastTiming.totalMs + "ms");
@@ -449,6 +472,10 @@ window.__MAIN__ = function () {
 
   function clearGenerated(){
     document.documentElement.classList.remove("can-file-share");
+    document.documentElement.classList.remove("show-save-fallback");
+    nativeReady=false; nativeVideoPath="";
+    if(isAppBridge && window.AndroidShare && typeof window.AndroidShare.clearPreparedVideo === "function"){ try { window.AndroidShare.clearPreparedVideo(); } catch(e){} }
+    if(btnSendWeChat){ btnSendWeChat.hidden=true; btnSendWeChat.disabled=true; }
     if(lastUrl){ URL.revokeObjectURL(lastUrl); lastUrl=null; }
     lastBlob=null; lastFile=null;
     videoEl.pause();
@@ -496,7 +523,7 @@ window.__MAIN__ = function () {
       });
       var tFetchStart = performance.now();
       lastTiming.clickToFetchMs=Math.round(tFetchStart-tClick);
-      var url=MAKE_SEND_API + "/make-send?text=" + encodeURIComponent(text) + "&item=" + encodeURIComponent(current.item) + "&voiceId=" + encodeURIComponent(voiceSelect.value);
+      var url=MAKE_SEND_API + "/make-send?text=" + encodeURIComponent(text) + "&item=" + encodeURIComponent(current.item) + "&voiceId=" + encodeURIComponent(voiceSelect.value) + (isAppBridge ? "&app_bridge=1" : "");
       activeController = typeof AbortController === "function" ? new AbortController() : null;
       generatePhase="request-sent";
       renderDiag();
@@ -523,9 +550,22 @@ window.__MAIN__ = function () {
       var tDone = performance.now();
       lastTiming = { clickToFetchMs: Math.round(tFetchStart-tClick), fetchMs: Math.round(tHeaders-tFetchStart), blobMs: Math.round(tBlob-tHeaders), totalMs: Math.round(tDone-tClick) };
       generatePhase="success";
+      if(isAppBridge){ var vpath = resp.headers.get("X-Video-Path") || ""; nativeVideoPath = /^\/app-video\/[A-Za-z0-9_-]{20,128}\.mp4$/.test(vpath) ? vpath : ""; }
       setStatus("视频生成成功", "ok");
       setHint(isIOS ? "打开后，点击右上角‘…’即可分享" : (isWeChat ? "请在浏览器中打开后发送视频" : "点击“发送视频”，可选择微信或其他应用。"));
       btnOpen.hidden=false; btnSave.hidden=false; btnReEdit.hidden=false;
+      if(isAppBridge){
+        setHint("");
+        btnSendWeChat.hidden=false; btnSendWeChat.disabled=true; btnSendWeChat.textContent="发给微信好友";
+        if(nativeVideoPath){
+          setStatus("视频已生成，正在准备发送…", "ok");
+          try { window.AndroidShare.prepareVideo(MAKE_SEND_API + nativeVideoPath); }
+          catch(err){ nativeReady=false; btnSendWeChat.disabled=true; setStatus("视频准备失败，请重新生成后再试", "err"); document.documentElement.classList.add("show-save-fallback"); }
+        } else {
+          setStatus("视频已生成，但无法准备发送，请保存后从微信发送。", "err");
+          document.documentElement.classList.add("show-save-fallback");
+        }
+      }
       if(!isWeChat && navigator.canShare && navigator.canShare({files:[file]})){
         if(isAndroid) document.documentElement.classList.add("can-file-share");
         btnSend.hidden=false;
@@ -610,6 +650,10 @@ window.__MAIN__ = function () {
   btnSave.addEventListener("click", saveVideo);
   btnSend.addEventListener("click", sendVideo);
   btnReEdit.addEventListener("click", reEdit);
+  btnSendWeChat.addEventListener("click", function(){
+    if(!nativeReady){ setStatus("视频正在准备，请稍候…", ""); return; }
+    try { window.AndroidShare.sharePreparedVideo(); } catch(err){ setStatus("无法打开系统分享，请重试", "err"); }
+  });
 
   document.addEventListener("click", function(e){
     var el = document.elementFromPoint(e.clientX, e.clientY);
