@@ -280,22 +280,18 @@ def _build_filter(line_files, font_size, y_top):
 
 
 def build_speech_text(text, emotion):
-    """情绪声音编排基础规则（文本级；不宣称 lip-sync）。"""
-    t = text
-    # 优先在标点处切分，避免把词切断
-    punct = max(t.rfind("，"), t.rfind("。"), t.rfind("！"), t.rfind("？"))
-    mid = punct + 1 if punct > 0 and punct < len(t) - 1 else max(1, len(t) // 2)
-    if emotion == "委屈":
-        # spoken → inner_voice
-        t = t[:mid] + "……" + t[mid:]
-    elif emotion == "生气":
-        # leading silence → short spoken → pause → spoken → silence
-        t = "……" + t[:mid] + "……" + t[mid:] + "……"
-    elif emotion == "调皮":
-        # short spoken → pause → short spoken
-        t = t[:mid] + "……" + t[mid:]
-    # 开心：默认 spoken 为主，不额外处理
-    return t
+    """自然优先：默认 speechText = displayText（原句原样朗读，不再做文本级情绪编排）。
+
+    - 不做按字数中间切分；
+    - 不固定插入省略号/停顿；
+    - 不把末尾 1～3 个字拆出来；
+    - 不按情绪套固定断句模板。
+
+    原句本身有明确语义停顿（逗号/句号/问号/叹号）时原样保留，
+    由 TTS 在该处自然停顿；无停顿则一口气自然读完整句。
+    情绪差异交给母版画面与文案本身，不靠强制断句模拟。
+    """
+    return text
 
 
 def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None):
