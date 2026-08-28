@@ -381,16 +381,20 @@ def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None):
     master_dur = _probe_duration(master) or float(DURATION)
 
     # 视频：超出母版长度时用尾帧静帧 hold 补齐（不循环、不跳帧、无机械重复）；
-    # 短于母版则按 final_duration 裁剪。
-    vid = vlabel
+    # 短于母版则按 final_duration 裁剪。tpad 作为 filter_complex 内独立链，
+    # 用输出标签 [vout] 供 -map 使用（过滤表达式不能直接塞进 -map）。
+    extra = []
+    map_video = vlabel
     if final_duration > master_dur + 0.05:
-        vid = "%s,tpad=stop_mode=clone:stop_duration=%.3f" % (vlabel, final_duration - master_dur)
+        extra.append("%s,tpad=stop_mode=clone:stop_duration=%.3f[vout]" % (vlabel, final_duration - master_dur))
+        map_video = "[vout]"
     # 音频：apad 补尾段静音，保证收尾预留存在
-    audio_filter = "[1:a]apad[aout]"
+    extra.append("[1:a]apad[aout]")
+    filter_complex = filtergraph if not extra else "%s;%s" % (filtergraph, ";".join(extra))
     cmd = [
         FFMPEG, "-y", "-i", master, "-i", tts_path,
-        "-filter_complex", "%s;%s" % (filtergraph, audio_filter),
-        "-map", vid, "-map", "[aout]",
+        "-filter_complex", filter_complex,
+        "-map", map_video, "-map", "[aout]",
         "-threads", str(FFMPEG_THREADS),
         "-c:v", "libx264", "-pix_fmt", "yuv420p",
         "-r", str(FPS), "-b:v", "%dk" % BITRATE_KBPS,
