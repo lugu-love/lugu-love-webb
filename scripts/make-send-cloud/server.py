@@ -750,7 +750,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         if item not in MASTERS:
             item = "rabbit-happy"
         if len(text) > TEXT_MAX:
-            return self._send_json(400, {"error": "TEXT_TOO_LONG", "message": "这句话有点长，当前实验链支持约 %d 字以内，请缩短后重试。" % TEXT_MAX})
+            return self._send_json(400, {"error": "TEXT_TOO_LONG", "message": "这句话有点长，当前最长支持 %d 字，请缩短后重试。" % TEXT_MAX})
         if has_unsupported(text):
             return self._send_json(400, {"error": "暂不支持 emoji / 特殊符号，请使用文字、数字、标点"})
         if not rate_ok(self.client_address[0]):
