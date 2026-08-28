@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "description": "七星使者·情绪表达 统一映射（单一事实源）。前端预览与后端生成共用此表，禁止各自硬编码情绪->视频逻辑。",
+  "updatedAt": "2026-08-28",
+  "emotions": {
+    "rabbit-happy": {
+      "emotionId": "happy",
+      "itemId": "rabbit-happy",
+      "label": "开心",
+      "characterId": "fengxin-rabbit",
+      "sequenceId": "1",
+      "officialSource": "sequence/1",
+      "previewProxy": "mobile/1",
+      "previewFrames": 73,
+      "previewSheets": 7,
+      "renderMaster": "happy-master-v2.mp4",
+      "status": "official"
+    },
+    "rabbit-aggrieved": {
+      "emotionId": "wronged",
+      "itemId": "rabbit-aggrieved",
+      "label": "委屈",
+      "characterId": "fengxin-rabbit",
+      "sequenceId": "2",
+      "officialSource": "sequence/2",
+      "previewProxy": "mobile/2",
+      "previewFrames": 91,
+      "previewSheets": 8,
+      "renderMaster": "wronged-master-v2.mp4",
+      "status": "official"
+    },
+    "rabbit-angry": {
+      "emotionId": "angry",
+      "itemId": "rabbit-angry",
+      "label": "生气",
+      "characterId": "fengxin-rabbit",
+      "sequenceId": "3",
+      "officialSource": "sequence/3",
+      "previewProxy": "mobile/3",
+      "previewFrames": 109,
+      "previewSheets": 10,
+      "renderMaster": "angry-master-v2.mp4",
+      "status": "official"
+    },
+    "rabbit-playful": {
+      "emotionId": "playful",
+      "itemId": "rabbit-playful",
+      "label": "调皮",
+      "characterId": "fengxin-rabbit",
+      "renderMaster": "playful-master-v2.mp4",
+      "status": "experimental"
+    }
+  }
+}

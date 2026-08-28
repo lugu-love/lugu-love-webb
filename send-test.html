@@ -154,11 +154,40 @@ window.__MAIN__ = function () {
   var MAKE_SEND_API = "https://api.lugu.love";
   var GENERATE_TIMEOUT_MS = 55000;
 
-  var EMOTIONS = [
-    { id:"1", name:"开心", item:"rabbit-happy", totalFrames:73, sheetCount:7 },
-    { id:"2", name:"委屈", item:"rabbit-aggrieved", totalFrames:91, sheetCount:8 },
-    { id:"3", name:"生气", item:"rabbit-angry", totalFrames:109, sheetCount:10 }
+  // 三情绪映射唯一来源：scripts/make-send-cloud/emotion-manifest.json（官方配置）。
+  // 下方为离线/加载失败兜底；正常路径由 manifest 派生，前端不再自持第二套映射。
+  var EMOTIONS_FALLBACK = [
+    { id:"1", name:"开心", item:"rabbit-happy", totalFrames:73, sheetCount:7, previewProxy:"mobile/1" },
+    { id:"2", name:"委屈", item:"rabbit-aggrieved", totalFrames:91, sheetCount:8, previewProxy:"mobile/2" },
+    { id:"3", name:"生气", item:"rabbit-angry", totalFrames:109, sheetCount:10, previewProxy:"mobile/3" }
   ];
+  var EMOTIONS = EMOTIONS_FALLBACK.slice();
+
+  function loadEmotionManifest(){
+    return fetch("scripts/make-send-cloud/emotion-manifest.json", { cache:"no-store" })
+      .then(function(r){ if(!r.ok) throw new Error("manifest " + r.status); return r.json(); })
+      .then(function(m){
+        var src = (m && m.emotions) || {};
+        var list = ["rabbit-happy","rabbit-aggrieved","rabbit-angry"].map(function(itemId){
+          var e = src[itemId];
+          if(!e) return null;
+          return {
+            id: String(e.sequenceId || ""),
+            name: e.label || itemId,
+            item: e.itemId || itemId,
+            totalFrames: e.previewFrames,
+            sheetCount: e.previewSheets,
+            previewProxy: e.previewProxy
+          };
+        });
+        if(list.length === 3 && list.every(function(x){ return x && x.id && x.sheetCount > 0; })){
+          EMOTIONS = list;
+          return true;
+        }
+        return false;
+      })
+      .catch(function(){ return false; });
+  }
 
   var GUIDES = {
     "1": "把这份开心，说给你想分享的人。",
@@ -245,10 +274,24 @@ window.__MAIN__ = function () {
   });
   voiceSelect.value="Jr72SE8p9OcJmr8hyX0D";
 
-  EMOTIONS.forEach(function(e){
-    var b=document.createElement("button"); b.type="button"; b.className="emotion"; b.textContent=e.name;
-    b.addEventListener("click", function(){ selectEmotion(e.id); });
-    emotionsEl.appendChild(b);
+  function renderEmotionButtons(){
+    emotionsEl.innerHTML = "";
+    EMOTIONS.forEach(function(e){
+      var b=document.createElement("button"); b.type="button"; b.className="emotion"; b.textContent=e.name;
+      b.addEventListener("click", function(){ selectEmotion(e.id); });
+      emotionsEl.appendChild(b);
+    });
+    refreshUI(); renderGuide(); renderSuggest();
+  }
+  renderEmotionButtons();
+
+  loadEmotionManifest().then(function(ok){
+    if(!ok) return;
+    var keepId = current.id;
+    current = EMOTIONS.find(function(e){ return e.id === keepId; }) || EMOTIONS[0];
+    renderEmotionButtons();
+    renderDiag(); renderPreloadDiag();
+    if(typeof syncGenerateEnabled === "function") syncGenerateEnabled();
   });
 
   function refreshUI(){ Array.prototype.forEach.call(emotionsEl.children, function(b,i){ b.classList.toggle("active", EMOTIONS[i].id===current.id); }); }
@@ -290,7 +333,11 @@ window.__MAIN__ = function () {
     });
   }
 
-  function sheetUrl(id, i){ return "assets/video/fengxin-rabbit-sequence/mobile/" + id + "/sheet-" + String(i).padStart(2,"0") + ".webp"; }
+  function sheetUrl(id, i){
+    var e = EMOTIONS.find(function(x){ return x.id === id; });
+    var dir = (e && e.previewProxy) || ("mobile/" + id);
+    return "assets/video/fengxin-rabbit-sequence/" + dir + "/sheet-" + String(i).padStart(2,"0") + ".webp";
+  }
 
   function ensureSheets(id, cb, errCb){
     var e = EMOTIONS.find(function(x){ return x.id === id; });
