@@ -87,7 +87,7 @@
       <select id="voiceSelect" class="voice-select"></select>
     </div>
 
-    <div class="editor"><textarea id="textInput" maxlength="40" placeholder="写一句话…（建议 20 字以内，效果更自然）"></textarea></div>
+    <div class="editor"><textarea id="textInput" maxlength="40" placeholder="写一句话…（20 字以内效果更自然，最长支持 40 字）"></textarea></div>
     <div class="guide" id="guide"></div>
     <button class="suggest" id="btnSuggest" type="button">✨ 帮我选一句</button>
     <div class="suggest-box" id="suggestBox" hidden></div>
@@ -420,7 +420,8 @@ window.__MAIN__ = function () {
   function startLoop(){ frameIndex=0; lastFrameAt=0; paintFrame(); cancelAnimationFrame(animId); animId=requestAnimationFrame(loop); }
   function loop(now){ if(!lastFrameAt) lastFrameAt=now; if(now-lastFrameAt>=1000/FRAME_RATE){ lastFrameAt=now; frameIndex=(frameIndex+1)%current.totalFrames; paintFrame(); } animId=requestAnimationFrame(loop); }
 
-  textInput.addEventListener("input", function(){ previewTextEl.textContent=textInput.value; syncGenerateEnabled(); });
+  var longTextHintShown=false;
+  textInput.addEventListener("input", function(){ previewTextEl.textContent=textInput.value; var n=textInput.value.trim().length; if(n>30 && !longTextHintShown){ showToast("文字较长，生成视频会相应更长。"); } longTextHintShown=n>30; syncGenerateEnabled(); });
 
   function setStatus(msg, cls){ statusEl.textContent=msg; statusEl.className="status" + (cls ? " "+cls : ""); }
   function setHint(msg){ hintEl.textContent=msg || ""; }
@@ -473,7 +474,7 @@ window.__MAIN__ = function () {
     }
     var text=(textInput.value||"").trim();
     if(!text){ showToast("请先写一句话"); return; }
-    if(text.length > 20){ showToast("这句话有点长，建议缩短到 20 字以内，效果会更自然"); return; }
+    if(text.length > 30){ showToast("文字较长，生成视频会相应更长。"); }
 
     isGenerating=true;
     clearGenerated();
