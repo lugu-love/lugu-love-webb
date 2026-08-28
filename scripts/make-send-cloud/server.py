@@ -17,6 +17,7 @@ import time
 import urllib.parse
 from datetime import datetime
 import html
+import re
 
 from text_layout import layout_lines, has_unsupported
 from tts_provider import make_tts_provider, ElevenLabsProvider
@@ -101,13 +102,21 @@ FFMPEG_THREADS = int(os.environ.get("FFMPEG_THREADS", "2"))
 BITRATE_KBPS = int(os.environ.get("BITRATE_KBPS", "2500"))
 W, H = 720, 1280
 DURATION = 10
-TEXT_MAX = int(os.environ.get("TEXT_MAX", "20"))
+TEXT_MAX = int(os.environ.get("TEXT_MAX", "40"))
+TEXT_RECOMMEND = int(os.environ.get("TEXT_RECOMMEND", "20"))
 SAFE_WIDTH = 620
 BASE_FONT_SIZE = 50
 LINE_SPACING = 20
 COPY_TOP = 480   # 首行 y = H - 480 = 800（V2 正文区，避开播放器控制区）
 BOTTOM_MARGIN = 10
-MAX_HEIGHT = 2 * BASE_FONT_SIZE + LINE_SPACING   # 最多 2 行 = 120
+MAX_HEIGHT = 3 * BASE_FONT_SIZE + 2 * LINE_SPACING   # 最多 3 行 = 190
+MIN_FONT_SIZE = int(os.environ.get("MIN_FONT_SIZE", "36"))   # 可读字号下限
+
+# 动态时长实验（第一版简单规则；具体数值待 12 条实测后确定）：
+# finalDuration = max(BASE_MIN_DURATION, ttsDuration + ENDING_HOLD)
+BASE_MIN_DURATION = float(os.environ.get("BASE_MIN_DURATION", "5.0"))
+ENDING_HOLD = float(os.environ.get("ENDING_HOLD", "2.0"))
+MAX_FINAL_DURATION = float(os.environ.get("MAX_FINAL_DURATION", "30.0"))
 
 MAX_CONCURRENT = int(os.environ.get("MAX_CONCURRENT", "2"))
 RATE_WINDOW = float(os.environ.get("RATE_WINDOW", "60"))
@@ -294,6 +303,30 @@ def build_speech_text(text, emotion):
     return text
 
 
+def _probe_duration(path):
+    """探测媒体时长（秒）；ffprobe 优先，失败回退 ffmpeg -i 解析。"""
+    try:
+        r = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+             "-of", "default=noprint_wrappers=1:nokey=1", path],
+            capture_output=True, text=True, timeout=30,
+        )
+        if r.returncode == 0 and r.stdout.strip():
+            return float(r.stdout.strip())
+    except Exception:
+        pass
+    try:
+        r = subprocess.run([FFMPEG, "-i", path], capture_output=True, text=True, timeout=30)
+        out = (r.stderr or "") + (r.stdout or "")
+        m = re.search(r"Duration:\s*(\d+):(\d+):(\d+\.\d+)", out)
+        if m:
+            h, mi, s = int(m.group(1)), int(m.group(2)), float(m.group(3))
+            return h * 3600 + mi * 60 + s
+    except Exception:
+        pass
+    return None
+
+
 def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None):
     master_rel, _emotion = MASTERS[item]
     master = os.path.join(MASTERS_DIR, master_rel)
@@ -304,9 +337,10 @@ def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None):
     t0 = time.time()
     lines, font_size, block_h = layout_lines(
         text, FONT_FILE, BASE_FONT_SIZE, SAFE_WIDTH, MAX_HEIGHT, LINE_SPACING,
-        font_index=FONT_INDEX
+        min_size=MIN_FONT_SIZE, font_index=FONT_INDEX
     )
     y_top = H - COPY_TOP
+    meta["subtitle_safe"] = 1 if (y_top + block_h) <= H - BOTTOM_MARGIN else 0
     line_files = []
     for i, line in enumerate(lines):
         lf = os.path.join(workdir, "line%d.txt" % i)
@@ -340,21 +374,38 @@ def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None):
     meta["voice_id"] = voice_id or ""
 
     t0 = time.time()
+    # 动态时长：最终视频时长 = max(保底, TTS 实测时长 + 尾段预留)
+    tts_dur = _probe_duration(tts_path) or 0.0
+    final_duration = max(BASE_MIN_DURATION, tts_dur + ENDING_HOLD)
+    final_duration = min(final_duration, MAX_FINAL_DURATION)
+    master_dur = _probe_duration(master) or float(DURATION)
+
+    # 视频：超出母版长度时用尾帧静帧 hold 补齐（不循环、不跳帧、无机械重复）；
+    # 短于母版则按 final_duration 裁剪。
+    vid = vlabel
+    if final_duration > master_dur + 0.05:
+        vid = "%s,tpad=stop_mode=clone:stop_duration=%.3f" % (vlabel, final_duration - master_dur)
+    # 音频：apad 补尾段静音，保证收尾预留存在
+    audio_filter = "[1:a]apad[aout]"
     cmd = [
         FFMPEG, "-y", "-i", master, "-i", tts_path,
-        "-filter_complex", filtergraph,
-        "-map", vlabel, "-map", "1:a",
+        "-filter_complex", "%s;%s" % (filtergraph, audio_filter),
+        "-map", vid, "-map", "[aout]",
         "-threads", str(FFMPEG_THREADS),
         "-c:v", "libx264", "-pix_fmt", "yuv420p",
         "-r", str(FPS), "-b:v", "%dk" % BITRATE_KBPS,
         "-c:a", "aac", "-ar", "44100", "-b:a", "96k",
-        "-t", str(DURATION), final,
+        "-t", "%.3f" % final_duration, final,
     ]
-    r = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+    r = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
     meta["ffmpeg"] = time.time() - t0
     if r.returncode != 0:
         raise RuntimeError("ffmpeg rc=%d stderr=%s" % (r.returncode, r.stderr[-2000:]))
     meta["size"] = os.path.getsize(final)
+    meta["tts_duration"] = tts_dur
+    meta["final_duration"] = final_duration
+    meta["video_duration"] = _probe_duration(final) or final_duration
+    meta["speech_text"] = speech_text
     return final, meta
 
 
@@ -695,7 +746,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         if item not in MASTERS:
             item = "rabbit-happy"
         if len(text) > TEXT_MAX:
-            return self._send_json(400, {"error": "TEXT_TOO_LONG", "message": "这句话有点长，当前版本建议缩短到 %d 字以内，效果会更自然。" % TEXT_MAX})
+            return self._send_json(400, {"error": "TEXT_TOO_LONG", "message": "这句话有点长，当前实验链支持约 %d 字以内，请缩短后重试。" % TEXT_MAX})
         if has_unsupported(text):
             return self._send_json(400, {"error": "暂不支持 emoji / 特殊符号，请使用文字、数字、标点"})
         if not rate_ok(self.client_address[0]):
@@ -720,8 +771,9 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
                     return self._send_json(410, {"error": str(error)})
                 except journey_store.JourneyUnavailable as error:
                     return self._send_json(503, {"error": str(error)})
-            log("SUCCESS item=%s voice=%s tts_provider=%s text_len=%d lines=%d font=%d tts=%.2fs ffmpeg=%.2fs total=%.2fs size=%d"
-                % (item, meta.get("voice_id") or "-", meta.get("tts_provider") or "-", len(text), meta["lines"], meta["font_size"], meta["tts"], meta["ffmpeg"],
+            log("SUCCESS item=%s voice=%s tts_provider=%s text_len=%d lines=%d font=%d tts=%.2fs tts_dur=%.2fs vdur=%.2fs ffmpeg=%.2fs total=%.2fs size=%d"
+                % (item, meta.get("voice_id") or "-", meta.get("tts_provider") or "-", len(text), meta["lines"], meta["font_size"], meta["tts"],
+                   meta.get("tts_duration") or 0.0, meta.get("video_duration") or 0.0, meta["ffmpeg"],
                    time.time() - start, len(data)))
             self.send_response(200)
             self._cors()
@@ -731,6 +783,12 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             self.send_header("Cache-Control", "no-store")
             self.send_header("X-TTS-Provider", meta.get("tts_provider", ""))
             self.send_header("X-TTS-Voice", meta.get("voice_id", ""))
+            self.send_header("X-TTS-Duration-Sec", "%.3f" % (meta.get("tts_duration") or 0.0))
+            self.send_header("X-Video-Duration-Sec", "%.3f" % (meta.get("video_duration") or 0.0))
+            self.send_header("X-Subtitle-Lines", str(meta.get("lines", 0)))
+            self.send_header("X-Subtitle-Font-Size", str(meta.get("font_size", 0)))
+            self.send_header("X-Subtitle-Safe", str(meta.get("subtitle_safe", 1)))
+            self.send_header("X-Gen-Total-Sec", "%.3f" % (time.time() - start))
             if app_bridge:
                 token = store_app_video(data)
                 self.send_header("X-Video-Path", "/app-video/%s.mp4" % token)
