@@ -24,18 +24,49 @@ import journey_store
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 MASTERS_DIR = os.path.join(ROOT, "masters")
+MANIFEST_FILE = os.path.join(ROOT, "emotion-manifest.json")
 POC_SAMPLE_FILE = os.path.join(ROOT, "poc", "sample.mp4")
 FFMPEG = os.environ.get("FFMPEG_BIN", "ffmpeg")
 FONT_FILE = os.environ.get("FONT_FILE", "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc")
 FONT_INDEX = int(os.environ.get("FONT_INDEX", "2"))
 FONT_FC = os.environ.get("FONT_FC", "Noto Sans CJK SC")
 
-MASTERS = {
+# 兜底映射：仅当 emotion-manifest.json 缺失/损坏时使用。
+_FALLBACK_MASTERS = {
     "rabbit-happy":     ("happy-master-v2.mp4", "开心"),
     "rabbit-aggrieved": ("wronged-master-v2.mp4", "委屈"),
     "rabbit-angry":     ("angry-master-v2.mp4", "生气"),
     "rabbit-playful":   ("playful-master-v2.mp4", "调皮"),
 }
+_FALLBACK_JOURNEY_META = {
+    "rabbit-happy":     ("fengxin-rabbit", "happy"),
+    "rabbit-aggrieved": ("fengxin-rabbit", "wronged"),
+    "rabbit-angry":     ("fengxin-rabbit", "angry"),
+    "rabbit-playful":   ("fengxin-rabbit", "playful"),
+}
+
+
+def _load_emotion_manifest():
+    """读取统一映射 emotion-manifest.json；失败返回 {}，交由兜底逻辑处理。"""
+    try:
+        with open(MANIFEST_FILE, "r", encoding="utf-8") as f:
+            return json.load(f).get("emotions") or {}
+    except Exception:
+        return {}
+
+
+_emotions = _load_emotion_manifest()
+MASTERS = {}
+JOURNEY_META = {}
+for _item_id, _e in _emotions.items():
+    _master = _e.get("renderMaster")
+    if _master:
+        MASTERS[_item_id] = (_master, _e.get("label", _item_id))
+    JOURNEY_META[_item_id] = (_e.get("characterId", "fengxin-rabbit"), _e.get("emotionId", _item_id))
+if not MASTERS:
+    MASTERS = dict(_FALLBACK_MASTERS)
+if not JOURNEY_META:
+    JOURNEY_META = dict(_FALLBACK_JOURNEY_META)
 
 # 七星使者 · 测试声音池（ElevenLabs premade，voice_id 为稳定引用）
 VOICE_LIBRARY = {
@@ -102,12 +133,7 @@ ANDROID_DEBUG_CERT_SHA256 = os.environ.get(
     "3E:0B:BE:A2:D5:2C:BD:05:7E:84:FB:2D:E6:11:F9:6A:B5:AC:96:57:10:98:2E:A0:50:3F:AA:87:56:F1:2A:F7",
 )
 
-JOURNEY_META = {
-    "rabbit-happy": ("fengxin-rabbit", "happy"),
-    "rabbit-aggrieved": ("fengxin-rabbit", "wronged"),
-    "rabbit-angry": ("fengxin-rabbit", "angry"),
-    "rabbit-playful": ("fengxin-rabbit", "playful"),
-}
+# JOURNEY_META 已由 emotion-manifest.json 统一派生（见上方 _load_emotion_manifest）。
 APP_VIDEO_DIR = os.environ.get("APP_VIDEO_DIR", "/tmp/app-video-cache")
 
 

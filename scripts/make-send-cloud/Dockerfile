@@ -13,7 +13,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY server.py tts_provider.py text_layout.py journey_store.py ./
+COPY server.py tts_provider.py text_layout.py journey_store.py emotion-manifest.json ./
 COPY masters/ ./masters/
 COPY poc/ ./poc/
 
