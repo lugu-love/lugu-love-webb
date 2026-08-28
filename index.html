@@ -124,6 +124,39 @@ letter-spacing: .16em;
 color: rgba(255, 255, 255, .62);
 }
 
+.android-entry {
+position: fixed;
+top: max(60px, calc(env(safe-area-inset-top, 0px) + 60px));
+right: max(14px, env(safe-area-inset-right));
+z-index: 6;
+display: inline-flex;
+align-items: center;
+min-height: 40px;
+padding: 0 13px;
+border-radius: 999px;
+color: rgba(255, 244, 214, .85);
+font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+font-size: clamp(12px, 3.2vw, 14px);
+font-weight: 400;
+letter-spacing: .04em;
+text-decoration: none;
+background: rgba(20, 22, 40, .35);
+border: 1px solid rgba(255, 255, 255, .14);
+backdrop-filter: blur(6px);
+-webkit-backdrop-filter: blur(6px);
+text-shadow: 0 0 10px rgba(255, 236, 184, .35);
+transition: filter .24s ease, transform .24s ease;
+}
+.android-entry:hover,
+.android-entry:focus-visible,
+.android-entry:active {
+filter: drop-shadow(0 0 8px rgba(237, 196, 99, .45));
+outline: none;
+}
+.android-entry:active {
+transform: scale(.97);
+}
+
 .star {
 position: absolute;
 top: var(--y);
@@ -3184,10 +3217,11 @@ font-size: 12px;
 </head>
 <body>
 <main class="phone-stage" id="phoneStage" aria-label="地球首页手机竖屏舞台">
-<a class="place-mark" href="lugu/index.html?from=earth" aria-label="进入中国·泸沽湖">
+<a class="place-mark" href="/lugu-love-webb/" aria-label="返回泸沽湖主页">
 <img class="place-mark-logo" src="assets/icons/lugu-logo.svg" alt="" width="34" height="34">
 <span class="place-mark-text">中国·泸沽湖<span>LUGU LAKE · CHINA</span></span>
 </a>
+<a class="android-entry" href="download/android/" aria-label="下载 Android 情绪编辑工具">📲 Android 版</a>
 <div class="star-field" aria-hidden="true">
 <span class="star" style="--x: 7%; --y: 15%; --size: 3px; --color: #fff; --duration: 5.7s; --delay: -1.2s"></span>
 <span class="star" style="--x: 18%; --y: 36%; --size: 2px; --color: #e8f2ff; --duration: 6.8s; --delay: -4.7s"></span>

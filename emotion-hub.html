@@ -12,6 +12,8 @@
     font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;
     -webkit-font-smoothing:antialiased; }
   .app { width:min(100vw,430px); margin:0 auto; padding:calc(env(safe-area-inset-top,0px)+26px) 20px calc(env(safe-area-inset-bottom,0px)+26px); }
+  .site-logo { display:inline-flex; align-items:center; gap:6px; color:rgba(238,240,255,.72); text-decoration:none; font-size:14px; font-weight:400; letter-spacing:.05em; margin-bottom:18px; padding:6px 10px 6px 4px; border-radius:999px; }
+  .site-logo img { width:28px; height:28px; flex:0 0 28px; filter:drop-shadow(0 0 4px rgba(255,222,143,.4)); }
   .brand { margin:0; font-size:24px; letter-spacing:.02em; }
   .brand-sub { margin:8px 0 26px; font-size:13px; color:var(--muted); }
   .cards { display:grid; gap:14px; }
@@ -26,6 +28,7 @@
 </head>
 <body>
 <main class="app">
+  <a class="site-logo" href="/lugu-love-webb/" aria-label="返回泸沽湖主页"><img src="assets/icons/lugu-logo.svg" alt="" width="28" height="28">泸沽湖</a>
   <h1 class="brand">七星使者·情绪表达</h1>
   <p class="brand-sub">说出此刻的心情，把它交给想发的人</p>
 

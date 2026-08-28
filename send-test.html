@@ -11,7 +11,10 @@
     font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;
     -webkit-font-smoothing:antialiased; overflow:hidden; }
   .app { display:flex; flex-direction:column; height:100dvh; padding:calc(env(safe-area-inset-top,0px)+12px) 16px calc(env(safe-area-inset-bottom,0px)+10px); }
-  .brand { margin:8px 0 0 20px; font-size:17px; font-weight:450; letter-spacing:.02em; color:rgba(238,240,255,.82); }
+  .brand { display:flex; align-items:center; gap:8px; margin:8px 0 0 20px; font-size:17px; font-weight:450; letter-spacing:.02em; color:rgba(238,240,255,.82); }
+  .site-logo { display:inline-flex; align-items:center; gap:5px; color:rgba(238,240,255,.72); text-decoration:none; font-size:13px; font-weight:400; letter-spacing:.04em; padding:4px 6px 4px 0; border-radius:999px; }
+  .site-logo img { width:26px; height:26px; flex:0 0 26px; filter:drop-shadow(0 0 4px rgba(255,222,143,.4)); }
+  html.is-app-bridge .site-logo { display:none !important; }
   .brand .heart { color:rgba(238,240,255,.82); margin-right:5px; font-weight:400; }
   .brand .heart svg { width:17px; height:15px; }
   .brand-sub { opacity:.66; font-weight:350; margin-left:3px; }
@@ -82,7 +85,7 @@
 </div>
 
   <div class="app">
-    <div class="brand" id="brand"><span class="heart"><svg viewBox="0 0 48 44" width="22" height="20" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M24 40.2C19.5 35.8 7.2 27.1 4.6 17.8 2.5 10.2 7.1 4.3 14 4.3c4.5 0 7.8 2.7 10 6.5 2.2-3.8 5.5-6.5 10-6.5 6.9 0 11.5 5.9 9.4 13.5C40.8 27.1 28.5 35.8 24 40.2Z"/></svg></span><span class="brand-main">七星使者</span><span class="brand-sub">· 情绪表达</span></div>
+    <div class="brand" id="brand"><a class="site-logo" href="/lugu-love-webb/" aria-label="返回泸沽湖主页"><img src="assets/icons/lugu-logo.svg" alt="" width="26" height="26">泸沽湖</a><span class="heart"><svg viewBox="0 0 48 44" width="22" height="20" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M24 40.2C19.5 35.8 7.2 27.1 4.6 17.8 2.5 10.2 7.1 4.3 14 4.3c4.5 0 7.8 2.7 10 6.5 2.2-3.8 5.5-6.5 10-6.5 6.9 0 11.5 5.9 9.4 13.5C40.8 27.1 28.5 35.8 24 40.2Z"/></svg></span><span class="brand-main">七星使者</span><span class="brand-sub">· 情绪表达</span></div>
 
     <div class="stage-wrap"><canvas id="stage" width="540" height="540"></canvas></div>
 
