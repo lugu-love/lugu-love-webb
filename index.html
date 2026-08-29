@@ -3654,7 +3654,10 @@ copies: [
 
 const fengxinRabbitSequence = (fengxinNarrativeTestEnabled
 ? bottleMessengerSequence
-: fengxinRabbitLegacySequence).map((item) => ({
+: fengxinRabbitLegacySequence)
+// 临时：仅保留当前线上可用的 4 条兔子图集（狐狸 4 条资源 404，先过滤避免永久空瓶）
+.filter((item) => !/^fox-/.test(item.id || ""))
+.map((item) => ({
 ...item,
 poster: `${item.poster || `${item.assetPath || `assets/video/fengxin-rabbit-sequence/${item.id}`}/poster.${item.spriteExtension || "webp"}`}${item.assetVersion ? `?v=${item.assetVersion}` : ""}`,
 sprites: Array.from({ length: item.sheetCount }, (_, index) =>
@@ -3774,6 +3777,42 @@ const copy = copies[index % copies.length] || "愿你此刻的心情，也能被
 fengxinRabbitCopyIndexes[sequence.id] = (index + 1) % Math.max(1, copies.length);
 return copy;
 }
+// 图集下载并发限制：连续开瓶时避免多套 25-34MB 图集同时抢带宽，音频因此不再被拖慢
+var sheetLoadQueue = [];
+var sheetActiveLoads = 0;
+var sheetMaxConcurrent = 3;
+var sheetQueueStarted = false;
+function pumpSheetLoads() {
+while (sheetActiveLoads < sheetMaxConcurrent && sheetLoadQueue.length) {
+var img = sheetLoadQueue.shift();
+sheetActiveLoads += 1;
+var release = function () { sheetActiveLoads -= 1; pumpSheetLoads(); };
+img.addEventListener("load", release, { once: true });
+img.addEventListener("error", release, { once: true });
+img.src = img._sheetSrc;
+}
+}
+function queueSheetLoad(image, src) {
+image._sheetSrc = src;
+sheetLoadQueue.push(image);
+if (!sheetQueueStarted) {
+sheetQueueStarted = true;
+setTimeout(pumpSheetLoads, 600);
+} else {
+pumpSheetLoads();
+}
+}
+// 首屏空闲时预载所有可用序列的 poster（小图），保证开瓶第一时间就有兔子形象
+var rabbitPostersPreloaded = false;
+function preloadRabbitPosters() {
+if (rabbitPostersPreloaded) return;
+rabbitPostersPreloaded = true;
+fengxinRabbitSequence.forEach(function (sequence) {
+var image = new Image();
+image.src = sequence.poster;
+});
+}
+setTimeout(preloadRabbitPosters, 400);
 function preloadFengxinRabbitAngryAssets(sequence = fengxinRabbitSequence[fengxinRabbitSequenceIndex]) {
 if (fengxinRabbitPreloadedId === sequence.id && fengxinRabbitPreloadedImages) return;
 fengxinRabbitPreloadedId = sequence.id;
@@ -3783,7 +3822,11 @@ sequence.poster,
 ...(sequence.idle?.sprites || [])
 ].map((src) => {
 const image = new Image();
+if (src === sequence.poster) {
 image.src = src;
+} else {
+queueSheetLoad(image, src);
+}
 return image;
 });
 }
@@ -3815,12 +3858,12 @@ const renderX = sequence.renderX ?? Math.round((canvasSize - renderSize) / 2);
 const renderY = sequence.renderY ?? 69;
 const sprites = sequence.sprites.map((src) => {
 const sprite = new Image();
-sprite.src = src;
+queueSheetLoad(sprite, src);
 return sprite;
 });
 const idleSprites = (sequence.idle?.sprites || []).map((src) => {
 const sprite = new Image();
-sprite.src = src;
+queueSheetLoad(sprite, src);
 return sprite;
 });
 // This is a deliberately direct, isolated test of the newly supplied clip.
@@ -3908,6 +3951,30 @@ delete container._releaseRabbit;
 delete container._replayNarrative;
 }
 canvas.remove();
+if (activeFengxinRabbitDemo === canvas) activeFengxinRabbitDemo = null;
+}
+
+function abortSpritePlayback() {
+// 图集加载失败时保留已显示的 poster，不移除画布（避免空瓶）
+cancelAnimationFrame(animationFrame);
+clearTimeout(frameTimer);
+clearTimeout(wakeTimer);
+clearTimeout(largeBottleExitTimer);
+clearTimeout(bottleRevealTimer);
+clearTimeout(narrativeEnlargeTimer);
+clearTimeout(narrativeReturnTimer);
+clearTimeout(replayHintTimer);
+clearTimeout(narrativeHandoffTimer);
+replayHint?.remove();
+foregroundEntryAnimation?.cancel();
+sourceVideo?.pause();
+playbackRun += 1;
+canvas.removeEventListener("click", keepExpandedPlayback);
+if (container) {
+container.removeEventListener("fengxin-large-bottle-opened", armLargeBottleRelease);
+delete container._releaseRabbit;
+delete container._replayNarrative;
+}
 if (activeFengxinRabbitDemo === canvas) activeFengxinRabbitDemo = null;
 }
 
@@ -4223,7 +4290,7 @@ spritesReady.then(() => {
 if (rabbitStage !== "large" || !canvas.isConnected) return;
 // Keep the enlarged bottle alive until its own release signal arrives.
 runSpritePlayback("large");
-}).catch(removeDemo);
+}).catch(abortSpritePlayback);
 }
 
 function expandRabbitPerformance() {
@@ -4288,7 +4355,7 @@ canvas.style.transform = "translateX(-50%)";
 canvas.style.pointerEvents = "auto";
 spritesReady.then(() => {
 if (rabbitStage === "expanded" && canvas.isConnected) runSpritePlayback("narrative-replay", 1);
-}).catch(removeDemo);
+}).catch(abortSpritePlayback);
 };
 });
 } else if (!isNarrativeTest) {
@@ -4297,7 +4364,7 @@ canvas.style.top = "19%";
 canvas.style.width = "min(120vw, 510px)";
 canvas.style.height = "min(120vw, 510px)";
 canvas.style.transform = "translateX(-50%)";
-spritesReady.then(() => runSpritePlayback("expanded", 2)).catch(removeDemo);
+spritesReady.then(() => runSpritePlayback("expanded", 2)).catch(abortSpritePlayback);
 }
 }
 
@@ -4336,7 +4403,7 @@ if (rabbitStage === "small") {
 if (isNarrativeTest) runSpritePlayback("narrative-idle");
 else runSpritePlayback("initial");
 }
-}).catch(removeDemo);
+}).catch(abortSpritePlayback);
 }, 1550);
 }, wakeDelay);
 }
