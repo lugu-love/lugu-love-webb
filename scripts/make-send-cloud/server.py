@@ -102,7 +102,7 @@ FFMPEG_THREADS = int(os.environ.get("FFMPEG_THREADS", "2"))
 BITRATE_KBPS = int(os.environ.get("BITRATE_KBPS", "2500"))
 W, H = 720, 1280
 DURATION = 10
-TEXT_MAX = int(os.environ.get("TEXT_MAX", "40"))
+TEXT_MAX = int(os.environ.get("TEXT_MAX", "120"))
 TEXT_RECOMMEND = int(os.environ.get("TEXT_RECOMMEND", "20"))
 SAFE_WIDTH = 620
 BASE_FONT_SIZE = 50
@@ -750,7 +750,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         if item not in MASTERS:
             item = "rabbit-happy"
         if len(text) > TEXT_MAX:
-            return self._send_json(400, {"error": "TEXT_TOO_LONG", "message": "这句话有点长，当前最长支持 %d 字，请缩短后重试。" % TEXT_MAX})
+            return self._send_json(400, {"error": "TEXT_TOO_LONG", "message": "这段内容较长，当前最多支持 %d 字，请适当精简后重试。" % TEXT_MAX})
         if has_unsupported(text):
             return self._send_json(400, {"error": "暂不支持 emoji / 特殊符号，请使用文字、数字、标点"})
         if not rate_ok(self.client_address[0]):
