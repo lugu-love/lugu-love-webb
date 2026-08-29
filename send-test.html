@@ -40,9 +40,6 @@
   .suggest-chip .txt { flex:1; }
   .editor textarea { width:100%; min-height:60px; border-radius:14px; background:#12142a; color:#fff; border:1px solid rgba(255,255,255,.10); padding:12px 12px 12px 18px; font-size:15px; line-height:1.5; resize:none; outline:none; }
   .char-count { text-align:right; font-size:12px; line-height:1.4; color:rgba(150,140,190,.55); margin:5px 2px 0 0; }
-  .char-count.near { color:#e0b36a; }
-  .char-count.max { color:#ff9d76; font-weight:600; }
-  .char-count.over { color:#ff6b6b; font-weight:700; }
   .preview-text { text-align:center; font-size:14px; line-height:1.5; min-height:22px; margin:6px 0 0; white-space:pre-wrap; color:#fff; }
   .cta { display:flex; justify-content:center; margin-top:18px; }
   .success-actions { display:flex; gap:8px; margin-top:10px; }
@@ -96,7 +93,7 @@
       <select id="voiceSelect" class="voice-select"></select>
     </div>
 
-    <div class="editor"><textarea id="textInput" placeholder="写一句话…（20 字以内效果更自然，最长支持 40 字）"></textarea><div class="char-count" id="charCount" aria-live="polite">0 / 40</div></div>
+    <div class="editor"><textarea id="textInput" placeholder="写一句话…"></textarea><div class="char-count" id="charCount" aria-live="polite">当前 0 字</div></div>
     <div class="guide" id="guide"></div>
     <button class="suggest" id="btnSuggest" type="button">✨ 帮我选一句</button>
     <div class="suggest-box" id="suggestBox" hidden></div>
@@ -164,7 +161,6 @@
 window.__MAIN__ = function () {
   var MAKE_SEND_API = "https://api.lugu.love";
   var GENERATE_TIMEOUT_MS = 55000;
-  var CHAR_LIMIT = 40;      // 与后端 TEXT_MAX=40 保持一致
   var BLOB_TIMEOUT_MS = 20000;
 
   // 三情绪映射唯一来源：scripts/make-send-cloud/emotion-manifest.json（官方配置）。
@@ -534,27 +530,17 @@ window.__MAIN__ = function () {
 
   var longTextHintShown=false;
   function countChars(str){ return Array.from((str||"").trim()).length; }  // 与后端 Python len() 一致：按 Unicode 码点计数（中文/标点/英文/数字/空格/换行/emoji 均算 1）
-  function isOverLimit(){ return countChars(textInput.value) > CHAR_LIMIT; }
-  function overCount(){ return countChars(textInput.value) - CHAR_LIMIT; }
   function updateCharCount(){
     var n = countChars(textInput.value);
-    var text = n + " / " + CHAR_LIMIT;
-    var cls = "char-count";
-    if(n > CHAR_LIMIT){
-      text += " · 已超出 " + (n - CHAR_LIMIT) + " 字";
-      cls += " over";
-      setStatus("已超出 " + (n - CHAR_LIMIT) + " 字，请缩短后再生成", "err");
-    } else if(n === CHAR_LIMIT){ cls += " max"; }
-    else if(n >= 31){ cls += " near"; }
-    if(charCountEl){ charCountEl.textContent = text; charCountEl.className = cls; }
-    if(n <= CHAR_LIMIT && /已超出/.test(statusEl.textContent)){ setStatus(""); setHint(""); }
+    var text = "当前 " + n + " 字";
+    if(charCountEl){ charCountEl.textContent = text; charCountEl.className = "char-count"; }
     return n;
   }
   textInput.addEventListener("input", function(){
     userCancelInFlight();
     previewTextEl.textContent=textInput.value;
     var n=updateCharCount();
-    if(n>30 && n<=CHAR_LIMIT && !longTextHintShown){ showToast("文字较长，生成视频会相应更长。"); }
+    if(n>30 && !longTextHintShown){ showToast("文字较长，生成视频会相应更长。"); }
     longTextHintShown=n>30;
     syncGenerateEnabled();
   });
@@ -578,7 +564,7 @@ window.__MAIN__ = function () {
 
   function syncGenerateEnabled(){
     var hasText = countChars(textInput.value) > 0;
-    btnGenerate.disabled = !hasText || isGenerating || isOverLimit();
+    btnGenerate.disabled = !hasText || isGenerating;
   }
 
   var cancelReason=null, genToken=0, genTimerId=null, genTimeoutId=null;
@@ -660,11 +646,6 @@ window.__MAIN__ = function () {
     }
     var text=(textInput.value||"").trim();
     if(!text){ showToast("请先写一句话"); return; }
-    if(isOverLimit()){
-      setStatus("已超出 " + overCount() + " 字，请缩短后再生成", "err");
-      showToast("已超出 " + overCount() + " 字，请缩短后再生成");
-      return;
-    }
     if(countChars(text) > 30){ showToast("文字较长，生成视频会相应更长。"); }
 
     cancelReason=null;
