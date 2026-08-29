@@ -6442,5 +6442,15 @@ syncUI();
 setTimeout(syncUI, 300);
 })();
 </script>
+
+<script>
+// Android/Huawei：情绪表达入口直接唤起已安装的“七星使者·情绪编辑工具”（lugu://remix 为已注册 Deep Link）
+(function () {
+  if (!/Android/i.test(navigator.userAgent)) return;
+  var el = document.querySelector('a.emotion-entry[aria-label="情绪表达"]');
+  if (el) el.href = "lugu://remix";
+})();
+</script>
+
 </body>
 </html>
