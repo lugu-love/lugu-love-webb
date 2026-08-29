@@ -114,7 +114,7 @@
     <div class="hint" id="hint"></div>
     <video id="videoPreview" controls playsinline hidden></video>
 
-    <details class="debug" id="debugDetails">
+    <details class="debug" id="debugDetails" hidden>
       <summary>调试</summary>
       <div class="diag" id="bridgeDiag">Bridge：…</div>
       <div class="diag" id="diag">诊断信息…</div>
@@ -355,7 +355,7 @@ window.__MAIN__ = function () {
     }, d);
   }
   if(isAppBridge){ document.documentElement.classList.add("is-app-bridge"); }
-  if(/[?&]app=/.test(location.search) && debugDetailsEl){ debugDetailsEl.open = true; }
+  if(/[?&]debug=1/.test(location.search) && debugDetailsEl){ debugDetailsEl.hidden = false; debugDetailsEl.open = true; }
   scheduleBridgeChecks();
   window.addEventListener("pageshow", function(){ setTimeout(detectBridgeNow, 0); });
   document.addEventListener("visibilitychange", function(){
