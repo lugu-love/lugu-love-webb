@@ -1,16 +1,31 @@
 {
-  "name": "泸沽湖·心域",
-  "short_name": "心域",
+  "name": "泸沽湖·爱与文明",
+  "short_name": "泸沽湖·爱与文明",
   "description": "情感文明共创空间",
   "lang": "zh-CN",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": "/lugu-love-webb/",
+  "scope": "/lugu-love-webb/",
   "display": "standalone",
   "background_color": "#020407",
   "theme_color": "#020407",
   "icons": [
-    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "assets/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }

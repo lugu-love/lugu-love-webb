@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="心域">
+<meta name="apple-mobile-web-app-title" content="泸沽湖·爱与文明">
 <title>泸沽湖·心域</title>
 <link rel="icon" href="assets/icons/lugu-logo.svg" type="image/svg+xml">
 <style>
@@ -6450,6 +6450,16 @@ setTimeout(syncUI, 300);
   var el = document.querySelector('a.emotion-entry[aria-label="情绪表达"]');
   if (el) el.href = "https://api.lugu.love/remix/open/";
 })();
+</script>
+
+
+<script>
+// PWA：注册 service worker，支持“添加到桌面/安装 App”（网络直通、不缓存，不改页面行为）
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("sw.js").catch(function () {});
+  });
+}
 </script>
 
 </body>
