@@ -123,6 +123,7 @@
 
     <details class="debug" id="debugDetails">
       <summary>调试</summary>
+      <div class="diag" id="bridgeDiag">Bridge：…</div>
       <div class="diag" id="diag">诊断信息…</div>
       <div class="diag" id="preloadDiag">预加载：…</div>
       <div class="diag" id="tapDiag">点击命中：—</div>
@@ -267,6 +268,8 @@ window.__MAIN__ = function () {
   var btnSend=document.getElementById("btnSend");
   var btnReEdit=document.getElementById("btnReEdit");
   var btnSendWeChat=document.getElementById("btnSendWeChat");
+  var bridgeDiagEl=document.getElementById("bridgeDiag");
+  var debugDetailsEl=document.getElementById("debugDetails");
   var toastEl=document.getElementById("toast");
   var userAgent=navigator.userAgent || "";
   var isIOS=/iPad|iPhone|iPod/.test(userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
@@ -277,7 +280,96 @@ window.__MAIN__ = function () {
   if(isWeChat){ document.documentElement.classList.add("is-wechat"); }
   var isAppBridge = !!(window.AndroidShare && typeof window.AndroidShare.prepareVideo === "function" && typeof window.AndroidShare.sharePreparedVideo === "function");
   var nativeReady=false, nativeVideoPath="";
+  var __SEND_TEST_VERSION__ = "2026-08-29-bridge-v14";
+  var bridgeDiag = { prepareCalled:false, lastNativeEvent:null, nativeStatus:null };
+  function bridgeAvailable(){
+    return !!(window.AndroidShare && typeof window.AndroidShare.prepareVideo === "function" && typeof window.AndroidShare.sharePreparedVideo === "function");
+  }
+  function renderBridgeDiag(){
+    if(!bridgeDiagEl) return;
+    var lines = [];
+    lines.push("<b>页面版本:</b> " + __SEND_TEST_VERSION__);
+    lines.push("<b>URL:</b> " + location.href);
+    lines.push("<b>typeof AndroidShare:</b> " + (typeof window.AndroidShare));
+    lines.push("<b>prepareVideo:</b> " + (window.AndroidShare && typeof window.AndroidShare.prepareVideo === "function" ? "有" : "无")
+      + " ｜ sharePreparedVideo: " + (window.AndroidShare && typeof window.AndroidShare.sharePreparedVideo === "function" ? "有" : "无")
+      + " ｜ getStatus: " + (window.AndroidShare && typeof window.AndroidShare.getStatus === "function" ? "有" : "无"));
+    lines.push("<b>isAppBridge:</b> " + (isAppBridge ? "true" : "false") + " ｜ html class: " + (document.documentElement.className || "(空)"));
+    lines.push("<b>finalMp4Url(nativeVideoPath):</b> " + (nativeVideoPath || "(空)"));
+    lines.push("<b>prepareVideo 已调用:</b> " + (bridgeDiag.prepareCalled ? "是" : "否"));
+    lines.push("<b>nativeReady:</b> " + (nativeReady ? "true" : "false"));
+    if(bridgeDiag.lastNativeEvent){
+      lines.push("<b>最近 native 事件:</b> phase=" + bridgeDiag.lastNativeEvent.phase
+        + " message=" + (bridgeDiag.lastNativeEvent.message || "")
+        + " canShare=" + (bridgeDiag.lastNativeEvent.canShare ? "true" : "false")
+        + " elapsedMs=" + (bridgeDiag.lastNativeEvent.elapsedMs || 0));
+    }
+    lines.push("<b>按钮:</b> 发微信 hidden=" + btnSendWeChat.hidden + " disabled=" + btnSendWeChat.disabled
+      + " ｜ 打开预览 hidden=" + btnOpen.hidden
+      + " ｜ 保存 hidden=" + btnSave.hidden
+      + " ｜ 发送(Web) hidden=" + btnSend.hidden);
+    if(bridgeDiag.nativeStatus){
+      lines.push("<b>native getStatus:</b> " + bridgeDiag.nativeStatus);
+    }
+    bridgeDiagEl.innerHTML = lines.join("<br>");
+  }
+  function handoffToNative(){
+    if(!isAppBridge || !nativeVideoPath || bridgeDiag.prepareCalled) return;
+    bridgeDiag.prepareCalled = true;
+    setStatus("视频已生成，正在准备发送…", "ok");
+    setHint("");
+    try {
+      window.AndroidShare.prepareVideo(MAKE_SEND_API + nativeVideoPath);
+    } catch(err){
+      console.error("[send-test] prepareVideo threw", err);
+      bridgeDiag.prepareCalled = false;
+      nativeReady = false;
+      if(btnSendWeChat){ btnSendWeChat.disabled = true; }
+      setStatus("视频准备失败，请重新生成后再试", "err");
+      document.documentElement.classList.add("show-save-fallback");
+    }
+    renderBridgeDiag();
+  }
+  function refreshAppBridgeUi(){
+    if(!isAppBridge) return;
+    document.documentElement.classList.add("is-app-bridge");
+    if(btnSendWeChat){ btnSendWeChat.hidden=false; btnSendWeChat.disabled=!nativeReady; }
+    renderBridgeDiag();
+  }
+  function detectBridgeNow(){
+    var now = bridgeAvailable();
+    if(now && !isAppBridge){
+      isAppBridge = true;
+      console.info("[send-test] AndroidShare bridge detected (late), isAppBridge -> true");
+      if(bridgeDiag.nativeStatus === null && window.AndroidShare && typeof window.AndroidShare.getStatus === "function"){
+        try { bridgeDiag.nativeStatus = window.AndroidShare.getStatus(); } catch(e){}
+      }
+      if(nativeVideoPath && !bridgeDiag.prepareCalled){ handoffToNative(); }
+    } else if(now && bridgeDiag.nativeStatus === null && window.AndroidShare && typeof window.AndroidShare.getStatus === "function"){
+      try { bridgeDiag.nativeStatus = window.AndroidShare.getStatus(); } catch(e){}
+    }
+    refreshAppBridgeUi();
+    renderDiag();
+    renderBridgeDiag();
+  }
+  var bridgeRetries = 0;
+  function scheduleBridgeChecks(){
+    if(bridgeRetries++ > 12) return;
+    var delays = [120, 300, 800, 1600, 3000, 5000, 8000, 12000];
+    var d = delays[Math.min(bridgeRetries-1, delays.length-1)];
+    setTimeout(function(){
+      detectBridgeNow();
+      if(!isAppBridge) scheduleBridgeChecks();
+    }, d);
+  }
   if(isAppBridge){ document.documentElement.classList.add("is-app-bridge"); }
+  if(/[?&]app=/.test(location.search) && debugDetailsEl){ debugDetailsEl.open = true; }
+  scheduleBridgeChecks();
+  window.addEventListener("pageshow", function(){ setTimeout(detectBridgeNow, 0); });
+  document.addEventListener("visibilitychange", function(){
+    if(document.visibilityState === "visible"){ setTimeout(detectBridgeNow, 0); }
+  });
+  window.addEventListener("load", function(){ setTimeout(detectBridgeNow, 150); });
 
   var current=EMOTIONS[0];
   var cache={}, preloadOrder=["2","3"], preloadStarted=false, activeUserLoad=false;
@@ -475,12 +567,14 @@ window.__MAIN__ = function () {
   window.onNativeStatus = function(ev){
     try {
       var phase = ev && ev.phase;
+      bridgeDiag.lastNativeEvent = { phase:phase, message:(ev && ev.message) || "", canShare:!!(ev && ev.canShare), elapsedMs:(ev && ev.elapsedMs) || 0 };
       if(phase === "preparing"){ nativeReady=false; btnSendWeChat.disabled=true; btnSendWeChat.textContent="发给微信好友"; setStatus("视频已生成，正在准备发送…", "ok"); }
       else if(phase === "ready"){ nativeReady=true; btnSendWeChat.disabled=false; btnSendWeChat.textContent="发给微信好友"; setStatus("准备完成，可以发送了", "ok"); }
       else if(phase === "busy"){ setStatus(ev.message || "请先完成当前分享", ""); }
       else if(phase === "error"){ nativeReady=false; btnSendWeChat.disabled=true; btnSendWeChat.textContent="发给微信好友"; setStatus(ev.message || "视频准备失败，请重新生成后再试", "err"); document.documentElement.classList.add("show-save-fallback"); }
       else if(phase === "sharing"){ setStatus("正在打开系统分享…", ""); }
       else if(phase === "video_share_returned"){ setStatus(ev.message || "视频已发送", "ok"); }
+      renderBridgeDiag();
     } catch(err){ console.error("onNativeStatus error:", err); }
   };
   function setHint(msg){ hintEl.textContent=msg || ""; }
@@ -534,12 +628,14 @@ window.__MAIN__ = function () {
       lines.push("<b>耗时:</b> 点击→请求=" + lastTiming.clickToFetchMs + "ms fetch=" + lastTiming.fetchMs + "ms blob=" + lastTiming.blobMs + "ms 总=" + lastTiming.totalMs + "ms");
     }
     diagEl.innerHTML = lines.join("<br>");
+    renderBridgeDiag();
   }
 
   function clearGenerated(){
     document.documentElement.classList.remove("can-file-share");
     document.documentElement.classList.remove("show-save-fallback");
     nativeReady=false; nativeVideoPath="";
+    bridgeDiag.prepareCalled=false;
     if(isAppBridge && window.AndroidShare && typeof window.AndroidShare.clearPreparedVideo === "function"){ try { window.AndroidShare.clearPreparedVideo(); } catch(e){} }
     if(btnSendWeChat){ btnSendWeChat.hidden=true; btnSendWeChat.disabled=true; }
     if(lastUrl){ URL.revokeObjectURL(lastUrl); lastUrl=null; }
@@ -632,9 +728,7 @@ window.__MAIN__ = function () {
         setHint("");
         btnSendWeChat.hidden=false; btnSendWeChat.disabled=true; btnSendWeChat.textContent="发给微信好友";
         if(nativeVideoPath){
-          setStatus("视频已生成，正在准备发送…", "ok");
-          try { window.AndroidShare.prepareVideo(MAKE_SEND_API + nativeVideoPath); }
-          catch(err){ nativeReady=false; btnSendWeChat.disabled=true; setStatus("视频准备失败，请重新生成后再试", "err"); document.documentElement.classList.add("show-save-fallback"); }
+          handoffToNative();
         } else {
           setStatus("视频已生成，但无法准备发送，请保存后从微信发送。", "err");
           document.documentElement.classList.add("show-save-fallback");
@@ -730,6 +824,7 @@ window.__MAIN__ = function () {
   btnSendWeChat.addEventListener("click", function(){
     if(!nativeReady){ setStatus("视频正在准备，请稍候…", ""); return; }
     try { window.AndroidShare.sharePreparedVideo(); } catch(err){ setStatus("无法打开系统分享，请重试", "err"); }
+    renderBridgeDiag();
   });
 
   document.addEventListener("click", function(e){
@@ -741,6 +836,7 @@ window.__MAIN__ = function () {
   refreshUI();
   loadSheets();
   renderDiag();
+  renderBridgeDiag();
   renderPreloadDiag();
   renderGuide();
   updateCharCount();
