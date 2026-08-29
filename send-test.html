@@ -578,11 +578,13 @@ window.__MAIN__ = function () {
     if(btnGenerate){ btnGenerate.textContent="生成视频 →"; }
     syncGenerateEnabled();
     renderDiag();
+    cancelReason = null;
   }
 
   function userCancelInFlight(){
     if(!isGenerating) return;
     cancelReason="user";
+    genToken++;
     resetGenerateState();
   }
 
