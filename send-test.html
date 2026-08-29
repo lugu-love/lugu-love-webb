@@ -39,6 +39,10 @@
   .suggest-chip .star { color:rgba(150,140,190,.48); font-size:11px; line-height:1.5; transform:translateY(1px); flex:0 0 auto; }
   .suggest-chip .txt { flex:1; }
   .editor textarea { width:100%; min-height:60px; border-radius:14px; background:#12142a; color:#fff; border:1px solid rgba(255,255,255,.10); padding:12px 12px 12px 18px; font-size:15px; line-height:1.5; resize:none; outline:none; }
+  .char-count { text-align:right; font-size:12px; line-height:1.4; color:rgba(150,140,190,.55); margin:5px 2px 0 0; }
+  .char-count.near { color:#e0b36a; }
+  .char-count.max { color:#ff9d76; font-weight:600; }
+  .char-count.over { color:#ff6b6b; font-weight:700; }
   .preview-text { text-align:center; font-size:14px; line-height:1.5; min-height:22px; margin:6px 0 0; white-space:pre-wrap; color:#fff; }
   .cta { display:flex; justify-content:center; margin-top:18px; }
   .success-actions { display:flex; gap:8px; margin-top:10px; }
@@ -96,7 +100,7 @@
       <select id="voiceSelect" class="voice-select"></select>
     </div>
 
-    <div class="editor"><textarea id="textInput" maxlength="40" placeholder="写一句话…（20 字以内效果更自然，最长支持 40 字）"></textarea></div>
+    <div class="editor"><textarea id="textInput" placeholder="写一句话…（20 字以内效果更自然，最长支持 40 字）"></textarea><div class="char-count" id="charCount" aria-live="polite">0 / 40</div></div>
     <div class="guide" id="guide"></div>
     <button class="suggest" id="btnSuggest" type="button">✨ 帮我选一句</button>
     <div class="suggest-box" id="suggestBox" hidden></div>
@@ -163,6 +167,8 @@
 window.__MAIN__ = function () {
   var MAKE_SEND_API = "https://api.lugu.love";
   var GENERATE_TIMEOUT_MS = 55000;
+  var CHAR_LIMIT = 40;      // 与后端 TEXT_MAX=40 保持一致
+  var BLOB_TIMEOUT_MS = 20000;
 
   // 三情绪映射唯一来源：scripts/make-send-cloud/emotion-manifest.json（官方配置）。
   // 下方为离线/加载失败兜底；正常路径由 manifest 派生，前端不再自持第二套映射。
@@ -235,6 +241,7 @@ window.__MAIN__ = function () {
   var canvas=document.getElementById("stage"), ctx=canvas.getContext("2d");
   var emotionsEl=document.getElementById("emotions");
   var textInput=document.getElementById("textInput");
+  var charCountEl=document.getElementById("charCount");
   var previewTextEl=document.getElementById("previewText");
   var statusEl=document.getElementById("status");
   var hintEl=document.getElementById("hint");
@@ -310,6 +317,7 @@ window.__MAIN__ = function () {
 
   function refreshUI(){ Array.prototype.forEach.call(emotionsEl.children, function(b,i){ b.classList.toggle("active", EMOTIONS[i].id===current.id); }); }
   function selectEmotion(id){
+    userCancelInFlight();
     var prevId = current.id;
     current = EMOTIONS.find(function(e){return e.id===id;}) || EMOTIONS[0];
     if(prevId !== current.id){
@@ -317,6 +325,7 @@ window.__MAIN__ = function () {
       previewTextEl.textContent = "";
       suggestBox.hidden = true;
     }
+    updateCharCount();
     refreshUI(); clearGenerated(); loadSheets(); renderDiag(); renderPreloadDiag(); renderSuggest(); renderGuide(); syncGenerateEnabled();
     if(prevId !== current.id){ try { textInput.focus(); } catch(e) {} }
   }
@@ -341,6 +350,7 @@ window.__MAIN__ = function () {
         textInput.value = txt;
         previewTextEl.textContent = txt;
         suggestBox.hidden = true;
+        updateCharCount();
         syncGenerateEnabled();
       });
       suggestBox.appendChild(b);
@@ -435,7 +445,31 @@ window.__MAIN__ = function () {
   function loop(now){ if(!lastFrameAt) lastFrameAt=now; if(now-lastFrameAt>=1000/FRAME_RATE){ lastFrameAt=now; frameIndex=(frameIndex+1)%current.totalFrames; paintFrame(); } animId=requestAnimationFrame(loop); }
 
   var longTextHintShown=false;
-  textInput.addEventListener("input", function(){ previewTextEl.textContent=textInput.value; var n=textInput.value.trim().length; if(n>30 && !longTextHintShown){ showToast("文字较长，生成视频会相应更长。"); } longTextHintShown=n>30; syncGenerateEnabled(); });
+  function countChars(str){ return Array.from((str||"").trim()).length; }  // 与后端 Python len() 一致：按 Unicode 码点计数（中文/标点/英文/数字/空格/换行/emoji 均算 1）
+  function isOverLimit(){ return countChars(textInput.value) > CHAR_LIMIT; }
+  function overCount(){ return countChars(textInput.value) - CHAR_LIMIT; }
+  function updateCharCount(){
+    var n = countChars(textInput.value);
+    var text = n + " / " + CHAR_LIMIT;
+    var cls = "char-count";
+    if(n > CHAR_LIMIT){
+      text += " · 已超出 " + (n - CHAR_LIMIT) + " 字";
+      cls += " over";
+      setStatus("已超出 " + (n - CHAR_LIMIT) + " 字，请缩短后再生成", "err");
+    } else if(n === CHAR_LIMIT){ cls += " max"; }
+    else if(n >= 31){ cls += " near"; }
+    if(charCountEl){ charCountEl.textContent = text; charCountEl.className = cls; }
+    if(n <= CHAR_LIMIT && /已超出/.test(statusEl.textContent)){ setStatus(""); setHint(""); }
+    return n;
+  }
+  textInput.addEventListener("input", function(){
+    userCancelInFlight();
+    previewTextEl.textContent=textInput.value;
+    var n=updateCharCount();
+    if(n>30 && n<=CHAR_LIMIT && !longTextHintShown){ showToast("文字较长，生成视频会相应更长。"); }
+    longTextHintShown=n>30;
+    syncGenerateEnabled();
+  });
 
   function setStatus(msg, cls){ statusEl.textContent=msg; statusEl.className="status" + (cls ? " "+cls : ""); }
   window.onNativeStatus = function(ev){
@@ -453,8 +487,37 @@ window.__MAIN__ = function () {
   function showToast(msg){ toastEl.textContent=msg; toastEl.classList.add("show"); clearTimeout(showToast._t); showToast._t=setTimeout(function(){toastEl.classList.remove("show");},1800); }
 
   function syncGenerateEnabled(){
-    var hasText = textInput.value.trim().length > 0;
-    btnGenerate.disabled = !hasText || isGenerating;
+    var hasText = countChars(textInput.value) > 0;
+    btnGenerate.disabled = !hasText || isGenerating || isOverLimit();
+  }
+
+  var cancelReason=null, genToken=0, genTimerId=null, genTimeoutId=null;
+
+  function resetGenerateState(){
+    if(genTimerId){ clearInterval(genTimerId); genTimerId=null; }
+    if(genTimeoutId){ clearTimeout(genTimeoutId); genTimeoutId=null; }
+    if(activeController){ try { activeController.abort(); } catch(e){} activeController=null; }
+    isGenerating=false;
+    generatePhase="idle";
+    if(btnGenerate){ btnGenerate.textContent="生成视频 →"; }
+    syncGenerateEnabled();
+    renderDiag();
+  }
+
+  function userCancelInFlight(){
+    if(!isGenerating) return;
+    cancelReason="user";
+    resetGenerateState();
+  }
+
+  function withTimeout(promise, ms, controller){
+    return new Promise(function(resolve, reject){
+      var t=setTimeout(function(){
+        if(controller){ try { controller.abort(); } catch(e){} }
+        reject(new Error("generate timeout"));
+      }, ms);
+      promise.then(function(v){ clearTimeout(t); resolve(v); }, function(e){ clearTimeout(t); reject(e); });
+    });
   }
 
   function renderDiag(){
@@ -491,6 +554,7 @@ window.__MAIN__ = function () {
   }
 
   function reEdit(){
+    userCancelInFlight();
     clearGenerated();
     syncGenerateEnabled();
     try { textInput.focus(); } catch(e) {}
@@ -504,10 +568,16 @@ window.__MAIN__ = function () {
     }
     var text=(textInput.value||"").trim();
     if(!text){ showToast("请先写一句话"); return; }
-    if(text.length > 30){ showToast("文字较长，生成视频会相应更长。"); }
+    if(isOverLimit()){
+      setStatus("已超出 " + overCount() + " 字，请缩短后再生成", "err");
+      showToast("已超出 " + overCount() + " 字，请缩短后再生成");
+      return;
+    }
+    if(countChars(text) > 30){ showToast("文字较长，生成视频会相应更长。"); }
 
+    cancelReason=null;
+    var myToken=++genToken;
     isGenerating=true;
-    clearGenerated();
     genCount++;
     var tClick = performance.now();
     btnGenerate.textContent="正在生成…"; syncGenerateEnabled();
@@ -516,11 +586,10 @@ window.__MAIN__ = function () {
     generatePhase="feedback-visible";
     lastTiming={ clickToFetchMs:"—", fetchMs:"—", blobMs:"—", totalMs:"—" };
     renderDiag();
-    var timer=setInterval(function(){ mi=(mi+1)%msgs.length; setStatus(msgs[mi]); }, 2600);
-    var timeoutId=null;
-    var didTimeout=false;
+    genTimerId=setInterval(function(){ mi=(mi+1)%msgs.length; setStatus(msgs[mi]); }, 2600);
 
     try{
+      clearGenerated();
       await new Promise(function(resolve){
         requestAnimationFrame(function(){ setTimeout(resolve, 0); });
       });
@@ -532,18 +601,20 @@ window.__MAIN__ = function () {
       renderDiag();
       console.info("[send-test] request sent", { item:current.item, clickToFetchMs:lastTiming.clickToFetchMs });
       var request = fetch(url, { cache:"no-store", mode:"cors", signal:activeController ? activeController.signal : undefined });
-      var timeout = new Promise(function(_, reject){
-        timeoutId=setTimeout(function(){
-          didTimeout=true;
-          if(activeController) activeController.abort();
-          reject(new Error("generate timeout"));
-        }, GENERATE_TIMEOUT_MS);
-      });
-      var resp=await Promise.race([request, timeout]);
+      var resp=await withTimeout(request, GENERATE_TIMEOUT_MS, activeController);
       var tHeaders = performance.now();
       generatePhase="response-headers";
-      if(!resp.ok) throw new Error("HTTP "+resp.status);
-      var blob=await resp.blob();
+      if(!resp.ok){
+        var errMsg=null;
+        try {
+          var errText=await withTimeout(resp.text(), 4000, activeController);
+          try { var j=JSON.parse(errText); errMsg=(j && (j.message || j.error)) || null; } catch(e){ errMsg=errText ? errText.slice(0,120) : null; }
+        } catch(e){ /* 错误响应体读取超时也直接按通用错误处理 */ }
+        var err=new Error("HTTP "+resp.status);
+        if(errMsg){ err.backendMessage=errMsg; }
+        throw err;
+      }
+      var blob=await withTimeout(resp.blob(), BLOB_TIMEOUT_MS, activeController);
       var tBlob = performance.now();
       if(!blob || blob.size===0) throw new Error("empty blob");
       var file=new File([blob], "七星使者-" + current.name + ".mp4", { type:"video/mp4" });
@@ -574,22 +645,25 @@ window.__MAIN__ = function () {
         btnSend.hidden=false;
       }
     } catch(err){
+      if(myToken !== genToken) return;
+      var timedOut = !!(activeController && activeController.signal.aborted && cancelReason !== "user");
       console.error("generate error:", err);
-      generatePhase=didTimeout || (err && err.name === "AbortError") ? "timeout" : "error";
-      if(generatePhase === "timeout"){
+      generatePhase = timedOut ? "timeout" : "error";
+      if(cancelReason === "user"){
+        // 用户主动修改文字/切换情绪：静默取消，不弹错误
+      } else if(timedOut){
         setStatus("生成时间有点久，请再试一次。", "err");
         showToast("生成时间有点久，请再试一次。");
+      } else if(err && err.backendMessage){
+        setStatus(err.backendMessage, "err");
+        showToast(err.backendMessage);
       } else {
         setStatus("视频生成失败，请重试", "err");
         showToast("视频生成失败，请重试");
       }
     } finally {
-      clearTimeout(timeoutId);
-      clearInterval(timer);
-      activeController=null;
-      isGenerating=false;
-      btnGenerate.textContent="生成视频"; syncGenerateEnabled();
-      renderDiag();
+      if(myToken !== genToken) return;
+      resetGenerateState();
     }
   }
 
@@ -669,6 +743,7 @@ window.__MAIN__ = function () {
   renderDiag();
   renderPreloadDiag();
   renderGuide();
+  updateCharCount();
   syncGenerateEnabled();
 };
 
