@@ -668,7 +668,7 @@ window.__MAIN__ = function () {
       });
       var tFetchStart = performance.now();
       lastTiming.clickToFetchMs=Math.round(tFetchStart-tClick);
-      var url=MAKE_SEND_API + "/make-send?text=" + encodeURIComponent(text) + "&item=" + encodeURIComponent(current.item) + "&voiceId=" + encodeURIComponent(voiceSelect.value) + (isAppBridge ? "&app_bridge=1" : "");
+      var url=MAKE_SEND_API + "/make-send?text=" + encodeURIComponent(text) + "&item=" + encodeURIComponent(current.item) + "&voiceId=" + encodeURIComponent(voiceSelect.value) + (isAppBridge ? "&app_bridge=1" : "") + "&async=1";
       activeController = typeof AbortController === "function" ? new AbortController() : null;
       generatePhase="request-sent";
       renderDiag();
@@ -687,8 +687,49 @@ window.__MAIN__ = function () {
         if(errMsg){ err.backendMessage=errMsg; }
         throw err;
       }
-      var blob=await withTimeout(resp.blob(), BLOB_TIMEOUT_MS, activeController);
+      var jobData=null;
+      try { jobData=await withTimeout(resp.json(), 4000, activeController); } catch(e){}
+      if(!jobData || !jobData.job){ throw new Error("invalid job response"); }
+      var job=jobData.job;
+      // 长文本异步生成：后端立即返回 202 {job}，前端轮询 /make-send/result 拿 videoPath，
+      // 避免单次长连接等待超过网络/代理容忍窗口而被切断。
+      var videoPath="";
+      var pollDeadline = Date.now() + 150000;
+      generatePhase="polling";
+      renderDiag();
+      while(true){
+        if(myToken !== genToken || cancelReason === "user" || !isGenerating){ return; }
+        if(Date.now() > pollDeadline){
+          if(activeController){ try{ activeController.abort(); }catch(e){} }
+          throw new Error("generate timeout");
+        }
+        var pollUrl=MAKE_SEND_API + "/make-send/result?job=" + encodeURIComponent(job);
+        var pollResp=await withTimeout(fetch(pollUrl, { cache:"no-store", mode:"cors" }), 20000, activeController);
+        var pollJson=null;
+        try { pollJson=await pollResp.json(); } catch(e){}
+        if(!pollResp.ok || !pollJson){
+          var perr=new Error("HTTP "+(pollResp ? pollResp.status : "?"));
+          if(pollJson && (pollJson.error || pollJson.message)){ perr.backendMessage=pollJson.error || pollJson.message; }
+          throw perr;
+        }
+        if(pollJson.status === "done" && pollJson.videoPath){ videoPath=pollJson.videoPath; break; }
+        if(pollJson.status === "error"){
+          var e3=new Error(pollJson.error || "生成失败");
+          e3.backendMessage=pollJson.error || "生成失败";
+          throw e3;
+        }
+        if(pollJson.status === "busy"){
+          var e4=new Error(pollJson.error || "服务繁忙，请稍后重试");
+          e4.backendMessage=pollJson.error || "服务繁忙，请稍后重试";
+          throw e4;
+        }
+        await new Promise(function(res){ setTimeout(res, 2000); });
+        if(myToken !== genToken || cancelReason === "user" || !isGenerating){ return; }
+      }
+      var vresp=await withTimeout(fetch(MAKE_SEND_API + videoPath, { cache:"no-store", mode:"cors", signal:activeController ? activeController.signal : undefined }), BLOB_TIMEOUT_MS, activeController);
+      if(!vresp.ok) throw new Error("HTTP "+vresp.status);
       var tBlob = performance.now();
+      var blob=await withTimeout(vresp.blob(), BLOB_TIMEOUT_MS, activeController);
       if(!blob || blob.size===0) throw new Error("empty blob");
       var file=new File([blob], "七星使者-" + current.name + ".mp4", { type:"video/mp4" });
       lastBlob=blob; lastFile=file;
@@ -697,7 +738,7 @@ window.__MAIN__ = function () {
       var tDone = performance.now();
       lastTiming = { clickToFetchMs: Math.round(tFetchStart-tClick), fetchMs: Math.round(tHeaders-tFetchStart), blobMs: Math.round(tBlob-tHeaders), totalMs: Math.round(tDone-tClick) };
       generatePhase="success";
-      if(isAppBridge){ var vpath = resp.headers.get("X-Video-Path") || ""; nativeVideoPath = /^\/app-video\/[A-Za-z0-9_-]{20,128}\.mp4$/.test(vpath) ? vpath : ""; }
+      if(isAppBridge){ nativeVideoPath = /^\/app-video\/[A-Za-z0-9_-]{20,128}\.mp4$/.test(videoPath) ? videoPath : ""; }
       setStatus("视频生成成功", "ok");
       var shareHint;
       if(isIOS){ shareHint = "打开后，点击右上角‘…’即可分享"; }
