@@ -48,10 +48,6 @@
   .success-actions { display:flex; gap:8px; margin-top:10px; }
   html.is-ios #btnOpen, html.is-ios #btnSend { display:none !important; }
   html.is-ios #btnSave { background:linear-gradient(135deg,#9ca6ff,#b68cff); color:#fff; border:1px solid rgba(210,205,255,.28); }
-  html.is-android.can-file-share .success-actions { display:grid; grid-template-columns:1fr 1fr; gap:7px 10px; }
-  html.is-android.can-file-share #btnSend { grid-column:1 / -1; grid-row:1; height:44px; background:linear-gradient(135deg,#7d8bff,#a06bff); color:#fff; border:none; font-size:15px; }
-  html.is-android.can-file-share #btnOpen { grid-column:1; grid-row:2; }
-  html.is-android.can-file-share #btnSave { grid-column:2; grid-row:2; }
   html.is-android #btnOpen, html.is-android #btnSave { height:34px; background:transparent; color:rgba(238,240,255,.68); border:1px solid rgba(255,255,255,.10); font-size:12px; font-weight:500; }
   html.is-android.is-wechat #btnSend { display:none !important; }
   html.is-app-bridge #btnOpen, html.is-app-bridge #btnSend, html.is-app-bridge #btnSave { display:none !important; }
@@ -59,7 +55,7 @@
   html.is-app-bridge #btnSendWeChat { width:100%; height:50px; background:linear-gradient(135deg,#7d8bff,#a06bff); color:#fff; border:none; font-size:16px; }
   html.is-app-bridge #btnSendWeChat:disabled { opacity:.6; }
   html.is-app-bridge #btnReEdit { width:100%; height:38px; background:transparent; color:rgba(238,240,255,.6); border:1px solid rgba(255,255,255,.12); font-size:13px; }
-  html.is-app-bridge.show-save-fallback #btnSave { display:inline-flex !important; }
+  html.is-app-bridge.show-save-fallback #btnOpen, html.is-app-bridge.show-save-fallback #btnSave { display:inline-flex !important; }
   button { flex:1; min-width:82px; height:44px; border-radius:14px; border:none; font-size:14px; font-weight:650; cursor:pointer; }
   .btn-primary { background:linear-gradient(135deg,#7d8bff,#a06bff); color:#fff; }
   #btnGenerate { width:50%; height:44px; font-size:15px; border-radius:14px; background:rgba(125,139,255,.16); color:rgba(238,240,255,.92); border:1px solid rgba(125,139,255,.20); box-shadow:none; }
@@ -722,7 +718,12 @@ window.__MAIN__ = function () {
       generatePhase="success";
       if(isAppBridge){ var vpath = resp.headers.get("X-Video-Path") || ""; nativeVideoPath = /^\/app-video\/[A-Za-z0-9_-]{20,128}\.mp4$/.test(vpath) ? vpath : ""; }
       setStatus("视频生成成功", "ok");
-      setHint(isIOS ? "打开后，点击右上角‘…’即可分享" : (isWeChat ? "请在浏览器中打开后发送视频" : "点击“发送视频”，可选择微信或其他应用。"));
+      var shareHint;
+      if(isIOS){ shareHint = "打开后，点击右上角‘…’即可分享"; }
+      else if(isWeChat){ shareHint = "请在浏览器中打开后发送视频"; }
+      else if(isAndroid){ shareHint = "如需发送，请保存到手机后从微信发送。"; }
+      else { shareHint = "点击“发送视频”，可选择微信或其他应用。"; }
+      setHint(shareHint);
       btnOpen.hidden=false; btnSave.hidden=false; btnReEdit.hidden=false;
       if(isAppBridge){
         setHint("");
@@ -734,8 +735,7 @@ window.__MAIN__ = function () {
           document.documentElement.classList.add("show-save-fallback");
         }
       }
-      if(!isWeChat && navigator.canShare && navigator.canShare({files:[file]})){
-        if(isAndroid) document.documentElement.classList.add("can-file-share");
+      if(!isAndroid && !isWeChat && navigator.canShare && navigator.canShare({files:[file]})){
         btnSend.hidden=false;
       }
     } catch(err){
