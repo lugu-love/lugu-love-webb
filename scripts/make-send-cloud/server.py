@@ -265,6 +265,39 @@ def take_app_video(token):
         return record["path"], record["expires"], record["reads"]
 
 
+# 异步生成任务：/make-send?async=1 立即返回 202 {job}，后台线程生成并写入
+# app-video 缓存；前端轮询 /make-send/result 拿 videoPath，再取视频。
+# 目的：长文本生成耗时超过网络/代理对单次无数据连接的容忍窗口，会整个被切断；
+# 改成请求即回 + 轮询后，每次 HTTP 交互都在短时间完成，视频最终可达客户端。
+_jobs = {}
+_jobs_lock = threading.Lock()
+
+
+def _run_job_async(job_id, text, item, voice_id):
+    workdir = None
+    try:
+        workdir = tempfile.mkdtemp(prefix="make-send-")
+        final, meta = generate(item, text, workdir, voice_id=voice_id, speech_text=None)
+        with open(final, "rb") as f:
+            data = f.read()
+        token = store_app_video(data)
+        with _jobs_lock:
+            t0 = _jobs.get(job_id, {}).get("t0", time.time())
+            _jobs[job_id] = {"status": "done", "token": token, "text_len": len(text), "meta": meta}
+        log("JOB-DONE job=%s item=%s voice=%s text_len=%d lines=%d font=%d tts=%.2fs tts_dur=%.2fs vdur=%.2fs ffmpeg=%.2fs total=%.2fs size=%d"
+            % (job_id, item, meta.get("voice_id") or "-", len(text), meta.get("lines", 0), meta.get("font_size", 0),
+               meta.get("tts", 0), meta.get("tts_duration") or 0.0, meta.get("video_duration") or 0.0,
+               meta.get("ffmpeg", 0), time.time() - t0, len(data)))
+    except Exception as e:
+        log("JOB-ERROR job=%s %s: %s" % (job_id, type(e).__name__, e))
+        with _jobs_lock:
+            _jobs[job_id] = {"status": "error", "error": str(e)}
+    finally:
+        if workdir and os.path.isdir(workdir):
+            shutil.rmtree(workdir, ignore_errors=True)
+        SEM.release()
+
+
 def _font_selector():
     fc = os.environ.get("FONT_FC", "")
     if fc:
@@ -651,16 +684,36 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             return self._send_app_video(path[len("/app-video/"):-4])
         if path == "/admin":
             return self._send_html(ADMIN_HTML)
+        if path == "/make-send/result":
+            qs = urllib.parse.parse_qs(parsed.query)
+            job = (qs.get("job") or [""])[0]
+            with _jobs_lock:
+                info = _jobs.get(job)
+            if not info:
+                return self._send_json(404, {"error": "job not found"})
+            status = info.get("status")
+            if status == "pending":
+                return self._send_json(200, {"status": "pending"})
+            if status == "busy":
+                return self._send_json(429, {"status": "busy", "error": info.get("error", "server busy")})
+            if status == "error":
+                return self._send_json(500, {"status": "error", "error": info.get("error", "生成失败")})
+            return self._send_json(200, {
+                "status": "done",
+                "videoPath": "/app-video/%s.mp4" % info["token"],
+                "textLen": info.get("text_len", 0),
+            })
         if path == "/make-send":
             qs = urllib.parse.parse_qs(parsed.query)
             app_bridge = qs.get("app_bridge", [""])[0] == "1"
             journey_v1 = qs.get("journey_v1", [""])[0] == "1"
+            async_mode = qs.get("async", [""])[0] == "1"
             voice_id = (qs.get("voice") or qs.get("voiceId") or [""])[0] or DEFAULT_VOICE_ID
             speech_text = (qs.get("speechText") or qs.get("speech_text") or [""])[0] or None
             return self._serve(
                 qs.get("text", [""])[0], qs.get("item", ["rabbit-happy"])[0], app_bridge,
                 journey_v1, qs.get("remix_token", [""])[0], qs.get("source_channel", ["h5"])[0],
-                voice_id, speech_text,
+                voice_id, speech_text, async_mode,
             )
         return self._not_found()
 
@@ -705,7 +758,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
                 data.get("text", "") or "", data.get("item", "rabbit-happy") or "rabbit-happy",
                 bool(data.get("app_bridge")), bool(data.get("journey_v1")),
                 data.get("remix_token", "") or "", data.get("source_channel", "h5") or "h5",
-                voice_id, speech_text,
+                voice_id, speech_text, bool(data.get("async")),
             )
         return self._not_found()
 
@@ -742,7 +795,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         log("ADMIN-TOGGLE enabled=%s" % enabled)
         return self._send_json(200, {"enabled": enabled})
 
-    def _serve(self, text, item, app_bridge=False, journey_v1=False, remix_token="", source_channel="h5", voice_id=None, speech_text=None):
+    def _serve(self, text, item, app_bridge=False, journey_v1=False, remix_token="", source_channel="h5", voice_id=None, speech_text=None, async_mode=False):
         if not read_enabled():
             return self._send_json(503, {"error": "service temporarily unavailable"})
         start = time.time()
@@ -757,6 +810,16 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             return self._send_json(429, {"error": "too many requests"})
         if not SEM.acquire(blocking=False):
             return self._send_json(429, {"error": "server busy"})
+
+        if async_mode:
+            job_id = secrets.token_urlsafe(16)
+            now = time.time()
+            with _jobs_lock:
+                for jid in [j for j, r in list(_jobs.items()) if now - r.get("t0", 0) > 900]:
+                    _jobs.pop(jid, None)
+                _jobs[job_id] = {"status": "pending", "t0": now, "text_len": len(text)}
+            threading.Thread(target=_run_job_async, args=(job_id, text, item, voice_id), daemon=True).start()
+            return self._send_json(202, {"job": job_id, "status": "pending"})
 
         workdir = None
         try:
