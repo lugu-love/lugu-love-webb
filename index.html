@@ -3886,6 +3886,7 @@ const isNarrativeTest = Boolean(sequence.narrative);
 const renderSize = sequence.renderSize || 375;
 const renderX = sequence.renderX ?? Math.round((canvasSize - renderSize) / 2);
 const renderY = sequence.renderY ?? 69;
+const rabbitVisibleBottomRatio = (renderY + renderSize) / canvasSize;
 const sprites = sequence.sprites.map((src) => {
 const sprite = new Image();
 queueSheetLoad(sprite, src);
@@ -4079,10 +4080,7 @@ const targetTop = targetRect.top;
 
 // The card follows the same flight with the same timing, no extra delay.
 container?.dispatchEvent(new CustomEvent("rabbit-return-start", { detail: {
-fromBottom: startRect.top + startRect.height,
-toBottom: targetRect.top + targetRect.height,
-fromCenterX: startRect.left + startRect.width / 2,
-toCenterX: targetRect.left + targetRect.width / 2,
+toBottom: targetRect.top + targetRect.height * rabbitVisibleBottomRatio,
 duration: 4200,
 easing: "cubic-bezier(.18, .68, .18, 1)"
 }}));
@@ -4345,10 +4343,7 @@ container.dataset.rabbitReleased = "1";
 container.classList.add("is-rabbit-releasing");
 if (isNarrativeTest) container.classList.add("is-rabbit-emerging");
 container.dispatchEvent(new CustomEvent("rabbit-expanded", { detail: {
-fromBottom: entryStartRect.top + entryStartRect.height,
-toBottom: targetTop + targetSize,
-fromCenterX: entryStartRect.left + entryStartRect.width / 2,
-toCenterX: targetLeft + targetSize / 2,
+toBottom: targetTop + targetSize * rabbitVisibleBottomRatio,
 duration: isNarrativeTest ? (narrativeReplayActive ? 1200 : 4000) : 450,
 easing: isNarrativeTest ? "cubic-bezier(.18, .7, .16, 1)" : "cubic-bezier(.2, .72, .2, 1)"
 }}));
@@ -6283,12 +6278,8 @@ if (!letterNode?.isConnected || !letterNode.classList.contains("is-floating-card
 const stageNode = stage || document.body;
 const stageRect = stageNode.getBoundingClientRect();
 const cardRect = letterNode.getBoundingClientRect();
-const cardTop = cardRect.top - stageRect.top;
-const cardLeft = cardRect.left - stageRect.left;
-const deltaY = (detail.toBottom - detail.fromBottom) || 0;
-const deltaX = (detail.toCenterX - detail.fromCenterX) || 0;
-const targetTop = cardTop + deltaY;
-const targetLeft = cardLeft + deltaX;
+const targetTop = Math.max(10, (detail.toBottom - stageRect.top) + 10);
+const targetLeft = Math.max(10, stageRect.width / 2 - cardRect.width / 2);
 
 letterNode.classList.remove("is-following-large-bottle", "is-following-rabbit-return");
 letterNode.style.transition = `left ${detail.duration}ms ${detail.easing}, top ${detail.duration}ms ${detail.easing}`;
