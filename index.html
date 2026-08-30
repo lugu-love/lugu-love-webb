@@ -2496,20 +2496,21 @@ pointer-events: none;
 .my-space-button {
 position: fixed;
 left: 50%;
-bottom: 60px;
+bottom: 48px;
 z-index: 4;
-width: clamp(86px, 8.2vw, 120px);
-height: clamp(66px, 6.8vw, 90px);
-padding: 8px 10px;
+width: 136px;
+height: 44px;
+padding: 0 10px;
 border: 1px solid rgba(255, 255, 255, .24);
-border-radius: 18px;
+border-radius: 14px;
 background: rgba(255, 255, 255, .08);
 backdrop-filter: blur(22px);
 box-shadow: 0 0 30px rgba(140, 120, 255, .25), inset 0 0 20px rgba(255, 255, 255, .05);
 display: inline-flex;
-flex-direction: column;
+flex-direction: row;
 justify-content: center;
 align-items: center;
+gap: 7px;
 color: #fff;
 font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
 font-weight: 600;
@@ -2521,43 +2522,24 @@ user-select: none;
 animation: my-space-invite 4.8s ease-in-out 12.5s infinite;
 }
 
-.my-space-button::after {
-content: "";
-position: absolute;
-right: 13px;
-top: 14px;
-width: 4px;
-height: 4px;
-border-radius: 50%;
-background: rgba(255, 255, 255, .92);
-box-shadow: 0 0 10px rgba(255, 255, 255, .9);
-animation: my-space-spark 2.5s ease-in-out infinite;
-pointer-events: none;
-}
 
 .my-space-button-label {
-font-size: clamp(12px, 1.1vw, 15px);
-letter-spacing: .06em;
-line-height: 1.1;
+font-size: 14px;
+letter-spacing: .04em;
+line-height: 1;
 background: linear-gradient(90deg, #fff, #ffb3ff, #b3c7ff);
 -webkit-background-clip: text;
 -webkit-text-fill-color: transparent;
 }
 
 .my-space-button-icon {
-font-size: clamp(26px, 2.8vw, 38px);
+font-size: 17px;
 line-height: 1;
-margin-bottom: 4px;
-filter: drop-shadow(0 0 12px rgba(255, 220, 150, .5));
+filter: drop-shadow(0 0 10px rgba(255, 220, 150, .5));
 }
 
 .my-space-button-sub {
-margin-top: 3px;
-font-size: clamp(7px, .72vw, 9px);
-font-weight: 300;
-letter-spacing: .14em;
-line-height: 1;
-opacity: .75;
+display: none;
 }
 
 .my-space-button:hover,
@@ -3211,10 +3193,11 @@ font-size: 12px;
 </style>
 <style>
   .emotion-entry {
-    position: fixed; left: calc(50% + 74px); bottom: 52px;
+    position: fixed; left: 50%; margin-left: 102px; bottom: 48px;
+    transform: translateX(-50%);
     z-index: 4; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 2px; width: 50px; height: 44px; padding: 4px 3px;
-    border: 1px solid rgba(255,255,255,.22); border-radius: 12px;
+    gap: 2px; width: 44px; height: 44px; padding: 4px 3px;
+    border: 1px solid rgba(255,255,255,.22); border-radius: 13px;
     background: rgba(255,255,255,.07);
     backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     box-shadow: 0 0 18px rgba(140,120,255,.20), inset 0 0 12px rgba(255,255,255,.04);
@@ -3222,16 +3205,17 @@ font-size: 12px;
     font-family: "PingFang SC","Microsoft YaHei",Arial,sans-serif;
     text-align: center;
   }
-  .emotion-entry:active { transform: scale(.96); }
+  .emotion-entry:active { transform: translateX(-50%) scale(.96); }
   .emotion-entry-emoji { font-size: 14px; line-height: 1; filter: drop-shadow(0 0 6px rgba(255,210,140,.4)); }
   .emotion-entry-text { display: flex; flex-direction: column; line-height: 1.15; }
   .emotion-entry-title { font-size: 9px; font-weight: 650; letter-spacing: .01em; white-space: nowrap; }
   .emotion-entry-sub { display: none; }
   .career-entry {
-    position: fixed; left: calc(50% - 124px); bottom: 52px;
+    position: fixed; left: 50%; margin-left: -102px; bottom: 48px;
+    transform: translateX(-50%);
     z-index: 4; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 2px; width: 50px; height: 44px; padding: 4px 3px;
-    border: 1px solid rgba(255,255,255,.22); border-radius: 12px;
+    gap: 2px; width: 44px; height: 44px; padding: 4px 3px;
+    border: 1px solid rgba(255,255,255,.22); border-radius: 13px;
     background: rgba(255,255,255,.07);
     backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     box-shadow: 0 0 18px rgba(140,120,255,.20), inset 0 0 12px rgba(255,255,255,.04);
@@ -3239,10 +3223,28 @@ font-size: 12px;
     font-family: "PingFang SC","Microsoft YaHei",Arial,sans-serif;
     text-align: center;
   }
-  .career-entry:active { transform: scale(.96); }
+  .career-entry:active { transform: translateX(-50%) scale(.96); }
   .career-entry-emoji { font-size: 14px; line-height: 1; filter: drop-shadow(0 0 6px rgba(255,210,140,.4)); }
   .career-entry-text { display: flex; flex-direction: column; line-height: 1.15; }
   .career-entry-title { font-size: 9px; font-weight: 650; letter-spacing: .01em; white-space: nowrap; }
+
+  .world-entry {
+    position: fixed; left: 50%; bottom: 96px;
+    transform: translateX(-50%);
+    z-index: 5; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; width: 52px; height: 52px; padding: 6px 3px;
+    border: 1px solid rgba(255,255,255,.32); border-radius: 16px;
+    background: rgba(255,255,255,.12);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 0 30px rgba(160,140,255,.36), inset 0 0 18px rgba(255,255,255,.08);
+    color: #fff; text-decoration: none;
+    font-family: "PingFang SC","Microsoft YaHei",Arial,sans-serif;
+    text-align: center;
+  }
+  .world-entry:active { transform: translateX(-50%) scale(.96); }
+  .world-entry-emoji { font-size: 19px; line-height: 1; filter: drop-shadow(0 0 9px rgba(255,210,140,.55)); }
+  .world-entry-text { display: flex; flex-direction: column; line-height: 1.1; }
+  .world-entry-title { font-size: 10px; font-weight: 700; letter-spacing: .01em; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -3328,10 +3330,15 @@ font-size: 12px;
 <span class="emotion-entry-title">情绪表达</span>
 </span>
 </a>
-<button class="my-space-button" type="button" aria-label="选择我的空间 My Space">
+<a class="world-entry" href="lugu/index.html?from=earth" aria-label="心域世界">
+<span class="world-entry-emoji" aria-hidden="true">💗</span>
+<span class="world-entry-text">
+<span class="world-entry-title">心域世界</span>
+</span>
+</a>
+<button class="my-space-button" type="button" aria-label="我的空间">
 <span class="my-space-button-icon" aria-hidden="true">🏠</span>
 <span class="my-space-button-label">我的空间</span>
-<span class="my-space-button-sub">MY SPACE</span>
 </button>
 <div class="my-space-modal" id="mySpaceModal" role="dialog" aria-modal="true" aria-label="我的空间" aria-hidden="true">
 <div class="my-space-bg" id="mySpaceBg"></div>
