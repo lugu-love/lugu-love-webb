@@ -4066,9 +4066,6 @@ returningToBottle = false;
 rabbitStage = "returned";
 return;
 }
-// This is the real beginning of the rabbit's visible return flight. The card
-// receives its signal here, then deliberately waits .8 seconds.
-container?.dispatchEvent(new Event("rabbit-return-start"));
 // Measure a real, unexpanded rabbit in the restored bottle.  The bottle has
 // responsive transforms on phones, so fixed pixel maths can land beside it.
 const targetProbe = document.createElement("canvas");
@@ -4082,6 +4079,16 @@ const targetWidth = targetRect.width;
 const targetHeight = targetRect.height;
 const targetLeft = targetRect.left;
 const targetTop = targetRect.top;
+
+// The card follows the same flight with the same timing, no extra delay.
+container?.dispatchEvent(new CustomEvent("rabbit-return-start", { detail: {
+fromBottom: startRect.top + startRect.height,
+toBottom: targetRect.top + targetRect.height,
+fromCenterX: startRect.left + startRect.width / 2,
+toCenterX: targetRect.left + targetRect.width / 2,
+duration: 4200,
+easing: "cubic-bezier(.18, .68, .18, 1)"
+}}));
 let returnFlightFinished = false;
 const returnAnimation = canvas.animate([
 {
@@ -4328,7 +4335,10 @@ runSpritePlayback("large");
 
 function expandRabbitPerformance() {
 if (rabbitStage !== "large" || canvas.dataset.exiting === "1" || !canvas.isConnected) return;
-const entryStartRect = isNarrativeTest ? canvas.getBoundingClientRect() : null;
+const entryStartRect = canvas.getBoundingClientRect();
+const targetSize = Math.min(window.innerWidth * 1.2, 510);
+const targetLeft = (window.innerWidth - targetSize) / 2;
+const targetTop = window.innerHeight * .5 - 62 - targetSize / 2;
 rabbitStage = "expanded";
 thirdStepReached = true;
 clearTimeout(largeBottleExitTimer);
@@ -4337,7 +4347,14 @@ container.dataset.cardFrozen = "1";
 container.dataset.rabbitReleased = "1";
 container.classList.add("is-rabbit-releasing");
 if (isNarrativeTest) container.classList.add("is-rabbit-emerging");
-container.dispatchEvent(new Event("rabbit-expanded"));
+container.dispatchEvent(new CustomEvent("rabbit-expanded", { detail: {
+fromBottom: entryStartRect.top + entryStartRect.height,
+toBottom: targetTop + targetSize,
+fromCenterX: entryStartRect.left + entryStartRect.width / 2,
+toCenterX: targetLeft + targetSize / 2,
+duration: isNarrativeTest ? (narrativeReplayActive ? 1200 : 4000) : 450,
+easing: isNarrativeTest ? "cubic-bezier(.18, .7, .16, 1)" : "cubic-bezier(.2, .72, .2, 1)"
+}}));
 }
 canvas.classList.remove("is-awakening");
 canvas.classList.add("is-expanded-performance");
@@ -4359,9 +4376,6 @@ container.style.removeProperty("--bottle-zoom-y");
 }
 
 if (isNarrativeTest && entryStartRect) {
-const targetSize = Math.min(window.innerWidth * 1.2, 510);
-const targetLeft = (window.innerWidth - targetSize) / 2;
-const targetTop = window.innerHeight * .5 - 62 - Math.min(window.innerWidth * 1.2, 510) / 2;
 const foregroundEntryDuration = narrativeReplayActive ? 1200 : 4000;
 canvas.style.left = `${entryStartRect.left}px`;
 canvas.style.top = `${entryStartRect.top}px`;
@@ -6267,28 +6281,44 @@ letterNode.classList.add("is-following-large-bottle");
 letterNode.style.left = `${left}px`;
 letterNode.style.top = `${top}px`;
 }
+function followRabbitCard(detail) {
+if (!letterNode?.isConnected || !letterNode.classList.contains("is-floating-card")) return;
+const stageNode = stage || document.body;
+const stageRect = stageNode.getBoundingClientRect();
+const cardRect = letterNode.getBoundingClientRect();
+const cardTop = cardRect.top - stageRect.top;
+const cardLeft = cardRect.left - stageRect.left;
+const deltaY = (detail.toBottom - detail.fromBottom) || 0;
+const deltaX = (detail.toCenterX - detail.fromCenterX) || 0;
+const targetTop = cardTop + deltaY;
+const targetLeft = cardLeft + deltaX;
+
+letterNode.classList.remove("is-following-large-bottle", "is-following-rabbit-return");
+letterNode.style.transition = `left ${detail.duration}ms ${detail.easing}, top ${detail.duration}ms ${detail.easing}`;
+void letterNode.offsetWidth;
+letterNode.style.left = `${targetLeft}px`;
+letterNode.style.top = `${targetTop}px`;
+
+clearTimeout(followRabbitCard._t);
+followRabbitCard._t = setTimeout(() => {
+letterNode.style.transition = "";
+}, detail.duration + 120);
+}
+
 bottle.addEventListener("rabbit-returned-to-bottle", () => {
 clearTimeout(cardReturnTimer);
+clearTimeout(followRabbitCard._t);
+letterNode.style.transition = "";
 letterNode?.classList.remove("is-following-large-bottle");
 letterNode?.classList.remove("is-following-rabbit-return");
 positionCardFromBottle();
 });
-bottle.addEventListener("rabbit-expanded", () => {
-// This is intentionally driven by the rabbit's real jump rather than by the
-// enlarged-bottle step, because replay now skips that intermediate step.
-// On the first play the card has already moved during the bottle enlargement;
-// applying the relative positioning formula twice would push it off-screen.
-if (letterNode?.classList.contains("is-following-large-bottle")) return;
-positionCardForLargeBottle();
+bottle.addEventListener("rabbit-expanded", (event) => {
+if (event.detail) followRabbitCard(event.detail);
 });
-bottle.addEventListener("rabbit-return-start", () => {
+bottle.addEventListener("rabbit-return-start", (event) => {
 clearTimeout(cardReturnTimer);
-cardReturnTimer = setTimeout(() => {
-if (!letterNode?.isConnected || !letterNode.classList.contains("is-floating-card") || closed) return;
-letterNode.classList.remove("is-following-large-bottle");
-letterNode.classList.add("is-following-rabbit-return");
-positionCardFromBottle();
-}, 800);
+if (event.detail) followRabbitCard(event.detail);
 });
 // Let the original bottle-opening animation finish, then permanently detach
 // the card at exactly the position where it arrived.
