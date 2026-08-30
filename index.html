@@ -606,8 +606,11 @@ left: 0;
 bottom: auto;
 width: 100%;
 gap: 2px;
-font-size: 10px;
+font-size: 9px;
 letter-spacing: .065em;
+}
+.voice-letter.is-floating-card .voice-letter-footer.is-visible {
+opacity: .55;
 }
 
 .voice-letter.is-floating-card .voice-card-actions {
@@ -637,6 +640,30 @@ padding: 0 8px;
 
 .voice-letter.is-floating-card .world-house-title {
 font-size: 13px;
+}
+.voice-letter.is-floating-card .voice-send-button {
+grid-column: 2;
+position: relative;
+justify-self: end;
+align-self: center;
+right: 0;
+bottom: auto;
+margin-left: 0;
+min-width: 104px;
+height: 28px;
+padding: 0 8px;
+border-radius: 4px;
+border: 1px solid rgba(255, 226, 158, .52);
+background: linear-gradient(135deg, rgba(255, 242, 214, .30), rgba(191, 132, 88, .18) 48%, rgba(255, 209, 141, .22));
+backdrop-filter: blur(16px) saturate(1.2);
+-webkit-backdrop-filter: blur(16px) saturate(1.2);
+box-shadow: 0 0 16px rgba(255, 176, 91, .18), inset 0 1px 0 rgba(255, 255, 255, .38), inset 0 0 12px rgba(255, 255, 255, .12);
+color: rgba(255, 247, 228, .96);
+font-size: 13px;
+font-weight: 600;
+letter-spacing: .04em;
+line-height: 1;
+white-space: nowrap;
 }
 
 .voice-letter.is-returned-to-bottle {
@@ -1540,7 +1567,7 @@ transform: translateX(-50%);
 .fengxin-rabbit-demo.is-expanded-performance {
 position: absolute;
 left: 50%;
-top: 19%;
+top: calc(50svh - 62px - min(60vw, 255px));
 z-index: 12;
 width: min(120vw, 510px);
 height: min(120vw, 510px);
@@ -1852,8 +1879,8 @@ animation: close-show 1s ease calc(var(--letter-delay) + .75s) forwards;
 @keyframes bottle-arrive {
 0% {
 opacity: 0;
-transform: translate3d(var(--bottle-x), calc(var(--bottle-y) - 12px), 0) rotate(-24deg) scale(.1);
-filter: blur(1px) brightness(1.9);
+transform: translate3d(calc(var(--stage-width) * .5 - 50%), calc(var(--stage-height) * .5 - 50% - 62px - 42px), 0) rotate(-24deg) scale(.12);
+filter: blur(2px) brightness(.55);
 }
 
 100% {
@@ -2102,7 +2129,7 @@ to { opacity: 0; filter: blur(4px); transform: translateX(-50%) translateY(-8px)
 .touch-guide {
 position: fixed;
 left: 50%;
-top: calc(clamp(36px, 22%, 190px) - 30px);
+top: calc(clamp(36px, 22%, 190px) - 80px);
 z-index: 2;
 display: block;
 width: min(calc(var(--stage-width) - 28px), 390px);
@@ -2233,7 +2260,7 @@ animation-delay: 8.2s;
 .guide-final-heart {
 position: fixed;
 left: 50%;
-top: clamp(36px, 22%, 190px);
+top: calc(clamp(36px, 22%, 190px) - 50px);
 z-index: 2;
 opacity: 0;
 color: rgba(255, 230, 157, .98);
@@ -4328,7 +4355,7 @@ container.style.removeProperty("--bottle-zoom-y");
 if (isNarrativeTest && entryStartRect) {
 const targetSize = Math.min(window.innerWidth * 1.2, 510);
 const targetLeft = (window.innerWidth - targetSize) / 2;
-const targetTop = window.innerHeight * .19;
+const targetTop = window.innerHeight * .5 - 62 - Math.min(window.innerWidth * 1.2, 510) / 2;
 const foregroundEntryDuration = narrativeReplayActive ? 1200 : 4000;
 canvas.style.left = `${entryStartRect.left}px`;
 canvas.style.top = `${entryStartRect.top}px`;
@@ -4348,7 +4375,7 @@ foregroundEntryAnimation.cancel();
 foregroundEntryAnimation = null;
 narrativeReplayActive = false;
 canvas.style.left = "50%";
-canvas.style.top = "19%";
+canvas.style.top = "calc(50svh - 62px - min(60vw, 255px))";
 canvas.style.width = "min(120vw, 510px)";
 canvas.style.height = "min(120vw, 510px)";
 canvas.style.transform = "translateX(-50%)";
@@ -4360,7 +4387,7 @@ if (rabbitStage === "expanded" && canvas.isConnected) runSpritePlayback("narrati
 });
 } else if (!isNarrativeTest) {
 canvas.style.left = "50%";
-canvas.style.top = "19%";
+canvas.style.top = "calc(50svh - 62px - min(60vw, 255px))";
 canvas.style.width = "min(120vw, 510px)";
 canvas.style.height = "min(120vw, 510px)";
 canvas.style.transform = "translateX(-50%)";
@@ -6061,7 +6088,7 @@ bottle.innerHTML = `
 <span class="voice-world-avatar" aria-hidden="true"><img src="${rabbitSequence.poster}" alt=""></span>
 <span class="world-house-title">ta的世界</span>
 </button>
-<button class="voice-send-button" type="button" aria-label="发给ta">发给ta</button>
+<button class="voice-send-button" type="button" aria-label="转发ta">转发ta</button>
 </div>
 </div>
 `;
