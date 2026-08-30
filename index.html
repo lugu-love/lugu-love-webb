@@ -2498,8 +2498,8 @@ position: fixed;
 left: 50%;
 bottom: 48px;
 z-index: 4;
-width: 108px;
-height: 38px;
+width: 100px;
+height: 32px;
 padding: 0 8px;
 border: 1px solid rgba(255, 255, 255, .28);
 border-radius: 13px;
@@ -3195,7 +3195,7 @@ font-size: 12px;
     position: fixed; left: 50%; margin-left: 89px; bottom: 48px;
     transform: translateX(-50%);
     z-index: 4; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 2px; width: 46px; height: 46px; padding: 4px 3px;
+    gap: 4px; width: 46px; height: 46px; padding: 6px 3px;
     border: 1px solid rgba(255,255,255,.26); border-radius: 14px;
     background: rgba(24,24,38,.42);
     backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
@@ -3205,15 +3205,15 @@ font-size: 12px;
     text-align: center;
   }
   .emotion-entry:active { transform: translateX(-50%) scale(.96); }
-  .emotion-entry-emoji { font-size: 17px; line-height: 1; filter: drop-shadow(0 0 5px rgba(190,210,255,.30)); }
-  .emotion-entry-text { display: flex; flex-direction: column; line-height: 1.15; }
+  .emotion-entry-emoji { font-size: 16px; line-height: 1; filter: drop-shadow(0 0 5px rgba(190,210,255,.30)); }
+  .emotion-entry-text { display: flex; flex-direction: column; line-height: 1.1; }
   .emotion-entry-title { font-size: 11px; font-weight: 500; letter-spacing: .01em; white-space: nowrap; }
   .emotion-entry-sub { display: none; }
   .career-entry {
     position: fixed; left: 50%; margin-left: -89px; bottom: 48px;
     transform: translateX(-50%);
     z-index: 4; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 2px; width: 46px; height: 46px; padding: 4px 3px;
+    gap: 4px; width: 46px; height: 46px; padding: 6px 3px;
     border: 1px solid rgba(255,255,255,.26); border-radius: 14px;
     background: rgba(24,24,38,.42);
     backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
@@ -3223,15 +3223,15 @@ font-size: 12px;
     text-align: center;
   }
   .career-entry:active { transform: translateX(-50%) scale(.96); }
-  .career-entry-emoji { font-size: 17px; line-height: 1; filter: drop-shadow(0 0 5px rgba(190,210,255,.30)); }
-  .career-entry-text { display: flex; flex-direction: column; line-height: 1.15; }
+  .career-entry-emoji { font-size: 16px; line-height: 1; filter: drop-shadow(0 0 5px rgba(190,210,255,.30)); }
+  .career-entry-text { display: flex; flex-direction: column; line-height: 1.1; }
   .career-entry-title { font-size: 11px; font-weight: 500; letter-spacing: .01em; white-space: nowrap; }
 
   .world-entry {
     position: fixed; left: 50%; bottom: 94px;
     transform: translateX(-50%);
     z-index: 5; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 3px; width: 56px; height: 56px; padding: 4px 2px;
+    gap: 5px; width: 56px; height: 56px; padding: 5px 2px;
     border: 1px solid rgba(210,225,255,.55); border-radius: 18px;
     background: rgba(18,26,52,.52);
     backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -3241,7 +3241,10 @@ font-size: 12px;
     text-align: center;
   }
   .world-entry:active { transform: translateX(-50%) scale(.96); }
-  .world-entry-emoji { font-size: 20px; line-height: 1; color: rgba(214,228,255,.95); text-shadow: 0 0 8px rgba(140,170,255,.55); }
+  .world-entry-emoji { display: block; font-size: 0; line-height: 0; filter: drop-shadow(0 0 6px rgba(140,170,255,.45)); }
+  .world-entry-emoji svg { width: 19px; height: 19px; display: block; }
+  .world-entry-emoji .wd-heart { fill: none; stroke: rgba(214,228,255,.95); stroke-width: 1.3; stroke-linejoin: round; stroke-linecap: round; }
+  .world-entry-emoji .wd-spark { fill: rgba(214,228,255,.95); }
   .world-entry-text { display: flex; flex-direction: column; line-height: 1; }
   .world-entry-title { font-size: 13px; font-weight: 600; letter-spacing: 0; white-space: nowrap; }
 </style>
@@ -3330,7 +3333,12 @@ font-size: 12px;
 </span>
 </a>
 <a class="world-entry" href="lugu/index.html?from=earth" aria-label="心域世界">
-<span class="world-entry-emoji" aria-hidden="true">♡</span>
+<span class="world-entry-emoji" aria-hidden="true">
+<svg viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+<path class="wd-heart" d="M12 20.2C8 17 3.2 13.6 3.2 9.4 3.2 6.4 5.5 4.4 8 4.4c1.9 0 3.5 1.1 4 2.6.5-1.5 2.1-2.6 4-2.6 2.5 0 4.8 2 4.8 5 0 4.2-4.8 7.6-8.8 10.8Z"/>
+<path class="wd-spark" d="M17.6 2.1l.7 1.9 1.9.7-1.9.7-.7 1.9-.7-1.9-1.9-.7 1.9-.7Z"/>
+</svg>
+</span>
 <span class="world-entry-text">
 <span class="world-entry-title">心域世界</span>
 </span>
