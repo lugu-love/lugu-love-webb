@@ -623,19 +623,17 @@ opacity: .55;
 position: relative;
 grid-column: 1 / -1;
 grid-row: 3;
-display: grid;
-grid-template-columns: 1fr auto auto;
-column-gap: 8px;
+display: flex;
+flex-direction: row;
+justify-content: center;
 align-items: center;
+gap: 12px;
 min-height: 28px;
-margin-top: -8px;
+margin-top: 0;
 }
 
 .voice-letter.is-floating-card .voice-world-button {
 position: relative;
-grid-column: 3;
-grid-row: auto;
-justify-self: end;
 align-self: center;
 right: 0;
 bottom: auto;
@@ -648,9 +646,8 @@ padding: 0 8px;
 font-size: 13px;
 }
 .voice-letter.is-floating-card .voice-send-button {
-grid-column: 2;
+order: -1;
 position: relative;
-justify-self: end;
 align-self: center;
 right: 0;
 bottom: auto;
