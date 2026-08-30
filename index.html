@@ -2498,23 +2498,23 @@ position: fixed;
 left: 50%;
 bottom: 48px;
 z-index: 4;
-width: 136px;
-height: 44px;
-padding: 0 10px;
-border: 1px solid rgba(255, 255, 255, .24);
-border-radius: 14px;
-background: rgba(255, 255, 255, .08);
-backdrop-filter: blur(22px);
-box-shadow: 0 0 30px rgba(140, 120, 255, .25), inset 0 0 20px rgba(255, 255, 255, .05);
+width: 108px;
+height: 38px;
+padding: 0 8px;
+border: 1px solid rgba(255, 255, 255, .28);
+border-radius: 13px;
+background: rgba(24, 24, 38, .46);
+backdrop-filter: blur(18px);
+box-shadow: 0 0 8px rgba(255, 255, 255, .05);
 display: inline-flex;
 flex-direction: row;
 justify-content: center;
 align-items: center;
-gap: 7px;
+gap: 6px;
 color: #fff;
 font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
-font-weight: 600;
-text-shadow: 0 0 12px rgba(255, 184, 246, .42);
+font-weight: 500;
+text-shadow: 0 0 10px rgba(190, 210, 255, .30);
 cursor: pointer;
 transform: translateX(-50%);
 transition: transform .25s ease, background .25s ease, box-shadow .25s ease, border-color .25s ease;
@@ -2524,18 +2524,17 @@ animation: my-space-invite 4.8s ease-in-out 12.5s infinite;
 
 
 .my-space-button-label {
-font-size: 14px;
-letter-spacing: .04em;
+font-size: 13px;
+font-weight: 500;
+letter-spacing: .02em;
 line-height: 1;
-background: linear-gradient(90deg, #fff, #ffb3ff, #b3c7ff);
--webkit-background-clip: text;
--webkit-text-fill-color: transparent;
+color: rgba(238, 242, 255, .96);
 }
 
 .my-space-button-icon {
-font-size: 17px;
+font-size: 15px;
 line-height: 1;
-filter: drop-shadow(0 0 10px rgba(255, 220, 150, .5));
+filter: drop-shadow(0 0 6px rgba(190, 210, 255, .35));
 }
 
 .my-space-button-sub {
@@ -2544,10 +2543,10 @@ display: none;
 
 .my-space-button:hover,
 .my-space-button:focus-visible {
-background: rgba(255, 255, 255, .15);
-border-color: rgba(255, 255, 255, .34);
-box-shadow: 0 0 52px rgba(255, 180, 90, .38), inset 0 0 24px rgba(255, 255, 255, .08);
-transform: translateX(-50%) scale(1.06);
+background: rgba(255, 255, 255, .10);
+border-color: rgba(255, 255, 255, .40);
+box-shadow: 0 0 16px rgba(170, 195, 255, .22), inset 0 0 10px rgba(255, 255, 255, .06);
+transform: translateX(-50%) scale(1.04);
 outline: none;
 }
 
@@ -2632,8 +2631,8 @@ filter: drop-shadow(0 0 8px rgba(255, 220, 130, .9)) drop-shadow(0 0 15px rgba(8
 }
 
 @keyframes my-space-invite {
-0%, 100% { box-shadow: 0 0 30px rgba(140, 120, 255, .25), inset 0 0 20px rgba(255, 255, 255, .05); border-color: rgba(255, 255, 255, .24); }
-50% { box-shadow: 0 0 42px rgba(190, 151, 255, .4), inset 0 0 25px rgba(255, 255, 255, .1); border-color: rgba(255, 243, 221, .42); }
+0%, 100% { box-shadow: 0 0 8px rgba(255, 255, 255, .05), inset 0 0 8px rgba(255, 255, 255, .03); border-color: rgba(255, 255, 255, .28); }
+50% { box-shadow: 0 0 16px rgba(170, 195, 255, .20), inset 0 0 10px rgba(255, 255, 255, .05); border-color: rgba(210, 225, 255, .45); }
 }
 
 .my-space-modal {
@@ -3193,58 +3192,58 @@ font-size: 12px;
 </style>
 <style>
   .emotion-entry {
-    position: fixed; left: 50%; margin-left: 102px; bottom: 48px;
+    position: fixed; left: 50%; margin-left: 89px; bottom: 48px;
     transform: translateX(-50%);
     z-index: 4; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 2px; width: 44px; height: 44px; padding: 4px 3px;
-    border: 1px solid rgba(255,255,255,.22); border-radius: 13px;
-    background: rgba(255,255,255,.07);
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    box-shadow: 0 0 18px rgba(140,120,255,.20), inset 0 0 12px rgba(255,255,255,.04);
+    gap: 2px; width: 46px; height: 46px; padding: 4px 3px;
+    border: 1px solid rgba(255,255,255,.26); border-radius: 14px;
+    background: rgba(24,24,38,.42);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 0 8px rgba(255,255,255,.06);
     color: #fff; text-decoration: none;
     font-family: "PingFang SC","Microsoft YaHei",Arial,sans-serif;
     text-align: center;
   }
   .emotion-entry:active { transform: translateX(-50%) scale(.96); }
-  .emotion-entry-emoji { font-size: 14px; line-height: 1; filter: drop-shadow(0 0 6px rgba(255,210,140,.4)); }
+  .emotion-entry-emoji { font-size: 17px; line-height: 1; filter: drop-shadow(0 0 5px rgba(190,210,255,.30)); }
   .emotion-entry-text { display: flex; flex-direction: column; line-height: 1.15; }
-  .emotion-entry-title { font-size: 9px; font-weight: 650; letter-spacing: .01em; white-space: nowrap; }
+  .emotion-entry-title { font-size: 11px; font-weight: 500; letter-spacing: .01em; white-space: nowrap; }
   .emotion-entry-sub { display: none; }
   .career-entry {
-    position: fixed; left: 50%; margin-left: -102px; bottom: 48px;
+    position: fixed; left: 50%; margin-left: -89px; bottom: 48px;
     transform: translateX(-50%);
     z-index: 4; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 2px; width: 44px; height: 44px; padding: 4px 3px;
-    border: 1px solid rgba(255,255,255,.22); border-radius: 13px;
-    background: rgba(255,255,255,.07);
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    box-shadow: 0 0 18px rgba(140,120,255,.20), inset 0 0 12px rgba(255,255,255,.04);
+    gap: 2px; width: 46px; height: 46px; padding: 4px 3px;
+    border: 1px solid rgba(255,255,255,.26); border-radius: 14px;
+    background: rgba(24,24,38,.42);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 0 8px rgba(255,255,255,.06);
     color: #fff; text-decoration: none;
     font-family: "PingFang SC","Microsoft YaHei",Arial,sans-serif;
     text-align: center;
   }
   .career-entry:active { transform: translateX(-50%) scale(.96); }
-  .career-entry-emoji { font-size: 14px; line-height: 1; filter: drop-shadow(0 0 6px rgba(255,210,140,.4)); }
+  .career-entry-emoji { font-size: 17px; line-height: 1; filter: drop-shadow(0 0 5px rgba(190,210,255,.30)); }
   .career-entry-text { display: flex; flex-direction: column; line-height: 1.15; }
-  .career-entry-title { font-size: 9px; font-weight: 650; letter-spacing: .01em; white-space: nowrap; }
+  .career-entry-title { font-size: 11px; font-weight: 500; letter-spacing: .01em; white-space: nowrap; }
 
   .world-entry {
-    position: fixed; left: 50%; bottom: 96px;
+    position: fixed; left: 50%; bottom: 94px;
     transform: translateX(-50%);
     z-index: 5; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 3px; width: 52px; height: 52px; padding: 6px 3px;
-    border: 1px solid rgba(255,255,255,.32); border-radius: 16px;
-    background: rgba(255,255,255,.12);
+    gap: 3px; width: 56px; height: 56px; padding: 4px 2px;
+    border: 1px solid rgba(210,225,255,.55); border-radius: 18px;
+    background: rgba(18,26,52,.52);
     backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    box-shadow: 0 0 30px rgba(160,140,255,.36), inset 0 0 18px rgba(255,255,255,.08);
+    box-shadow: 0 0 14px rgba(120,160,255,.20);
     color: #fff; text-decoration: none;
     font-family: "PingFang SC","Microsoft YaHei",Arial,sans-serif;
     text-align: center;
   }
   .world-entry:active { transform: translateX(-50%) scale(.96); }
-  .world-entry-emoji { font-size: 19px; line-height: 1; filter: drop-shadow(0 0 9px rgba(255,210,140,.55)); }
-  .world-entry-text { display: flex; flex-direction: column; line-height: 1.1; }
-  .world-entry-title { font-size: 10px; font-weight: 700; letter-spacing: .01em; white-space: nowrap; }
+  .world-entry-emoji { font-size: 20px; line-height: 1; color: rgba(214,228,255,.95); text-shadow: 0 0 8px rgba(140,170,255,.55); }
+  .world-entry-text { display: flex; flex-direction: column; line-height: 1; }
+  .world-entry-title { font-size: 13px; font-weight: 600; letter-spacing: 0; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -3331,7 +3330,7 @@ font-size: 12px;
 </span>
 </a>
 <a class="world-entry" href="lugu/index.html?from=earth" aria-label="心域世界">
-<span class="world-entry-emoji" aria-hidden="true">💗</span>
+<span class="world-entry-emoji" aria-hidden="true">♡</span>
 <span class="world-entry-text">
 <span class="world-entry-title">心域世界</span>
 </span>
