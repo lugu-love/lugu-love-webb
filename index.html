@@ -567,10 +567,9 @@ opacity: .98;
 overflow: visible;
 transform: none;
 animation: none;
-border: 1px solid rgba(255, 255, 255, .18);
+border: 0;
 border-radius: 16px;
 background: transparent;
-box-shadow: 0 14px 44px rgba(0, 0, 0, .38), inset 0 0 18px rgba(255, 255, 255, .05);
 transition: left .55s cubic-bezier(.2, .72, .2, 1), top .55s cubic-bezier(.2, .72, .2, 1);
 }
 
@@ -6279,7 +6278,7 @@ if (!letterNode?.isConnected || !letterNode.classList.contains("is-floating-card
 const stageNode = stage || document.body;
 const stageRect = stageNode.getBoundingClientRect();
 const cardRect = letterNode.getBoundingClientRect();
-const targetTop = Math.max(10, (detail.toBottom - stageRect.top) + 10);
+const targetTop = Math.max(10, (detail.toBottom - stageRect.top) + 10 - (detail.cardLift || 0));
 const targetLeft = Math.max(10, stageRect.width / 2 - cardRect.width / 2);
 
 letterNode.classList.remove("is-following-large-bottle", "is-following-rabbit-return");
@@ -6303,7 +6302,7 @@ letterNode?.classList.remove("is-following-rabbit-return");
 positionCardFromBottle();
 });
 bottle.addEventListener("rabbit-expanded", (event) => {
-if (event.detail) followRabbitCard(event.detail);
+if (event.detail) { event.detail.cardLift = 30; followRabbitCard(event.detail); }
 });
 bottle.addEventListener("rabbit-return-start", (event) => {
 clearTimeout(cardReturnTimer);
