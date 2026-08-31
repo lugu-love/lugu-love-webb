@@ -1,4 +1,6 @@
 """TTS provider 抽象层。edge-tts 为兜底，ElevenLabs 为正式声音源。"""
+ELEVENLABS_MODEL_ID_DEFAULT = "eleven_v3"
+ELEVENLABS_OUTPUT_FORMAT = "mp3_44100_128"
 import json
 import os
 import urllib.error
@@ -37,7 +39,7 @@ class ElevenLabsProvider(TTSProvider):
     def __init__(self, voice_id, api_key=None, model_id=None):
         self.voice_id = voice_id
         self.api_key = api_key or os.environ.get("ELEVENLABS_API_KEY", "")
-        self.model_id = model_id or os.environ.get("ELEVENLABS_MODEL_ID", "eleven_v3")
+        self.model_id = model_id or os.environ.get("ELEVENLABS_MODEL_ID", ELEVENLABS_MODEL_ID_DEFAULT)
 
     def synthesize(self, text, out_path):
         if not self.voice_id:
@@ -48,7 +50,7 @@ class ElevenLabsProvider(TTSProvider):
         payload = json.dumps({
             "text": text,
             "model_id": self.model_id,
-            "output_format": "mp3_44100_128",
+            "output_format": ELEVENLABS_OUTPUT_FORMAT,
         }).encode("utf-8")
         req = urllib.request.Request(
             url,

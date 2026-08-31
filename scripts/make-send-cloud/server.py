@@ -20,7 +20,12 @@ import html
 import re
 
 from text_layout import layout_lines, has_unsupported
-from tts_provider import make_tts_provider, ElevenLabsProvider
+from tts_provider import (
+    make_tts_provider,
+    ElevenLabsProvider,
+    ELEVENLABS_MODEL_ID_DEFAULT,
+    ELEVENLABS_OUTPUT_FORMAT,
+)
 import journey_store
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -132,6 +137,8 @@ _login_fails = {}
 _login_lock = threading.Lock()
 _app_videos = {}
 _app_video_lock = threading.Lock()
+_tts_cache = {}
+_tts_cache_lock = threading.Lock()
 DEFAULT_TEXT = "今天先开心，其他事情都给我排队。"
 APP_VIDEO_TTL = int(os.environ.get("APP_VIDEO_TTL", "600"))
 APP_VIDEO_MAX_READS = int(os.environ.get("APP_VIDEO_MAX_READS", "3"))
@@ -144,6 +151,8 @@ ANDROID_DEBUG_CERT_SHA256 = os.environ.get(
 
 # JOURNEY_META 已由 emotion-manifest.json 统一派生（见上方 _load_emotion_manifest）。
 APP_VIDEO_DIR = os.environ.get("APP_VIDEO_DIR", "/tmp/app-video-cache")
+TTS_CACHE_DIR = os.environ.get("TTS_CACHE_DIR", "/tmp/tts-cache")
+TTS_CACHE_TTL = int(os.environ.get("TTS_CACHE_TTL", "600"))
 
 
 def log(msg):
@@ -265,6 +274,60 @@ def take_app_video(token):
         return record["path"], record["expires"], record["reads"]
 
 
+def _tts_cache_key(text, voice_id):
+    """试听缓存 key：覆盖 text / voiceId / 实际影响 TTS 的 model 与 output format。
+
+    当前 emotion 不影响 TTS，故不纳入 key；若日后 emotion/style 参与 TTS 必须加入。
+    """
+    model_id = os.environ.get("ELEVENLABS_MODEL_ID", ELEVENLABS_MODEL_ID_DEFAULT)
+    return _sha256("\0".join([text, voice_id or "", model_id, ELEVENLABS_OUTPUT_FORMAT]))
+
+
+def store_tts_audio(data, text, voice_id):
+    """把试听生成的 mp3 落入临时缓存，返回 ttsToken。"""
+    os.makedirs(TTS_CACHE_DIR, exist_ok=True)
+    now = time.time()
+    with _tts_cache_lock:
+        for token in [t for t, r in list(_tts_cache.items()) if r["expires"] <= now]:
+            try:
+                os.remove(_tts_cache[token]["path"])
+            except OSError:
+                pass
+            _tts_cache.pop(token, None)
+        token = secrets.token_urlsafe(24)
+        path = os.path.join(TTS_CACHE_DIR, token + ".mp3")
+        with open(path, "wb") as f:
+            f.write(data)
+        _tts_cache[token] = {
+            "path": path,
+            "expires": now + TTS_CACHE_TTL,
+            "text": text,
+            "voice_id": voice_id or "",
+            "key": _tts_cache_key(text, voice_id),
+        }
+    return token
+
+
+def take_tts_audio(token, text, voice_id):
+    """校验 token 有效且与当前 text/voiceId 对应；命中返回音频文件路径，否则 None。"""
+    if not token:
+        return None
+    now = time.time()
+    with _tts_cache_lock:
+        record = _tts_cache.get(token)
+        if not record or record["expires"] <= now:
+            if record:
+                try:
+                    os.remove(record["path"])
+                except OSError:
+                    pass
+                _tts_cache.pop(token, None)
+            return None
+        if record["text"] != text or record["voice_id"] != (voice_id or ""):
+            return None
+        return record["path"]
+
+
 # 异步生成任务：/make-send?async=1 立即返回 202 {job}，后台线程生成并写入
 # app-video 缓存；前端轮询 /make-send/result 拿 videoPath，再取视频。
 # 目的：长文本生成耗时超过网络/代理对单次无数据连接的容忍窗口，会整个被切断；
@@ -273,19 +336,19 @@ _jobs = {}
 _jobs_lock = threading.Lock()
 
 
-def _run_job_async(job_id, text, item, voice_id):
+def _run_job_async(job_id, text, item, voice_id, tts_audio_path=None):
     workdir = None
     try:
         workdir = tempfile.mkdtemp(prefix="make-send-")
-        final, meta = generate(item, text, workdir, voice_id=voice_id, speech_text=None)
+        final, meta = generate(item, text, workdir, voice_id=voice_id, speech_text=None, tts_audio_path=tts_audio_path)
         with open(final, "rb") as f:
             data = f.read()
         token = store_app_video(data)
         with _jobs_lock:
             t0 = _jobs.get(job_id, {}).get("t0", time.time())
             _jobs[job_id] = {"status": "done", "token": token, "text_len": len(text), "meta": meta}
-        log("JOB-DONE job=%s item=%s voice=%s text_len=%d lines=%d font=%d tts=%.2fs tts_dur=%.2fs vdur=%.2fs ffmpeg=%.2fs total=%.2fs size=%d"
-            % (job_id, item, meta.get("voice_id") or "-", len(text), meta.get("lines", 0), meta.get("font_size", 0),
+        log("JOB-DONE job=%s item=%s voice=%s tts_provider=%s text_len=%d lines=%d font=%d tts=%.2fs tts_dur=%.2fs vdur=%.2fs ffmpeg=%.2fs total=%.2fs size=%d"
+            % (job_id, item, meta.get("voice_id") or "-", meta.get("tts_provider") or "-", len(text), meta.get("lines", 0), meta.get("font_size", 0),
                meta.get("tts", 0), meta.get("tts_duration") or 0.0, meta.get("video_duration") or 0.0,
                meta.get("ffmpeg", 0), time.time() - t0, len(data)))
     except Exception as e:
@@ -360,7 +423,29 @@ def _probe_duration(path):
     return None
 
 
-def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None):
+def synthesize_tts(speech_text, voice_id, tts_path, tts=None):
+    """统一 TTS 合成入口：ElevenLabs 命中优先，失败/未知声音降级 edge-tts。
+
+    试听接口 /tts 与 /make-send 共用此函数，保证两者声音行为一致。
+    """
+    provider_used = "edge-tts"
+    if voice_id and voice_id in VOICE_LIBRARY:
+        try:
+            ElevenLabsProvider(voice_id).synthesize(speech_text, tts_path)
+            provider_used = "elevenlabs"
+        except Exception as e:
+            log("ELEVENLABS-FALLBACK voice=%s err=%s" % (voice_id, "%s: %s" % (type(e).__name__, e)))
+            make_tts_provider("edge-tts").synthesize(speech_text, tts_path)
+            provider_used = "edge-tts-fallback"
+    else:
+        if voice_id:
+            log("UNKNOWN-VOICE voice=%s fallback=edge-tts" % voice_id)
+            provider_used = "edge-tts-fallback"
+        (tts or make_tts_provider("edge-tts")).synthesize(speech_text, tts_path)
+    return provider_used
+
+
+def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts_audio_path=None):
     master_rel, _emotion = MASTERS[item]
     master = os.path.join(MASTERS_DIR, master_rel)
     final = os.path.join(workdir, "final.mp4")
@@ -388,20 +473,12 @@ def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None):
     t0 = time.time()
     if speech_text is None:
         speech_text = build_speech_text(text, _emotion)
-    provider_used = "edge-tts"
-    if voice_id and voice_id in VOICE_LIBRARY:
-        try:
-            ElevenLabsProvider(voice_id).synthesize(speech_text, tts_path)
-            provider_used = "elevenlabs"
-        except Exception as e:
-            log("ELEVENLABS-FALLBACK voice=%s err=%s" % (voice_id, "%s: %s" % (type(e).__name__, e)))
-            make_tts_provider("edge-tts").synthesize(speech_text, tts_path)
-            provider_used = "edge-tts-fallback"
+    if tts_audio_path and os.path.isfile(tts_audio_path):
+        # 试听缓存命中：直接复用同一份音频文件，不再次调用 TTS。
+        shutil.copyfile(tts_audio_path, tts_path)
+        provider_used = "tts-cache"
     else:
-        if voice_id:
-            log("UNKNOWN-VOICE voice=%s fallback=edge-tts" % voice_id)
-            provider_used = "edge-tts-fallback"
-        (tts or make_tts_provider("edge-tts")).synthesize(speech_text, tts_path)
+        provider_used = synthesize_tts(speech_text, voice_id, tts_path, tts=tts)
     meta["tts"] = time.time() - t0
     meta["tts_provider"] = provider_used
     meta["voice_id"] = voice_id or ""
@@ -536,7 +613,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self.send_header(
             "Access-Control-Expose-Headers",
             "X-Video-Path, X-Video-Expires-In, X-Video-Id, X-Journey-Id, "
-            "X-Parent-Video-Id, X-Generation, X-Remix-Entry",
+            "X-Parent-Video-Id, X-Generation, X-Remix-Entry, "
+            "X-TTS-Token, X-TTS-Provider, X-TTS-Voice",
         )
 
     def _send_json(self, code, obj):
@@ -624,6 +702,61 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         self.end_headers()
         self.wfile.write(body)
 
+    def _tts(self):
+        data = self._read_json_body()
+        if data is None:
+            return self._send_json(400, {"error": "bad request"})
+        return self._tts_serve(
+            data.get("text", "") or "",
+            data.get("voice") or data.get("voiceId") or DEFAULT_VOICE_ID,
+        )
+
+    def _tts_serve(self, text, voice_id):
+        """试听：只生成 TTS 音频并返回 audio/mpeg + X-TTS-Token，不跑 ffmpeg、不生成视频。"""
+        if not read_enabled():
+            return self._send_json(503, {"error": "service temporarily unavailable"})
+        text = (text or "").strip()
+        if not text:
+            return self._send_json(400, {"error": "请先写一句话"})
+        if len(text) > TEXT_MAX:
+            return self._send_json(400, {"error": "TEXT_TOO_LONG", "message": "这段内容较长，当前最多支持 %d 字，请适当精简后重试。" % TEXT_MAX})
+        if has_unsupported(text):
+            return self._send_json(400, {"error": "暂不支持 emoji / 特殊符号，请使用文字、数字、标点"})
+        if not rate_ok(self.client_address[0]):
+            return self._send_json(429, {"error": "too many requests"})
+        if not SEM.acquire(blocking=False):
+            return self._send_json(429, {"error": "server busy"})
+        workdir = None
+        try:
+            workdir = tempfile.mkdtemp(prefix="tts-")
+            tts_path = os.path.join(workdir, "tts.mp3")
+            speech_text = text  # 当前 build_speech_text 原样返回 text，emotion 不影响 TTS
+            provider_used = synthesize_tts(speech_text, voice_id, tts_path)
+            with open(tts_path, "rb") as f:
+                data = f.read()
+            if not data:
+                raise RuntimeError("tts returned empty audio")
+            token = store_tts_audio(data, speech_text, voice_id)
+            log("TTS-OK voice=%s provider=%s text_len=%d bytes=%d token=%s ttl=%ds"
+                % (voice_id or "-", provider_used, len(text), len(data), token, TTS_CACHE_TTL))
+            self.send_response(200)
+            self._cors()
+            self.send_header("Content-Type", "audio/mpeg")
+            self.send_header("Content-Length", str(len(data)))
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("X-TTS-Token", token)
+            self.send_header("X-TTS-Provider", provider_used)
+            self.send_header("X-TTS-Voice", voice_id or "")
+            self.end_headers()
+            self.wfile.write(data)
+        except Exception as e:
+            log("TTS-ERROR %s: %s" % (type(e).__name__, e))
+            self._send_json(500, {"error": str(e)})
+        finally:
+            if workdir and os.path.isdir(workdir):
+                shutil.rmtree(workdir, ignore_errors=True)
+            SEM.release()
+
     def _read_json_body(self):
         try:
             length = int(self.headers.get("Content-Length", "0") or 0)
@@ -710,10 +843,11 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             async_mode = qs.get("async", [""])[0] == "1"
             voice_id = (qs.get("voice") or qs.get("voiceId") or [""])[0] or DEFAULT_VOICE_ID
             speech_text = (qs.get("speechText") or qs.get("speech_text") or [""])[0] or None
+            tts_token = (qs.get("ttsToken") or [""])[0] or None
             return self._serve(
                 qs.get("text", [""])[0], qs.get("item", ["rabbit-happy"])[0], app_bridge,
                 journey_v1, qs.get("remix_token", [""])[0], qs.get("source_channel", ["h5"])[0],
-                voice_id, speech_text, async_mode,
+                voice_id, speech_text, async_mode, tts_token,
             )
         return self._not_found()
 
@@ -748,17 +882,20 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             except (journey_store.JourneyUnavailable, ValueError) as error:
                 return self._send_json(503 if isinstance(error, journey_store.JourneyUnavailable) else 400, {"error": str(error)})
             return self._send_json(201, {"recorded": True}) if ok else self._not_found()
+        if path == "/tts":
+            return self._tts()
         if path == "/make-send":
             data = self._read_json_body()
             if data is None:
                 return self._send_json(400, {"error": "bad request"})
             voice_id = data.get("voice") or data.get("voiceId") or DEFAULT_VOICE_ID
             speech_text = data.get("speechText") or data.get("speech_text") or None
+            tts_token = data.get("ttsToken") or None
             return self._serve(
                 data.get("text", "") or "", data.get("item", "rabbit-happy") or "rabbit-happy",
                 bool(data.get("app_bridge")), bool(data.get("journey_v1")),
                 data.get("remix_token", "") or "", data.get("source_channel", "h5") or "h5",
-                voice_id, speech_text, bool(data.get("async")),
+                voice_id, speech_text, bool(data.get("async")), tts_token,
             )
         return self._not_found()
 
@@ -795,7 +932,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         log("ADMIN-TOGGLE enabled=%s" % enabled)
         return self._send_json(200, {"enabled": enabled})
 
-    def _serve(self, text, item, app_bridge=False, journey_v1=False, remix_token="", source_channel="h5", voice_id=None, speech_text=None, async_mode=False):
+    def _serve(self, text, item, app_bridge=False, journey_v1=False, remix_token="", source_channel="h5", voice_id=None, speech_text=None, async_mode=False, tts_token=None):
         if not read_enabled():
             return self._send_json(503, {"error": "service temporarily unavailable"})
         start = time.time()
@@ -811,6 +948,10 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         if not SEM.acquire(blocking=False):
             return self._send_json(429, {"error": "server busy"})
 
+        tts_audio_path = take_tts_audio(tts_token, text, voice_id) if tts_token else None
+        if tts_token:
+            log("TTS-TOKEN %s text_len=%d voice=%s" % ("hit" if tts_audio_path else "miss", len(text), voice_id or "-"))
+
         if async_mode:
             job_id = secrets.token_urlsafe(16)
             now = time.time()
@@ -818,13 +959,13 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
                 for jid in [j for j, r in list(_jobs.items()) if now - r.get("t0", 0) > 900]:
                     _jobs.pop(jid, None)
                 _jobs[job_id] = {"status": "pending", "t0": now, "text_len": len(text)}
-            threading.Thread(target=_run_job_async, args=(job_id, text, item, voice_id), daemon=True).start()
+            threading.Thread(target=_run_job_async, args=(job_id, text, item, voice_id, tts_audio_path), daemon=True).start()
             return self._send_json(202, {"job": job_id, "status": "pending"})
 
         workdir = None
         try:
             workdir = tempfile.mkdtemp(prefix="make-send-")
-            final, meta = generate(item, text, workdir, voice_id=voice_id, speech_text=speech_text)
+            final, meta = generate(item, text, workdir, voice_id=voice_id, speech_text=speech_text, tts_audio_path=tts_audio_path)
             with open(final, "rb") as f:
                 data = f.read()
             journey_record = None
