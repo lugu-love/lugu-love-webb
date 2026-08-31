@@ -32,6 +32,8 @@
   .voice-mini { display:inline-flex; align-items:center; gap:6px; height:34px; padding:0 10px; border:1px solid rgba(255,255,255,.12); border-radius:999px; background:rgba(255,255,255,.05); }
   .voice-mini .voice-icon { font-size:12px; line-height:1; color:var(--muted); }
   .voice-select { height:30px; max-width:150px; padding:0 2px; border:none; background:transparent; color:#b8c0ff; font-size:12px; font-weight:600; outline:none; }
+  .voice-preview { flex:0 1 auto; min-width:0; height:34px; display:inline-flex; align-items:center; gap:6px; padding:0 14px; border:1px solid rgba(255,255,255,.14); border-radius:999px; background:rgba(255,255,255,.05); color:#b8c0ff; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; }
+  .voice-preview:disabled { opacity:.55; cursor:default; }
   .suggest-box { display:flex; flex-direction:column; flex-shrink:0; margin-top:6px; padding:0 16px; max-height:132px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
   .suggest-chip { display:flex; align-items:flex-start; gap:9px; text-align:left; padding:11px 0; border:none; background:transparent; border-bottom:1px solid rgba(255,255,255,.06); color:rgba(224,218,240,.82); font-size:13px; line-height:1.4; cursor:pointer; }
   .suggest-chip:last-child { border-bottom:none; }
@@ -110,6 +112,7 @@
     <div class="sub-actions">
       <button class="suggest" id="btnSuggest" type="button">✨ 帮我选一句</button>
       <label class="voice-mini"><span class="voice-icon">🔊</span><select id="voiceSelect" class="voice-select"></select></label>
+      <button class="voice-preview" id="btnPreviewVoice" type="button">🔊 试听</button>
     </div>
     <div class="suggest-box" id="suggestBox" hidden></div>
     <div class="preview-text" id="previewText"></div>
@@ -393,6 +396,15 @@ window.__MAIN__ = function () {
     var o=document.createElement("option"); o.value=v.id; o.textContent=v.name+"｜"+v.label; voiceSelect.appendChild(o);
   });
   voiceSelect.value="Jr72SE8p9OcJmr8hyX0D";
+  var btnPreviewVoice=document.getElementById("btnPreviewVoice");
+  var ttsToken=null;
+  var previewAudio=null;
+  var previewAudioUrl=null;
+  var previewAudioCtx=null;
+  var previewSource=null;
+  var previewState="idle";
+  var previewReqId=0;
+  voiceSelect.addEventListener("change", invalidatePreviewToken);
 
   function renderEmotionButtons(){
     emotionsEl.innerHTML = "";
@@ -420,6 +432,7 @@ window.__MAIN__ = function () {
     var prevId = current.id;
     current = EMOTIONS.find(function(e){return e.id===id;}) || EMOTIONS[0];
     if(prevId !== current.id){
+      invalidatePreviewToken();
       textInput.value = "";
       previewTextEl.textContent = "";
       suggestBox.hidden = true;
@@ -446,6 +459,7 @@ window.__MAIN__ = function () {
       b.querySelector(".txt").textContent = txt;
       if(txt === textInput.value) b.className = "suggest-chip selected";
       b.addEventListener("click", function(){
+        invalidatePreviewToken();
         textInput.value = txt;
         previewTextEl.textContent = txt;
         suggestBox.hidden = true;
@@ -553,6 +567,7 @@ window.__MAIN__ = function () {
   }
   textInput.addEventListener("input", function(){
     userCancelInFlight();
+    invalidatePreviewToken();
     previewTextEl.textContent=textInput.value;
     var n=updateCharCount();
     if(n>30 && !longTextHintShown){ showToast("文字较长，生成视频会相应更长。"); }
@@ -657,6 +672,109 @@ window.__MAIN__ = function () {
     try { textInput.scrollIntoView({ behavior:"smooth", block:"center" }); } catch(e) {}
   }
 
+  function resetPreviewButton(){ btnPreviewVoice.disabled=false; btnPreviewVoice.textContent="🔊 试听"; }
+  function stopPreviewAudio(){
+    if(previewSource){
+      try{ previewSource.onended=null; previewSource.stop(); }catch(e){}
+      try{ previewSource.disconnect(); }catch(e){}
+      previewSource=null;
+    }
+    if(previewAudio){
+      try{ previewAudio.pause(); }catch(e){}
+      previewAudio.onended=null; previewAudio.onerror=null;
+      previewAudio.removeAttribute("src");
+      try{ previewAudio.load(); }catch(e){}
+      previewAudio=null;
+    }
+    if(previewAudioUrl){ try{ URL.revokeObjectURL(previewAudioUrl); }catch(e){} previewAudioUrl=null; }
+  }
+  function invalidatePreviewToken(){
+    previewReqId++;
+    stopPreviewAudio();
+    previewState="idle";
+    ttsToken=null;
+    resetPreviewButton();
+  }
+  function onPreviewAudioEnded(){
+    stopPreviewAudio();
+    previewState="idle";
+    resetPreviewButton();
+  }
+  function previewVoice(){
+    if(previewState==="playing"){ stopPreviewAudio(); previewState="idle"; resetPreviewButton(); return; }
+    if(previewState==="loading") return;
+    var text=(textInput.value||"").trim();
+    if(!text){ showToast("请先写一句话"); return; }
+    var myReq=++previewReqId;
+    previewState="loading";
+    btnPreviewVoice.disabled=true; btnPreviewVoice.textContent="生成语音…";
+
+    // iOS：必须在用户点击手势内创建/恢复 AudioContext，之后 fetch 返回再播放才不会被自动播放策略拦截
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if(!previewAudioCtx && AC){ try{ previewAudioCtx=new AC(); }catch(e){ previewAudioCtx=null; } }
+    if(previewAudioCtx && previewAudioCtx.state==="suspended"){ previewAudioCtx.resume().catch(function(){}); }
+
+    fetch(MAKE_SEND_API + "/tts", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ text:text, voiceId:voiceSelect.value }),
+      cache:"no-store",
+      mode:"cors"
+    }).then(function(resp){
+      if(myReq!==previewReqId) return null;
+      var token=resp.headers.get("X-TTS-Token");
+      if(!resp.ok){
+        return resp.json().catch(function(){ return {}; }).then(function(d){ throw new Error((d&&d.message)||(d&&d.error)||("HTTP "+resp.status)); });
+      }
+      return resp.blob().then(function(blob){
+        if(myReq!==previewReqId) return null;
+        if(!blob || blob.size===0) throw new Error("empty audio");
+        return { blob:blob, token:token };
+      });
+    }).then(function(result){
+      if(myReq!==previewReqId || !result) return;
+      stopPreviewAudio();
+      ttsToken=result.token || null;
+
+      if(previewAudioCtx){
+        return result.blob.arrayBuffer().then(function(buf){
+          if(myReq!==previewReqId) return null;
+          return new Promise(function(resolve, reject){
+            previewAudioCtx.decodeAudioData(buf, resolve, reject);
+          });
+        }).then(function(audioBuffer){
+          if(myReq!==previewReqId) return;
+          if(!audioBuffer) throw new Error("decode audio failed");
+          var src=previewAudioCtx.createBufferSource();
+          src.buffer=audioBuffer;
+          src.connect(previewAudioCtx.destination);
+          src.onended=function(){ if(previewSource===src){ previewSource=null; onPreviewAudioEnded(); } };
+          previewSource=src;
+          previewState="playing";
+          btnPreviewVoice.disabled=false; btnPreviewVoice.textContent="⏹ 停止";
+          src.start(0);
+        });
+      }
+
+      // 兜底：无 AudioContext 时用 HTMLAudioElement（Android/桌面 Chrome 等）
+      previewAudioUrl=URL.createObjectURL(result.blob);
+      previewAudio=new Audio(previewAudioUrl);
+      previewAudio.onended=onPreviewAudioEnded;
+      previewAudio.onerror=function(){ onPreviewAudioEnded(); };
+      previewState="playing";
+      btnPreviewVoice.disabled=false; btnPreviewVoice.textContent="⏹ 停止";
+      var pr=previewAudio.play();
+      if(pr && pr.catch){ pr.catch(function(){ if(previewAudio){ onPreviewAudioEnded(); showToast("播放失败，请重试"); } }); }
+    }).catch(function(err){
+      if(myReq!==previewReqId) return;
+      stopPreviewAudio();
+      previewState="idle";
+      ttsToken=null;
+      resetPreviewButton();
+      showToast(err && err.message ? err.message : "试听失败，请重试");
+    });
+  }
+
   async function generateVideo(){
     if(isGenerating){
       showToast("视频正在生成，请稍候");
@@ -686,7 +804,7 @@ window.__MAIN__ = function () {
       });
       var tFetchStart = performance.now();
       lastTiming.clickToFetchMs=Math.round(tFetchStart-tClick);
-      var url=MAKE_SEND_API + "/make-send?text=" + encodeURIComponent(text) + "&item=" + encodeURIComponent(current.item) + "&voiceId=" + encodeURIComponent(voiceSelect.value) + (isAppBridge ? "&app_bridge=1" : "") + "&async=1";
+      var url=MAKE_SEND_API + "/make-send?text=" + encodeURIComponent(text) + "&item=" + encodeURIComponent(current.item) + "&voiceId=" + encodeURIComponent(voiceSelect.value) + (ttsToken ? "&ttsToken=" + encodeURIComponent(ttsToken) : "") + (isAppBridge ? "&app_bridge=1" : "") + "&async=1";
       activeController = typeof AbortController === "function" ? new AbortController() : null;
       generatePhase="request-sent";
       renderDiag();
@@ -857,6 +975,7 @@ window.__MAIN__ = function () {
     }
   });
 
+  btnPreviewVoice.addEventListener("click", previewVoice);
   btnGenerate.addEventListener("click", generateVideo);
   btnOpen.addEventListener("click", openVideo);
   btnSave.addEventListener("click", saveVideo);
