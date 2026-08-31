@@ -2498,9 +2498,10 @@ position: fixed;
 left: 50%;
 bottom: 48px;
 z-index: 4;
-width: 100px;
+box-sizing: border-box;
+width: 112px;
 height: 32px;
-padding: 0 8px;
+padding: 0 10px;
 border: 1px solid rgba(255, 255, 255, .28);
 border-radius: 13px;
 background: rgba(24, 24, 38, .46);
@@ -2520,15 +2521,17 @@ transform: translateX(-50%);
 transition: transform .25s ease, background .25s ease, box-shadow .25s ease, border-color .25s ease;
 user-select: none;
 animation: my-space-invite 4.8s ease-in-out 12.5s infinite;
+white-space: nowrap;
 }
 
 
 .my-space-button-label {
 font-size: 13px;
 font-weight: 500;
-letter-spacing: .02em;
+letter-spacing: 0;
 line-height: 1;
 color: rgba(238, 242, 255, .96);
+white-space: nowrap;
 }
 
 .my-space-button-icon {
@@ -3192,10 +3195,11 @@ font-size: 12px;
 </style>
 <style>
   .emotion-entry {
-    position: fixed; left: 50%; margin-left: 89px; bottom: 48px;
+    position: fixed; left: 50%; margin-left: 98px; bottom: 48px;
     transform: translateX(-50%);
     z-index: 4; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 4px; width: 51px; height: 46px; padding: 6px 3px;
+    box-sizing: border-box;
+    gap: 3px; width: 80px; height: 48px; padding: 5px 7px;
     border: 1px solid rgba(255,255,255,.26); border-radius: 14px;
     background: rgba(24,24,38,.42);
     backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
@@ -3203,17 +3207,20 @@ font-size: 12px;
     color: #fff; text-decoration: none;
     font-family: "PingFang SC","Microsoft YaHei",Arial,sans-serif;
     text-align: center;
+    white-space: nowrap;
   }
   .emotion-entry:active { transform: translateX(-50%) scale(.96); }
-  .emotion-entry-emoji { font-size: 16px; line-height: 1; filter: drop-shadow(0 0 5px rgba(190,210,255,.30)); }
+  .emotion-entry-emoji { font-size: 0; line-height: 0; filter: drop-shadow(0 0 5px rgba(190,210,255,.30)); }
+  .emotion-entry-emoji img { width: 24px; height: 24px; display: block; object-fit: contain; }
   .emotion-entry-text { display: flex; flex-direction: column; line-height: 1.1; }
-  .emotion-entry-title { font-size: 11px; font-weight: 500; letter-spacing: .01em; white-space: nowrap; }
+  .emotion-entry-title { font-size: 13px; font-weight: 500; letter-spacing: 0; line-height: 1; white-space: nowrap; }
   .emotion-entry-sub { display: none; }
   .career-entry {
-    position: fixed; left: 50%; margin-left: -89px; bottom: 48px;
+    position: fixed; left: 50%; margin-left: -98px; bottom: 48px;
     transform: translateX(-50%);
     z-index: 4; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 4px; width: 51px; height: 46px; padding: 6px 3px;
+    box-sizing: border-box;
+    gap: 3px; width: 80px; height: 48px; padding: 5px 7px;
     border: 1px solid rgba(255,255,255,.26); border-radius: 14px;
     background: rgba(24,24,38,.42);
     backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
@@ -3221,17 +3228,20 @@ font-size: 12px;
     color: #fff; text-decoration: none;
     font-family: "PingFang SC","Microsoft YaHei",Arial,sans-serif;
     text-align: center;
+    white-space: nowrap;
   }
   .career-entry:active { transform: translateX(-50%) scale(.96); }
-  .career-entry-emoji { font-size: 16px; line-height: 1; filter: drop-shadow(0 0 5px rgba(190,210,255,.30)); }
+  .career-entry-emoji { font-size: 0; line-height: 0; filter: drop-shadow(0 0 5px rgba(190,210,255,.30)); }
+  .career-entry-emoji img { width: 24px; height: 24px; display: block; object-fit: contain; }
   .career-entry-text { display: flex; flex-direction: column; line-height: 1.1; }
-  .career-entry-title { font-size: 11px; font-weight: 500; letter-spacing: .01em; white-space: nowrap; }
+  .career-entry-title { font-size: 13px; font-weight: 500; letter-spacing: 0; line-height: 1; white-space: nowrap; }
 
   .world-entry {
     position: fixed; left: 50%; bottom: 94px;
     transform: translateX(-50%);
     z-index: 5; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 5px; width: 62px; height: 56px; padding: 5px 2px;
+    box-sizing: border-box;
+    gap: 4px; width: 84px; height: 68px; padding: 5px 8px;
     border: 1px solid rgba(210,225,255,.55); border-radius: 18px;
     background: rgba(18,26,52,.52);
     backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -3239,14 +3249,16 @@ font-size: 12px;
     color: #fff; text-decoration: none;
     font-family: "PingFang SC","Microsoft YaHei",Arial,sans-serif;
     text-align: center;
+    white-space: nowrap;
   }
   .world-entry:active { transform: translateX(-50%) scale(.96); }
   .world-entry-emoji { display: block; font-size: 0; line-height: 0; filter: drop-shadow(0 0 6px rgba(140,170,255,.45)); }
+  .world-entry-emoji img { width: 38px; height: 38px; display: block; object-fit: contain; }
   .world-entry-emoji svg { width: 19px; height: 19px; display: block; }
   .world-entry-emoji .wd-heart { fill: none; stroke: rgba(214,228,255,.95); stroke-width: 1.3; stroke-linejoin: round; stroke-linecap: round; }
   .world-entry-emoji .wd-spark { fill: rgba(214,228,255,.95); }
   .world-entry-text { display: flex; flex-direction: column; line-height: 1; }
-  .world-entry-title { font-size: 13px; font-weight: 600; letter-spacing: 0; white-space: nowrap; }
+  .world-entry-title { font-size: 15px; font-weight: 600; letter-spacing: 0; line-height: 1; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -3321,20 +3333,20 @@ font-size: 12px;
 </div>
 <div class="guide-final-heart" aria-hidden="true">♥</div>
 <a class="career-entry" href="co-create.html" aria-label="事业共创">
-<span class="career-entry-emoji" aria-hidden="true"><img src="assets/icons/career-cocreation.png" alt="" width="22" height="22" style="display:block;object-fit:contain"></span>
+<span class="career-entry-emoji" aria-hidden="true"><img src="assets/icons/career-cocreation.png" alt="" width="24" height="24" style="display:block;object-fit:contain"></span>
 <span class="career-entry-text">
 <span class="career-entry-title">事业共创</span>
 </span>
 </a>
-<a class="emotion-entry" href="send-test.html" aria-label="情绪表达">
-<span class="emotion-entry-emoji" aria-hidden="true"><img src="assets/icons/emotion-expression.png" alt="" width="22" height="22" style="display:block;object-fit:contain"></span>
+<a class="emotion-entry" href="send-test.html" aria-label="情感表达">
+<span class="emotion-entry-emoji" aria-hidden="true"><img src="assets/icons/emotion-expression.png" alt="" width="24" height="24" style="display:block;object-fit:contain"></span>
 <span class="emotion-entry-text">
-<span class="emotion-entry-title">情绪表达</span>
+<span class="emotion-entry-title">情感表达</span>
 </span>
 </a>
 <a class="world-entry" href="lugu/index.html?from=earth" aria-label="心域世界">
 <span class="world-entry-emoji" aria-hidden="true">
-<img src="assets/icons/home-world.png" alt="" width="24" height="24" style="display:block;object-fit:contain">
+<img src="assets/icons/home-world.png" alt="" width="38" height="38" style="display:block;object-fit:contain">
 </span>
 <span class="world-entry-text">
 <span class="world-entry-title">心域世界</span>
@@ -6575,7 +6587,7 @@ setTimeout(syncUI, 300);
 // Android/Huawei：情绪表达入口直接唤起已安装的“七星使者·情绪编辑工具”（lugu://remix 为已注册 Deep Link）
 (function () {
   if (!/Android/i.test(navigator.userAgent)) return;
-  var el = document.querySelector('a.emotion-entry[aria-label="情绪表达"]');
+  var el = document.querySelector('a.emotion-entry');
   if (el) el.href = "https://api.lugu.love/remix/open/";
 })();
 </script>
