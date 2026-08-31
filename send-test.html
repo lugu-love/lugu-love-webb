@@ -47,8 +47,8 @@
   .preview-text { text-align:center; font-size:14px; line-height:1.5; min-height:22px; margin:6px 0 0; white-space:pre-wrap; color:#fff; }
   .cta { display:flex; justify-content:center; margin-top:18px; }
   .success-actions { display:flex; gap:8px; margin-top:10px; }
-  html.is-ios #btnOpen, html.is-ios #btnSend { display:none !important; }
-  html.is-ios #btnSave { background:linear-gradient(135deg,#9ca6ff,#b68cff); color:#fff; border:1px solid rgba(210,205,255,.28); }
+  html.is-ios #btnOpen { display:none !important; }
+  html.is-ios #btnSend { background:linear-gradient(135deg,#9ca6ff,#b68cff); color:#fff; border:1px solid rgba(210,205,255,.28); }
   html.is-android #btnOpen, html.is-android #btnSave { height:34px; background:transparent; color:rgba(238,240,255,.68); border:1px solid rgba(255,255,255,.10); font-size:12px; font-weight:500; }
   html.is-android.is-wechat #btnSend { display:none !important; }
   html.is-app-bridge #btnOpen, html.is-app-bridge #btnSend, html.is-app-bridge #btnSave { display:none !important; }
@@ -285,7 +285,7 @@ window.__MAIN__ = function () {
   var isIOS=/iPad|iPhone|iPod/.test(userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   var isAndroid=/Android/i.test(userAgent);
   var isWeChat=/MicroMessenger/i.test(userAgent);
-  if(isIOS){ document.documentElement.classList.add("is-ios"); btnSave.textContent="打开并分享"; }
+  if(isIOS){ document.documentElement.classList.add("is-ios"); btnSave.textContent="打开并分享"; btnSend.textContent="发给微信好友"; }
   if(isAndroid){ document.documentElement.classList.add("is-android"); btnOpen.textContent="打开预览"; }
   if(isWeChat){ document.documentElement.classList.add("is-wechat"); }
   var isAppBridge = !!(window.AndroidShare && typeof window.AndroidShare.prepareVideo === "function" && typeof window.AndroidShare.sharePreparedVideo === "function");
@@ -877,8 +877,11 @@ window.__MAIN__ = function () {
       if(isAppBridge){ nativeVideoPath = /^\/app-video\/[A-Za-z0-9_-]{20,128}\.mp4$/.test(videoPath) ? videoPath : ""; }
       setStatus("视频生成成功", "ok");
       document.documentElement.classList.add("state-done");
+      var canShareFile = false;
+      try { canShareFile = !!(navigator.canShare && navigator.canShare({files:[file]})); } catch(e) { canShareFile = false; }
       var shareHint;
-      if(isIOS){ shareHint = "打开后，点击右上角‘…’即可分享"; }
+      if(isIOS && !isWeChat && canShareFile){ shareHint = "点击“发给微信好友”，即可打开系统分享面板"; }
+      else if(isIOS){ shareHint = "打开后，点击右上角‘…’即可分享"; }
       else if(isWeChat){ shareHint = "请在浏览器中打开后发送视频"; }
       else if(isAndroid){ shareHint = "如需发送，请保存到手机后从微信发送。"; }
       else { shareHint = "点击“发送视频”，可选择微信或其他应用。"; }
@@ -894,7 +897,7 @@ window.__MAIN__ = function () {
           document.documentElement.classList.add("show-save-fallback");
         }
       }
-      if(!isAndroid && !isWeChat && navigator.canShare && navigator.canShare({files:[file]})){
+      if(!isAndroid && !isWeChat && canShareFile){
         btnSend.hidden=false;
       }
     } catch(err){
@@ -955,6 +958,9 @@ window.__MAIN__ = function () {
         if(isAndroid && e && e.name === "AbortError"){
           setStatus("视频已生成", "ok");
           setHint("已取消发送，可再次点击“发送视频”。");
+        } else if(isIOS && e && e.name === "AbortError"){
+          setStatus("视频已生成", "ok");
+          setHint("已取消分享，可再次点击“发给微信好友”。");
         } else {
           setStatus("视频已生成，但系统分享失败", "err");
           setHint("请点“保存到手机”后从微信发送。");
