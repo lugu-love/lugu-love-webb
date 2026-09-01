@@ -10,7 +10,7 @@
   html,body { margin:0; padding:0; height:100%; background:var(--bg); color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;
     -webkit-font-smoothing:antialiased; overflow-x:hidden; overflow-y:auto; }
-  .app { display:flex; flex-direction:column; min-height:100dvh; height:auto; padding:calc(env(safe-area-inset-top,0px)+16px) 16px calc(env(safe-area-inset-bottom,0px)+10px); }
+  .app { display:flex; flex-direction:column; min-height:100vh; min-height:100svh; height:auto; padding:calc(env(safe-area-inset-top,0px)+16px) 16px calc(env(safe-area-inset-bottom,0px)+10px); }
   .brand { display:flex; align-items:center; gap:12px; margin:0; padding:2px 4px; position:relative; z-index:60; }
   .site-logo { display:inline-flex; align-items:center; gap:5px; color:rgba(238,240,255,.72); text-decoration:none; font-size:13px; font-weight:400; letter-spacing:.04em; padding:4px 6px 4px 0; border-radius:999px; }
   .site-logo img { width:26px; height:26px; flex:0 0 26px; filter:drop-shadow(0 0 4px rgba(255,222,143,.4)); }
@@ -68,8 +68,8 @@
   html.state-done .cta,
   html.state-done .status,
   html.state-done .hint { display:none !important; }
-  html.state-done .app { justify-content:center; height:100dvh; min-height:0; overflow:hidden; }
-  html.state-done #videoPreview { order:1; display:block; align-self:center; flex:0 1 auto; width:auto; height:min(54svh, calc(100dvh - 260px)); max-width:100%; max-height:58svh; aspect-ratio:9/16; object-fit:contain; border-radius:0; background:transparent; margin:0; }
+  html.state-done .app { justify-content:center; height:100dvh; min-height:0; overflow:hidden; background:transparent; }
+  html.state-done #videoPreview { order:1; display:block; align-self:center; flex:0 1 auto; width:auto; height:min(54svh, calc(100dvh - 260px)); max-width:100%; max-height:58svh; aspect-ratio:9/16; object-fit:contain; border-radius:0; background:transparent; box-shadow:none; margin:0; }
   html.state-done .preview-text { order:2; flex:0 0 auto; font-size:16px; margin:16px 0 0; }
   html.state-done .success-actions { order:3; flex:0 0 auto; }
   html.state-done .debug { order:99; }
@@ -446,7 +446,7 @@ window.__MAIN__ = function () {
     }
     updateCharCount();
     refreshUI(); clearGenerated(); loadSheets(); renderDiag(); renderPreloadDiag(); renderSuggest(); renderGuide(); syncGenerateEnabled();
-    if(prevId !== current.id){ try { textInput.focus(); } catch(e) {} }
+    if(prevId !== current.id){ focusTextInput(); }
   }
 
   function renderGuide(){
@@ -671,12 +671,15 @@ window.__MAIN__ = function () {
     setHint("");
   }
 
+  function focusTextInput(){
+    try { textInput.focus({ preventScroll: true }); } catch(e){ try { textInput.focus(); } catch(e2){} }
+  }
   function reEdit(){
     userCancelInFlight();
     clearGenerated();
     syncGenerateEnabled();
-    try { textInput.focus(); } catch(e) {}
-    try { textInput.scrollIntoView({ behavior:"smooth", block:"center" }); } catch(e) {}
+    focusTextInput();
+    try { textInput.scrollIntoView({ block:"nearest", inline:"nearest" }); } catch(e) {}
   }
 
   function resetPreviewButton(){ btnPreviewVoice.disabled=false; btnPreviewVoice.textContent="🔊 试听"; }
@@ -1049,6 +1052,25 @@ window.__MAIN__ = function () {
     var desc = el ? (el.tagName + "." + (typeof el.className === "string" ? el.className : "").split(" ")[0]) : "null";
     if(tapDiagEl) tapDiagEl.innerHTML = "点击命中: " + desc;
   }, true);
+
+  // 键盘状态适配：视觉视口变化（键盘弹出/收起）时，仅当输入框被键盘遮挡才做最小滚动，
+  // 不做整页居中/大幅滚动；键盘收起后视口变大不会触发滚动，页面位置保持原位。
+  if ((isAndroid || isIOS) && window.visualViewport && textInput) {
+    var onViewportChange = function () {
+      if (document.activeElement !== textInput) return;
+      try {
+        var vv = window.visualViewport;
+        var r = textInput.getBoundingClientRect();
+        var visibleBottom = vv.height;
+        var overflow = r.bottom - (visibleBottom - 10);
+        if (overflow > 0) {
+          window.scrollBy(0, Math.ceil(overflow));
+        }
+      } catch (err) {}
+    };
+    window.visualViewport.addEventListener("resize", onViewportChange);
+    window.visualViewport.addEventListener("scroll", onViewportChange);
+  }
 
   refreshUI();
   loadSheets();
