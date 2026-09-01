@@ -11,10 +11,10 @@
     font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;
     -webkit-font-smoothing:antialiased; overflow:hidden; }
   .app { display:flex; flex-direction:column; height:100dvh; padding:calc(env(safe-area-inset-top,0px)+16px) 16px calc(env(safe-area-inset-bottom,0px)+10px); }
-  .brand { display:flex; align-items:center; gap:8px; margin:8px 0 0 20px; font-size:17px; font-weight:450; letter-spacing:.02em; color:rgba(238,240,255,.82); }
+  .brand { display:flex; align-items:center; gap:8px; margin:0 0 0 4px; font-size:17px; font-weight:450; letter-spacing:.02em; color:rgba(238,240,255,.82); position:relative; z-index:60; }
   .site-logo { display:inline-flex; align-items:center; gap:5px; color:rgba(238,240,255,.72); text-decoration:none; font-size:13px; font-weight:400; letter-spacing:.04em; padding:4px 6px 4px 0; border-radius:999px; }
   .site-logo img { width:26px; height:26px; flex:0 0 26px; filter:drop-shadow(0 0 4px rgba(255,222,143,.4)); }
-  .back-home { display:inline-flex; align-items:center; color:rgba(238,240,255,.8); text-decoration:none; font-size:13px; font-weight:500; letter-spacing:.02em; padding:6px 10px 6px 0; white-space:nowrap; }
+  .back-home { display:inline-flex; align-items:center; justify-content:center; gap:4px; min-width:44px; min-height:44px; padding:0 14px 0 0; color:rgba(238,240,255,.92); text-decoration:none; font-size:14px; font-weight:600; letter-spacing:.02em; white-space:nowrap; }
   .back-home:active { opacity:.6; }
   html.is-app-bridge .site-logo { display:none !important; }
   .brand .heart { color:rgba(238,240,255,.82); margin-right:5px; font-weight:400; }
@@ -67,13 +67,13 @@
   html.state-done .cta,
   html.state-done .status,
   html.state-done .hint { display:none !important; }
-  html.state-done .video-stage { order:1; }
-  html.state-done .video-tap-hint { order:2; }
-  html.state-done .preview-text { order:3; font-size:16px; margin:14px 0 0; }
-  html.state-done .success-actions { order:4; }
+  html.state-done .app { justify-content:center; }
+  html.state-done #videoPreview { order:1; display:block; align-self:center; flex:0 1 auto; width:auto; height:min(54svh, calc(100dvh - 260px)); max-width:100%; max-height:58svh; aspect-ratio:9/16; object-fit:contain; border-radius:16px; background:#000; margin:0; }
+  html.state-done .preview-text { order:2; flex:0 0 auto; font-size:16px; margin:16px 0 0; }
+  html.state-done .success-actions { order:3; flex:0 0 auto; }
   html.state-done .debug { order:99; }
   button { flex:1; min-width:82px; height:44px; border-radius:14px; border:none; font-size:14px; font-weight:650; cursor:pointer; }
-  .btn-primary { background:linear-gradient(135deg,#7d8bff,#a06bff); color:#fff; }
+  .btn-primary { background:rgba(255,255,255,.94); color:#15172b; }
   #btnGenerate { width:100%; height:46px; font-size:15px; border-radius:14px; background:rgba(125,139,255,.16); color:rgba(238,240,255,.92); border:1px solid rgba(125,139,255,.20); box-shadow:none; }
   .btn-secondary { background:rgba(255,255,255,.08); color:var(--ink); border:1px solid rgba(255,255,255,.14); }
   button:disabled { opacity:.55; }
@@ -81,10 +81,7 @@
   .status.ok { color:#a9e3a0; }
   .status.err { color:#ff9aa6; }
   .hint { min-height:14px; margin:4px 0 0; text-align:center; font-size:12px; color:var(--muted); }
-  .video-tap-hint { text-align:center; font-size:11px; letter-spacing:.08em; color:rgba(255,255,255,.42); margin:8px 0 0; }
   video { width:100%; max-height:30vh; border-radius:14px; margin-top:8px; background:#000; }
-  .video-stage { position:relative; align-self:center; width:auto; height:54svh; max-height:56svh; max-width:100%; aspect-ratio:9/16; border-radius:16px; overflow:hidden; background:#000; cursor:pointer; }
-  .video-stage video, .video-stage .video-poster { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:block; }
   .toast { position:fixed; left:50%; bottom:90px; transform:translateX(-50%); z-index:9; padding:9px 14px; border-radius:999px; background:rgba(20,22,40,.88); border:1px solid rgba(255,255,255,.16); color:#fff; font-size:12px; opacity:0; transition:opacity .25s; max-width:80vw; text-align:center; }
   .toast.show { opacity:1; }
   .debug { margin-top:8px; font-size:11px; color:rgba(255,255,255,.35); border-top:1px solid rgba(255,255,255,.06); padding-top:4px; }
@@ -136,11 +133,7 @@
 
     <div class="status" id="status"></div>
     <div class="hint" id="hint"></div>
-    <div class="video-stage" id="videoStage" hidden>
-      <video id="videoPreview" playsinline preload="auto"></video>
-      <img class="video-poster" id="videoPoster" alt="">
-    </div>
-    <p class="video-tap-hint" id="videoTapHint" hidden>轻触预览</p>
+    <video id="videoPreview" autoplay muted playsinline loop preload="auto" hidden></video>
 
     <details class="debug" id="debugDetails" hidden>
       <summary>调试</summary>
@@ -267,8 +260,6 @@ window.__MAIN__ = function () {
   var statusEl=document.getElementById("status");
   var hintEl=document.getElementById("hint");
   var videoEl=document.getElementById("videoPreview");
-  var videoStage=document.getElementById("videoStage");
-  var videoPoster=document.getElementById("videoPoster");
   var diagEl=document.getElementById("diag");
   var preloadDiagEl=document.getElementById("preloadDiag");
   var tapDiagEl=document.getElementById("tapDiag");
@@ -290,7 +281,6 @@ window.__MAIN__ = function () {
   var btnSend=document.getElementById("btnSend");
   var btnReEdit=document.getElementById("btnReEdit");
   var btnHome=document.getElementById("btnHome");
-  var videoTapHint=document.getElementById("videoTapHint");
   var btnSendWeChat=document.getElementById("btnSendWeChat");
   var bridgeDiagEl=document.getElementById("bridgeDiag");
   var debugDetailsEl=document.getElementById("debugDetails");
@@ -675,9 +665,6 @@ window.__MAIN__ = function () {
     videoEl.removeAttribute("src");
     videoEl.load();
     videoEl.hidden=true;
-    if(videoPoster){ videoPoster.hidden=true; videoPoster.removeAttribute("src"); }
-    if(videoStage) videoStage.hidden=true;
-    if(videoTapHint) videoTapHint.hidden=true;
     btnOpen.hidden=true; btnSave.hidden=true; btnSend.hidden=true; btnReEdit.hidden=true; btnHome.hidden=true;
     setStatus("");
     setHint("");
@@ -931,8 +918,8 @@ window.__MAIN__ = function () {
       lastBlob=blob; lastFile=file;
       lastUrl=URL.createObjectURL(blob);
       videoEl.src=lastUrl;
-      videoStage.hidden=false;
-      videoEl.hidden=false; videoPoster.hidden=true;
+      videoEl.hidden=false;
+      videoEl.play().catch(function(){});
       var tDone = performance.now();
       lastTiming = { clickToFetchMs: Math.round(tFetchStart-tClick), fetchMs: Math.round(tHeaders-tFetchStart), blobMs: Math.round(tBlob-tHeaders), totalMs: Math.round(tDone-tClick) };
       generatePhase="success";
@@ -949,7 +936,6 @@ window.__MAIN__ = function () {
       else { shareHint = "点击“发给TA”，可选择微信或其他应用。"; }
       setHint(shareHint);
       btnReEdit.hidden=false; btnHome.hidden=false;
-      if(videoTapHint) videoTapHint.hidden=false;
       if(isAppBridge){
         setHint("");
         btnSendWeChat.hidden=false; btnSendWeChat.disabled=true; btnSendWeChat.textContent="发给微信好友";
@@ -1051,44 +1037,6 @@ window.__MAIN__ = function () {
   btnSend.addEventListener("click", sendVideo);
   btnReEdit.addEventListener("click", reEdit);
   btnHome.addEventListener("click", function(){ location.href = "index.html"; });
-  function captureVideoPoster(){
-    if(!videoEl || !videoPoster) return;
-    var w = videoEl.videoWidth, h = videoEl.videoHeight;
-    if(!w || !h) return;
-    try {
-      var c = document.createElement("canvas");
-      c.width = w; c.height = h;
-      c.getContext("2d").drawImage(videoEl, 0, 0, w, h);
-      videoPoster.src = c.toDataURL("image/jpeg", 0.85);
-      videoPoster.hidden = false;
-      videoEl.hidden = true;
-    } catch(e) {
-      videoPoster.hidden = true;
-      videoEl.hidden = false;
-    }
-  }
-  videoEl.addEventListener("loadeddata", function(){
-    if(videoStage && !videoStage.hidden && lastUrl) captureVideoPoster();
-  });
-  videoEl.addEventListener("ended", function(){
-    videoEl.pause();
-    try { videoEl.currentTime = 0; } catch(e) {}
-    videoEl.hidden = true;
-    if(videoPoster) videoPoster.hidden = false;
-  });
-  videoStage.addEventListener("click", function(){
-    if(!lastUrl) return;
-    if(videoPoster && videoPoster.hidden === false){
-      videoPoster.hidden = true;
-      videoEl.hidden = false;
-      try { videoEl.currentTime = 0; } catch(e) {}
-      videoEl.play().catch(function(){});
-    } else if(videoEl.paused){
-      videoEl.play().catch(function(){});
-    } else {
-      videoEl.pause();
-    }
-  });
   btnSendWeChat.addEventListener("click", function(){
     if(!nativeReady){ setStatus("视频正在准备，请稍候…", ""); return; }
     try { window.AndroidShare.sharePreparedVideo(); } catch(err){ setStatus("无法打开系统分享，请重试", "err"); }
