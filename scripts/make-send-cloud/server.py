@@ -15,7 +15,7 @@ import tempfile
 import threading
 import time
 import urllib.parse
-from datetime import datetime
+from datetime import datetime, date, timezone, timedelta
 import html
 import re
 
@@ -99,6 +99,20 @@ DEFAULT_VOICE_ID = "Jr72SE8p9OcJmr8hyX0D"  # Chutki（风信兔正式声音身�
 FPS = int(os.environ.get("FPS", "18"))
 SERVICE_ENABLED = os.environ.get("SERVICE_ENABLED", "true").lower() in ("1", "true", "yes", "on")
 SITE_STATE_FILE = os.environ.get("SITE_STATE_FILE", "/data/site_state.json")
+WELCOME_FILE = os.environ.get("WELCOME_FILE", "/data/welcome-messages.json")
+WELCOME_EPOCH_DATE = date(2026, 1, 1)
+SHANGHAI_TZ = timezone(timedelta(hours=8))
+WELCOME_DEFAULT = {
+    "schemaVersion": 1,
+    "mode": "auto",
+    "activeId": None,
+    "messages": [
+        {"id": "w1", "text": "这里，欢迎每一个愿意回到“初心”的人。", "enabled": True, "order": 1},
+        {"id": "w2", "text": "欢迎来到这里，听见自己，也看见彼此。", "enabled": True, "order": 2},
+        {"id": "w3", "text": "这里，愿每一颗心都被温柔地看见。", "enabled": True, "order": 3},
+        {"id": "w4", "text": "愿我们从真实开始，接纳自己，理解彼此。", "enabled": True, "order": 4},
+    ],
+}
 ADMIN_PASSWORD_HASH = os.environ.get("ADMIN_PASSWORD_HASH", "").strip()
 ADMIN_SESSION_TTL = int(os.environ.get("ADMIN_SESSION_TTL", "3600"))
 ADMIN_MAX_FAILS = int(os.environ.get("ADMIN_MAX_FAILS", "5"))
@@ -188,6 +202,79 @@ def write_enabled(enabled):
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(data, f)
     os.replace(tmp, SITE_STATE_FILE)
+
+
+def _shanghai_today():
+    return datetime.now(timezone.utc).astimezone(SHANGHAI_TZ).date()
+
+
+def _resolve_welcome(cfg):
+    messages = cfg.get("messages") or []
+    enabled = sorted(
+        [m for m in messages if m.get("enabled")],
+        key=lambda m: (int(m.get("order", 0) or 0), str(m.get("id", ""))),
+    )
+    if cfg.get("mode") == "manual":
+        active_id = cfg.get("activeId")
+        for m in enabled:
+            if m.get("id") == active_id:
+                return {"id": m.get("id"), "text": m.get("text", "")}
+    if enabled:
+        days = (_shanghai_today() - WELCOME_EPOCH_DATE).days
+        m = enabled[days % len(enabled)]
+        return {"id": m.get("id"), "text": m.get("text", "")}
+    return {"id": None, "text": ""}
+
+
+def _load_welcome():
+    try:
+        with open(WELCOME_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if isinstance(data, dict) and isinstance(data.get("messages"), list):
+            return data
+    except Exception:
+        pass
+    return json.loads(json.dumps(WELCOME_DEFAULT, ensure_ascii=False))
+
+
+def _save_welcome(cfg):
+    d = os.path.dirname(WELCOME_FILE)
+    if d:
+        os.makedirs(d, exist_ok=True)
+    tmp = WELCOME_FILE + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(cfg, f, ensure_ascii=False)
+    os.replace(tmp, WELCOME_FILE)
+
+
+def _normalize_welcome(payload):
+    if not isinstance(payload, dict):
+        raise ValueError("bad payload")
+    raw = payload.get("messages")
+    if not isinstance(raw, list):
+        raise ValueError("messages must be a list")
+    seen = set()
+    cleaned = []
+    for idx, m in enumerate(raw):
+        if not isinstance(m, dict):
+            continue
+        mid = str(m.get("id") or "").strip()
+        text = str(m.get("text") or "").strip()
+        if not mid or not text or mid in seen:
+            continue
+        seen.add(mid)
+        try:
+            order = int(m.get("order", idx + 1))
+        except (TypeError, ValueError):
+            order = idx + 1
+        cleaned.append({"id": mid, "text": text, "enabled": bool(m.get("enabled", True)), "order": order})
+    mode = payload.get("mode")
+    if mode not in ("auto", "manual"):
+        mode = "auto"
+    active_id = payload.get("activeId")
+    if mode != "manual":
+        active_id = None
+    return {"schemaVersion": 1, "mode": mode, "activeId": active_id, "messages": cleaned}
 
 
 def _sha256(s):
@@ -757,6 +844,29 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
                 shutil.rmtree(workdir, ignore_errors=True)
             SEM.release()
 
+    def _welcome_public(self):
+        cfg = _load_welcome()
+        return self._send_json(200, {"config": cfg, "resolved": _resolve_welcome(cfg)})
+
+    def _welcome_admin_save(self):
+        data = self._read_json_body()
+        if data is None:
+            return self._send_json(400, {"error": "bad request"})
+        auth = self.headers.get("Authorization", "") or ""
+        tok = auth[7:] if auth.startswith("Bearer ") else ""
+        if not tok or not session_valid(tok):
+            return self._send_json(401, {"error": "unauthorized"})
+        try:
+            cfg = _normalize_welcome(data)
+        except ValueError as e:
+            return self._send_json(400, {"error": str(e)})
+        try:
+            _save_welcome(cfg)
+        except Exception as e:
+            log("WELCOME-SAVE-ERROR %s: %s" % (type(e).__name__, e))
+            return self._send_json(500, {"error": "save failed"})
+        return self._send_json(200, {"ok": True, "config": cfg, "resolved": _resolve_welcome(cfg)})
+
     def _read_json_body(self):
         try:
             length = int(self.headers.get("Content-Length", "0") or 0)
@@ -783,6 +893,8 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         path = parsed.path
         if path == "/status":
             return self._send_json(200, {"enabled": read_enabled()})
+        if path == "/welcome":
+            return self._welcome_public()
         if path == "/.well-known/assetlinks.json":
             return self._send_assetlinks()
         if path.startswith("/r/"):
@@ -858,6 +970,8 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             return self._admin_login()
         if path == "/admin/toggle":
             return self._admin_toggle()
+        if path == "/welcome/admin":
+            return self._welcome_admin_save()
         if path == "/journey/remix-token":
             data = self._read_json_body()
             if data is None:
