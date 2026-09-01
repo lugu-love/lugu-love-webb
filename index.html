@@ -2121,20 +2121,21 @@ line-height: 1.75;
 
 .home-intro-lang {
 display: inline-flex;
-gap: 12px;
-margin-top: 14px;
-justify-content: center;
+align-items: center;
+gap: 6px;
+margin-right: 8px;
 pointer-events: auto;
 }
 .home-intro-lang button {
 background: transparent;
 border: none;
-padding: 2px 8px;
-color: rgba(220, 232, 250, .48);
+padding: 0 5px;
+color: rgba(220, 232, 250, .55);
 font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
 font-size: 12px;
 font-weight: 500;
-letter-spacing: .06em;
+letter-spacing: .04em;
+line-height: 30px;
 cursor: pointer;
 }
 .home-intro-lang button.active {
@@ -3327,10 +3328,6 @@ font-size: 12px;
 <span class="home-intro-title" data-i18n="siteTitle">泸沽湖·心域</span>
 <span class="home-intro-subtitle" data-i18n="siteSubtitle">全球情感文明共创空间</span>
 <span class="home-intro-copy" id="homeIntroWelcome"></span>
-<span class="home-intro-lang" id="homeIntroLang" hidden>
-<button type="button" data-lang="zh" aria-label="中文">中</button>
-<button type="button" data-lang="en" aria-label="English">EN</button>
-</span>
 </section>
 <div class="touch-guide" aria-hidden="true">
 <div class="guide-line">
@@ -3411,6 +3408,10 @@ font-size: 12px;
 </div>
 <div class="footer-signature" data-i18n="footerTagline">泸沽湖·心域 · 情感文明共创家园</div>
 <div id="audioControl">
+<span class="home-intro-lang" id="homeIntroLang" hidden>
+<button type="button" data-lang="zh" aria-label="中文">中</button>
+<button type="button" data-lang="en" aria-label="English">EN</button>
+</span>
 <button id="audioToggleBtn" type="button" data-i18n-aria="musicToggle" aria-label="音乐开关">🔇</button>
 <input id="audioVolumeSlider" type="range" min="0" max="1" step="0.01" value="0.6" data-i18n-aria="volumeSlider" aria-label="背景音乐音量">
 </div>
