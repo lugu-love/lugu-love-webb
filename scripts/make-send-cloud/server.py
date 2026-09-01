@@ -238,7 +238,10 @@ def _load_welcome():
         with open(WELCOME_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
         if isinstance(data, dict) and isinstance(data.get("messages"), list):
-            return data
+            msgs = data.get("messages")
+            legacy = any(isinstance(m, dict) and ("textZh" not in m) for m in msgs)
+            if not legacy:
+                return data
     except Exception:
         pass
     return json.loads(json.dumps(WELCOME_DEFAULT, ensure_ascii=False))
