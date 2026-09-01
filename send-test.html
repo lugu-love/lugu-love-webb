@@ -9,17 +9,18 @@
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   html,body { margin:0; padding:0; height:100%; background:var(--bg); color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;
-    -webkit-font-smoothing:antialiased; overflow:hidden; }
-  .app { display:flex; flex-direction:column; height:100dvh; padding:calc(env(safe-area-inset-top,0px)+16px) 16px calc(env(safe-area-inset-bottom,0px)+10px); }
-  .brand { display:flex; align-items:center; gap:8px; margin:0 0 0 4px; font-size:17px; font-weight:450; letter-spacing:.02em; color:rgba(238,240,255,.82); position:relative; z-index:60; }
+    -webkit-font-smoothing:antialiased; overflow-x:hidden; overflow-y:auto; }
+  .app { display:flex; flex-direction:column; min-height:100dvh; height:auto; padding:calc(env(safe-area-inset-top,0px)+16px) 16px calc(env(safe-area-inset-bottom,0px)+10px); }
+  .brand { display:flex; align-items:center; gap:12px; margin:0; padding:2px 4px; position:relative; z-index:60; }
   .site-logo { display:inline-flex; align-items:center; gap:5px; color:rgba(238,240,255,.72); text-decoration:none; font-size:13px; font-weight:400; letter-spacing:.04em; padding:4px 6px 4px 0; border-radius:999px; }
   .site-logo img { width:26px; height:26px; flex:0 0 26px; filter:drop-shadow(0 0 4px rgba(255,222,143,.4)); }
-  .back-home { display:inline-flex; align-items:center; justify-content:center; gap:4px; min-width:44px; min-height:44px; padding:0 14px 0 0; color:rgba(238,240,255,.92); text-decoration:none; font-size:14px; font-weight:600; letter-spacing:.02em; white-space:nowrap; }
+  .back-home { display:inline-flex; align-items:center; justify-content:center; gap:5px; min-width:68px; min-height:40px; padding:0 14px; border-radius:10px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); color:rgba(238,240,255,.92); text-decoration:none; font-size:14px; font-weight:600; letter-spacing:.02em; white-space:nowrap; }
   .back-home:active { opacity:.6; }
   html.is-app-bridge .site-logo { display:none !important; }
   .brand .heart { color:rgba(238,240,255,.82); margin-right:5px; font-weight:400; }
   .brand .heart svg { width:17px; height:15px; }
   .brand-sub { opacity:.66; font-weight:350; margin-left:3px; }
+  .brand-title { display:inline-flex; align-items:baseline; gap:2px; font-size:17px; font-weight:450; letter-spacing:.02em; color:rgba(238,240,255,.82); }
   .brand-a { font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; font-weight:500; letter-spacing:.02em; }
   .brand-b { font-family:"Kaiti SC","STKaiti","KaiTi",serif; font-weight:400; letter-spacing:.01em; }
   .brand-c { font-family:"Avenir Next","PingFang SC","Hiragino Sans GB",sans-serif; font-weight:450; letter-spacing:.015em; }
@@ -67,8 +68,8 @@
   html.state-done .cta,
   html.state-done .status,
   html.state-done .hint { display:none !important; }
-  html.state-done .app { justify-content:center; }
-  html.state-done #videoPreview { order:1; display:block; align-self:center; flex:0 1 auto; width:auto; height:min(54svh, calc(100dvh - 260px)); max-width:100%; max-height:58svh; aspect-ratio:9/16; object-fit:contain; border-radius:16px; background:#000; margin:0; }
+  html.state-done .app { justify-content:center; height:100dvh; min-height:0; overflow:hidden; }
+  html.state-done #videoPreview { order:1; display:block; align-self:center; flex:0 1 auto; width:auto; height:min(54svh, calc(100dvh - 260px)); max-width:100%; max-height:58svh; aspect-ratio:9/16; object-fit:contain; border-radius:0; background:transparent; margin:0; }
   html.state-done .preview-text { order:2; flex:0 0 auto; font-size:16px; margin:16px 0 0; }
   html.state-done .success-actions { order:3; flex:0 0 auto; }
   html.state-done .debug { order:99; }
@@ -81,7 +82,7 @@
   .status.ok { color:#a9e3a0; }
   .status.err { color:#ff9aa6; }
   .hint { min-height:14px; margin:4px 0 0; text-align:center; font-size:12px; color:var(--muted); }
-  video { width:100%; max-height:30vh; border-radius:14px; margin-top:8px; background:#000; }
+  video { width:100%; max-height:30vh; border-radius:0; margin-top:8px; background:transparent; }
   .toast { position:fixed; left:50%; bottom:90px; transform:translateX(-50%); z-index:9; padding:9px 14px; border-radius:999px; background:rgba(20,22,40,.88); border:1px solid rgba(255,255,255,.16); color:#fff; font-size:12px; opacity:0; transition:opacity .25s; max-width:80vw; text-align:center; }
   .toast.show { opacity:1; }
   .debug { margin-top:8px; font-size:11px; color:rgba(255,255,255,.35); border-top:1px solid rgba(255,255,255,.06); padding-top:4px; }
@@ -101,7 +102,7 @@
 </div>
 
   <div class="app">
-    <div class="brand" id="brand"><a class="back-home" href="index.html" aria-label="返回首页">← 首页</a><a class="site-logo" href="/lugu-love-webb/lugu/index.html?from=earth" aria-label="进入中国·泸沽湖"><img src="assets/icons/lugu-logo.svg" alt="" width="26" height="26">泸沽湖</a><span class="heart"><svg viewBox="0 0 48 44" width="22" height="20" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M24 40.2C19.5 35.8 7.2 27.1 4.6 17.8 2.5 10.2 7.1 4.3 14 4.3c4.5 0 7.8 2.7 10 6.5 2.2-3.8 5.5-6.5 10-6.5 6.9 0 11.5 5.9 9.4 13.5C40.8 27.1 28.5 35.8 24 40.2Z"/></svg></span><span class="brand-main">七星使者</span><span class="brand-sub">· 情绪表达</span></div>
+    <div class="brand" id="brand"><a class="back-home" href="index.html" aria-label="返回首页">← 首页</a><span class="brand-title"><span class="brand-main">七星使者</span><span class="brand-sub">· 情绪表达</span></span></div>
 
     <div class="stage-wrap"><canvas id="stage" width="540" height="540"></canvas></div>
 
