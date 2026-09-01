@@ -14,6 +14,8 @@
   .brand { display:flex; align-items:center; gap:8px; margin:8px 0 0 20px; font-size:17px; font-weight:450; letter-spacing:.02em; color:rgba(238,240,255,.82); }
   .site-logo { display:inline-flex; align-items:center; gap:5px; color:rgba(238,240,255,.72); text-decoration:none; font-size:13px; font-weight:400; letter-spacing:.04em; padding:4px 6px 4px 0; border-radius:999px; }
   .site-logo img { width:26px; height:26px; flex:0 0 26px; filter:drop-shadow(0 0 4px rgba(255,222,143,.4)); }
+  .back-home { display:inline-flex; align-items:center; color:rgba(238,240,255,.8); text-decoration:none; font-size:13px; font-weight:500; letter-spacing:.02em; padding:6px 10px 6px 0; white-space:nowrap; }
+  .back-home:active { opacity:.6; }
   html.is-app-bridge .site-logo { display:none !important; }
   .brand .heart { color:rgba(238,240,255,.82); margin-right:5px; font-weight:400; }
   .brand .heart svg { width:17px; height:15px; }
@@ -65,7 +67,7 @@
   html.state-done .cta,
   html.state-done .status,
   html.state-done .hint { display:none !important; }
-  html.state-done #videoPreview { order:1; }
+  html.state-done .video-stage { order:1; }
   html.state-done .video-tap-hint { order:2; }
   html.state-done .preview-text { order:3; font-size:16px; margin:14px 0 0; }
   html.state-done .success-actions { order:4; }
@@ -81,7 +83,8 @@
   .hint { min-height:14px; margin:4px 0 0; text-align:center; font-size:12px; color:var(--muted); }
   .video-tap-hint { text-align:center; font-size:11px; letter-spacing:.08em; color:rgba(255,255,255,.42); margin:8px 0 0; }
   video { width:100%; max-height:30vh; border-radius:14px; margin-top:8px; background:#000; }
-  html.state-done #videoPreview { display:block; align-self:center; width:auto; height:54svh; max-height:56svh; max-width:100%; aspect-ratio:9/16; object-fit:contain; border-radius:16px; background:#000; margin:0; }
+  .video-stage { position:relative; align-self:center; width:auto; height:54svh; max-height:56svh; max-width:100%; aspect-ratio:9/16; border-radius:16px; overflow:hidden; background:#000; cursor:pointer; }
+  .video-stage video, .video-stage .video-poster { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:block; }
   .toast { position:fixed; left:50%; bottom:90px; transform:translateX(-50%); z-index:9; padding:9px 14px; border-radius:999px; background:rgba(20,22,40,.88); border:1px solid rgba(255,255,255,.16); color:#fff; font-size:12px; opacity:0; transition:opacity .25s; max-width:80vw; text-align:center; }
   .toast.show { opacity:1; }
   .debug { margin-top:8px; font-size:11px; color:rgba(255,255,255,.35); border-top:1px solid rgba(255,255,255,.06); padding-top:4px; }
@@ -101,7 +104,7 @@
 </div>
 
   <div class="app">
-    <div class="brand" id="brand"><a class="site-logo" href="/lugu-love-webb/lugu/index.html?from=earth" aria-label="进入中国·泸沽湖"><img src="assets/icons/lugu-logo.svg" alt="" width="26" height="26">泸沽湖</a><span class="heart"><svg viewBox="0 0 48 44" width="22" height="20" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M24 40.2C19.5 35.8 7.2 27.1 4.6 17.8 2.5 10.2 7.1 4.3 14 4.3c4.5 0 7.8 2.7 10 6.5 2.2-3.8 5.5-6.5 10-6.5 6.9 0 11.5 5.9 9.4 13.5C40.8 27.1 28.5 35.8 24 40.2Z"/></svg></span><span class="brand-main">七星使者</span><span class="brand-sub">· 情绪表达</span></div>
+    <div class="brand" id="brand"><a class="back-home" href="index.html" aria-label="返回首页">← 首页</a><a class="site-logo" href="/lugu-love-webb/lugu/index.html?from=earth" aria-label="进入中国·泸沽湖"><img src="assets/icons/lugu-logo.svg" alt="" width="26" height="26">泸沽湖</a><span class="heart"><svg viewBox="0 0 48 44" width="22" height="20" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M24 40.2C19.5 35.8 7.2 27.1 4.6 17.8 2.5 10.2 7.1 4.3 14 4.3c4.5 0 7.8 2.7 10 6.5 2.2-3.8 5.5-6.5 10-6.5 6.9 0 11.5 5.9 9.4 13.5C40.8 27.1 28.5 35.8 24 40.2Z"/></svg></span><span class="brand-main">七星使者</span><span class="brand-sub">· 情绪表达</span></div>
 
     <div class="stage-wrap"><canvas id="stage" width="540" height="540"></canvas></div>
 
@@ -133,7 +136,10 @@
 
     <div class="status" id="status"></div>
     <div class="hint" id="hint"></div>
-    <video id="videoPreview" playsinline preload="auto" hidden></video>
+    <div class="video-stage" id="videoStage" hidden>
+      <video id="videoPreview" playsinline preload="auto"></video>
+      <img class="video-poster" id="videoPoster" alt="">
+    </div>
     <p class="video-tap-hint" id="videoTapHint" hidden>轻触预览</p>
 
     <details class="debug" id="debugDetails" hidden>
@@ -261,6 +267,8 @@ window.__MAIN__ = function () {
   var statusEl=document.getElementById("status");
   var hintEl=document.getElementById("hint");
   var videoEl=document.getElementById("videoPreview");
+  var videoStage=document.getElementById("videoStage");
+  var videoPoster=document.getElementById("videoPoster");
   var diagEl=document.getElementById("diag");
   var preloadDiagEl=document.getElementById("preloadDiag");
   var tapDiagEl=document.getElementById("tapDiag");
@@ -667,6 +675,8 @@ window.__MAIN__ = function () {
     videoEl.removeAttribute("src");
     videoEl.load();
     videoEl.hidden=true;
+    if(videoPoster){ videoPoster.hidden=true; videoPoster.removeAttribute("src"); }
+    if(videoStage) videoStage.hidden=true;
     if(videoTapHint) videoTapHint.hidden=true;
     btnOpen.hidden=true; btnSave.hidden=true; btnSend.hidden=true; btnReEdit.hidden=true; btnHome.hidden=true;
     setStatus("");
@@ -920,7 +930,9 @@ window.__MAIN__ = function () {
       var file=new File([blob], "七星使者-" + current.name + ".mp4", { type:"video/mp4" });
       lastBlob=blob; lastFile=file;
       lastUrl=URL.createObjectURL(blob);
-      videoEl.src=lastUrl; videoEl.hidden=false;
+      videoEl.src=lastUrl;
+      videoStage.hidden=false;
+      videoEl.hidden=false; videoPoster.hidden=true;
       var tDone = performance.now();
       lastTiming = { clickToFetchMs: Math.round(tFetchStart-tClick), fetchMs: Math.round(tHeaders-tFetchStart), blobMs: Math.round(tBlob-tHeaders), totalMs: Math.round(tDone-tClick) };
       generatePhase="success";
@@ -1039,8 +1051,43 @@ window.__MAIN__ = function () {
   btnSend.addEventListener("click", sendVideo);
   btnReEdit.addEventListener("click", reEdit);
   btnHome.addEventListener("click", function(){ location.href = "index.html"; });
-  videoEl.addEventListener("click", function(){
-    if(videoEl.paused){ videoEl.play().catch(function(){}); } else { videoEl.pause(); }
+  function captureVideoPoster(){
+    if(!videoEl || !videoPoster) return;
+    var w = videoEl.videoWidth, h = videoEl.videoHeight;
+    if(!w || !h) return;
+    try {
+      var c = document.createElement("canvas");
+      c.width = w; c.height = h;
+      c.getContext("2d").drawImage(videoEl, 0, 0, w, h);
+      videoPoster.src = c.toDataURL("image/jpeg", 0.85);
+      videoPoster.hidden = false;
+      videoEl.hidden = true;
+    } catch(e) {
+      videoPoster.hidden = true;
+      videoEl.hidden = false;
+    }
+  }
+  videoEl.addEventListener("loadeddata", function(){
+    if(videoStage && !videoStage.hidden && lastUrl) captureVideoPoster();
+  });
+  videoEl.addEventListener("ended", function(){
+    videoEl.pause();
+    try { videoEl.currentTime = 0; } catch(e) {}
+    videoEl.hidden = true;
+    if(videoPoster) videoPoster.hidden = false;
+  });
+  videoStage.addEventListener("click", function(){
+    if(!lastUrl) return;
+    if(videoPoster && videoPoster.hidden === false){
+      videoPoster.hidden = true;
+      videoEl.hidden = false;
+      try { videoEl.currentTime = 0; } catch(e) {}
+      videoEl.play().catch(function(){});
+    } else if(videoEl.paused){
+      videoEl.play().catch(function(){});
+    } else {
+      videoEl.pause();
+    }
   });
   btnSendWeChat.addEventListener("click", function(){
     if(!nativeReady){ setStatus("视频正在准备，请稍候…", ""); return; }
