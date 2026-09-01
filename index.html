@@ -2512,13 +2512,16 @@ font-weight: 300;
 letter-spacing: .12em;
 text-align: center;
 text-shadow: 0 0 10px rgba(255, 236, 184, .28);
-white-space: nowrap;
 pointer-events: none;
 }
 
+.footer-line {
+display: block;
+white-space: nowrap;
+line-height: 1.25;
+}
+
 html[lang="en"] .footer-signature {
-white-space: pre-line;
-line-height: 1.2;
 bottom: 12px;
 }
 
@@ -3407,7 +3410,10 @@ font-size: 12px;
 <p class="heart-star-card-voice" id="heartStarCardVoice">“希望世界因为爱重新连接。”</p>
 <a class="heart-star-card-link" id="heartStarCardLink" data-i18n="enterTheirWorld" href="life-space-v1/index.html?mode=visitor&amp;id=demo-lugu&amp;v=20260728-6">进入TA的世界</a>
 </div>
-<div class="footer-signature" data-i18n="footerTagline">泸沽湖·心域 · 情感文明共创家园</div>
+<div class="footer-signature">
+<span class="footer-line" data-i18n="footerLine1">心域 · 情感文明共创家园</span>
+<span class="footer-line" data-i18n="footerLine2"></span>
+</div>
 <div id="audioControl">
 <span class="home-intro-lang" id="homeIntroLang" hidden>
 <button type="button" data-lang="zh" aria-label="中文">中</button>
@@ -6648,7 +6654,8 @@ if ("serviceWorker" in navigator) {
       coCreate: "事业共创",
       emotion: "情绪表达",
       mySpace: "我的空间",
-      footerTagline: "泸沽湖·心域 · 情感文明共创家园",
+      footerLine1: "心域 · 情感文明共创家园",
+      footerLine2: "",
       mySpaceTitle: "请选择进入哪个“我的空间”",
       mySpacePrimary: "进入原来的“我的空间”",
       mySpaceThird: "进入 V1.3 装修空间",
@@ -6688,7 +6695,8 @@ if ("serviceWorker" in navigator) {
       coCreate: "Co-Create",
       emotion: "Express",
       mySpace: "My Space",
-      footerTagline: "Heart Realm\nA Home for Emotional Co-Creation",
+      footerLine1: "Heart Realm",
+      footerLine2: "A Home for Emotional Co-Creation",
       mySpaceTitle: "Choose which space to enter",
       mySpacePrimary: "Enter the original My Space",
       mySpaceThird: "Enter the V1.3 decorated space",
