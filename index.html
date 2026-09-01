@@ -3298,8 +3298,8 @@ font-size: 12px;
 </div>
 <section class="home-intro" aria-label="心域介绍">
 <span class="home-intro-title">泸沽湖·心域</span>
-<span class="home-intro-subtitle">情感文明共创空间</span>
-<span class="home-intro-copy">在这里，每一颗心星，<br>都藏着一个正在发生的生命故事。</span>
+<span class="home-intro-subtitle">全球情感文明共创空间</span>
+<span class="home-intro-copy" id="homeIntroWelcome"></span>
 </section>
 <div class="touch-guide" aria-hidden="true">
 <div class="guide-line">
@@ -6600,6 +6600,44 @@ if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js").catch(function () {});
   });
 }
+</script>
+
+<script>
+(function () {
+  var el = document.getElementById("homeIntroWelcome");
+  if (!el) return;
+  var API = "https://api.lugu.love/welcome";
+  var FALLBACK = "这里，欢迎每一个愿意回到“初心”的人。";
+
+  function shanghaiDayIndex() {
+    var now = new Date();
+    var sh = new Date(now.getTime() + (8 * 60 + now.getTimezoneOffset()) * 60000);
+    var epoch = Date.UTC(2026, 0, 1);
+    var todayUtc = Date.UTC(sh.getUTCFullYear(), sh.getUTCMonth(), sh.getUTCDate());
+    return Math.floor((todayUtc - epoch) / 86400000);
+  }
+  function resolveLocal(cfg) {
+    if (!cfg || !Array.isArray(cfg.messages)) return null;
+    var list = cfg.messages.filter(function (m) { return m && m.enabled; });
+    list.sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
+    if (cfg.mode === "manual") {
+      for (var i = 0; i < list.length; i++) if (list[i].id === cfg.activeId) return list[i];
+    }
+    if (list.length) return list[shanghaiDayIndex() % list.length];
+    return null;
+  }
+  function applyText(text) { if (text) el.textContent = text; }
+
+  fetch(API, { cache: "no-store" })
+    .then(function (r) { if (!r.ok) throw new Error("http " + r.status); return r.json(); })
+    .then(function (d) { if (d && d.resolved && d.resolved.text) applyText(d.resolved.text); })
+    .catch(function () {
+      fetch("welcome-messages.json", { cache: "no-store" })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (cfg) { var m = resolveLocal(cfg); if (m) applyText(m.text); })
+        .catch(function () { applyText(FALLBACK); });
+    });
+})();
 </script>
 
 </body>

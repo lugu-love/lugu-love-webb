@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "mode": "auto",
+  "activeId": null,
+  "messages": [
+    { "id": "w1", "text": "这里，欢迎每一个愿意回到“初心”的人。", "enabled": true, "order": 1 },
+    { "id": "w2", "text": "欢迎来到这里，听见自己，也看见彼此。", "enabled": true, "order": 2 },
+    { "id": "w3", "text": "这里，愿每一颗心都被温柔地看见。", "enabled": true, "order": 3 },
+    { "id": "w4", "text": "愿我们从真实开始，接纳自己，理解彼此。", "enabled": true, "order": 4 }
+  ]
+}
