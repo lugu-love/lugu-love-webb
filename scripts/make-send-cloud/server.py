@@ -107,10 +107,10 @@ WELCOME_DEFAULT = {
     "mode": "auto",
     "activeId": None,
     "messages": [
-        {"id": "w1", "text": "这里，欢迎每一个愿意回到“初心”的人。", "enabled": True, "order": 1},
-        {"id": "w2", "text": "欢迎来到这里，听见自己，也看见彼此。", "enabled": True, "order": 2},
-        {"id": "w3", "text": "这里，愿每一颗心都被温柔地看见。", "enabled": True, "order": 3},
-        {"id": "w4", "text": "愿我们从真实开始，接纳自己，理解彼此。", "enabled": True, "order": 4},
+        {"id": "w1", "textZh": "这里，欢迎每一个愿意回到“初心”的人。", "textEn": "Welcome to everyone willing to return to their true heart.", "enabled": True, "inRotation": True, "order": 1},
+        {"id": "w2", "textZh": "欢迎来到这里，听见自己，也看见彼此。", "textEn": "Welcome here—to hear yourself, and to see one another.", "enabled": True, "inRotation": True, "order": 2},
+        {"id": "w3", "textZh": "这里，愿每一颗心都被温柔地看见。", "textEn": "Here, may every heart be gently seen.", "enabled": True, "inRotation": True, "order": 3},
+        {"id": "w4", "textZh": "愿我们从真实开始，接纳自己，理解彼此。", "textEn": "May we begin from truth—accept ourselves, and understand one another.", "enabled": True, "inRotation": True, "order": 4},
     ],
 }
 ADMIN_PASSWORD_HASH = os.environ.get("ADMIN_PASSWORD_HASH", "").strip()
@@ -208,22 +208,29 @@ def _shanghai_today():
     return datetime.now(timezone.utc).astimezone(SHANGHAI_TZ).date()
 
 
+def _msg_texts(m):
+    zh = str(m.get("textZh") or m.get("text") or "").strip()
+    en = str(m.get("textEn") or "").strip()
+    return zh, en
+
+
 def _resolve_welcome(cfg):
     messages = cfg.get("messages") or []
-    enabled = sorted(
-        [m for m in messages if m.get("enabled")],
-        key=lambda m: (int(m.get("order", 0) or 0), str(m.get("id", ""))),
-    )
+    enabled = [m for m in messages if m.get("enabled") and _msg_texts(m)[0]]
+    enabled.sort(key=lambda m: (int(m.get("order", 0) or 0), str(m.get("id", ""))))
     if cfg.get("mode") == "manual":
         active_id = cfg.get("activeId")
         for m in enabled:
             if m.get("id") == active_id:
-                return {"id": m.get("id"), "text": m.get("text", "")}
-    if enabled:
+                zh, en = _msg_texts(m)
+                return {"id": m.get("id"), "textZh": zh, "textEn": en}
+    pool = [m for m in enabled if m.get("inRotation") is not False]
+    if pool:
         days = (_shanghai_today() - WELCOME_EPOCH_DATE).days
-        m = enabled[days % len(enabled)]
-        return {"id": m.get("id"), "text": m.get("text", "")}
-    return {"id": None, "text": ""}
+        m = pool[days % len(pool)]
+        zh, en = _msg_texts(m)
+        return {"id": m.get("id"), "textZh": zh, "textEn": en}
+    return {"id": None, "textZh": "", "textEn": ""}
 
 
 def _load_welcome():
@@ -259,15 +266,23 @@ def _normalize_welcome(payload):
         if not isinstance(m, dict):
             continue
         mid = str(m.get("id") or "").strip()
-        text = str(m.get("text") or "").strip()
-        if not mid or not text or mid in seen:
+        text_zh = str(m.get("textZh") or m.get("text") or "").strip()
+        text_en = str(m.get("textEn") or "").strip()
+        if not mid or not text_zh or mid in seen:
             continue
         seen.add(mid)
         try:
             order = int(m.get("order", idx + 1))
         except (TypeError, ValueError):
             order = idx + 1
-        cleaned.append({"id": mid, "text": text, "enabled": bool(m.get("enabled", True)), "order": order})
+        cleaned.append({
+            "id": mid,
+            "textZh": text_zh,
+            "textEn": text_en,
+            "enabled": bool(m.get("enabled", True)),
+            "inRotation": bool(m.get("inRotation", True)),
+            "order": order,
+        })
     mode = payload.get("mode")
     if mode not in ("auto", "manual"):
         mode = "auto"
