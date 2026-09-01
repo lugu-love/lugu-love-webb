@@ -3284,10 +3284,10 @@ font-size: 12px;
 </style>
 </head>
 <body>
-<main class="phone-stage" id="phoneStage" aria-label="地球首页手机竖屏舞台">
-<a class="place-mark" href="/lugu-love-webb/lugu/index.html?from=earth" aria-label="进入中国·泸沽湖">
+<main class="phone-stage" id="phoneStage" data-i18n-aria="phoneStage" aria-label="地球首页手机竖屏舞台">
+<a class="place-mark" href="/lugu-love-webb/lugu/index.html?from=earth" data-i18n-aria="enterLugu" aria-label="进入中国·泸沽湖">
 <img class="place-mark-logo" src="assets/icons/lugu-logo.svg" alt="" width="34" height="34">
-<span class="place-mark-text">中国·泸沽湖<span>LUGU LAKE · CHINA</span></span>
+<span class="place-mark-text"><span data-i18n="placeMark">中国·泸沽湖</span><span>LUGU LAKE · CHINA</span></span>
 </a>
 <div class="star-field" aria-hidden="true">
 <span class="star" style="--x: 7%; --y: 15%; --size: 3px; --color: #fff; --duration: 5.7s; --delay: -1.2s"></span>
@@ -3312,15 +3312,15 @@ font-size: 12px;
 <span class="star" style="--x: 86%; --y: 55%; --size: 2px; --color: #ffe0a6; --duration: 6.2s; --delay: -4.4s"></span>
 </div>
 <div class="voice-star-layer" aria-hidden="true"></div>
-<div class="heart-star-layer" aria-label="已发射心星"></div>
+<div class="heart-star-layer" data-i18n-aria="launchedStars" aria-label="已发射心星"></div>
 <div class="approach">
 <div class="earth">
 <img src="earth.webp" alt="">
 </div>
 </div>
-<section class="home-intro" aria-label="心域介绍">
-<span class="home-intro-title">泸沽湖·心域</span>
-<span class="home-intro-subtitle">全球情感文明共创空间</span>
+<section class="home-intro" data-i18n-aria="introLabel" aria-label="心域介绍">
+<span class="home-intro-title" data-i18n="siteTitle">泸沽湖·心域</span>
+<span class="home-intro-subtitle" data-i18n="siteSubtitle">全球情感文明共创空间</span>
 <span class="home-intro-copy" id="homeIntroWelcome"></span>
 <span class="home-intro-lang" id="homeIntroLang" hidden>
 <button type="button" data-lang="zh" aria-label="中文">中</button>
@@ -3355,59 +3355,59 @@ font-size: 12px;
 <span class="guide-part" style="--i: 21">.</span>
 </div>
 <span class="guide-orbit"></span>
-<span class="guide-sub">Gently touch a “heart star”, meet a “world”.</span>
+<span class="guide-sub">Gently touch a “heart star” and meet a “world”.</span>
 </div>
 <div class="guide-final-heart" aria-hidden="true">♥</div>
-<a class="career-entry" href="co-create.html" aria-label="事业共创">
+<a class="career-entry" href="co-create.html" data-i18n-aria="coCreate" aria-label="事业共创">
 <span class="career-entry-emoji" aria-hidden="true"><img src="assets/icons/career-cocreation.png" alt="" width="24" height="24" style="display:block;object-fit:contain"></span>
 <span class="career-entry-text">
-<span class="career-entry-title">事业共创</span>
+<span class="career-entry-title" data-i18n="coCreate">事业共创</span>
 </span>
 </a>
-<a class="emotion-entry" href="send-test.html" aria-label="情感表达">
+<a class="emotion-entry" href="send-test.html" data-i18n-aria="emotion" aria-label="情感表达">
 <span class="emotion-entry-emoji" aria-hidden="true"><img src="assets/icons/emotion-expression.png" alt="" width="24" height="24" style="display:block;object-fit:contain"></span>
 <span class="emotion-entry-text">
-<span class="emotion-entry-title">情感表达</span>
+<span class="emotion-entry-title" data-i18n="emotion">情感表达</span>
 </span>
 </a>
-<a class="world-entry" href="lugu/index.html?from=earth" aria-label="心域世界">
+<a class="world-entry" href="lugu/index.html?from=earth" data-i18n-aria="world" aria-label="心域世界">
 <span class="world-entry-emoji" aria-hidden="true">
 <img src="assets/icons/home-world.png" alt="" width="38" height="38" style="display:block;object-fit:contain">
 </span>
 <span class="world-entry-text">
-<span class="world-entry-title">心域世界</span>
+<span class="world-entry-title" data-i18n="world">心域世界</span>
 </span>
 </a>
-<button class="my-space-button" type="button" aria-label="我的空间">
+<button class="my-space-button" type="button" data-i18n-aria="mySpace" aria-label="我的空间">
 <span class="my-space-button-icon" aria-hidden="true">🏠</span>
-<span class="my-space-button-label">我的空间</span>
+<span class="my-space-button-label" data-i18n="mySpace">我的空间</span>
 </button>
-<div class="my-space-modal" id="mySpaceModal" role="dialog" aria-modal="true" aria-label="我的空间" aria-hidden="true">
+<div class="my-space-modal" id="mySpaceModal" role="dialog" aria-modal="true" data-i18n-aria="mySpace" aria-label="我的空间" aria-hidden="true">
 <div class="my-space-bg" id="mySpaceBg"></div>
-<button class="my-space-close" id="mySpaceClose" type="button" aria-label="关闭我的空间">×</button>
+<button class="my-space-close" id="mySpaceClose" type="button" data-i18n-aria="closeMySpace" aria-label="关闭我的空间">×</button>
 <div class="my-space-shell" id="mySpaceMenu">
 <p class="my-space-kicker">My Space · Choose Your World</p>
-<h2 class="my-space-title">请选择进入哪个“我的空间”</h2>
-<button class="my-space-action my-space-primary" id="mySpaceGenerate" type="button">进入原来的“我的空间”</button>
-<button class="my-space-action my-space-third" id="mySpaceV13" type="button">进入 V1.3 装修空间</button>
-<p class="my-space-kicker">两个空间平行保存，互不覆盖。</p>
+<h2 class="my-space-title" data-i18n="mySpaceTitle">请选择进入哪个“我的空间”</h2>
+<button class="my-space-action my-space-primary" id="mySpaceGenerate" type="button" data-i18n="mySpacePrimary">进入原来的“我的空间”</button>
+<button class="my-space-action my-space-third" id="mySpaceV13" type="button" data-i18n="mySpaceThird">进入 V1.3 装修空间</button>
+<p class="my-space-kicker" data-i18n="mySpaceKicker">两个空间平行保存，互不覆盖。</p>
 </div>
 <div class="my-space-result" id="mySpaceResult" aria-live="polite">
-<div class="my-space-card" id="mySpaceCard">我的空间已生成</div>
-<button class="my-space-back" id="mySpaceBack" type="button">返回</button>
+<div class="my-space-card" id="mySpaceCard" data-i18n="mySpaceGenerated">我的空间已生成</div>
+<button class="my-space-back" id="mySpaceBack" type="button" data-i18n="back">返回</button>
 </div>
 </div>
-<div class="heart-star-card" id="heartStarCard" role="dialog" aria-modal="false" aria-label="心星卡片" aria-hidden="true">
-<button class="heart-star-card-close" id="heartStarCardClose" type="button" aria-label="关闭心星卡片">×</button>
+<div class="heart-star-card" id="heartStarCard" role="dialog" aria-modal="false" data-i18n-aria="heartStarCard" aria-label="心星卡片" aria-hidden="true">
+<button class="heart-star-card-close" id="heartStarCardClose" type="button" data-i18n-aria="closeHeartStarCard" aria-label="关闭心星卡片">×</button>
 <p class="heart-star-card-no" id="heartStarCardNo">🌟 LX-2026-000001</p>
 <p class="heart-star-card-name" id="heartStarCardName">晨光星</p>
 <p class="heart-star-card-voice" id="heartStarCardVoice">“希望世界因为爱重新连接。”</p>
-<a class="heart-star-card-link" id="heartStarCardLink" href="life-space-v1/index.html?mode=visitor&amp;id=demo-lugu&amp;v=20260728-6">进入TA的世界</a>
+<a class="heart-star-card-link" id="heartStarCardLink" data-i18n="enterTheirWorld" href="life-space-v1/index.html?mode=visitor&amp;id=demo-lugu&amp;v=20260728-6">进入TA的世界</a>
 </div>
-<div class="footer-signature">泸沽湖·心域 · 情感文明共创家园</div>
+<div class="footer-signature" data-i18n="footerTagline">泸沽湖·心域 · 情感文明共创家园</div>
 <div id="audioControl">
-<button id="audioToggleBtn" type="button" aria-label="音乐开关">🔇</button>
-<input id="audioVolumeSlider" type="range" min="0" max="1" step="0.01" value="0.6" aria-label="背景音乐音量">
+<button id="audioToggleBtn" type="button" data-i18n-aria="musicToggle" aria-label="音乐开关">🔇</button>
+<input id="audioVolumeSlider" type="range" min="0" max="1" step="0.01" value="0.6" data-i18n-aria="volumeSlider" aria-label="背景音乐音量">
 </div>
 </main>
 <script src="assets/js/lugu-music-coordinator.js?v=20260713-2"></script>
@@ -4506,14 +4506,14 @@ removeSendOverlay();
 const overlay = document.createElement("div");
 overlay.className = "send-sticker-overlay";
 overlay.innerHTML = `
-<button class="send-sticker-cancel" type="button" aria-label="取消">×</button>
+<button class="send-sticker-cancel" type="button" aria-label="${window.__t('cancel')}">×</button>
 <div class="send-sticker-card">
 <img class="send-sticker-img" src="${sequence.sendAssetPath || sequence.poster}" alt="">
-<div class="send-sticker-edit-label">✎ 点文字修改</div>
-<textarea class="send-sticker-copy" maxlength="40" rows="2" placeholder="点这里，写下你想说的话"></textarea>
+<div class="send-sticker-edit-label">${window.__t('editLabel')}</div>
+<textarea class="send-sticker-copy" maxlength="40" rows="2" placeholder="${window.__t('editPlaceholder')}"></textarea>
 <div class="send-sticker-actions">
-<button class="send-sticker-send" type="button">保存并转发</button>
-<button class="send-sticker-cancel2" type="button">取消</button>
+<button class="send-sticker-send" type="button">${window.__t('saveAndShare')}</button>
+<button class="send-sticker-cancel2" type="button">${window.__t('cancel')}</button>
 </div>
 <div class="send-sticker-progress" hidden></div>
 <div class="send-sticker-hint" hidden></div>
@@ -4544,14 +4544,14 @@ el.value += text[i++];
 async function saveAndForward(sequence, overlay, copyEl, hint) {
 const text = (copyEl.value || "").trim();
 if (!text) {
-if (hint) { hint.textContent = "请先输入一句想说的话。"; hint.hidden = false; }
+if (hint) { hint.textContent = window.__t("sendNeedText"); hint.hidden = false; }
 return;
 }
 const btn = overlay.querySelector(".send-sticker-send");
 const prog = overlay.querySelector(".send-sticker-progress");
-if (btn) { btn.disabled = true; btn.classList.add("is-loading"); btn.textContent = "生成中…"; }
+if (btn) { btn.disabled = true; btn.classList.add("is-loading"); btn.textContent = window.__t("sendGenerating"); }
 if (prog) { prog.hidden = false; }
-if (hint) { hint.textContent = "正在生成动态视频…"; hint.hidden = false; }
+if (hint) { hint.textContent = window.__t("sendRendering"); hint.hidden = false; }
 try {
 let resp;
 if (sequence.staticSendMp4) {
@@ -4564,7 +4564,7 @@ const blob = await resp.blob();
 const file = new File([blob], "fengxin-rabbit-happy.mp4", { type: "video/mp4" });
 if (navigator.canShare && navigator.canShare({ files: [file] })) {
 await navigator.share({ title: "七星使者", text: text, files: [file] });
-if (hint) { hint.textContent = "已调起分享，请选择微信。"; hint.hidden = false; }
+if (hint) { hint.textContent = window.__t("sendShareOpened"); hint.hidden = false; }
 return;
 }
 const url = URL.createObjectURL(blob);
@@ -4575,12 +4575,12 @@ document.body.appendChild(a);
 a.click();
 a.remove();
 setTimeout(() => URL.revokeObjectURL(url), 10000);
-if (hint) { hint.textContent = "已开始下载视频。"; hint.hidden = false; }
+if (hint) { hint.textContent = window.__t("sendDownloadStarted"); hint.hidden = false; }
 } catch (error) {
 if (error && error.name === "AbortError") return;
-if (hint) { hint.textContent = "生成或分享失败，请重试。"; hint.hidden = false; }
+if (hint) { hint.textContent = window.__t("sendFailed"); hint.hidden = false; }
 } finally {
-if (btn) { btn.disabled = false; btn.classList.remove("is-loading"); btn.textContent = "保存并转发"; }
+if (btn) { btn.disabled = false; btn.classList.remove("is-loading"); btn.textContent = window.__t("saveAndShare"); }
 if (prog) { prog.hidden = true; }
 }
 }
@@ -5001,7 +5001,7 @@ if (heartStarCardLink) {
 heartStarCardLink.href = isMyStar
 ? "life-space-v1/index.html?v=20260728-6"
 : "life-space-v1/index.html?mode=visitor&id=demo-lugu&v=20260728-6";
-heartStarCardLink.textContent = isMyStar ? "进入我的空间" : "进入TA的世界";
+heartStarCardLink.textContent = isMyStar ? window.__t("enterMySpace") : window.__t("enterTheirWorld");
 heartStarCardLink.onclick = (event) => enterSpaceWithMusic(event, heartStarCardLink.href, data, isMyStar);
 }
 heartStarCard.classList.add("is-visible");
@@ -5089,7 +5089,7 @@ if (mySpaceButton) mySpaceButton.focus({ preventScroll: true });
 }
 
 function applyMySpace(styleName, background) {
-if (mySpaceCard) mySpaceCard.textContent = `风格：${styleName}`;
+if (mySpaceCard) mySpaceCard.textContent = window.__t("stylePrefix") + styleName;
 if (mySpaceBg) {
 mySpaceBg.style.background = background;
 mySpaceBg.classList.add("is-active");
@@ -5118,7 +5118,9 @@ if (mySpaceMenu) mySpaceMenu.style.display = "none";
 if (mySpaceResult) mySpaceResult.classList.add("is-visible");
 }
 
-function showWorldMaintenanceDialog(anchor, firstLine = "《ta的世界》正在维护中......", secondLine = "敬请期待") {
+function showWorldMaintenanceDialog(anchor, firstLine, secondLine) {
+firstLine = firstLine || window.__t("maintenance");
+secondLine = secondLine || window.__t("maintenanceStayTuned");
 clearTimeout(worldMaintenanceTimer);
 clearTimeout(worldMaintenanceRemoveTimer);
 
@@ -6630,15 +6632,102 @@ if ("serviceWorker" in navigator) {
 
 <script>
 (function () {
+  var I18N = {
+    zh: {
+      siteTitle: "泸沽湖·心域",
+      siteSubtitle: "全球情感文明共创空间",
+      placeMark: "中国·泸沽湖",
+      world: "心域世界",
+      coCreate: "事业共创",
+      emotion: "情绪表达",
+      mySpace: "我的空间",
+      footerTagline: "泸沽湖·心域 · 情感文明共创家园",
+      mySpaceTitle: "请选择进入哪个“我的空间”",
+      mySpacePrimary: "进入原来的“我的空间”",
+      mySpaceThird: "进入 V1.3 装修空间",
+      mySpaceKicker: "两个空间平行保存，互不覆盖。",
+      mySpaceGenerated: "我的空间已生成",
+      back: "返回",
+      closeMySpace: "关闭我的空间",
+      enterTheirWorld: "进入TA的世界",
+      enterMySpace: "进入我的空间",
+      editLabel: "✎ 点文字修改",
+      editPlaceholder: "点这里，写下你想说的话",
+      saveAndShare: "保存并转发",
+      cancel: "取消",
+      sendNeedText: "请先输入一句想说的话。",
+      sendGenerating: "生成中…",
+      sendRendering: "正在生成动态视频…",
+      sendShareOpened: "已调起分享，请选择微信。",
+      sendDownloadStarted: "已开始下载视频。",
+      sendFailed: "生成或分享失败，请重试。",
+      maintenance: "《ta的世界》正在维护中......",
+      maintenanceStayTuned: "敬请期待",
+      musicToggle: "音乐开关",
+      volumeSlider: "背景音乐音量",
+      launchedStars: "已发射心星",
+      introLabel: "心域介绍",
+      enterLugu: "进入中国·泸沽湖",
+      phoneStage: "地球首页手机竖屏舞台",
+      heartStarCard: "心星卡片",
+      closeHeartStarCard: "关闭心星卡片",
+      stylePrefix: "风格："
+    },
+    en: {
+      siteTitle: "Lugu Lake · Heart Realm",
+      siteSubtitle: "A Global Co-Creation Space for Emotional Civilization",
+      placeMark: "Lugu Lake, China",
+      world: "Heart Realm",
+      coCreate: "Co-Create",
+      emotion: "Express Emotions",
+      mySpace: "My Space",
+      footerTagline: "Lugu Lake · Heart Realm — A Home for Emotional Co-Creation",
+      mySpaceTitle: "Choose which space to enter",
+      mySpacePrimary: "Enter the original My Space",
+      mySpaceThird: "Enter the V1.3 decorated space",
+      mySpaceKicker: "The two spaces save separately and don't overwrite each other.",
+      mySpaceGenerated: "Your space is ready",
+      back: "Back",
+      closeMySpace: "Close My Space",
+      enterTheirWorld: "Enter Their World",
+      enterMySpace: "Enter My Space",
+      editLabel: "✎ Tap to edit",
+      editPlaceholder: "Write your message here",
+      saveAndShare: "Save & Share",
+      cancel: "Cancel",
+      sendNeedText: "Please write a message first.",
+      sendGenerating: "Creating…",
+      sendRendering: "Creating your video…",
+      sendShareOpened: "Share opened — choose WeChat.",
+      sendDownloadStarted: "Download started.",
+      sendFailed: "Failed to create or share. Try again.",
+      maintenance: "“Their World” is under maintenance…",
+      maintenanceStayTuned: "Stay tuned",
+      musicToggle: "Music",
+      volumeSlider: "Background music volume",
+      launchedStars: "Launched heart stars",
+      introLabel: "Heart Realm intro",
+      enterLugu: "Enter Lugu Lake, China",
+      phoneStage: "Earth home — phone stage",
+      heartStarCard: "Heart star card",
+      closeHeartStarCard: "Close heart star card",
+      stylePrefix: "Style: "
+    }
+  };
+  var LANG_KEY = "lugu_lang";
+  var LEGACY_KEY = "lugu_welcome_lang";
+  var currentLang = "zh";
+  var resolvedMsg = null;
   var el = document.getElementById("homeIntroWelcome");
   var langBox = document.getElementById("homeIntroLang");
-  if (!el) return;
-  var API = "https://api.lugu.love/welcome";
-  var LANG_KEY = "lugu_welcome_lang";
-  var resolvedMsg = null;
 
   function getStoredLang() {
-    try { var v = localStorage.getItem(LANG_KEY); if (v === "zh" || v === "en") return v; } catch (e) {}
+    try {
+      var v = localStorage.getItem(LANG_KEY);
+      if (v === "zh" || v === "en") return v;
+      v = localStorage.getItem(LEGACY_KEY);
+      if (v === "zh" || v === "en") return v;
+    } catch (e) {}
     return null;
   }
   function detectLang() {
@@ -6647,30 +6736,65 @@ if ("serviceWorker" in navigator) {
     var nav = (navigator.language || navigator.userLanguage || navigator.browserLanguage || "").toLowerCase();
     return nav.indexOf("zh") === 0 ? "zh" : "en";
   }
-  function saveLang(lang) { try { localStorage.setItem(LANG_KEY, lang); } catch (e) {} }
+  function saveLang(lang) {
+    try { localStorage.setItem(LANG_KEY, lang); localStorage.setItem(LEGACY_KEY, lang); } catch (e) {}
+  }
+  function t(key) { return (I18N[currentLang] && I18N[currentLang][key]) || I18N.zh[key] || ""; }
+  window.__t = t;
+  window.__getLang = function () { return currentLang; };
+
   function textOf(msg, lang) {
     if (!msg) return "";
     if (lang === "zh") return msg.textZh || msg.text || "";
     return msg.textEn || msg.textZh || msg.text || "";
   }
-  function render() {
-    var lang = detectLang();
-    var text = textOf(resolvedMsg, lang);
-    if (text) el.textContent = text;
-    if (langBox) {
-      langBox.hidden = false;
-      var btns = langBox.querySelectorAll("button");
-      for (var i = 0; i < btns.length; i++) {
-        btns[i].classList.toggle("active", btns[i].getAttribute("data-lang") === lang);
-      }
+  function renderWelcome() {
+    if (el) {
+      var text = textOf(resolvedMsg, currentLang);
+      if (text) el.textContent = text;
     }
   }
+  function updateToggle() {
+    if (!langBox) return;
+    langBox.hidden = false;
+    var btns = langBox.querySelectorAll("button");
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].classList.toggle("active", btns[i].getAttribute("data-lang") === currentLang);
+    }
+  }
+  function applyGuide(lang) {
+    var lines = document.querySelectorAll(".guide-line");
+    var orbit = document.querySelector(".guide-orbit");
+    var hide = lang === "en";
+    for (var i = 0; i < lines.length; i++) lines[i].style.display = hide ? "none" : "";
+    if (orbit) orbit.style.display = hide ? "none" : "";
+  }
+  function applyLanguage(lang) {
+    if (lang !== "zh" && lang !== "en") lang = "zh";
+    currentLang = lang;
+    saveLang(lang);
+    document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
+    var dict = I18N[lang] || I18N.zh;
+    document.querySelectorAll("[data-i18n]").forEach(function (node) {
+      var k = node.getAttribute("data-i18n");
+      if (dict[k] != null) node.textContent = dict[k];
+    });
+    document.querySelectorAll("[data-i18n-aria]").forEach(function (node) {
+      var k = node.getAttribute("data-i18n-aria");
+      if (dict[k] != null) node.setAttribute("aria-label", dict[k]);
+    });
+    if (dict.siteTitle) { try { document.title = dict.siteTitle; } catch (e) {} }
+    applyGuide(lang);
+    renderWelcome();
+    updateToggle();
+  }
+  window.__applyLanguage = applyLanguage;
+
   if (langBox) {
     var btns = langBox.querySelectorAll("button");
     for (var i = 0; i < btns.length; i++) {
       btns[i].addEventListener("click", function () {
-        saveLang(this.getAttribute("data-lang"));
-        render();
+        applyLanguage(this.getAttribute("data-lang"));
       });
     }
   }
@@ -6694,20 +6818,23 @@ if ("serviceWorker" in navigator) {
     return null;
   }
 
-  fetch(API, { cache: "no-store" })
+  applyLanguage(detectLang());
+
+  fetch("https://api.lugu.love/welcome", { cache: "no-store" })
     .then(function (r) { if (!r.ok) throw new Error("http " + r.status); return r.json(); })
-    .then(function (d) { resolvedMsg = (d && d.resolved) || null; render(); })
+    .then(function (d) { resolvedMsg = (d && d.resolved) || null; renderWelcome(); })
     .catch(function () {
       fetch("welcome-messages.json", { cache: "no-store" })
         .then(function (r) { return r.ok ? r.json() : null; })
-        .then(function (cfg) { var m = resolveLocal(cfg); if (m) resolvedMsg = m; render(); })
+        .then(function (cfg) { var m = resolveLocal(cfg); if (m) resolvedMsg = m; renderWelcome(); })
         .catch(function () {
           resolvedMsg = { textZh: "这里，欢迎每一个愿意回到“初心”的人。", textEn: "Welcome to everyone willing to return to their true heart." };
-          render();
+          renderWelcome();
         });
     });
 })();
 </script>
+
 
 </body>
 </html>
