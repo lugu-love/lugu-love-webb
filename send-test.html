@@ -402,6 +402,8 @@ window.__MAIN__ = function () {
   var previewAudioUrl=null;
   var previewAudioCtx=null;
   var previewSource=null;
+  var previewHtmlAudio=null;
+  var SILENT_WAV="data:audio/wav;base64,UklGRkQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==";
   var previewState="idle";
   var previewReqId=0;
   voiceSelect.addEventListener("change", invalidatePreviewToken);
@@ -686,6 +688,13 @@ window.__MAIN__ = function () {
       try{ previewAudio.load(); }catch(e){}
       previewAudio=null;
     }
+    if(previewHtmlAudio){
+      try{ previewHtmlAudio.pause(); }catch(e){}
+      previewHtmlAudio.onended=null; previewHtmlAudio.onerror=null;
+      previewHtmlAudio.removeAttribute("src");
+      try{ previewHtmlAudio.load(); }catch(e){}
+      previewHtmlAudio.muted=false;
+    }
     if(previewAudioUrl){ try{ URL.revokeObjectURL(previewAudioUrl); }catch(e){} previewAudioUrl=null; }
   }
   function invalidatePreviewToken(){
@@ -709,10 +718,20 @@ window.__MAIN__ = function () {
     previewState="loading";
     btnPreviewVoice.disabled=true; btnPreviewVoice.textContent="生成语音…";
 
-    // iOS：必须在用户点击手势内创建/恢复 AudioContext，之后 fetch 返回再播放才不会被自动播放策略拦截
-    var AC = window.AudioContext || window.webkitAudioContext;
-    if(!previewAudioCtx && AC){ try{ previewAudioCtx=new AC(); }catch(e){ previewAudioCtx=null; } }
-    if(previewAudioCtx && previewAudioCtx.state==="suspended"){ previewAudioCtx.resume().catch(function(){}); }
+    if(isIOS){
+      // iOS：点击手势内先用可复用的 HTMLAudioElement 做 muted 解锁（不播放可听内容），
+      // 之后同一 element 收到真实 MP3 时才能被 iOS 允许播放。
+      if(!previewHtmlAudio){ try{ previewHtmlAudio=new Audio(); }catch(e){ previewHtmlAudio=null; } }
+      if(previewHtmlAudio){
+        previewHtmlAudio.muted=true;
+        previewHtmlAudio.src=SILENT_WAV;
+        try{ previewHtmlAudio.play().catch(function(){}); }catch(e){}
+      }
+    } else {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if(!previewAudioCtx && AC){ try{ previewAudioCtx=new AC(); }catch(e){ previewAudioCtx=null; } }
+      if(previewAudioCtx && previewAudioCtx.state==="suspended"){ previewAudioCtx.resume().catch(function(){}); }
+    }
 
     fetch(MAKE_SEND_API + "/tts", {
       method:"POST",
@@ -735,6 +754,21 @@ window.__MAIN__ = function () {
       if(myReq!==previewReqId || !result) return;
       stopPreviewAudio();
       ttsToken=result.token || null;
+
+      if(isIOS){
+        if(!previewHtmlAudio){ try{ previewHtmlAudio=new Audio(); }catch(e){ previewHtmlAudio=null; } }
+        previewAudioUrl=URL.createObjectURL(result.blob);
+        previewHtmlAudio.src=previewAudioUrl;
+        previewHtmlAudio.muted=false;
+        previewHtmlAudio.onended=onPreviewAudioEnded;
+        previewHtmlAudio.onerror=function(){ onPreviewAudioEnded(); };
+        try{ previewHtmlAudio.load(); }catch(e){}
+        previewState="playing";
+        btnPreviewVoice.disabled=false; btnPreviewVoice.textContent="⏹ 停止";
+        var pr=previewHtmlAudio.play();
+        if(pr && pr.catch){ pr.catch(function(){ if(myReq!==previewReqId) return; if(previewHtmlAudio){ onPreviewAudioEnded(); } showToast("播放失败，请重试"); }); }
+        return;
+      }
 
       if(previewAudioCtx){
         try {
@@ -765,7 +799,7 @@ window.__MAIN__ = function () {
         }
       }
 
-      // 兜底：无 AudioContext 或 AudioContext 播放失败时用 HTMLAudioElement
+      // 非 iOS 兜底：无 AudioContext 或 AudioContext 播放失败时用 HTMLAudioElement
       previewAudioUrl=URL.createObjectURL(result.blob);
       previewAudio=new Audio(previewAudioUrl);
       previewAudio.onended=onPreviewAudioEnded;
