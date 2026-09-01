@@ -2119,6 +2119,28 @@ letter-spacing: .08em;
 line-height: 1.75;
 }
 
+.home-intro-lang {
+display: inline-flex;
+gap: 12px;
+margin-top: 14px;
+justify-content: center;
+pointer-events: auto;
+}
+.home-intro-lang button {
+background: transparent;
+border: none;
+padding: 2px 8px;
+color: rgba(220, 232, 250, .48);
+font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+font-size: 12px;
+font-weight: 500;
+letter-spacing: .06em;
+cursor: pointer;
+}
+.home-intro-lang button.active {
+color: rgba(255, 248, 225, .92);
+}
+
 @keyframes home-intro-life {
 0% { opacity: 0; filter: blur(5px); transform: translateX(-50%) translateY(10px); }
 12%, 88% { opacity: 1; filter: blur(0); transform: translateX(-50%) translateY(0); }
@@ -3300,6 +3322,10 @@ font-size: 12px;
 <span class="home-intro-title">泸沽湖·心域</span>
 <span class="home-intro-subtitle">全球情感文明共创空间</span>
 <span class="home-intro-copy" id="homeIntroWelcome"></span>
+<span class="home-intro-lang" id="homeIntroLang" hidden>
+<button type="button" data-lang="zh" aria-label="中文">中</button>
+<button type="button" data-lang="en" aria-label="English">EN</button>
+</span>
 </section>
 <div class="touch-guide" aria-hidden="true">
 <div class="guide-line">
@@ -6605,9 +6631,49 @@ if ("serviceWorker" in navigator) {
 <script>
 (function () {
   var el = document.getElementById("homeIntroWelcome");
+  var langBox = document.getElementById("homeIntroLang");
   if (!el) return;
   var API = "https://api.lugu.love/welcome";
-  var FALLBACK = "这里，欢迎每一个愿意回到“初心”的人。";
+  var LANG_KEY = "lugu_welcome_lang";
+  var resolvedMsg = null;
+
+  function getStoredLang() {
+    try { var v = localStorage.getItem(LANG_KEY); if (v === "zh" || v === "en") return v; } catch (e) {}
+    return null;
+  }
+  function detectLang() {
+    var stored = getStoredLang();
+    if (stored) return stored;
+    var nav = (navigator.language || navigator.userLanguage || navigator.browserLanguage || "").toLowerCase();
+    return nav.indexOf("zh") === 0 ? "zh" : "en";
+  }
+  function saveLang(lang) { try { localStorage.setItem(LANG_KEY, lang); } catch (e) {} }
+  function textOf(msg, lang) {
+    if (!msg) return "";
+    if (lang === "zh") return msg.textZh || msg.text || "";
+    return msg.textEn || msg.textZh || msg.text || "";
+  }
+  function render() {
+    var lang = detectLang();
+    var text = textOf(resolvedMsg, lang);
+    if (text) el.textContent = text;
+    if (langBox) {
+      langBox.hidden = false;
+      var btns = langBox.querySelectorAll("button");
+      for (var i = 0; i < btns.length; i++) {
+        btns[i].classList.toggle("active", btns[i].getAttribute("data-lang") === lang);
+      }
+    }
+  }
+  if (langBox) {
+    var btns = langBox.querySelectorAll("button");
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].addEventListener("click", function () {
+        saveLang(this.getAttribute("data-lang"));
+        render();
+      });
+    }
+  }
 
   function shanghaiDayIndex() {
     var now = new Date();
@@ -6618,24 +6684,27 @@ if ("serviceWorker" in navigator) {
   }
   function resolveLocal(cfg) {
     if (!cfg || !Array.isArray(cfg.messages)) return null;
-    var list = cfg.messages.filter(function (m) { return m && m.enabled; });
-    list.sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
+    var enabled = cfg.messages.filter(function (m) { return m && m.enabled && (m.textZh || m.text); });
+    enabled.sort(function (a, b) { return (a.order || 0) - (b.order || 0); });
     if (cfg.mode === "manual") {
-      for (var i = 0; i < list.length; i++) if (list[i].id === cfg.activeId) return list[i];
+      for (var i = 0; i < enabled.length; i++) if (enabled[i].id === cfg.activeId) return enabled[i];
     }
-    if (list.length) return list[shanghaiDayIndex() % list.length];
+    var pool = enabled.filter(function (m) { return m.inRotation !== false; });
+    if (pool.length) return pool[shanghaiDayIndex() % pool.length];
     return null;
   }
-  function applyText(text) { if (text) el.textContent = text; }
 
   fetch(API, { cache: "no-store" })
     .then(function (r) { if (!r.ok) throw new Error("http " + r.status); return r.json(); })
-    .then(function (d) { if (d && d.resolved && d.resolved.text) applyText(d.resolved.text); })
+    .then(function (d) { resolvedMsg = (d && d.resolved) || null; render(); })
     .catch(function () {
       fetch("welcome-messages.json", { cache: "no-store" })
         .then(function (r) { return r.ok ? r.json() : null; })
-        .then(function (cfg) { var m = resolveLocal(cfg); if (m) applyText(m.text); })
-        .catch(function () { applyText(FALLBACK); });
+        .then(function (cfg) { var m = resolveLocal(cfg); if (m) resolvedMsg = m; render(); })
+        .catch(function () {
+          resolvedMsg = { textZh: "这里，欢迎每一个愿意回到“初心”的人。", textEn: "Welcome to everyone willing to return to their true heart." };
+          render();
+        });
     });
 })();
 </script>

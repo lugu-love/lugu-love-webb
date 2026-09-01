@@ -3,9 +3,9 @@
   "mode": "auto",
   "activeId": null,
   "messages": [
-    { "id": "w1", "text": "这里，欢迎每一个愿意回到“初心”的人。", "enabled": true, "order": 1 },
-    { "id": "w2", "text": "欢迎来到这里，听见自己，也看见彼此。", "enabled": true, "order": 2 },
-    { "id": "w3", "text": "这里，愿每一颗心都被温柔地看见。", "enabled": true, "order": 3 },
-    { "id": "w4", "text": "愿我们从真实开始，接纳自己，理解彼此。", "enabled": true, "order": 4 }
+    { "id": "w1", "textZh": "这里，欢迎每一个愿意回到“初心”的人。", "textEn": "Welcome to everyone willing to return to their true heart.", "enabled": true, "inRotation": true, "order": 1 },
+    { "id": "w2", "textZh": "欢迎来到这里，听见自己，也看见彼此。", "textEn": "Welcome here—to hear yourself, and to see one another.", "enabled": true, "inRotation": true, "order": 2 },
+    { "id": "w3", "textZh": "这里，愿每一颗心都被温柔地看见。", "textEn": "Here, may every heart be gently seen.", "enabled": true, "inRotation": true, "order": 3 },
+    { "id": "w4", "textZh": "愿我们从真实开始，接纳自己，理解彼此。", "textEn": "May we begin from truth—accept ourselves, and understand one another.", "enabled": true, "inRotation": true, "order": 4 }
   ]
 }

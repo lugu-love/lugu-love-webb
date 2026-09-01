@@ -8,20 +8,22 @@
   :root { --bg:#0b0c18; --card:#17192e; --ink:#eef0ff; --muted:#9aa0c3; --accent:#7d8bff; --err:#ff9aa6; --ok:#a9e3a0; }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.6 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",Arial,sans-serif; padding:20px; }
-  .wrap { max-width:720px; margin:0 auto; }
+  .wrap { max-width:760px; margin:0 auto; }
   h1 { font-size:20px; margin:0 0 16px; }
   .box { background:var(--card); border-radius:14px; padding:16px; margin-bottom:14px; }
   .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:10px; }
   input[type=text], input[type=password] { flex:1; min-width:120px; background:#12142a; color:#fff; border:1px solid rgba(255,255,255,.12); border-radius:10px; padding:10px 12px; font-size:14px; }
   button { background:rgba(125,139,255,.18); color:#fff; border:1px solid rgba(125,139,255,.30); border-radius:10px; padding:9px 14px; font-size:14px; cursor:pointer; }
   button.primary { background:linear-gradient(135deg,#7d8bff,#a06bff); border:none; }
-  button.ghost { background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.14); }
+  button.ghost { background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.14); padding:7px 10px; font-size:13px; }
   button:disabled { opacity:.55; cursor:default; }
-  .msg { display:flex; gap:8px; align-items:center; border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:10px; margin-bottom:8px; }
-  .msg input[type=text] { flex:1; min-width:0; }
-  .msg .idx { color:var(--muted); font-size:12px; width:26px; text-align:right; }
-  .msg .cur { color:var(--accent); font-size:12px; white-space:nowrap; }
-  .msg label { color:var(--muted); font-size:13px; white-space:nowrap; display:inline-flex; align-items:center; gap:4px; }
+  .msg { display:flex; gap:8px; align-items:flex-start; border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:10px; margin-bottom:8px; }
+  .msg .idx { color:var(--muted); font-size:12px; width:24px; text-align:right; line-height:34px; }
+  .msg .fields { flex:1; display:flex; flex-direction:column; gap:6px; min-width:0; }
+  .msg .fields input { width:100%; }
+  .msg .meta { display:flex; flex-direction:column; gap:6px; align-items:flex-end; white-space:nowrap; }
+  .msg label { color:var(--muted); font-size:12px; display:inline-flex; align-items:center; gap:4px; }
+  .msg .cur { color:var(--accent); font-size:12px; }
   .status { min-height:18px; font-size:13px; margin-top:6px; }
   .status.ok { color:var(--ok); }
   .status.err { color:var(--err); }
@@ -49,7 +51,8 @@
         <button class="primary" id="btnSave" type="button">保存</button>
       </div>
       <div class="row">
-        <input type="text" id="newText" placeholder="新增一句欢迎语">
+        <input type="text" id="newZh" placeholder="新增中文（必填）">
+        <input type="text" id="newEn" placeholder="新增 English（可空）">
         <button id="btnAdd" type="button">新增</button>
       </div>
     </div>
@@ -57,7 +60,8 @@
     <div class="box" id="listBox"></div>
 
     <div class="box">
-      <div class="resolved">当前显示：<span id="resolvedText">—</span></div>
+      <div class="resolved">当前显示（中文）：<span id="resolvedZh">—</span></div>
+      <div class="resolved">当前显示（EN）：<span id="resolvedEn">—</span></div>
       <div class="status" id="status"></div>
     </div>
   </div>
@@ -73,14 +77,8 @@
   function setStatus(msg, cls) { var el = $("status"); el.textContent = msg || ""; el.className = "status" + (cls ? " " + cls : ""); }
   function setLoginErr(msg) { var el = $("loginErr"); el.textContent = msg || ""; el.className = "status" + (msg ? " err" : ""); }
 
-  function showManager() {
-    $("loginBox").style.display = "none";
-    $("managerBox").style.display = "";
-  }
-  function showLogin() {
-    $("loginBox").style.display = "";
-    $("managerBox").style.display = "none";
-  }
+  function showManager() { $("loginBox").style.display = "none"; $("managerBox").style.display = ""; }
+  function showLogin() { $("loginBox").style.display = ""; $("managerBox").style.display = "none"; }
 
   function newId() { return "w" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 
@@ -91,50 +89,63 @@
     list.forEach(function (m, i) {
       var div = document.createElement("div");
       div.className = "msg";
+
       var idx = document.createElement("span");
-      idx.className = "idx";
-      idx.textContent = String(i + 1);
-      var text = document.createElement("input");
-      text.type = "text";
-      text.value = m.text;
-      text.addEventListener("input", function () { m.text = text.value; });
-      var en = document.createElement("label");
+      idx.className = "idx"; idx.textContent = String(i + 1);
+
+      var fields = document.createElement("div");
+      fields.className = "fields";
+      var zh = document.createElement("input");
+      zh.type = "text"; zh.placeholder = "中文（必填）"; zh.value = m.textZh || "";
+      zh.addEventListener("input", function () { m.textZh = zh.value; });
+      var en = document.createElement("input");
+      en.type = "text"; en.placeholder = "English（可空）"; en.value = m.textEn || "";
+      en.addEventListener("input", function () { m.textEn = en.value; });
+      fields.appendChild(zh); fields.appendChild(en);
+
+      var meta = document.createElement("div");
+      meta.className = "meta";
+      var enLabel = document.createElement("label");
       var cb = document.createElement("input");
-      cb.type = "checkbox";
-      cb.checked = !!m.enabled;
+      cb.type = "checkbox"; cb.checked = !!m.enabled;
       cb.addEventListener("change", function () { m.enabled = cb.checked; });
-      en.appendChild(cb);
-      en.appendChild(document.createTextNode("启用"));
+      enLabel.appendChild(cb); enLabel.appendChild(document.createTextNode("启用"));
+      var rotLabel = document.createElement("label");
+      var rb = document.createElement("input");
+      rb.type = "checkbox"; rb.checked = (m.inRotation !== false);
+      rb.addEventListener("change", function () { m.inRotation = rb.checked; });
+      rotLabel.appendChild(rb); rotLabel.appendChild(document.createTextNode("参与轮换"));
       var cur = document.createElement("span");
       cur.className = "cur";
       if (cfg.mode === "manual" && cfg.activeId === m.id) cur.textContent = "当前使用";
-      var up = document.createElement("button");
-      up.type = "button"; up.textContent = "↑"; up.className = "ghost";
+      var btns = document.createElement("div");
+      btns.className = "row"; btns.style.marginBottom = "0";
+      var up = document.createElement("button"); up.type="button"; up.textContent="↑"; up.className="ghost";
       up.disabled = i === 0;
-      up.addEventListener("click", function () { list.splice(i - 1, 0, list.splice(i, 1)[0]); normalizeOrder(); render(); });
-      var down = document.createElement("button");
-      down.type = "button"; down.textContent = "↓"; down.className = "ghost";
-      down.disabled = i === list.length - 1;
-      down.addEventListener("click", function () { list.splice(i + 1, 0, list.splice(i, 1)[0]); normalizeOrder(); render(); });
-      var setCur = document.createElement("button");
-      setCur.type = "button"; setCur.textContent = "设为当前"; setCur.className = "ghost";
-      setCur.addEventListener("click", function () { cfg.mode = "manual"; cfg.activeId = m.id; $("modeLabel").textContent = "manual"; render(); });
-      div.appendChild(idx); div.appendChild(text); div.appendChild(en); div.appendChild(cur); div.appendChild(up); div.appendChild(down); div.appendChild(setCur);
+      up.addEventListener("click", function () { list.splice(i-1,0,list.splice(i,1)[0]); normalizeOrder(); render(); });
+      var down = document.createElement("button"); down.type="button"; down.textContent="↓"; down.className="ghost";
+      down.disabled = i === list.length-1;
+      down.addEventListener("click", function () { list.splice(i+1,0,list.splice(i,1)[0]); normalizeOrder(); render(); });
+      var setCur = document.createElement("button"); setCur.type="button"; setCur.textContent="设为当前"; setCur.className="ghost";
+      setCur.addEventListener("click", function () { cfg.mode="manual"; cfg.activeId=m.id; $("modeLabel").textContent="manual"; render(); });
+      btns.appendChild(up); btns.appendChild(down); btns.appendChild(setCur);
+      meta.appendChild(enLabel); meta.appendChild(rotLabel); meta.appendChild(cur); meta.appendChild(btns);
+
+      div.appendChild(idx); div.appendChild(fields); div.appendChild(meta);
       box.appendChild(div);
     });
     $("modeLabel").textContent = cfg.mode || "auto";
   }
 
-  function normalizeOrder() {
-    (cfg.messages || []).forEach(function (m, i) { m.order = i + 1; });
-  }
+  function normalizeOrder() { (cfg.messages || []).forEach(function (m, i) { m.order = i + 1; }); }
 
   function loadConfig() {
     fetch(API + "/welcome", { cache: "no-store" })
       .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
       .then(function (d) {
         cfg = JSON.parse(JSON.stringify(d.config));
-        $("resolvedText").textContent = (d.resolved && d.resolved.text) || "—";
+        $("resolvedZh").textContent = (d.resolved && d.resolved.textZh) || "—";
+        $("resolvedEn").textContent = (d.resolved && d.resolved.textEn) || (d.resolved && d.resolved.textZh) || "—";
         render();
       })
       .catch(function (e) { setStatus("加载失败：" + e.message, "err"); });
@@ -142,6 +153,8 @@
 
   function save() {
     if (!cfg) return;
+    var bad = (cfg.messages || []).some(function (m) { return !(m.textZh && m.textZh.trim()); });
+    if (bad) { setStatus("存在中文为空的欢迎语，请补全后再保存", "err"); return; }
     setStatus("保存中…");
     fetch(API + "/welcome/admin", {
       method: "POST",
@@ -152,7 +165,8 @@
       .then(function (x) {
         if (!x.ok) { setStatus(x.d && x.d.error ? x.d.error : "保存失败", "err"); return; }
         cfg = x.d.config;
-        $("resolvedText").textContent = (x.d.resolved && x.d.resolved.text) || "—";
+        $("resolvedZh").textContent = (x.d.resolved && x.d.resolved.textZh) || "—";
+        $("resolvedEn").textContent = (x.d.resolved && x.d.resolved.textEn) || (x.d.resolved && x.d.resolved.textZh) || "—";
         setStatus("已保存", "ok");
         render();
       })
@@ -162,39 +176,29 @@
   $("btnLogin").addEventListener("click", function () {
     var pw = $("pwd").value;
     if (!pw) { setLoginErr("请输入密码"); return; }
-    fetch(API + "/admin/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password: pw })
-    })
+    fetch(API + "/admin/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password: pw }) })
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
       .then(function (x) {
         if (!x.ok) { setLoginErr(x.d && x.d.error ? x.d.error : "登录失败"); return; }
         token = x.d.token;
         localStorage.setItem("welcome_admin_token", token);
-        setLoginErr("");
-        $("pwd").value = "";
-        showManager();
-        loadConfig();
+        setLoginErr(""); $("pwd").value = "";
+        showManager(); loadConfig();
       })
       .catch(function (e) { setLoginErr("登录失败：" + e.message); });
   });
 
   $("btnAdd").addEventListener("click", function () {
-    var t = $("newText").value.trim();
-    if (!t) return;
+    var zh = $("newZh").value.trim();
+    var en = $("newEn").value.trim();
+    if (!zh) { setStatus("请先填写中文", "err"); return; }
     cfg.messages = cfg.messages || [];
-    cfg.messages.push({ id: newId(), text: t, enabled: true, order: cfg.messages.length + 1 });
-    $("newText").value = "";
+    cfg.messages.push({ id: newId(), textZh: zh, textEn: en, enabled: true, inRotation: true, order: cfg.messages.length + 1 });
+    $("newZh").value = ""; $("newEn").value = "";
     render();
   });
 
-  $("btnAuto").addEventListener("click", function () {
-    cfg.mode = "auto";
-    cfg.activeId = null;
-    render();
-  });
-
+  $("btnAuto").addEventListener("click", function () { cfg.mode = "auto"; cfg.activeId = null; render(); });
   $("btnSave").addEventListener("click", save);
 
   if (token) { showManager(); loadConfig(); }
