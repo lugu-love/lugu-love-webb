@@ -3386,6 +3386,37 @@ font-size: 12px;
 </main>
 <script src="assets/js/lugu-music-coordinator.js?v=20260713-2"></script>
 <script>
+(function () {
+  if (window.__BOOT_DEBUG__) return;
+  window.__BOOT_DEBUG__ = true;
+  var box = document.createElement("div");
+  box.id = "bootDebugBox";
+  box.style.cssText = "position:fixed;right:4px;bottom:4px;z-index:2147483647;max-width:80vw;max-height:40vh;overflow:auto;background:rgba(0,0,0,.78);color:#a7f3c9;font:11px/1.5 Menlo,Consolas,monospace;padding:6px 8px;border-radius:8px;white-space:pre-wrap;word-break:break-all;pointer-events:none;text-align:left;";
+  box.textContent = "";
+  document.body.appendChild(box);
+  function line(t) {
+    box.textContent += (box.textContent ? "\n" : "") + t;
+    try { console.log("[BOOT] " + t); } catch (e) {}
+  }
+  window.__bootLine = line;
+  function probe(fn) { try { fn(); return "ok"; } catch (e) { return "ERR:" + (e && e.name); } }
+  line("BOOT 0 debug-ready");
+  line("URL " + location.href);
+  line("UA " + navigator.userAgent);
+  line("standalone " + (typeof navigator.standalone === "boolean" ? String(navigator.standalone) : "n/a"));
+  line("displayMode " + probe(function () { return matchMedia("(display-mode: standalone)").matches ? "standalone" : "browser"; }));
+  line("localStorage " + probe(function () { localStorage.getItem("__boot_probe__"); }));
+  line("sessionStorage " + probe(function () { sessionStorage.getItem("__boot_probe__"); }));
+  window.addEventListener("error", function (e) {
+    line("ERROR " + (e.message || "") + " @ " + (e.filename || "") + ":" + (e.lineno || 0) + ":" + (e.colno || 0));
+  });
+  window.addEventListener("unhandledrejection", function (e) {
+    var r = e && e.reason;
+    line("REJECT " + (r && r.message ? r.message : String(r)));
+  });
+})();
+</script>
+<script>
 (() => {
 if (!window.LuguMusic) {
 window.LuguMusic = { register() { return () => {}; }, claim() {}, release() {} };
@@ -3417,6 +3448,7 @@ const heartStarCardNo = document.getElementById("heartStarCardNo");
 const heartStarCardName = document.getElementById("heartStarCardName");
 const heartStarCardVoice = document.getElementById("heartStarCardVoice");
 const heartStarCardLink = document.getElementById("heartStarCardLink");
+window.__bootLine && window.__bootLine("BOOT 1");
 const mySpaceStorageKey = "lugu_my_space_v11";
 const launchedHeartColors = {
 gold: { value: "#ffd76a", core: "#fff8dc", glow: "rgba(255, 211, 104, .78)", size: 42, speed: "2.5s" },
@@ -3724,6 +3756,7 @@ sprites: Array.from({ length: item.idle.sheetCount }, (_, index) =>
 } : null
 }));
 let fengxinRabbitSequenceIndex = 0;
+window.__bootLine && window.__bootLine("BOOT 2");
 let fengxinRabbitPreloadedImages = null;
 let fengxinRabbitPreloadedId = null;
 // The bottle label gently changes tint with the rabbit's current emotion.
@@ -5712,6 +5745,7 @@ window.startMusic = startMusic;
 window.stopVoiceMusic = stopVoiceMusic;
 window.startVoiceMusic = startVoiceMusic;
 window.syncMusicMotion = syncMusicMotion;
+window.__bootLine && window.__bootLine("BOOT 3");
 window.setEarthMusicEnabled = function (enabled) {
 window.earthMusicEnabled = Boolean(enabled);
 try { localStorage.setItem("lugu_earth_music_enabled", window.earthMusicEnabled ? "1" : "0"); } catch (error) {}
@@ -6499,6 +6533,7 @@ stars.delete(star);
 }
 
 function updateVoiceStars(now) {
+window.__bootLine && window.__bootLine("STAR");
 if (voiceStarsEnabled && now > nextSpawn) {
 spawnVoiceStar();
 nextSpawn = now + random(880, 1900);
@@ -6545,6 +6580,7 @@ document.addEventListener("pointerdown", (event) => {
 if (event.target.closest && event.target.closest(".voice-star")) return;
 unlockEarthSounds();
 }, { passive: true });
+window.__bootLine && window.__bootLine("BOOT 4");
 requestAnimationFrame(updateVoiceStars);
 })();
 </script>
