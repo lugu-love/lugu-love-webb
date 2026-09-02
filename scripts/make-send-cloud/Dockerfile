@@ -22,7 +22,10 @@ COPY server.py tts_provider.py text_layout.py journey_store.py emotion-manifest.
 ARG MASTERS_REF=codex/p3-cloud
 RUN mkdir -p masters poc && \
     for f in happy-master.mp4 angry-master.mp4 wronged-master.mp4 \
-             happy-master-v2.mp4 wronged-master-v2.mp4 angry-master-v2.mp4 playful-master-v2.mp4; do \
+             happy-master-v2.mp4 wronged-master-v2.mp4 angry-master-v2.mp4 playful-master-v2.mp4 \
+             rabbit-sajiao.mp4 rabbit-playful.mp4 rabbit-jealous.mp4 rabbit-stubborn.mp4 rabbit-surprise.mp4 \
+             rabbit-confused.mp4 rabbit-disgust.mp4 rabbit-guilty.mp4 rabbit-apology.mp4 \
+             rabbit-lowenergy.mp4 rabbit-cool.mp4 rabbit-gloat.mp4; do \
       curl -fsSL -o "masters/$f" "https://raw.githubusercontent.com/lugu-love/lugu-love-webb/${MASTERS_REF}/scripts/make-send-cloud/masters/$f" || exit 1; \
     done && \
     curl -fsSL -o "poc/sample.mp4" "https://raw.githubusercontent.com/lugu-love/lugu-love-webb/${MASTERS_REF}/scripts/make-send-cloud/poc/sample.mp4" || exit 1
