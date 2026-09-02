@@ -10,14 +10,15 @@
   html,body { margin:0; padding:0; height:100%; background:var(--bg); color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;
     -webkit-font-smoothing:antialiased; overflow-x:hidden; overflow-y:auto; }
-  .app { display:flex; flex-direction:column; min-height:100vh; min-height:100svh; height:auto; padding:calc(env(safe-area-inset-top,0px)+16px) 16px calc(env(safe-area-inset-bottom,0px)+86px); }
+  .app { display:flex; flex-direction:column; min-height:100vh; min-height:100svh; height:auto; }
+  html:not(.state-done) .app { padding:calc(env(safe-area-inset-top,0px)+16px) 16px calc(env(safe-area-inset-bottom,0px)+86px); }
   .edit-top { position:sticky; top:0; z-index:20; flex:0 0 auto; background:var(--bg); }
-  html.keyboard-open .app { padding-top: calc(env(safe-area-inset-top,0px) + 6px); padding-bottom: calc(env(safe-area-inset-bottom,0px) + 10px); }
-  html.keyboard-open .edit-top .stage-wrap { margin-top: 0; }
-  html.keyboard-open .emotions { margin-top: 8px; margin-bottom: 6px; }
-  html.keyboard-open #stage { width: min(56vw, 232px); }
-  html.keyboard-open .emotion { padding: 6px 14px; }
-  html.keyboard-open .cta { display: none !important; }
+  html:not(.state-done).keyboard-open .app { padding-top: calc(env(safe-area-inset-top,0px) + 6px); padding-bottom: calc(env(safe-area-inset-bottom,0px) + 10px); }
+  html:not(.state-done).keyboard-open .edit-top .stage-wrap { margin-top: 0; }
+  html:not(.state-done).keyboard-open .emotions { margin-top: 8px; margin-bottom: 6px; }
+  html:not(.state-done).keyboard-open #stage { width: min(56vw, 232px); }
+  html:not(.state-done).keyboard-open .emotion { padding: 6px 14px; }
+  html:not(.state-done).keyboard-open .cta { display: none !important; }
   .brand { display:flex; align-items:center; gap:12px; margin:0; padding:2px 4px; position:relative; z-index:60; }
   .site-logo { display:inline-flex; align-items:center; gap:5px; color:rgba(238,240,255,.72); text-decoration:none; font-size:13px; font-weight:400; letter-spacing:.04em; padding:4px 6px 4px 0; border-radius:999px; }
   .site-logo img { width:26px; height:26px; flex:0 0 26px; filter:drop-shadow(0 0 4px rgba(255,222,143,.4)); }
@@ -76,8 +77,8 @@
   html.state-done .cta,
   html.state-done .status,
   html.state-done .hint { display:none !important; }
-  html.state-done .app { justify-content:center; height:100dvh; min-height:0; overflow:hidden; background:transparent; padding-bottom:calc(env(safe-area-inset-bottom,0px) + 10px); }
-  html.state-done #videoPreview { order:1; display:block; align-self:center; flex:0 1 auto; width:auto; height:min(54vh, calc(100vh - 260px)); max-width:100%; max-height:58vh; aspect-ratio:9/16; object-fit:contain; border-radius:0; background:transparent; box-shadow:none; margin:0; }
+  html.state-done .app { justify-content:center; height:100dvh; min-height:0; overflow:hidden; background:transparent; padding:0 16px calc(env(safe-area-inset-bottom,0px) + 10px); }
+  html.state-done #videoPreview { order:1; display:block; align-self:center; flex:0 1 auto; width:auto; height:min(54vh, calc(100vh - 260px)); min-height:180px; max-width:100%; max-height:58vh; aspect-ratio:9/16; object-fit:contain; border-radius:0; background:transparent; box-shadow:none; margin:0; }
   html.state-done .preview-text { order:2; flex:0 0 auto; font-size:16px; margin:16px 0 0; }
   html.state-done .success-actions { order:3; flex:0 0 auto; }
   html.state-done .debug { order:99; }
@@ -90,7 +91,7 @@
   .status.ok { color:#a9e3a0; }
   .status.err { color:#ff9aa6; }
   .hint { min-height:14px; margin:4px 0 0; text-align:center; font-size:12px; color:var(--muted); }
-  video { width:100%; max-height:30vh; border-radius:0; margin-top:8px; background:transparent; }
+  html:not(.state-done) video { width:100%; max-height:30vh; border-radius:0; margin-top:8px; background:transparent; }
   .toast { position:fixed; left:50%; bottom:calc(env(safe-area-inset-bottom,0px) + 92px); transform:translateX(-50%); z-index:9; padding:9px 14px; border-radius:999px; background:rgba(20,22,40,.88); border:1px solid rgba(255,255,255,.16); color:#fff; font-size:12px; opacity:0; transition:opacity .25s; max-width:80vw; text-align:center; }
   .toast.show { opacity:1; }
   .debug { margin-top:8px; font-size:11px; color:rgba(255,255,255,.35); border-top:1px solid rgba(255,255,255,.06); padding-top:4px; }
@@ -1023,6 +1024,15 @@ window.__MAIN__ = function () {
           videoEl.poster=fc.toDataURL("image/jpeg", 0.7);
         } catch(e){}
       });
+      // poster 仅作兜底：自动播放被拦截时，首次任意交互（或点击视频）即恢复真实视频播放
+      var ensurePlay = function(){
+        document.removeEventListener("touchstart", ensurePlay);
+        document.removeEventListener("click", ensurePlay);
+        try { if(videoEl.paused) videoEl.play().catch(function(){}); } catch(e){}
+      };
+      document.addEventListener("touchstart", ensurePlay, { passive:true });
+      document.addEventListener("click", ensurePlay);
+      videoEl.addEventListener("click", function(){ try { videoEl.play().catch(function(){}); } catch(e){} });
       var tDone = performance.now();
       lastTiming = { clickToFetchMs: Math.round(tFetchStart-tClick), fetchMs: Math.round(tHeaders-tFetchStart), blobMs: Math.round(tBlob-tHeaders), totalMs: Math.round(tDone-tClick) };
       generatePhase="success";
