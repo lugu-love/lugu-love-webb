@@ -446,7 +446,6 @@ window.__MAIN__ = function () {
     }
     updateCharCount();
     refreshUI(); clearGenerated(); loadSheets(); renderDiag(); renderPreloadDiag(); renderSuggest(); renderGuide(); syncGenerateEnabled();
-    if(prevId !== current.id){ focusTextInput(); }
   }
 
   function renderGuide(){
@@ -671,15 +670,10 @@ window.__MAIN__ = function () {
     setHint("");
   }
 
-  function focusTextInput(){
-    try { textInput.focus({ preventScroll: true }); } catch(e){ try { textInput.focus(); } catch(e2){} }
-  }
   function reEdit(){
     userCancelInFlight();
     clearGenerated();
     syncGenerateEnabled();
-    focusTextInput();
-    try { textInput.scrollIntoView({ block:"nearest", inline:"nearest" }); } catch(e) {}
   }
 
   function resetPreviewButton(){ btnPreviewVoice.disabled=false; btnPreviewVoice.textContent="🔊 试听"; }
@@ -1053,24 +1047,6 @@ window.__MAIN__ = function () {
     if(tapDiagEl) tapDiagEl.innerHTML = "点击命中: " + desc;
   }, true);
 
-  // 键盘状态适配：视觉视口变化（键盘弹出/收起）时，仅当输入框被键盘遮挡才做最小滚动，
-  // 不做整页居中/大幅滚动；键盘收起后视口变大不会触发滚动，页面位置保持原位。
-  if ((isAndroid || isIOS) && window.visualViewport && textInput) {
-    var onViewportChange = function () {
-      if (document.activeElement !== textInput) return;
-      try {
-        var vv = window.visualViewport;
-        var r = textInput.getBoundingClientRect();
-        var visibleBottom = vv.height;
-        var overflow = r.bottom - (visibleBottom - 10);
-        if (overflow > 0) {
-          window.scrollBy(0, Math.ceil(overflow));
-        }
-      } catch (err) {}
-    };
-    window.visualViewport.addEventListener("resize", onViewportChange);
-    window.visualViewport.addEventListener("scroll", onViewportChange);
-  }
 
   refreshUI();
   loadSheets();
