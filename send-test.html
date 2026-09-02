@@ -61,7 +61,6 @@
   .success-actions #btnSend, .success-actions #btnSendWeChat { width:100%; height:50px; font-size:16px; font-weight:700; flex:none; }
   .success-sub-actions { display:flex; gap:10px; }
   .success-sub-actions button { flex:1; min-width:0; height:44px; font-size:14px; }
-  #btnOpen, #btnSave { display:none !important; }
   html.is-android.is-wechat #btnSend { display:none !important; }
   html.is-app-bridge #btnSend { display:none !important; }
   html.is-app-bridge.show-save-fallback #btnOpen, html.is-app-bridge.show-save-fallback #btnSave { display:inline-flex !important; }
@@ -1040,8 +1039,11 @@ window.__MAIN__ = function () {
           document.documentElement.classList.add("show-save-fallback");
         }
       }
-      if(!isAndroid && !isWeChat && canShareFile){
+      if(!isWeChat && canShareFile){
         btnSend.hidden=false;
+      } else if(!isWeChat && !isAppBridge){
+        btnSave.hidden=false;
+        setHint("点击“保存到手机”下载视频后，可从微信发送。");
       }
     } catch(err){
       if(myToken !== genToken) return;
