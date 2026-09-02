@@ -187,13 +187,14 @@
     }
   }
   if (!staticOn) { pause(); return; }
-  if (app) app.style.display = 'none';
+  start();  // 立即显示页面并初始化首屏，不再等待后端健康检查
+  // 后台健康检查：不阻塞首屏；后端禁用时仅置标记，真正生成视频前再提示
   try {
     fetch('https://api.lugu.love/status', { cache: 'no-store' })
       .then(function (r) { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
-      .then(function (d) { if (d && d.enabled === false) { pause(); } else { start(); } })
-      .catch(function () { start(); });
-  } catch (e) { start(); }
+      .then(function (d) { if (d && d.enabled === false) { window.__SITE_PAUSED__ = true; } })
+      .catch(function () {});
+  } catch (e) {}
 })();
 </script>
 
@@ -549,7 +550,14 @@ window.__MAIN__ = function () {
       sheets = sheetsReady;
       startLoop();
       activeUserLoad = false;
-      if(!NO_PRELOAD && !preloadStarted){ preloadStarted = true; setTimeout(preloadNext, 800); }
+      if(!NO_PRELOAD && !preloadStarted){
+        preloadStarted = true;
+        if ("requestIdleCallback" in window) {
+          window.requestIdleCallback(function(){ preloadNext(); }, { timeout: 6000 });
+        } else {
+          setTimeout(preloadNext, 4000);
+        }
+      }
     }, function(){
       activeUserLoad = false;
       setStatus("情绪素材加载失败，点击该情绪重试", "err");
@@ -930,6 +938,7 @@ window.__MAIN__ = function () {
   }
 
   async function generateVideo(){
+    if(window.__SITE_PAUSED__ === true){ showToast("当前正在内部测试中，请稍后再试"); return; }
     if(isGenerating){
       showToast("视频正在生成，请稍候");
       return;

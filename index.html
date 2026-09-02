@@ -6843,5 +6843,29 @@ if ("serviceWorker" in navigator) {
 </script>
 
 
+<script>
+// 性能：首页空闲后低优先级预载 A 路（情绪表达）最小资源，
+// 不阻塞首页首屏；点击“情绪表达”时页面框架尽量秒开。
+(function () {
+  function preloadARoute() {
+    if (document.hidden) return;
+    var urls = ["send-test.html", "scripts/make-send-cloud/emotion-manifest.json"];
+    for (var i = 0; i < 7; i++) {
+      urls.push("assets/video/fengxin-rabbit-sequence/mobile/1/sheet-" + String(i).padStart(2, "0") + ".webp");
+    }
+    urls.forEach(function (u) {
+      var l = document.createElement("link");
+      l.rel = "prefetch";
+      l.href = u;
+      document.head.appendChild(l);
+    });
+  }
+  if ("requestIdleCallback" in window) {
+    window.requestIdleCallback(preloadARoute, { timeout: 10000 });
+  } else {
+    setTimeout(preloadARoute, 5000);
+  }
+})();
+</script>
 </body>
 </html>
