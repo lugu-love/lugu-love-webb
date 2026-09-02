@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0c18">
+<title>统一壳层速度实验 · 同文档切换</title>
+<style>
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { margin:0; padding:0; background:#0b0c18; color:#eef0ff;
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif; }
+  body { min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:20px 16px; }
+  h1 { font-size:17px; font-weight:600; margin:8px 0 4px; letter-spacing:.02em; }
+  .sub { font-size:12px; color:#8a90b8; margin:0 0 14px; text-align:center; line-height:1.6; }
+  .stats { width:100%; max-width:420px; background:#14172b; border:1px solid rgba(255,255,255,.08);
+    border-radius:14px; padding:12px 14px; font-size:12px; color:#9fb0ff; margin-bottom:16px; }
+  .stats b { color:#7CFFB2; font-size:15px; }
+  .stats .row { display:flex; justify-content:space-between; padding:2px 0; }
+  .stats .hist { margin-top:6px; border-top:1px solid rgba(255,255,255,.06); padding-top:6px;
+    color:#7CFFB2; font-size:11px; line-height:1.7; word-break:break-all; }
+  .stage { width:100%; max-width:420px; min-height:300px; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:18px; background:#171a30;
+    border:1px solid rgba(255,255,255,.1); border-radius:20px; padding:30px 20px; }
+  .view { display:none; flex-direction:column; align-items:center; gap:8px; text-align:center; }
+  .view.active { display:flex; }
+  .view .name { font-size:22px; font-weight:700; }
+  .view .memo { font-size:12px; color:#8a90b8; }
+  button { min-width:180px; height:46px; border-radius:999px; border:none; font-size:15px; font-weight:650;
+    background:linear-gradient(135deg,#8a7dff,#b06bff); color:#fff; cursor:pointer; margin-top:12px; }
+  button:active { transform:scale(.97); }
+  .flag { width:100%; max-width:420px; text-align:center; font-size:12px; color:#8a90b8; margin-top:14px; line-height:1.7; }
+  .flag .ok { color:#7CFFB2; }
+</style>
+</head>
+<body>
+  <h1>统一壳层速度实验</h1>
+  <p class="sub">两个模拟页面放在同一个 document 里，只用 DOM 显隐 + history.pushState 切换，<b style="color:#7CFFB2">不产生任何页面导航</b>。</p>
+
+  <div class="stats" id="stats">
+    <div class="row"><span>最近一次切换</span><b id="vLast">—</b></div>
+    <div class="row"><span>平均（全部）</span><b id="vAvg">—</b></div>
+    <div class="row"><span>最快 / 最慢</span><b id="vMinMax">—</b></div>
+    <div class="row"><span>切换次数</span><b id="vCount">0</b></div>
+    <div class="hist" id="vHist">（点击下方按钮开始测试）</div>
+  </div>
+
+  <div class="stage">
+    <section id="view-home" class="view active">
+      <div class="name">🌍 地球首页（模拟）</div>
+      <div class="memo">这是模拟首页状态</div>
+      <button id="btnToEmotion" type="button">进入情绪表达 →</button>
+    </section>
+    <section id="view-emotion" class="view">
+      <div class="name">🐰 情绪表达主页（模拟）</div>
+      <div class="memo">这是模拟 A 路状态</div>
+      <button id="btnHome" type="button">← 返回首页</button>
+    </section>
+  </div>
+
+  <div class="flag" id="flag">document navigation：<span class="ok" id="navFlag">否（本页从未重新加载）</span></div>
+
+<script>
+(function () {
+  var VIEWS = { home: "view-home", emotion: "view-emotion" };
+  var current = "home";
+  var samples = [];
+  var initialized = false;   // 初始恢复视图不计入样本
+
+  function setFlag() {
+    try {
+      var nav = performance.getEntriesByType("navigation")[0];
+      var el = document.getElementById("navFlag");
+      if (nav && nav.type !== "navigate") el.textContent = "是(" + nav.type + ")！";
+    } catch (e) {}
+  }
+
+  function render() {
+    document.getElementById("vLast").textContent = samples.length ? samples[samples.length - 1].ms + " ms" : "—";
+    if (samples.length) {
+      var sum = samples.reduce(function (s, x) { return s + x.ms; }, 0);
+      var mins = Math.min.apply(null, samples.map(function (x) { return x.ms; }));
+      var maxs = Math.max.apply(null, samples.map(function (x) { return x.ms; }));
+      document.getElementById("vAvg").textContent = Math.round(sum / samples.length) + " ms";
+      document.getElementById("vMinMax").textContent = mins + " / " + maxs + " ms";
+      document.getElementById("vCount").textContent = samples.length;
+      var last10 = samples.slice(-10).map(function (x) { return x.ms; }).join(", ");
+      document.getElementById("vHist").textContent = "最近 10 次(ms): " + last10;
+    }
+    setFlag();
+  }
+
+  function show(view, via) {
+    var t0 = performance.now();
+    current = view;
+    document.getElementById(VIEWS.home).classList.toggle("active", view === "home");
+    document.getElementById(VIEWS.emotion).classList.toggle("active", view === "emotion");
+    var q = view === "emotion" ? "?view=emotion" : "?view=home";
+    if (!via) history.pushState({ view: view }, "", q);
+    // 到“可见”以下一帧为界；初始恢复不计入统计
+    requestAnimationFrame(function () {
+      var ms = Math.round((performance.now() - t0) * 10) / 10;
+      if (initialized) { samples.push({ ms: ms }); render(); }
+      else { initialized = true; }
+    });
+  }
+
+  window.addEventListener("popstate", function (e) {
+    var v = (e.state && e.state.view) || "home";
+    show(v === "emotion" ? "emotion" : "home", true);
+  });
+
+  document.getElementById("btnToEmotion").addEventListener("click", function () { show("emotion", false); });
+  document.getElementById("btnHome").addEventListener("click", function () { show("home", false); });
+
+  // 初始：按 URL 恢复视图（刷新场景，不计入样本）
+  var initial = new URLSearchParams(location.search).get("view");
+  if (initial === "emotion") show("emotion", true); else show("home", true);
+})();
+</script>
+</body>
+</html>
