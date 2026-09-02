@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=overlays-content">
 <meta name="theme-color" content="#0b0c18">
 <title>七星使者 · 情绪表达</title>
 <style>  :root { --bg:#0b0c18; --card:#17192e; --ink:#eef0ff; --muted:#9aa0c3; --accent:#7d8bff; }
@@ -10,7 +10,8 @@
   html,body { margin:0; padding:0; height:100%; background:var(--bg); color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;
     -webkit-font-smoothing:antialiased; overflow-x:hidden; overflow-y:auto; }
-  .app { display:flex; flex-direction:column; min-height:100vh; min-height:100svh; height:auto; padding:calc(env(safe-area-inset-top,0px)+16px) 16px calc(env(safe-area-inset-bottom,0px)+10px); }
+  .app { display:flex; flex-direction:column; min-height:100vh; min-height:100svh; height:auto; padding:calc(env(safe-area-inset-top,0px)+16px) 16px calc(env(safe-area-inset-bottom,0px)+86px); }
+  .edit-top { position:sticky; top:0; z-index:20; flex:0 0 auto; background:var(--bg); }
   .brand { display:flex; align-items:center; gap:12px; margin:0; padding:2px 4px; position:relative; z-index:60; }
   .site-logo { display:inline-flex; align-items:center; gap:5px; color:rgba(238,240,255,.72); text-decoration:none; font-size:13px; font-weight:400; letter-spacing:.04em; padding:4px 6px 4px 0; border-radius:999px; }
   .site-logo img { width:26px; height:26px; flex:0 0 26px; filter:drop-shadow(0 0 4px rgba(255,222,143,.4)); }
@@ -48,7 +49,7 @@
   .editor textarea { width:100%; min-height:68px; border-radius:14px; background:#12142a; color:#fff; border:1px solid rgba(255,255,255,.10); padding:12px 12px 24px 18px; font-size:15px; line-height:1.5; resize:none; outline:none; display:block; }
   .char-count { position:absolute; right:12px; bottom:6px; font-size:11px; line-height:1; color:rgba(150,140,190,.55); pointer-events:none; margin:0; text-align:right; }
   .preview-text { text-align:center; font-size:14px; line-height:1.5; min-height:22px; margin:6px 0 0; white-space:pre-wrap; color:#fff; }
-  .cta { display:flex; justify-content:center; margin-top:18px; }
+  .cta { position:fixed; left:0; right:0; bottom:0; z-index:40; display:flex; justify-content:center; margin:0; padding:10px 16px calc(env(safe-area-inset-bottom,0px) + 10px); background:var(--bg); border-top:1px solid rgba(255,255,255,.08); }
   .success-actions { display:flex; flex-direction:column; gap:10px; margin-top:14px; }
   .success-actions #btnSend, .success-actions #btnSendWeChat { width:100%; height:50px; font-size:16px; font-weight:700; flex:none; }
   .success-sub-actions { display:flex; gap:10px; }
@@ -58,6 +59,7 @@
   html.is-app-bridge #btnSend { display:none !important; }
   html.is-app-bridge.show-save-fallback #btnOpen, html.is-app-bridge.show-save-fallback #btnSave { display:inline-flex !important; }
   html:not(.state-done) #btnSendWeChat { display:none !important; }
+  html.state-done .edit-top,
   html.state-done .brand,
   html.state-done .stage-wrap,
   html.state-done .emotions,
@@ -68,7 +70,7 @@
   html.state-done .cta,
   html.state-done .status,
   html.state-done .hint { display:none !important; }
-  html.state-done .app { justify-content:center; height:100dvh; min-height:0; overflow:hidden; background:transparent; }
+  html.state-done .app { justify-content:center; height:100dvh; min-height:0; overflow:hidden; background:transparent; padding-bottom:calc(env(safe-area-inset-bottom,0px) + 10px); }
   html.state-done #videoPreview { order:1; display:block; align-self:center; flex:0 1 auto; width:auto; height:min(54svh, calc(100dvh - 260px)); max-width:100%; max-height:58svh; aspect-ratio:9/16; object-fit:contain; border-radius:0; background:transparent; box-shadow:none; margin:0; }
   html.state-done .preview-text { order:2; flex:0 0 auto; font-size:16px; margin:16px 0 0; }
   html.state-done .success-actions { order:3; flex:0 0 auto; }
@@ -83,7 +85,7 @@
   .status.err { color:#ff9aa6; }
   .hint { min-height:14px; margin:4px 0 0; text-align:center; font-size:12px; color:var(--muted); }
   video { width:100%; max-height:30vh; border-radius:0; margin-top:8px; background:transparent; }
-  .toast { position:fixed; left:50%; bottom:90px; transform:translateX(-50%); z-index:9; padding:9px 14px; border-radius:999px; background:rgba(20,22,40,.88); border:1px solid rgba(255,255,255,.16); color:#fff; font-size:12px; opacity:0; transition:opacity .25s; max-width:80vw; text-align:center; }
+  .toast { position:fixed; left:50%; bottom:calc(env(safe-area-inset-bottom,0px) + 92px); transform:translateX(-50%); z-index:9; padding:9px 14px; border-radius:999px; background:rgba(20,22,40,.88); border:1px solid rgba(255,255,255,.16); color:#fff; font-size:12px; opacity:0; transition:opacity .25s; max-width:80vw; text-align:center; }
   .toast.show { opacity:1; }
   .debug { margin-top:8px; font-size:11px; color:rgba(255,255,255,.35); border-top:1px solid rgba(255,255,255,.06); padding-top:4px; }
   .debug summary { cursor:pointer; padding:3px 0; font-size:11px; color:rgba(255,255,255,.35); }
@@ -102,11 +104,13 @@
 </div>
 
   <div class="app">
-    <div class="brand" id="brand"><a class="back-home" href="index.html" aria-label="返回首页">← 首页</a><span class="brand-title"><span class="brand-main">七星使者</span><span class="brand-sub">· 情绪表达</span></span></div>
+    <div class="edit-top">
+      <div class="brand" id="brand"><a class="back-home" href="index.html" aria-label="返回首页">← 首页</a><span class="brand-title"><span class="brand-main">七星使者</span><span class="brand-sub">· 情绪表达</span></span></div>
 
-    <div class="stage-wrap"><canvas id="stage" width="540" height="540"></canvas></div>
+      <div class="stage-wrap"><canvas id="stage" width="540" height="540"></canvas></div>
 
-    <div class="emotions" id="emotions"></div>
+      <div class="emotions" id="emotions"></div>
+    </div>
 
     <div class="editor"><textarea id="textInput" placeholder="写一句话…"></textarea><div class="char-count" id="charCount" aria-live="polite">当前 0 字</div></div>
     <div class="guide" id="guide"></div>
@@ -285,6 +289,7 @@ window.__MAIN__ = function () {
   var btnSendWeChat=document.getElementById("btnSendWeChat");
   var bridgeDiagEl=document.getElementById("bridgeDiag");
   var debugDetailsEl=document.getElementById("debugDetails");
+  var debugMode = /[?&]debug=1/.test(location.search);
   var toastEl=document.getElementById("toast");
   var userAgent=navigator.userAgent || "";
   var isIOS=/iPad|iPhone|iPod/.test(userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
@@ -301,7 +306,7 @@ window.__MAIN__ = function () {
     return !!(window.AndroidShare && typeof window.AndroidShare.prepareVideo === "function" && typeof window.AndroidShare.sharePreparedVideo === "function");
   }
   function renderBridgeDiag(){
-    if(!bridgeDiagEl) return;
+    if(!debugMode || !bridgeDiagEl) return;
     var lines = [];
     lines.push("<b>页面版本:</b> " + __SEND_TEST_VERSION__);
     lines.push("<b>URL:</b> " + location.href);
@@ -378,7 +383,7 @@ window.__MAIN__ = function () {
     }, d);
   }
   if(isAppBridge){ document.documentElement.classList.add("is-app-bridge"); }
-  if(/[?&]debug=1/.test(location.search) && debugDetailsEl){ debugDetailsEl.hidden = false; debugDetailsEl.open = true; }
+  if(debugMode && debugDetailsEl){ debugDetailsEl.hidden = false; debugDetailsEl.open = true; }
   scheduleBridgeChecks();
   window.addEventListener("pageshow", function(){ setTimeout(detectBridgeNow, 0); });
   document.addEventListener("visibilitychange", function(){
@@ -541,6 +546,7 @@ window.__MAIN__ = function () {
   }
 
   function renderPreloadDiag(){
+    if(!debugMode || !preloadDiagEl) return;
     var parts = ["<b>预加载:</b>"];
     EMOTIONS.forEach(function(e){
       var c = cache[e.id];
@@ -635,6 +641,7 @@ window.__MAIN__ = function () {
   }
 
   function renderDiag(){
+    if(!debugMode || !diagEl) return;
     var ua = navigator.userAgent || "";
     var lines = [
       "<b>UA:</b> " + ua,
@@ -1041,11 +1048,13 @@ window.__MAIN__ = function () {
     renderBridgeDiag();
   });
 
-  document.addEventListener("click", function(e){
-    var el = document.elementFromPoint(e.clientX, e.clientY);
-    var desc = el ? (el.tagName + "." + (typeof el.className === "string" ? el.className : "").split(" ")[0]) : "null";
-    if(tapDiagEl) tapDiagEl.innerHTML = "点击命中: " + desc;
-  }, true);
+  if (debugMode) {
+    document.addEventListener("click", function(e){
+      var el = document.elementFromPoint(e.clientX, e.clientY);
+      var desc = el ? (el.tagName + "." + (typeof el.className === "string" ? el.className : "").split(" ")[0]) : "null";
+      if(tapDiagEl) tapDiagEl.innerHTML = "点击命中: " + desc;
+    }, true);
+  }
 
 
   refreshUI();
