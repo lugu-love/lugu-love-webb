@@ -615,22 +615,36 @@ window.__MAIN__ = function () {
     if(document.body && document.body.scrollHeight > document.body.clientHeight){ document.body.scrollTop = y; return; }
     try { window.scrollTo(0, y); } catch(e){}
   }
-  function syncKeyboardPosition(){
-    if(document.activeElement !== textInput) return;
-    var vv = window.visualViewport;
-    var kbTop = (vv && typeof vv.height === "number") ? (vv.offsetTop + vv.height) : window.innerHeight;
-    var r = textInput.getBoundingClientRect();
-    var overflow = r.bottom - (kbTop - 12);      // 需补距离，含 12px 安全间距
-    if(overflow > 0){ keyboardScrollBy(Math.ceil(overflow)); }
-  }
+  var kbBaseHeight = window.innerHeight;      // 无键盘时的窗口高度基准
   var kbSavedScroll = 0, kbFocusTimer = 0;
+  function syncKeyboardLayout(){
+    if(window.innerHeight > kbBaseHeight){ kbBaseHeight = window.innerHeight; }  // URL 栏收起等正常增大
+    var vv = window.visualViewport;
+    var visH = (vv && typeof vv.height === "number") ? vv.height : window.innerHeight;
+    var kbOpen = (kbBaseHeight - visH) > 40;   // 可视高度明显小于基准 → 键盘打开（兼容 overlay/resize 两种模式）
+    if(!kbOpen){
+      // 键盘已收起（含返回键收起：输入框可能仍保持焦点）→ 立即恢复布局，无需任何额外点击
+      if(document.documentElement.classList.contains("keyboard-open")){
+        document.documentElement.classList.remove("keyboard-open");
+        if(Math.abs(keyboardScrollTop() - kbSavedScroll) > 1){ keyboardScrollTo(kbSavedScroll); }
+        syncGenerateEnabled();
+      }
+      return;
+    }
+    if(document.activeElement === textInput){
+      var kbTop = (vv && typeof vv.height === "number") ? (vv.offsetTop + vv.height) : window.innerHeight;
+      var r = textInput.getBoundingClientRect();
+      var overflow = r.bottom - (kbTop - 12);  // 需补距离，含 12px 安全间距
+      if(overflow > 0){ keyboardScrollBy(Math.ceil(overflow)); }
+    }
+  }
   textInput.addEventListener("focus", function(){
     if(!(isAndroid || isIOS)) return;
     kbSavedScroll = keyboardScrollTop();
     document.documentElement.classList.add("keyboard-open");
     clearTimeout(kbFocusTimer);
     kbFocusTimer = setTimeout(function(){   // 兜底：部分 WebView 不发 visualViewport 事件
-      if(document.activeElement === textInput) syncKeyboardPosition();
+      if(document.activeElement === textInput) syncKeyboardLayout();
     }, 400);
   });
   textInput.addEventListener("blur", function(){
@@ -638,12 +652,13 @@ window.__MAIN__ = function () {
     clearTimeout(kbFocusTimer);
     document.documentElement.classList.remove("keyboard-open");
     if(Math.abs(keyboardScrollTop() - kbSavedScroll) > 1){ keyboardScrollTo(kbSavedScroll); }
+    syncGenerateEnabled();
   });
   if(window.visualViewport){
-    window.visualViewport.addEventListener("resize", syncKeyboardPosition);
-    window.visualViewport.addEventListener("scroll", syncKeyboardPosition);
+    window.visualViewport.addEventListener("resize", syncKeyboardLayout);
+    window.visualViewport.addEventListener("scroll", syncKeyboardLayout);
   }
-  window.addEventListener("resize", syncKeyboardPosition);   // 旧 WebView 兜底
+  window.addEventListener("resize", syncKeyboardLayout);   // 旧 WebView 兜底
 
   function setStatus(msg, cls){ statusEl.textContent=msg; statusEl.className="status" + (cls ? " "+cls : ""); }
   window.onNativeStatus = function(ev){
@@ -1091,6 +1106,7 @@ window.__MAIN__ = function () {
     } else {
       suggestBox.hidden = true;
     }
+    syncGenerateEnabled();
   });
 
   btnPreviewVoice.addEventListener("click", previewVoice);
