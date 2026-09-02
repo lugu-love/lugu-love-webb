@@ -77,7 +77,7 @@
   html.state-done .status,
   html.state-done .hint { display:none !important; }
   html.state-done .app { justify-content:center; height:100dvh; min-height:0; overflow:hidden; background:transparent; padding-bottom:calc(env(safe-area-inset-bottom,0px) + 10px); }
-  html.state-done #videoPreview { order:1; display:block; align-self:center; flex:0 1 auto; width:auto; height:min(54svh, calc(100dvh - 260px)); max-width:100%; max-height:58svh; aspect-ratio:9/16; object-fit:contain; border-radius:0; background:transparent; box-shadow:none; margin:0; }
+  html.state-done #videoPreview { order:1; display:block; align-self:center; flex:0 1 auto; width:auto; height:min(54vh, calc(100vh - 260px)); max-width:100%; max-height:58vh; aspect-ratio:9/16; object-fit:contain; border-radius:0; background:transparent; box-shadow:none; margin:0; }
   html.state-done .preview-text { order:2; flex:0 0 auto; font-size:16px; margin:16px 0 0; }
   html.state-done .success-actions { order:3; flex:0 0 auto; }
   html.state-done .debug { order:99; }
@@ -1013,6 +1013,16 @@ window.__MAIN__ = function () {
       videoEl.src=lastUrl;
       videoEl.hidden=false;
       videoEl.play().catch(function(){});
+      // 首帧设为 poster：个别 WebView 拦截自动播放时，预览区仍显示视频首帧而非空白
+      videoEl.addEventListener("loadeddata", function onFirstFrame(){
+        videoEl.removeEventListener("loadeddata", onFirstFrame);
+        try {
+          var fc=document.createElement("canvas");
+          fc.width=videoEl.videoWidth; fc.height=videoEl.videoHeight;
+          fc.getContext("2d").drawImage(videoEl, 0, 0);
+          videoEl.poster=fc.toDataURL("image/jpeg", 0.7);
+        } catch(e){}
+      });
       var tDone = performance.now();
       lastTiming = { clickToFetchMs: Math.round(tFetchStart-tClick), fetchMs: Math.round(tHeaders-tFetchStart), blobMs: Math.round(tBlob-tHeaders), totalMs: Math.round(tDone-tClick) };
       generatePhase="success";
