@@ -1218,5 +1218,43 @@ if (window.__MAIN_PENDING__) {
   window.__MAIN__();
 }
 </script>
+<script>
+// 诊断模式（仅 ?perf=1）：在页面右下角显示各阶段耗时（相对导航开始，毫秒）。
+// 用于真机定位“切换慢”的时间去向：HTML解析/初始化/兔子素材解码。
+(function () {
+  if (new URLSearchParams(location.search).get("perf") !== "1") return;
+  var navT = (window.performance && performance.timing && performance.timing.navigationStart) ? performance.timing.navigationStart : Date.now();
+  function now() {
+    return Math.round((window.performance && performance.now) ? performance.now() : (Date.now() - navT));
+  }
+  function show(html) {
+    var bar = document.getElementById("perfBar");
+    if (!bar) {
+      bar = document.createElement("div");
+      bar.id = "perfBar";
+      bar.style.cssText = "position:fixed;right:8px;bottom:120px;z-index:99999;background:rgba(0,0,0,.82);color:#7CFFB2;font:11px/1.6 monospace;padding:8px 10px;border-radius:10px;white-space:pre;max-width:78vw;pointer-events:none;";
+      document.body.appendChild(bar);
+    }
+    bar.innerHTML = html;
+  }
+  var R = { dcl: "-", load: "-", init: "-", rabbit: "-" };
+  document.addEventListener("DOMContentLoaded", function () { R.dcl = now(); });
+  window.addEventListener("load", function () { R.load = now(); });
+  var tries = 0;
+  function poll() {
+    tries++;
+    if (R.init === "-" && document.querySelectorAll(".emotion").length >= 3) R.init = now();
+    var cv = document.getElementById("stage");
+    var painted = false;
+    try { var c = cv && cv.getContext ? cv.getContext("2d") : null; if (c) { var d = c.getImageData(200, 200, 1, 1).data; painted = d[3] !== 0; } } catch (e) {}
+    if (R.rabbit === "-" && painted) R.rabbit = now();
+    show("页面解析/JS执行  → DOMContentLoaded: " + R.dcl + "ms\nload 事件: " + R.load + "ms\n情绪按钮渲染(初始化完成): " + R.init + "ms\n兔子首帧绘制(素材解码完成): " + R.rabbit + "ms\n网络传输(HTML+JS+素材): 另计");
+    if (R.rabbit !== "-" || tries > 400) { show("perf 完成\n→ DOMContentLoaded: " + R.dcl + "ms\n→ load: " + R.load + "ms\n→ 初始化(情绪按钮): " + R.init + "ms\n→ 兔子首帧: " + R.rabbit + "ms"); return; }
+    setTimeout(poll, 50);
+  }
+  setTimeout(poll, 100);
+  setTimeout(function () { show("perf(15s超时)\n→ DOMContentLoaded: " + R.dcl + "ms\n→ load: " + R.load + "ms\n→ 初始化: " + R.init + "ms\n→ 兔子首帧: " + R.rabbit + "ms"); }, 15000);
+})();
+</script>
 </body>
 </html>

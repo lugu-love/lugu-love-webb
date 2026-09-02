@@ -6867,5 +6867,48 @@ if ("serviceWorker" in navigator) {
   }
 })();
 </script>
+<script>
+// 诊断模式（仅 ?perf=1）：首页各阶段耗时（相对导航开始，毫秒）。
+(function () {
+  if (new URLSearchParams(location.search).get("perf") !== "1") return;
+  var navT = (window.performance && performance.timing && performance.timing.navigationStart) ? performance.timing.navigationStart : Date.now();
+  function now() { return Math.round((window.performance && performance.now) ? performance.now() : (Date.now() - navT)); }
+  function show(html) {
+    var bar = document.getElementById("perfBar");
+    if (!bar) {
+      bar = document.createElement("div");
+      bar.id = "perfBar";
+      bar.style.cssText = "position:fixed;right:8px;top:64px;z-index:99999;background:rgba(0,0,0,.82);color:#7CFFB2;font:11px/1.6 monospace;padding:8px 10px;border-radius:10px;white-space:pre;max-width:78vw;pointer-events:none;";
+      document.body.appendChild(bar);
+    }
+    bar.innerHTML = html;
+  }
+  var R = { dcl: "-", load: "-", firstCanvas: "-" };
+  document.addEventListener("DOMContentLoaded", function () { R.dcl = now(); });
+  window.addEventListener("load", function () { R.load = now(); });
+  var tries = 0;
+  function poll() {
+    tries++;
+    if (R.firstCanvas === "-") {
+      var canvases = document.querySelectorAll("canvas");
+      for (var i = 0; i < canvases.length; i++) {
+        try {
+          var c = canvases[i].getContext && canvases[i].getContext("2d");
+          var d = c && c.getImageData ? c.getImageData(0, 0, Math.min(4, canvases[i].width), Math.min(4, canvases[i].height)).data : null;
+          if (d) { for (var j = 3; j < d.length; j += 4) { if (d[j] !== 0) { R.firstCanvas = now(); break; } } }
+        } catch (e) {}
+        if (R.firstCanvas !== "-") break;
+      }
+    }
+    if (R.firstCanvas !== "-" || tries > 400) {
+      show("首页 perf\n→ DOMContentLoaded: " + R.dcl + "ms\n→ load: " + R.load + "ms\n→ 首个画布帧(兔子演示开始): " + R.firstCanvas + "ms");
+      return;
+    }
+    setTimeout(poll, 50);
+  }
+  setTimeout(poll, 100);
+  setTimeout(function () { show("首页 perf(超时)\n→ DOMContentLoaded: " + R.dcl + "ms\n→ load: " + R.load + "ms\n→ 首个画布帧: " + R.firstCanvas + "ms"); }, 20000);
+})();
+</script>
 </body>
 </html>
