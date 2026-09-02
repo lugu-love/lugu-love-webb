@@ -12,9 +12,12 @@
     -webkit-font-smoothing:antialiased; overflow-x:hidden; overflow-y:auto; }
   .app { display:flex; flex-direction:column; min-height:100vh; min-height:100svh; height:auto; padding:calc(env(safe-area-inset-top,0px)+16px) 16px calc(env(safe-area-inset-bottom,0px)+86px); }
   .edit-top { position:sticky; top:0; z-index:20; flex:0 0 auto; background:var(--bg); }
-  html.keyboard-open .app { padding-top: calc(env(safe-area-inset-top,0px) + 6px); }
+  html.keyboard-open .app { padding-top: calc(env(safe-area-inset-top,0px) + 6px); padding-bottom: calc(env(safe-area-inset-bottom,0px) + 10px); }
   html.keyboard-open .edit-top .stage-wrap { margin-top: 0; }
   html.keyboard-open .emotions { margin-top: 8px; margin-bottom: 6px; }
+  html.keyboard-open #stage { width: min(56vw, 232px); }
+  html.keyboard-open .emotion { padding: 6px 14px; }
+  html.keyboard-open .cta { display: none !important; }
   .brand { display:flex; align-items:center; gap:12px; margin:0; padding:2px 4px; position:relative; z-index:60; }
   .site-logo { display:inline-flex; align-items:center; gap:5px; color:rgba(238,240,255,.72); text-decoration:none; font-size:13px; font-weight:400; letter-spacing:.04em; padding:4px 6px 4px 0; border-radius:999px; }
   .site-logo img { width:26px; height:26px; flex:0 0 26px; filter:drop-shadow(0 0 4px rgba(255,222,143,.4)); }
@@ -593,41 +596,53 @@ window.__MAIN__ = function () {
   // 键盘覆盖模式：只补偿输入框，不重排整页。
   // 主动聚焦输入框 → 进入 keyboard-open（回收上方留白）；仅当输入框被键盘遮挡时做最小滚动，
   // 输入框已可见则不动；失焦/键盘收起后立即恢复原布局。
-  function keyboardScrollContainer(){
+  function keyboardScrollTop(){
     var se = document.scrollingElement || document.documentElement;
-    if(se && se.scrollHeight > se.clientHeight) return se;
-    if(document.body && document.body.scrollHeight > document.body.clientHeight) return document.body;
-    return se;
+    if(se && se.scrollHeight > se.clientHeight) return se.scrollTop;
+    if(document.body && document.body.scrollHeight > document.body.clientHeight) return document.body.scrollTop;
+    return (window.pageYOffset || 0);
   }
-  function keyboardScrollTop(){ var c = keyboardScrollContainer(); return c ? c.scrollTop : 0; }
-  var kbSavedScroll = 0;
+  function keyboardScrollBy(dy){
+    var se = document.scrollingElement || document.documentElement;
+    if(se && se.scrollHeight > se.clientHeight){ se.scrollTop += dy; return; }
+    if(document.body && document.body.scrollHeight > document.body.clientHeight){ document.body.scrollTop += dy; return; }
+    try { window.scrollBy(0, dy); } catch(e){}
+  }
+  function keyboardScrollTo(y){
+    var se = document.scrollingElement || document.documentElement;
+    if(se && se.scrollHeight > se.clientHeight){ se.scrollTop = y; return; }
+    if(document.body && document.body.scrollHeight > document.body.clientHeight){ document.body.scrollTop = y; return; }
+    try { window.scrollTo(0, y); } catch(e){}
+  }
+  function syncKeyboardPosition(){
+    if(document.activeElement !== textInput) return;
+    var vv = window.visualViewport;
+    var kbTop = (vv && typeof vv.height === "number") ? (vv.offsetTop + vv.height) : window.innerHeight;
+    var r = textInput.getBoundingClientRect();
+    var overflow = r.bottom - (kbTop - 12);      // 需补距离，含 12px 安全间距
+    if(overflow > 0){ keyboardScrollBy(Math.ceil(overflow)); }
+  }
+  var kbSavedScroll = 0, kbFocusTimer = 0;
   textInput.addEventListener("focus", function(){
     if(!(isAndroid || isIOS)) return;
     kbSavedScroll = keyboardScrollTop();
     document.documentElement.classList.add("keyboard-open");
+    clearTimeout(kbFocusTimer);
+    kbFocusTimer = setTimeout(function(){   // 兜底：部分 WebView 不发 visualViewport 事件
+      if(document.activeElement === textInput) syncKeyboardPosition();
+    }, 400);
   });
   textInput.addEventListener("blur", function(){
     if(!(isAndroid || isIOS)) return;
+    clearTimeout(kbFocusTimer);
     document.documentElement.classList.remove("keyboard-open");
-    var c = keyboardScrollContainer();
-    if(c && Math.abs(c.scrollTop - kbSavedScroll) > 1){ c.scrollTop = kbSavedScroll; }
+    if(Math.abs(keyboardScrollTop() - kbSavedScroll) > 1){ keyboardScrollTo(kbSavedScroll); }
   });
   if(window.visualViewport){
-    var onKeyboardViewport = function(){
-      if(document.activeElement !== textInput) return;
-      var vv = window.visualViewport;
-      if(!vv) return;
-      var r = textInput.getBoundingClientRect();
-      var kbTop = vv.offsetTop + vv.height;      // 键盘顶部（布局视口坐标）
-      var overflow = r.bottom - (kbTop - 12);    // 需补距离，含 12px 安全间距
-      if(overflow > 0){
-        var c = keyboardScrollContainer();
-        if(c){ c.scrollTop += Math.ceil(overflow); }
-      }
-    };
-    window.visualViewport.addEventListener("resize", onKeyboardViewport);
-    window.visualViewport.addEventListener("scroll", onKeyboardViewport);
+    window.visualViewport.addEventListener("resize", syncKeyboardPosition);
+    window.visualViewport.addEventListener("scroll", syncKeyboardPosition);
   }
+  window.addEventListener("resize", syncKeyboardPosition);   // 旧 WebView 兜底
 
   function setStatus(msg, cls){ statusEl.textContent=msg; statusEl.className="status" + (cls ? " "+cls : ""); }
   window.onNativeStatus = function(ev){
