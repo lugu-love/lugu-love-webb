@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0c18">
+<title>统一壳层（第一阶段）· 首页 ⇄ 情绪表达</title>
+<style>
+  * { box-sizing:border-box; }
+  html,body { margin:0; padding:0; background:#0b0c18; height:100%; }
+  .frame { position:fixed; inset:0; }
+  .frame iframe { width:100%; height:100%; border:0; display:block; }
+  .frame.active { display:block; }
+  .frame:not(.active) { display:none; }   /* 隐藏视图：rAF 由浏览器节流，动画自动暂停 */
+  #loading { position:fixed; inset:0; z-index:9999; display:none; align-items:center; justify-content:center;
+    background:#0b0c18; color:#8a90b8; font-size:14px; }
+  #loading.show { display:flex; }
+</style>
+</head>
+<body>
+  <div class="frame active" id="frame-home"><iframe id="if-home" src="index.html" title="地球首页"></iframe></div>
+  <div class="frame" id="frame-emotion"><iframe id="if-emotion" src="send-test.html" title="情绪表达" hidden></iframe></div>
+  <div id="loading">加载中…</div>
+<script>
+(function () {
+  var V = { home: "frame-home", emotion: "frame-emotion" };
+  var ifHome = document.getElementById("if-home");
+  var ifEmotion = document.getElementById("if-emotion");
+  var loadingEl = document.getElementById("loading");
+  var emotionLoading = false;
+
+  function param(name) {
+    return new URLSearchParams(location.search).get(name);
+  }
+
+  // 目标视图 iframe 已加载？（防止首次切到未加载完成的情绪表达）
+  function loaded(view) {
+    return view === "home" ? true : (ifEmotion.__loaded === true);
+  }
+
+  function show(view, replace) {
+    Object.keys(V).forEach(function (k) {
+      var el = document.getElementById(V[k]);
+      el.classList.toggle("active", k === view);
+      var ifr = el.querySelector("iframe");
+      if (ifr) ifr.style.visibility = k === view ? "visible" : "hidden";
+    });
+    var url = new URL(location.href);
+    url.searchParams.set("view", view);
+    url.search = url.searchParams.toString();
+    if (replace) history.replaceState({ view: view }, "", url.pathname + url.search);
+    else history.pushState({ view: view }, "", url.pathname + url.search);
+  }
+
+  function go(view) {
+    if (view === "emotion" && !loaded("emotion") && !emotionLoading) {
+      // 首次：等情绪表达 iframe 就绪再显示（后台已在加载，通常几百 ms 内）
+      emotionLoading = true;
+      loadingEl.classList.add("show");
+      var wait = 0;
+      var iv = setInterval(function () {
+        wait += 100;
+        if (ifEmotion.__loaded || wait > 8000) {
+          clearInterval(iv);
+          emotionLoading = false;
+          loadingEl.classList.remove("show");
+          show("emotion", false);
+        }
+      }, 100);
+      return;
+    }
+    show(view, false);
+  }
+
+  // popstate：系统返回键 / 前进
+  window.addEventListener("popstate", function (e) {
+    var v = (e.state && e.state.view) || param("view") || "home";
+    show(v === "emotion" ? "emotion" : "home", true);
+  });
+
+  // 子视图通知（拦截情绪表达入口 / 返回首页按钮）
+  window.addEventListener("message", function (ev) {
+    var d = ev.data;
+    if (d && d.luguShell === "go") go(d.view);
+  });
+
+  // iframe 加载完成后注入“壳层拦截器”（同源；业务页面本身零改动）
+  function inject(ifr, code) {
+    try {
+      var doc = ifr.contentDocument;
+      if (!doc) return false;
+      var s = doc.createElement("script");
+      s.textContent = code;
+      (doc.head || doc.documentElement).appendChild(s);
+      return true;
+    } catch (e) { return false; }
+  }
+
+  var HOME_INTERCEPT = "(function(){" +
+    "function h(e){" +
+    "  var a = e.target && e.target.closest ? e.target.closest('a') : null;" +
+    "  if (!a) return;" +
+    "  if (a.classList && a.classList.contains('emotion-entry')) {" +
+    "    e.preventDefault(); e.stopPropagation();" +
+    "    window.parent.postMessage({ luguShell:'go', view:'emotion' }, '*'); return;" +
+    "  }" +
+    "  var hr = (a.getAttribute('href')||'').trim();" +
+    "  if (hr && hr.charAt(0) !== '#' && hr.indexOf('javascript:') !== 0) { a.setAttribute('target','_top'); }" +
+    "}" +
+    "document.addEventListener('click', h, true);" +
+    "})();";
+
+  var EMOTION_INTERCEPT = "(function(){" +
+    "function h(e){" +
+    "  var el = e.target && e.target.closest ? e.target.closest('#btnHome') : null;" +
+    "  if (el) { e.preventDefault(); e.stopPropagation(); window.parent.postMessage({ luguShell:'go', view:'home' }, '*'); }" +
+    "}" +
+    "document.addEventListener('click', h, true);" +
+    "})();";
+
+  ifHome.addEventListener("load", function () {
+    ifHome.__loaded = true;
+    inject(ifHome, HOME_INTERCEPT);
+  });
+  ifEmotion.addEventListener("load", function () {
+    ifEmotion.__loaded = true;
+    ifEmotion.removeAttribute("hidden");
+    inject(ifEmotion, EMOTION_INTERCEPT);
+    // 若正等待切换，立即完成
+    if (emotionLoading) {
+      emotionLoading = false;
+      loadingEl.classList.remove("show");
+      show("emotion", true);
+    }
+  });
+
+  // 初始：深链 ?view=emotion 直接显示情绪表达
+  var initial = param("view") === "emotion" ? "emotion" : "home";
+  // 用 replaceState 建立初始历史（不产生额外历史项）
+  if (initial === "home") {
+    history.replaceState({ view: "home" }, "", location.pathname + "?view=home");
+  }
+  show(initial, true);
+  window.__shellGo = go;   // 调试/自动化钩子
+  window.__shellShow = function(v){ show(v, true); };
+})();
+</script>
+</body>
+</html>
