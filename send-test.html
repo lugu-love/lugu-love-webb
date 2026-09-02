@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=overlays-content">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b0c18">
 <title>七星使者 · 情绪表达</title>
 <style>  :root { --bg:#0b0c18; --card:#17192e; --ink:#eef0ff; --muted:#9aa0c3; --accent:#7d8bff; }
@@ -626,9 +626,8 @@ window.__MAIN__ = function () {
     syncGenerateEnabled();
   }
   function kbKeyboardOpenNow(){
-    var vv = window.visualViewport;
-    var visH = (vv && typeof vv.height === "number") ? vv.height : window.innerHeight;
-    return (kbBaseHeight - visH) > 40;       // 可视高度明显小于基准 → 键盘打开（兼容 overlay/resize）
+    // 统一原生 resize 模式：window.innerHeight 在键盘弹出时一定缩小，是最可靠信号
+    return (kbBaseHeight - window.innerHeight) > 40;
   }
   function kbPollCheck(){
     if(!document.documentElement.classList.contains("keyboard-open")){ kbRecover(); return; }
@@ -639,25 +638,27 @@ window.__MAIN__ = function () {
       kbClosedCount = 0;
     }
   }
+  function kbEnsureInputVisible(){
+    // 输入框可见性第一优先级：resize 模式下布局视口底部即键盘上方，被遮挡才最小滚动
+    if(document.activeElement !== textInput) return;
+    var kbTop = window.innerHeight;
+    var r = textInput.getBoundingClientRect();
+    var overflow = r.bottom - (kbTop - 12);   // 需补距离，含 12px 安全间距
+    if(overflow > 0){ keyboardScrollBy(Math.ceil(overflow)); }
+  }
   function syncKeyboardLayout(){
     if(window.innerHeight > kbBaseHeight){ kbBaseHeight = window.innerHeight; }  // URL 栏收起等正常增大
     if(!kbKeyboardOpenNow()){ kbRecover(); return; }
     kbClosedCount = 0;
-    if(document.activeElement === textInput){
-      var vv = window.visualViewport;
-      var kbTop = (vv && typeof vv.height === "number") ? (vv.offsetTop + vv.height) : window.innerHeight;
-      var r = textInput.getBoundingClientRect();
-      var overflow = r.bottom - (kbTop - 12);  // 需补距离，含 12px 安全间距
-      if(overflow > 0){ keyboardScrollBy(Math.ceil(overflow)); }
-    }
+    kbEnsureInputVisible();
   }
   textInput.addEventListener("focus", function(){
     if(!(isAndroid || isIOS)) return;
     kbSavedScroll = keyboardScrollTop();
     document.documentElement.classList.add("keyboard-open");
     clearTimeout(kbFocusTimer);
-    kbFocusTimer = setTimeout(function(){   // 兜底：部分 WebView 不发 visualViewport 事件
-      if(document.activeElement === textInput) syncKeyboardLayout();
+    kbFocusTimer = setTimeout(function(){   // 兜底：原生未滚动到位时做最小补偿
+      if(document.activeElement === textInput) kbEnsureInputVisible();
     }, 400);
     // 轮询兜底：即使 blur/resize/visualViewport 事件全部缺失，键盘一关闭也必定恢复按钮
     clearInterval(kbPollTimer);
