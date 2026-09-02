@@ -55,6 +55,7 @@
   .editor textarea { width:100%; min-height:68px; border-radius:14px; background:#12142a; color:#fff; border:1px solid rgba(255,255,255,.10); padding:12px 12px 24px 18px; font-size:15px; line-height:1.5; resize:none; outline:none; display:block; }
   .char-count { position:absolute; right:12px; bottom:6px; font-size:11px; line-height:1; color:rgba(150,140,190,.55); pointer-events:none; margin:0; text-align:right; }
   .preview-text { text-align:center; font-size:14px; line-height:1.5; min-height:22px; margin:6px 0 0; white-space:pre-wrap; color:#fff; }
+  html:not(.state-done) .preview-text { display:none !important; }   /* 编辑页不重复展示全文预览，仅结果页保留 */
   .cta { position:fixed; left:0; right:0; bottom:0; z-index:40; display:flex; justify-content:center; margin:0; padding:10px 16px calc(env(safe-area-inset-bottom,0px) + 10px); background:var(--bg); border-top:1px solid rgba(255,255,255,.08); }
   .success-actions { display:flex; flex-direction:column; gap:10px; margin-top:14px; }
   .success-actions #btnSend, .success-actions #btnSendWeChat { width:100%; height:50px; font-size:16px; font-weight:700; flex:none; }
