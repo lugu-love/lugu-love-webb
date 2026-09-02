@@ -59,7 +59,10 @@
   html:not(.state-done) .preview-text { display:none !important; }   /* 编辑页不重复展示全文预览，仅结果页保留 */
   .cta { position:fixed; left:0; right:0; bottom:0; z-index:40; display:flex; justify-content:center; margin:0; padding:10px 16px calc(env(safe-area-inset-bottom,0px) + 10px); background:var(--bg); border-top:1px solid rgba(255,255,255,.08); }
   .success-actions { display:flex; flex-direction:column; gap:10px; margin-top:14px; }
-  .success-actions #btnSend, .success-actions #btnSendWeChat { width:100%; height:50px; font-size:16px; font-weight:700; flex:none; }
+  .success-actions #btnSendWeChat { width:100%; height:50px; font-size:16px; font-weight:700; flex:none; }
+  .success-actions #btnSend, .success-actions #btnSave { flex:0 0 auto; align-self:center; min-width:170px; height:46px; padding:0 34px; border-radius:999px; font-size:15px; font-weight:700; }
+  .success-actions #btnSend { background:linear-gradient(135deg,#8a7dff,#b06bff); color:#fff; border:none; box-shadow:0 8px 24px rgba(125,139,255,.35); }
+  .success-actions #btnSend:active { transform:scale(.97); }
   .success-sub-actions { display:flex; gap:10px; }
   .success-sub-actions button { flex:1; min-width:0; height:44px; font-size:14px; }
   html.is-android.is-wechat #btnSend { display:none !important; }
@@ -78,7 +81,11 @@
   html.state-done .status,
   html.state-done .hint { display:none !important; }
   html.state-done .app { justify-content:center; height:100dvh; min-height:0; overflow:hidden; background:transparent; padding:0 16px calc(env(safe-area-inset-bottom,0px) + 10px); }
-  html.state-done #videoPreview { order:1; display:block; align-self:center; flex:0 1 auto; width:auto; height:min(54vh, calc(100vh - 260px)); min-height:180px; max-width:100%; max-height:58vh; aspect-ratio:9/16; object-fit:contain; border-radius:0; background:transparent; box-shadow:none; margin:0; }
+  html.state-done .video-wrap { order:1; align-self:center; position:relative; display:block; }
+  html:not(.state-done) .video-wrap { display:none !important; }
+  .sound-toggle { position:absolute; top:8px; right:8px; z-index:6; width:38px; height:38px; min-width:0; padding:0; border-radius:50%; background:rgba(8,10,22,.66); border:1px solid rgba(255,255,255,.24); color:#fff; font-size:16px; line-height:1; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .sound-toggle:active { transform:scale(.94); }
+  html.state-done #videoPreview { display:block; flex:0 1 auto; width:auto; height:min(54vh, calc(100vh - 260px)); min-height:180px; max-width:100%; max-height:58vh; aspect-ratio:9/16; object-fit:contain; border-radius:0; background:transparent; box-shadow:none; margin:0; }
   html.state-done .preview-text { order:2; flex:0 0 auto; font-size:16px; margin:16px 0 0; }
   html.state-done .success-actions { order:3; flex:0 0 auto; }
   html.state-done .debug { order:99; }
@@ -145,7 +152,10 @@
 
     <div class="status" id="status"></div>
     <div class="hint" id="hint"></div>
-    <video id="videoPreview" autoplay muted playsinline loop preload="auto" hidden></video>
+    <div class="video-wrap">
+      <video id="videoPreview" autoplay muted playsinline loop preload="auto" hidden></video>
+      <button class="sound-toggle" id="btnSound" type="button" aria-label="声音开关" title="声音开关" hidden>🔇</button>
+    </div>
 
     <details class="debug" id="debugDetails" hidden>
       <summary>调试</summary>
@@ -291,6 +301,7 @@ window.__MAIN__ = function () {
   var btnOpen=document.getElementById("btnOpen");
   var btnSave=document.getElementById("btnSave");
   var btnSend=document.getElementById("btnSend");
+  var btnSound=document.getElementById("btnSound");
   var btnReEdit=document.getElementById("btnReEdit");
   var btnHome=document.getElementById("btnHome");
   var btnSendWeChat=document.getElementById("btnSendWeChat");
@@ -758,9 +769,11 @@ window.__MAIN__ = function () {
     if(lastUrl){ URL.revokeObjectURL(lastUrl); lastUrl=null; }
     lastBlob=null; lastFile=null;
     videoEl.pause();
+    videoEl.muted=true;
     videoEl.removeAttribute("src");
     videoEl.load();
     videoEl.hidden=true;
+    if(btnSound){ btnSound.hidden=true; }
     btnOpen.hidden=true; btnSave.hidden=true; btnSend.hidden=true; btnReEdit.hidden=true; btnHome.hidden=true;
     setStatus("");
     setHint("");
@@ -1013,6 +1026,7 @@ window.__MAIN__ = function () {
       lastUrl=URL.createObjectURL(blob);
       videoEl.src=lastUrl;
       videoEl.hidden=false;
+      if(btnSound){ btnSound.hidden=false; syncSoundBtn(); }
       videoEl.play().catch(function(){});
       // 首帧设为 poster：个别 WebView 拦截自动播放时，预览区仍显示视频首帧而非空白
       videoEl.addEventListener("loadeddata", function onFirstFrame(){
@@ -1150,6 +1164,17 @@ window.__MAIN__ = function () {
   btnPreviewVoice.addEventListener("click", previewVoice);
   btnGenerate.addEventListener("click", generateVideo);
   btnOpen.addEventListener("click", openVideo);
+  function syncSoundBtn(){
+    if(!btnSound) return;
+    btnSound.textContent = videoEl.muted ? "🔇" : "🔊";
+  }
+  if(btnSound){
+    btnSound.addEventListener("click", function(){
+      videoEl.muted = !videoEl.muted;
+      syncSoundBtn();
+      try { if(videoEl.paused) videoEl.play().catch(function(){}); } catch(e){}
+    });
+  }
   btnSave.addEventListener("click", saveVideo);
   btnSend.addEventListener("click", sendVideo);
   btnReEdit.addEventListener("click", reEdit);
