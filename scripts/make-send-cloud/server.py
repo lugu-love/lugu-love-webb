@@ -556,6 +556,16 @@ def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts
     final = os.path.join(workdir, "final.mp4")
     tts_path = os.path.join(workdir, "tts.mp3")
     meta = {}
+    # 发声时机：speechStart（秒）= 该条视频里角色完成初步情绪建立、最适合开口的时间。
+    # 不同情绪/不同动作可不同；最低门槛 1.2s，负值/非法按 0 处理（不早于视频开头）。
+    speech_start = 0.0
+    try:
+        speech_start = float((_emotions.get(item) or {}).get("speechStart") or 0.0)
+    except Exception:
+        speech_start = 0.0
+    if speech_start < 0:
+        speech_start = 0.0
+    meta["speech_start"] = speech_start
 
     t0 = time.time()
     lines, font_size, block_h = layout_lines(
@@ -591,7 +601,7 @@ def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts
     t0 = time.time()
     # 动态时长：最终视频时长 = max(保底, TTS 实测时长 + 尾段预留)
     tts_dur = _probe_duration(tts_path) or 0.0
-    final_duration = max(BASE_MIN_DURATION, tts_dur + ENDING_HOLD)
+    final_duration = max(BASE_MIN_DURATION, speech_start + tts_dur + ENDING_HOLD)
     final_duration = min(final_duration, MAX_FINAL_DURATION)
     master_dur = _probe_duration(master) or float(DURATION)
 
@@ -603,8 +613,12 @@ def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts
     if final_duration > master_dur + 0.05:
         extra.append("%stpad=stop_mode=clone:stop_duration=%.3f[vout]" % (vlabel, final_duration - master_dur))
         map_video = "[vout]"
-    # 音频：apad 补尾段静音，保证收尾预留存在
-    extra.append("[1:a]apad[aout]")
+    # 音频：语音按 speechStart 延迟进入（情绪建立后再开口）；adelay 仅前置静音，
+    # 不裁切 TTS、不加 fade，保证首字完整；再 apad 补尾段静音
+    if speech_start > 0:
+        extra.append("[1:a]adelay=%.0f:all=1,apad[aout]" % (speech_start * 1000))
+    else:
+        extra.append("[1:a]apad[aout]")
     filter_complex = filtergraph if not extra else "%s;%s" % (filtergraph, ";".join(extra))
     cmd = [
         FFMPEG, "-y", "-i", master, "-i", tts_path,
