@@ -90,7 +90,6 @@
       var doc = ifr.contentDocument;
       if (!doc) return false;
       var s = doc.createElement("script");
-      s.setAttribute("data-shell-intercept", "1");
       s.textContent = code;
       (doc.head || doc.documentElement).appendChild(s);
       return true;
@@ -119,26 +118,14 @@
     "document.addEventListener('click', h, true);" +
     "})();";
 
-  // 以 DOMContentLoaded(interactive) 为就绪信号（业务页资源多，不等待 load）
-  function whenDoc(ifr, cb) {
-    var tries = 0;
-    var iv = setInterval(function () {
-      tries++;
-      var doc = null;
-      try { doc = ifr.contentDocument; } catch (e) {}
-      if (doc && (doc.readyState === "interactive" || doc.readyState === "complete")) {
-        clearInterval(iv);
-        cb(doc);
-      } else if (tries > 400) { clearInterval(iv); }
-    }, 50);
-  }
-  whenDoc(ifHome, function (doc) {
+  ifHome.addEventListener("load", function () {
     ifHome.__loaded = true;
-    inject(doc, HOME_INTERCEPT);
+    inject(ifHome, HOME_INTERCEPT);
   });
-  whenDoc(ifEmotion, function (doc) {
+  ifEmotion.addEventListener("load", function () {
     ifEmotion.__loaded = true;
-    inject(doc, EMOTION_INTERCEPT);
+    ifEmotion.removeAttribute("hidden");
+    inject(ifEmotion, EMOTION_INTERCEPT);
     // 若正等待切换，立即完成
     if (emotionLoading) {
       emotionLoading = false;
