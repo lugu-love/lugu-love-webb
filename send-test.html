@@ -17,7 +17,7 @@
   html:not(.state-done).keyboard-open .edit-top .stage-wrap { margin-top: 0; }
   html:not(.state-done).keyboard-open .emotions { margin-top: 8px; margin-bottom: 6px; }
   html:not(.state-done).keyboard-open #stage { width: min(56vw, 232px); }
-  html:not(.state-done).keyboard-open .emotion { padding: 6px 14px; }
+  html:not(.state-done).keyboard-open .emotion { padding: 4px 10px; font-size:12px; }
   html:not(.state-done).keyboard-open .cta { display: none !important; }
   .brand { display:flex; align-items:center; gap:12px; margin:0; padding:2px 4px; position:relative; z-index:60; }
   .site-logo { display:inline-flex; align-items:center; gap:5px; color:rgba(238,240,255,.72); text-decoration:none; font-size:13px; font-weight:400; letter-spacing:.04em; padding:4px 6px 4px 0; border-radius:999px; }
@@ -35,8 +35,8 @@
   .guide { margin:6px 0 0 16px; font-size:13px; color:rgba(207,198,235,.58); transition:opacity .2s ease; }
   .stage-wrap { display:flex; align-items:center; justify-content:center; min-height:0; pointer-events:none; margin-top:8px; }
   #stage { width:min(68vw,300px); height:auto; border-radius:18px; pointer-events:none; mix-blend-mode:lighten; }   /* 去黑底：黑色精灵背景与深色页面混合消失，只留兔子 */
-  .emotions { display:flex; justify-content:center; gap:20px; margin:18px 0 10px; position:relative; z-index:30; }
-  .emotion { flex:0 1 auto; padding:10px 20px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:var(--muted); font-size:13px; font-weight:600; cursor:pointer; text-align:center; white-space:nowrap; }
+  .emotions { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:8px 10px; margin:14px 0 8px; position:relative; z-index:30; max-width:min(94vw,520px); }
+  .emotion { flex:0 0 auto; padding:7px 14px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:var(--muted); font-size:13px; font-weight:600; cursor:pointer; text-align:center; white-space:nowrap; }
   .emotion.active { color:#fff; border-color:var(--accent); background:rgba(125,139,255,.22); box-shadow:0 0 16px rgba(125,139,255,.28); }
   .sub-actions { display:flex; align-items:center; justify-content:center; gap:6px; margin:8px 0 0; flex-wrap:wrap; }
   .sub-actions .suggest { margin:0; flex:0 1 auto; min-width:0; height:34px; display:inline-flex; align-items:center; gap:6px; padding:0 10px; border:1px solid rgba(255,255,255,.14); border-radius:999px; background:rgba(255,255,255,.05); color:#b8c0ff; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; }
@@ -212,7 +212,19 @@ window.__MAIN__ = function () {
   var EMOTIONS_FALLBACK = [
     { id:"1", name:"开心", item:"rabbit-happy", totalFrames:73, sheetCount:7, previewProxy:"mobile/1" },
     { id:"2", name:"委屈", item:"rabbit-aggrieved", totalFrames:91, sheetCount:8, previewProxy:"mobile/2" },
-    { id:"3", name:"生气", item:"rabbit-angry", totalFrames:109, sheetCount:10, previewProxy:"mobile/3" }
+    { id:"3", name:"生气", item:"rabbit-angry", totalFrames:109, sheetCount:10, previewProxy:"mobile/3" },
+    { id:"4", name:"撒娇", item:"rabbit-sajiao", totalFrames:72, sheetCount:6, previewProxy:"mobile/4" },
+    { id:"5", name:"调皮", item:"rabbit-playful", totalFrames:72, sheetCount:6, previewProxy:"mobile/5" },
+    { id:"6", name:"吃醋", item:"rabbit-jealous", totalFrames:72, sheetCount:6, previewProxy:"mobile/6" },
+    { id:"7", name:"嘴硬不服", item:"rabbit-stubborn", totalFrames:72, sheetCount:6, previewProxy:"mobile/7" },
+    { id:"8", name:"意外惊喜", item:"rabbit-surprise", totalFrames:72, sheetCount:6, previewProxy:"mobile/8" },
+    { id:"9", name:"疑惑", item:"rabbit-confused", totalFrames:72, sheetCount:6, previewProxy:"mobile/9" },
+    { id:"10", name:"嫌弃", item:"rabbit-disgust", totalFrames:72, sheetCount:6, previewProxy:"mobile/10" },
+    { id:"11", name:"心虚", item:"rabbit-guilty", totalFrames:72, sheetCount:6, previewProxy:"mobile/11" },
+    { id:"12", name:"求原谅", item:"rabbit-apology", totalFrames:72, sheetCount:6, previewProxy:"mobile/12" },
+    { id:"13", name:"躺平摆烂", item:"rabbit-lowenergy", totalFrames:72, sheetCount:6, previewProxy:"mobile/13" },
+    { id:"14", name:"装酷", item:"rabbit-cool", totalFrames:72, sheetCount:6, previewProxy:"mobile/14" },
+    { id:"15", name:"幸灾乐祸", item:"rabbit-gloat", totalFrames:72, sheetCount:6, previewProxy:"mobile/15" }
   ];
   var EMOTIONS = EMOTIONS_FALLBACK.slice();
 
@@ -221,7 +233,7 @@ window.__MAIN__ = function () {
       .then(function(r){ if(!r.ok) throw new Error("manifest " + r.status); return r.json(); })
       .then(function(m){
         var src = (m && m.emotions) || {};
-        var list = ["rabbit-happy","rabbit-aggrieved","rabbit-angry"].map(function(itemId){
+        var list = ["rabbit-happy","rabbit-aggrieved","rabbit-angry","rabbit-sajiao","rabbit-playful","rabbit-jealous","rabbit-stubborn","rabbit-surprise","rabbit-confused","rabbit-disgust","rabbit-guilty","rabbit-apology","rabbit-lowenergy","rabbit-cool","rabbit-gloat"].map(function(itemId){
           var e = src[itemId];
           if(!e) return null;
           return {
@@ -233,7 +245,7 @@ window.__MAIN__ = function () {
             previewProxy: e.previewProxy
           };
         });
-        if(list.length === 3 && list.every(function(x){ return x && x.id && x.sheetCount > 0; })){
+        if(list.length === 15 && list.every(function(x){ return x && x.id && x.sheetCount > 0; })){
           EMOTIONS = list;
           return true;
         }
@@ -245,7 +257,19 @@ window.__MAIN__ = function () {
   var GUIDES = {
     "1": "把这份开心，说给你想分享的人。",
     "2": "有些委屈，不知道怎么说也没关系。",
-    "3": "把不开心说出来，也是一种表达。"
+    "3": "把不开心说出来，也是一种表达。",
+    "4": "想被偏爱的时候，就撒个娇。",
+    "5": "今天想把世界轻轻逗笑。",
+    "6": "嘴上说没事，心里其实有点酸。",
+    "7": "输了气势，嘴上也绝不认输。",
+    "8": "惊喜来得太突然，先开心一下。",
+    "9": "有点想不明白，想听你说说。",
+    "10": "嘴上嫌弃，心里其实记着你的好。",
+    "11": "有点心虚，想把话说清楚。",
+    "12": "这次真的知道错了，求你原谅。",
+    "13": "世界有点累，今天先躺一会儿。",
+    "14": "表面很酷，心里其实早就动了。",
+    "15": "忍不住笑了一下，别介意呀。"
   };
 
   var SUGGESTIONS = {
@@ -269,6 +293,91 @@ window.__MAIN__ = function () {
       "我不是故意凶，我只是现在有点气。",
       "有些话我不想憋着，这次真的让我不舒服。",
       "我先气一会儿，等我消消气再说。"
+    ]
+,
+    "4": [
+      "抱一下嘛，就一下下。",
+      "我今天很乖，奖励我一个抱抱吧。",
+      "你理理我嘛，我等你好久了。",
+      "人家都主动找你了，还不哄哄我。",
+      "就今天，想当一次被捧在手心的小兔子。",
+    ],
+    "5": [
+      "嘿嘿，我要开始捣蛋了哦。",
+      "猜猜我这次藏了什么惊喜。",
+      "别眨眼，我马上要做个鬼脸。",
+      "逗你玩呢，别当真呀。",
+      "今天不想乖，想调皮一下。",
+    ],
+    "6": [
+      "你刚才对别人笑那么开心。",
+      "我没事，就是心里有点酸。",
+      "哼，我也要你哄，像哄别人那样。",
+      "你是不是更喜欢和她聊天呀。",
+      "我吃醋了，你看着办。",
+    ],
+    "7": [
+      "我才没有不服，我只是觉得还能更好。",
+      "哼，这次算你赢，下次可不一定。",
+      "我嘴硬怎么了，心里服你也不行啊。",
+      "别得意，我这是让着你。",
+      "你等着，我迟早扳回一城。",
+    ],
+    "8": [
+      "哇，真的假的？我没听错吧！",
+      "天哪，你怎么会记得这个！",
+      "这也太惊喜了吧，我缓一缓。",
+      "你居然偷偷准备了这些，我好开心。",
+      "这惊喜，我要记一辈子。",
+    ],
+    "9": [
+      "咦，为什么会这样呢？",
+      "我有点没看懂，能再解释一下吗？",
+      "奇怪，和我以为的不太一样。",
+      "让我想想，总觉得哪里不对。",
+      "你这样说，我反而更迷糊了。",
+    ],
+    "10": [
+      "咦，这个也太…算了吧。",
+      "我才不要，你拿走拿走。",
+      "有点嫌弃，不过还是谢谢你。",
+      "你这品味，我表示看不懂。",
+      "嘴上嫌弃，其实还是收了。",
+    ],
+    "11": [
+      "那个…我好像做错了一点事。",
+      "你听我解释，其实不是那样的。",
+      "我、我先把话说清楚再走。",
+      "你别这么看我，我心里发慌。",
+      "我错了嘛，你别生气。",
+    ],
+    "12": [
+      "对不起，我真的知道错了。",
+      "你原谅我这一次好不好？",
+      "我保证下次不会了，你信我。",
+      "你皱眉头的时候，我心里好难受。",
+      "让我用十个抱抱换你一个原谅。",
+    ],
+    "13": [
+      "今天先摆烂一下，明天再努力。",
+      "世界太累，我选择先躺平。",
+      "别叫我，让我静静瘫一会儿。",
+      "努力了三天，奖励自己躺三天。",
+      "躺平不可耻，快乐最重要。",
+    ],
+    "14": [
+      "嗯，还行吧，就那样。",
+      "我不在意的，真的不在意。",
+      "酷一点，不能让情绪露馅。",
+      "这种小事，不值得我皱眉头。",
+      "其实我开心死了，但不能说。",
+    ],
+    "15": [
+      "咳咳，我不该笑的，但真的没忍住。",
+      "我不是笑你，我是笑这件事。",
+      "让你上次笑话我，这次轮到我了。",
+      "对不起，我嘴角它自己扬起来了。",
+      "我不厚道地开心了一下。",
     ]
   };
 
