@@ -3363,6 +3363,11 @@ transition: opacity 1s ease, transform 1s ease;
 opacity: .97;
 transform: translateX(-50%) translateY(0);
 }
+.rhythm-guide-hint.is-fading {
+opacity: 0;
+transform: translateX(-50%) translateY(6px);
+transition: opacity 2s ease, transform 2s ease;
+}
 .rhythm-guide-hint .rhythm-guide-en {
 display: block;
 margin-top: 6px;
@@ -7064,10 +7069,16 @@ document.body.appendChild(hint);
 function scheduleAt(absMs, fn) {
   setTimeout(fn, Math.max(0, absMs - performance.now()));
 }
+function hideHint() {
+  if (!hint.classList.contains("is-visible")) return;
+  hint.classList.remove("is-visible");
+  hint.classList.add("is-fading");
+  setTimeout(function () { hint.classList.remove("is-fading"); }, 2100);
+}
 scheduleAt(13000, function () { hint.classList.add("is-visible"); setMark("guideHint"); });
-scheduleAt(24000, function () { hint.classList.remove("is-visible"); });
+scheduleAt(24000, hideHint);
 document.addEventListener("click", function (e) {
-  if (e.target && e.target.closest && e.target.closest(".voice-star")) hint.classList.remove("is-visible");
+  if (e.target && e.target.closest && e.target.closest(".voice-star")) hideHint();
 }, true);
 
 if (location.search.indexOf("auto=1") >= 0) {
