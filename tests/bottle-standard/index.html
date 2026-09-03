@@ -2079,7 +2079,7 @@ width: min(78%, 410px);
 aspect-ratio: 1;
 transform: translate(-50%, -50%) scale(.02);
 transform-origin: center;
-animation: approach-earth 7s linear forwards;
+animation: approach-earth 3.4s linear forwards;
 will-change: top, left, transform;
 }
 
@@ -4491,13 +4491,12 @@ frameTimer = setTimeout(() => {
 const openingSpritesReady = isNarrativeTest && idleSprites.length ? idleSpritesReady : spritesReady;
 openingSpritesReady.then(() => {
 if (rabbitStage === "small") {
-// The narrative sample plays its complete movement in the small bottle while
-// the card writes; the jump-out begins a fresh full performance.
+// RHYTHM TEST: start rabbit content sooner after arrival.
 if (isNarrativeTest) runSpritePlayback("narrative-idle");
 else runSpritePlayback("initial");
 }
 }).catch(abortSpritePlayback);
-}, 1550);
+}, 700);
 }, wakeDelay);
 }
 
@@ -5861,8 +5860,8 @@ const start = earthPoint();
 const palette = colors[Math.floor(Math.random() * colors.length)];
 const size = random(8.4, 14.7);
 const life = random(25000, 35000);
-const hold = random(1700, 3800);
-const grow = random(4300, 6600);
+const hold = random(1000, 1700);
+const grow = random(2400, 3600);
 const sway = random(7, 18);
 const endX = start.x + Math.cos(start.angle) * start.distance;
 const endY = start.y + Math.sin(start.angle) * start.distance;
@@ -5923,7 +5922,7 @@ if (!activeVoiceExperience) return null;
 return activeVoiceExperience.close();
 }
 
-function openVoiceBottle(star){if(star.clicked)return;const outgoingExit=closeActiveVoiceExperience();const handoffDelay=outgoingExit ? 1000 : 2000;const beganSoundSession=!earthSoundUnlocked;unlockEarthSounds();dismissTouchGuide();stopMusic();if(!beganSoundSession){const primedVoiceAudio=startVoiceMusic({startSilent:true});playStarClickSound(()=>revealVoiceMusic(primedVoiceAudio));}else{scheduleVoiceMusicStart();}unlockTypingKeySounds();star.clicked=true;star.element.classList.add("is-touched");
+function openVoiceBottle(star){if(star.clicked)return;const outgoingExit=closeActiveVoiceExperience();const handoffDelay=outgoingExit ? 600 : 450;const beganSoundSession=!earthSoundUnlocked;unlockEarthSounds();dismissTouchGuide();stopMusic();if(!beganSoundSession){const primedVoiceAudio=startVoiceMusic({startSilent:true});playStarClickSound(()=>revealVoiceMusic(primedVoiceAudio));}else{scheduleVoiceMusicStart();}unlockTypingKeySounds();star.clicked=true;star.element.classList.add("is-touched");
 
 let bottle = null;
 let typeTimer = 0;
@@ -6109,7 +6108,7 @@ const bottleStartX = star.currentX || star.startX;
 const bottleStartY = star.currentY || star.startY;
 bottle.style.setProperty("--bottle-x", `${bottleStartX}px`);
 bottle.style.setProperty("--bottle-y", `${bottleStartY}px`);
-const arriveSeconds = random(6, 8);
+const arriveSeconds = random(1.5, 2.1);
 bottle.style.setProperty("--bottle-arrive", `${arriveSeconds.toFixed(2)}s`);
 bottle.style.setProperty("--letter-delay", `${(arriveSeconds + .32).toFixed(2)}s`);
 // The name appears halfway through the bottle's journey and remains until
@@ -6601,8 +6600,10 @@ requestAnimationFrame(updateVoiceStars);
 
 // Let the identity appear with the arriving earth, rather than waiting for
 // the opening sound. The interaction guide starts only after it has faded.
-setTimeout(showHomeIntro, 280);
-setTimeout(() => scheduleTouchGuide(0), homeIntroDisplayDelay);
+setTimeout(showHomeIntro, 120);
+// RHYTHM TEST: open the first heart star early so one is clickable by ~6s.
+// No guide gate; later stars keep spawning but never block the first one.
+setTimeout(startVoiceStars, 4000);
 document.addEventListener("pointerdown", (event) => {
 if (event.target.closest && event.target.closest(".voice-star")) return;
 unlockEarthSounds();
@@ -6932,7 +6933,86 @@ if (false && "serviceWorker" in navigator) {
 })();
 </script>
 <script>
-(function(){ var n=0; function t(){ try{ if(window.fengxinRabbitSequence&&fengxinRabbitSequence.length&&window.stars&&stars.size){ var s=stars.values().next().value; if(s&&!s.clicked){ s.element.click(); return; } } }catch(e){} if(++n<70)setTimeout(t,300);} setTimeout(t,1800); })();
+/* RHYTHM TEST: records the real interaction time points and shows them in a
+   small on-screen table (times are ms since page start).  ?auto=1 auto-clicks
+   the first star so the flow can be verified headless. */
+(function () {
+var marks = { pageStart: 0 };
+window.__rhythmMarks = marks;
+var firstStar = null;
+var clickedStar = null;
+function setMark(key) { if (!(key in marks)) marks[key] = Math.round(performance.now()); }
+var labels = { pageStart: "页面开始", earthVisible: "地球可见", earthSpin: "地球转动", starVisible: "首星可见", starClickable: "首星可点", userClick: "点击", feedback: "点击反馈", bottleStart: "瓶出现", rabbitVisible: "兔可见", formalContent: "正式内容" };
+var order = ["pageStart", "earthVisible", "earthSpin", "starVisible", "starClickable", "userClick", "feedback", "bottleStart", "rabbitVisible", "formalContent"];
+
+setInterval(function () {
+  var ap = document.querySelector(".approach");
+  if (!("earthVisible" in marks) && ap) {
+    var r = ap.getBoundingClientRect();
+    if (r.width > 60) setMark("earthVisible");
+  }
+  if (!("earthSpin" in marks) && ("earthVisible" in marks)) {
+    var ea = document.querySelector(".earth");
+    if (ea) {
+      var m = new DOMMatrixReadOnly(getComputedStyle(ea).transform);
+      if (Math.abs(m.a - 1) > 0.002 || Math.abs(m.b) > 0.002) setMark("earthSpin");
+    }
+  }
+  var stars = document.querySelectorAll(".voice-star");
+  if (!("starVisible" in marks) && stars.length) {
+    var el = stars[0];
+    var cs = getComputedStyle(el);
+    var rr = el.getBoundingClientRect();
+    if (parseFloat(cs.opacity) > 0.5 && rr.width > 6) { setMark("starVisible"); firstStar = el; }
+  }
+  if (firstStar && !("starClickable" in marks)) {
+    var rc = firstStar.getBoundingClientRect();
+    var hit = document.elementFromPoint(rc.left + rc.width / 2, rc.top + rc.height / 2);
+    if (hit && (hit === firstStar || firstStar.contains(hit))) setMark("starClickable");
+  }
+  if (clickedStar && !("feedback" in marks) && clickedStar.classList.contains("is-touched")) setMark("feedback");
+  if (!("bottleStart" in marks) && document.querySelector(".voice-bottle")) setMark("bottleStart");
+  var rab = document.querySelector(".fengxin-rabbit-demo");
+  if (!("rabbitVisible" in marks) && rab) {
+    var rs = getComputedStyle(rab);
+    var rr2 = rab.getBoundingClientRect();
+    if (parseFloat(rs.opacity) > 0.5 && rr2.width > 24) setMark("rabbitVisible");
+  }
+  if (!("formalContent" in marks)) {
+    var text = document.querySelector(".voice-letter-text");
+    var awake = rab && rab.classList.contains("is-awakening");
+    if ((text && text.firstElementChild) || awake) setMark("formalContent");
+  }
+}, 30);
+
+document.addEventListener("click", function (e) {
+  var t = e.target && e.target.closest ? e.target.closest(".voice-star") : null;
+  if (t && !("userClick" in marks)) { marks.userClick = Math.round(performance.now()); clickedStar = t; }
+}, true);
+
+var panel = document.createElement("div");
+panel.style.cssText = "position:fixed;left:8px;top:8px;z-index:99999;background:rgba(0,0,0,.78);color:#9fe8ff;font:11px/1.5 Menlo,monospace;padding:6px 10px;border-radius:8px;pointer-events:none;white-space:pre;max-width:92vw;";
+document.body.appendChild(panel);
+function pad(s, n) { while (s.length < n) s += " "; return s; }
+function render() {
+  var lines = [];
+  for (var i = 0; i < order.length; i++) {
+    var k = order[i];
+    if (k in marks) lines.push(pad(labels[k], 8) + "  " + marks[k] + "ms");
+  }
+  panel.textContent = "— 交互节奏时间表 (自页面开始) —\n" + lines.join("\n") + "\n(加 ?auto=1 自动点击)";
+  requestAnimationFrame(render);
+}
+requestAnimationFrame(render);
+
+if (location.search.indexOf("auto=1") >= 0) {
+  var tries = 0;
+  var timer = setInterval(function () {
+    if (firstStar) { try { firstStar.click(); clearInterval(timer); return; } catch (e) {} }
+    if (++tries > 400) clearInterval(timer);
+  }, 80);
+}
+})();
 </script>
 </body>
 </html>
