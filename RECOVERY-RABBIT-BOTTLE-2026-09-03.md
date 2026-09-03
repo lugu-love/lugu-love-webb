@@ -100,8 +100,8 @@ python3 -m http.server 8765 --bind 0.0.0.0
 ## 最终发布信息
 - 正式线上（GitHub Pages，已发布新版）：**https://lugu-love.github.io/lugu-love-webb/**
   - 首页 = 原版地球 7s + 新版标题/13s“轻抚”/首星~6s + E01–E15 漂流瓶；A 路 send-test = 15 情绪横向滑动
-- Frontend commit：`a999dcc`（main 已更新：7231dfe..a999dcc）
-- Frontend tag：`rabbit-bottle-e01e15-2026-09-03`
+- Frontend release commit：`a999dcc`；**Pages 子路径 base 修复 commit：`20ea51f`**（main HEAD = 20ea51f）
+- Frontend tag：`rabbit-bottle-e01e15-2026-09-03`（已更新指向 20ea51f，含 base 修复）
 - Backend commit：`4780314`（分支 speech-timing，已推送）
 - Backend tag：`rabbit-bottle-e01e15-backend-2026-09-03`
 - lugu.love 域名指向：未能确认（探测超时）；由用户侧 DNS 指向 Pages 或后端
