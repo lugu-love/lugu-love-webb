@@ -4,7 +4,7 @@
    - cache:no-store 请求（/status、emotion-manifest.json 等即时/动态数据）：不拦截，保持直通。
    - HTML 页面（index/send-test）：不缓存为离线副本，保持默认网络，更新可靠，避免旧版锁死。
    版本升级：install 安装新缓存、activate 删除旧缓存；skipWaiting + clients.claim 立即生效。 */
-var CACHE_VERSION = "emotion-static-v1";
+var CACHE_VERSION = "emotion-static-v2-e15-2026-09-03";
 var CACHE_NAME = CACHE_VERSION;
 
 self.addEventListener("install", function () {

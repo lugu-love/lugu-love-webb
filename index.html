@@ -3380,7 +3380,7 @@ color: rgba(212, 226, 250, .62);
 </head>
 <body>
 <main class="phone-stage" id="phoneStage" data-i18n-aria="phoneStage" aria-label="地球首页手机竖屏舞台">
-<a class="place-mark" href="/lugu-love-webb/lugu/index.html?from=earth" data-i18n-aria="enterLugu" aria-label="进入中国·泸沽湖">
+<a class="place-mark" href="lugu/index.html?from=earth" data-i18n-aria="enterLugu" aria-label="进入中国·泸沽湖">
 <img class="place-mark-logo" src="assets/icons/lugu-logo.svg" alt="" width="34" height="34">
 <span class="place-mark-text"><span data-i18n="placeMark">中国·泸沽湖</span><span>LUGU LAKE · CHINA</span></span>
 </a>
@@ -6693,10 +6693,10 @@ setTimeout(syncUI, 300);
 
 
 <script>
-// PWA：注册 service worker，支持“添加到桌面/安装 App”（网络直通、不缓存，不改页面行为）
-if (false && "serviceWorker" in navigator) {
+// PWA：注册 service worker（版本参数强制刷新旧设备缓存；v2-e15 会清掉旧 v1 缓存）
+if ("serviceWorker" in navigator) {
   window.addEventListener("load", function () {
-    navigator.serviceWorker.register("sw.js").catch(function () {});
+    navigator.serviceWorker.register("sw.js?v=e15-2026-09-03").catch(function () {});
   });
 }
 </script>
