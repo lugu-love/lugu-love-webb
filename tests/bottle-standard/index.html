@@ -3334,11 +3334,11 @@ font-size: 12px;
 </style>
 <style>
 /* RHYTHM TEST additions */
-.home-intro.is-visible { animation: home-intro-rhythm 9s ease forwards; }
+.home-intro.is-visible { animation: home-intro-rhythm 10.8s ease forwards; }
 @keyframes home-intro-rhythm {
 0% { opacity: 0; filter: blur(8px); transform: translateX(-50%) translateY(14px); }
 15% { opacity: 1; filter: blur(0); transform: translateX(-50%) translateY(0); }
-80% { opacity: 1; filter: blur(0); transform: translateX(-50%) translateY(0); }
+66% { opacity: 1; filter: blur(0); transform: translateX(-50%) translateY(0); }
 100% { opacity: 0; filter: blur(5px); transform: translateX(-50%) translateY(-10px); }
 }
 .rhythm-guide-hint {
@@ -7064,8 +7064,8 @@ document.body.appendChild(hint);
 function scheduleAt(absMs, fn) {
   setTimeout(fn, Math.max(0, absMs - performance.now()));
 }
-scheduleAt(13200, function () { hint.classList.add("is-visible"); setMark("guideHint"); });
-scheduleAt(23000, function () { hint.classList.remove("is-visible"); });
+scheduleAt(14200, function () { hint.classList.add("is-visible"); setMark("guideHint"); });
+scheduleAt(24000, function () { hint.classList.remove("is-visible"); });
 document.addEventListener("click", function (e) {
   if (e.target && e.target.closest && e.target.closest(".voice-star")) hint.classList.remove("is-visible");
 }, true);
