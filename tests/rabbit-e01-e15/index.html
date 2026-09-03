@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>风信兔 E01–E15 标准化资产逐条查看</title>
+<link rel="icon" href="data:,">
+<style>
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#020407;
+  font-family:"PingFang SC","Microsoft YaHei",Arial,sans-serif;color:#fff;}
+body{display:grid;place-items:center;}
+.stage{position:relative;width:min(100vw,430px);height:100svh;max-height:100dvh;overflow:hidden;
+  background:radial-gradient(circle at 50% 30%,rgba(70,110,180,.18),transparent 60%),#020407;}
+.topbar{position:absolute;top:max(10px,env(safe-area-inset-top));left:0;right:0;display:flex;
+  align-items:center;justify-content:space-between;padding:6px 14px;font-size:12px;
+  color:rgba(255,255,255,.85);text-shadow:0 1px 6px rgba(0,0,0,.6);}
+.badge{position:absolute;top:max(52px,calc(env(safe-area-inset-top) + 42px));left:0;right:0;text-align:center;
+  font-size:11px;letter-spacing:.14em;color:rgba(255,224,150,.9);}
+.stage-view{position:absolute;left:50%;top:50%;transform:translate(-50%,-52%);width:min(76vw,300px);}
+.stage-view canvas{width:100%;height:auto;display:block;filter:drop-shadow(0 0 18px rgba(255,235,174,.28)) drop-shadow(0 0 34px rgba(111,200,255,.16));}
+.meta{position:absolute;left:0;right:0;bottom:calc(max(14px,env(safe-area-inset-bottom)) + 84px);
+  text-align:center;font-size:12px;color:rgba(210,226,255,.75);line-height:1.7;}
+.nav{position:absolute;left:0;right:0;bottom:max(14px,env(safe-area-inset-bottom));display:flex;
+  justify-content:center;gap:14px;}
+.nav button{min-width:88px;height:44px;border:1px solid rgba(255,255,255,.28);border-radius:999px;
+  background:rgba(20,24,44,.6);color:#fff;font-size:14px;letter-spacing:.08em;}
+.nav button:active{transform:scale(.97);}
+.blocked{position:absolute;left:10%;right:10%;top:34%;text-align:center;color:#ffd9a0;font-size:14px;line-height:1.9;}
+.hint{position:absolute;top:max(10px,env(safe-area-inset-top));right:14px;font-size:10px;color:rgba(255,255,255,.4);}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="hint">?auto=1 每 4s 自动切换</div>
+  <div class="topbar"><span id="eCode">—</span><span id="eName">风信兔标准化资产查看</span></div>
+  <div class="badge" id="badge"></div>
+  <div class="stage-view"><canvas id="cv" width="540" height="540"></canvas></div>
+  <div class="meta" id="meta"></div>
+  <div class="blocked" id="blocked" hidden></div>
+  <div class="nav">
+    <button id="prev" type="button">‹ 上一条</button>
+    <button id="next" type="button">下一条 ›</button>
+  </div>
+</div>
+<script>
+var LIST = [
+ {E:1,label:"开心",p:"../rabbit-standard/mobile/1"},
+ {E:2,label:"委屈难过",p:"../rabbit-standard/mobile/2"},
+ {E:3,label:"生气愤怒",p:"../rabbit-standard/mobile/3"},
+ {E:4,label:"撒娇",p:"../rabbit-standard/mobile/4"},
+ {E:5,label:"调皮幽默",p:"../rabbit-standard/mobile/5"},
+ {E:6,label:"吃醋",p:"../rabbit-standard/mobile/6"},
+ {E:7,label:"嘴硬不服",p:"../rabbit-standard/mobile/7"},
+ {E:8,label:"意外惊喜",p:"../rabbit-standard/mobile/8"},
+ {E:9,label:"疑惑",p:"../rabbit-standard/mobile/9"},
+ {E:10,label:"嫌弃",p:"../rabbit-standard/mobile/10"},
+ {E:11,label:"心虚",p:"../rabbit-standard/mobile/11"},
+ {E:12,label:"求原谅",p:"../rabbit-standard/mobile/12"},
+ {E:13,label:"躺平摆烂",p:"../rabbit-standard/mobile/13"},
+ {E:14,label:"装酷",p:"../rabbit-standard/mobile/14"},
+ {E:15,label:"幸灾乐祸",p:"../rabbit-standard/mobile/15"}
+];
+var cv=document.getElementById("cv"), ctx=cv.getContext("2d");
+var FRAMES=180, PER_SHEET=12, FPS=18, CELL=270;
+var idx=0, cur=null, raf=0, tPrev=0, sheetImgs=[], autoTimer=0;
+function loadSheets(p){
+  var arr=[]; for(var i=0;i<15;i++){ var im=new Image(); im.src=p+"/sheet-"+("0"+i).slice(-2)+".webp"; arr.push(im);} return arr;
+}
+function frame(fi){
+  var s=Math.floor(fi/PER_SHEET), l=fi%PER_SHEET;
+  var im=sheetImgs[s];
+  if(!im||!im.complete||!im.naturalWidth) return false;
+  var sx=(l%4)*CELL, sy=Math.floor(l/4)*CELL;
+  ctx.clearRect(0,0,540,540);
+  ctx.drawImage(im,sx,sy,CELL,CELL,70,60,400,400);
+  return true;
+}
+function loop(now){
+  if(!cur){ return; }
+  if(!tPrev) tPrev=now;
+  var fi=Math.floor((now-tPrev)/1000*FPS)%FRAMES;
+  frame(fi);
+  raf=requestAnimationFrame(loop);
+}
+function render(){
+  cancelAnimationFrame(raf); clearTimeout(autoTimer); tPrev=0;
+  cur=LIST[idx];
+  var isBlocked=!!cur.blocked;
+  document.getElementById("eCode").textContent="E"+("0"+cur.E).slice(-2);
+  document.getElementById("eName").textContent=cur.label;
+  document.getElementById("meta").textContent=isBlocked?"":"E"+("0"+cur.E).slice(-2)+" · "+cur.label+" · 标准化 sprite（180帧 @18fps = 10s 原速）";
+  document.getElementById("blocked").hidden=!isBlocked;
+  document.getElementById("blocked").textContent="E07 嘴硬不服 · 当前阻塞\n正确黑底母版缺失：现有“嘴硬不服黑底.mp4”与吃醋内容相同（历史导出错误）；\n“07嘴硬不服_副本.mp4”为彩底。需重新导出正确黑底母版后补跑同一管线。";
+  if(isBlocked){
+    document.getElementById("badge").textContent="⚠ blocked — 待补正确黑底母版";
+    ctx.clearRect(0,0,540,540);
+    document.getElementById("meta").textContent="E07 · 嘴硬不服 · blocked";
+  } else {
+    document.getElementById("badge").textContent="";
+    sheetImgs=loadSheets(cur.p);
+    raf=requestAnimationFrame(loop);
+  }
+  if(location.search.indexOf("auto=1")>=0){
+    autoTimer=setTimeout(function(){ idx=(idx+1)%LIST.length; render(); },4000);
+  }
+}
+document.getElementById("prev").onclick=function(){ idx=(idx-1+LIST.length)%LIST.length; render(); };
+document.getElementById("next").onclick=function(){ idx=(idx+1)%LIST.length; render(); };
+document.addEventListener("keydown",function(e){ if(e.key==="ArrowLeft"){idx=(idx-1+LIST.length)%LIST.length;render();} if(e.key==="ArrowRight"){idx=(idx+1)%LIST.length;render();} });
+render();
+</script>
+</body>
+</html>

@@ -17,7 +17,7 @@
 </div>
 </div>
 <script>
-var CFG={c4:"mobile/4",c13:"mobile/13"}, imgs={c4:[],c13:[]}, loaded={c4:0,c13:0}, SHEETS=6, FRAMES=72;
+var CFG={c4:"mobile/4",c13:"mobile/13"}, imgs={c4:[],c13:[]}, loaded={c4:0,c13:0}, SHEETS=15, FRAMES=180;
 Object.keys(CFG).forEach(function(k){ for(var i=0;i<SHEETS;i++){ (function(k,i){ var im=new Image(); im.onload=function(){imgs[k][i]=im; if(++loaded[k]===SHEETS) beacon(k+'ok');}; im.src=CFG[k]+'/sheet-'+String(i).padStart(2,'0')+'.webp'; })(k,i); } });
 function beacon(t){ try{fetch('__dbg?d='+t,{mode:'no-cors'});}catch(e){} }
 function paint(k,fi){ var cv=document.getElementById(k); var ctx=cv.getContext('2d'); var s=Math.floor(fi/12),l=fi%12; ctx.clearRect(0,0,540,540); var im=imgs[k][s]; if(!im)return; ctx.drawImage(im,(l%4)*270,Math.floor(l/4)*270,270,270,0,0,540,540); }

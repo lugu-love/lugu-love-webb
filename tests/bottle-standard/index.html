@@ -3380,7 +3380,6 @@ color: rgba(212, 226, 250, .62);
 </style>
 </head>
 <body>
-<div style="position:fixed;top:8px;left:8px;right:8px;z-index:999999;background:rgba(10,12,24,.88);color:#ffd9a0;font-size:12px;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,200,120,.45);pointer-events:none">E04撒娇 / E13躺平 · 标准化精灵 + 同一套全局参数（关掉一个瓶子后可点下一颗星看另一只）</div>
 <main class="phone-stage" id="phoneStage" data-i18n-aria="phoneStage" aria-label="地球首页手机竖屏舞台">
 <a class="place-mark" href="/lugu-love-webb/lugu/index.html?from=earth" data-i18n-aria="enterLugu" aria-label="进入中国·泸沽湖">
 <img class="place-mark-logo" src="assets/icons/lugu-logo.svg" alt="" width="34" height="34">
@@ -3654,8 +3653,8 @@ const fengxinRabbitLegacySequence = [
 const bottleNarrativeScene = {
 spriteExtension: "webp",
 spriteFrameSize: 270,
-totalFrames: 72,
-sheetCount: 6,
+totalFrames: 180,
+sheetCount: 15,
 frameRate: 18,
 renderSize: 400,
 renderX: 70,
@@ -6921,7 +6920,7 @@ if (false && "serviceWorker" in navigator) {
   function preloadARoute() {
     if (document.hidden) return;
     var urls = ["send-test.html", "scripts/make-send-cloud/emotion-manifest.json"];
-    for (var i = 0; i < 7; i++) {
+    for (var i = 0; i < 15; i++) {
       urls.push("assets/video/fengxin-rabbit-sequence/mobile/1/sheet-" + String(i).padStart(2, "0") + ".webp");
     }
     urls.forEach(function (u) {
@@ -7046,20 +7045,25 @@ document.addEventListener("click", function (e) {
   if (t && !("userClick" in marks)) { marks.userClick = Math.round(performance.now()); clickedStar = t; }
 }, true);
 
-var panel = document.createElement("div");
-panel.style.cssText = "position:fixed;left:8px;top:8px;z-index:99999;background:rgba(0,0,0,.78);color:#9fe8ff;font:11px/1.5 Menlo,monospace;padding:6px 10px;border-radius:8px;pointer-events:none;white-space:pre;max-width:92vw;";
-document.body.appendChild(panel);
+// Timing panel is debug-only: hidden by default, show with ?panel=1.
+var panel = null;
+if (new URLSearchParams(location.search).get("panel") === "1") {
+  panel = document.createElement("div");
+  panel.style.cssText = "position:fixed;left:8px;top:8px;z-index:99999;background:rgba(0,0,0,.78);color:#9fe8ff;font:11px/1.5 Menlo,monospace;padding:6px 10px;border-radius:8px;pointer-events:none;white-space:pre;max-width:92vw;";
+  document.body.appendChild(panel);
+}
 function pad(s, n) { while (s.length < n) s += " "; return s; }
 function render() {
+  if (!panel) return;
   var lines = [];
   for (var i = 0; i < order.length; i++) {
     var k = order[i];
     if (k in marks) lines.push(pad(labels[k], 8) + "  " + marks[k] + "ms");
   }
-  panel.textContent = "— 交互节奏时间表 (自页面开始) —\n" + lines.join("\n") + "\n(加 ?auto=1 自动点击)";
+  panel.textContent = "— 交互节奏时间表 (自页面开始) —\n" + lines.join("\n") + "\n(?panel=1 显示本面板)";
   requestAnimationFrame(render);
 }
-requestAnimationFrame(render);
+if (panel) requestAnimationFrame(render);
 
 /* "轻抚一颗心，遇见一个世界" light, non-blocking hint */
 var hint = document.createElement("div");

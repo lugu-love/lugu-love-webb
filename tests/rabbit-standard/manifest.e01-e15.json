@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "scope": "test",
+  "description": "E01-E15 标准化资产测试清单（tests/rabbit-standard/mobile，RCS v1 统一算法）。E07 已于 2026-09-03 补入正确黑底母版，标记强制人工目检。",
+  "updatedAt": "2026-09-03",
+  "emotions": [
+    {
+      "E": 1,
+      "id": "happy",
+      "label": "开心",
+      "assetPath": "tests/rabbit-standard/mobile/1",
+      "frames": 180,
+      "sheets": 15,
+      "fps": 18,
+      "status": "ready"
+    },
+    {
+      "E": 2,
+      "id": "wronged",
+      "label": "委屈难过",
+      "assetPath": "tests/rabbit-standard/mobile/2",
+      "frames": 180,
+      "sheets": 15,
+      "fps": 18,
+      "status": "ready"
+    },
+    {
+      "E": 3,
+      "id": "angry",
+      "label": "生气愤怒",
+      "assetPath": "tests/rabbit-standard/mobile/3",
+      "frames": 180,
+      "sheets": 15,
+      "fps": 18,
+      "status": "ready"
+    },
+    {
+      "E": 4,
+      "id": "sajiao",
+      "label": "撒娇",
+      "assetPath": "tests/rabbit-standard/mobile/4",
+      "frames": 180,
+      "sheets": 15,
+      "fps": 18,
+      "status": "ready"
+    },
+    {
+      "E": 5,
+      "id": "playful",
+      "label": "调皮幽默",
+      "assetPath": "tests/rabbit-standard/mobile/5",
+      "frames": 180,
+      "sheets": 15,
+      "fps": 18,
+      "status": "ready"
+    },
+    {
+      "E": 6,
+      "id": "jealous",
+      "label": "吃醋",
+      "assetPath": "tests/rabbit-standard/mobile/6",
+      "frames": 180,
+      "sheets": 15,
+      "fps": 18,
+      "status": "ready"
+    },
+    {
+      "E": 7,
+      "id": "stubborn",
+      "label": "嘴硬不服",
+      "assetPath": "tests/rabbit-standard/mobile/7",
+      "frames": 180,
+      "sheets": 15,
+      "fps": 18,
+      "status": "ready"
+    },
+    {
+      "E": 8,
+      "id": "surprised",
+      "label": "意外惊喜",
+      "assetPath": "tests/rabbit-standard/mobile/8",
+      "frames": 180,
+      "sheets": 15,
+      "fps": 18,
+      "status": "ready"
+    },
+    {
+      "E": 9,
+      "id": "confused",
+      "label": "疑惑",
+      "assetPath": "tests/rabbit-standard/mobile/9",
+      "frames": 180,
+      "sheets": 15,
+      "fps": 18,
+      "status": "ready"
+    },
+    {
+      "E": 10,
+      "id": "disgust",
+      "label": "嫌弃",
+      "assetPath": "tests/rabbit-standard/mobile/10",
+      "frames": 180,
+      "sheets": 15,
+      "fps": 18,
+      "status": "ready"
+    },
+    {
+      "E": 11,
+      "id": "guilty",
+      "label": "心虚",
+      "assetPath": "tests/rabbit-standard/mobile/11",
+      "frames": 180,
+      "sheets": 15,
+      "fps": 18,
+      "status": "ready"
+    },
+    {
+      "E": 12,
+      "id": "apology",
+      "label": "求原谅",
+      "assetPath": "tests/rabbit-standard/mobile/12",
+      "frames": 180,
+      "sheets": 15,
+      "fps": 18,
+      "status": "ready"
+    },
+    {
+      "E": 13,
+      "id": "lowenergy",
+      "label": "躺平摆烂",
+      "assetPath": "tests/rabbit-standard/mobile/13",
+      "frames": 180,
+      "sheets": 15,
+      "fps": 18,
+      "status": "ready"
+    },
+    {
+      "E": 14,
+      "id": "cool",
+      "label": "装酷",
+      "assetPath": "tests/rabbit-standard/mobile/14",
+      "frames": 180,
+      "sheets": 15,
+      "fps": 18,
+      "status": "ready"
+    },
+    {
+      "E": 15,
+      "id": "gloat",
+      "label": "幸灾乐祸",
+      "assetPath": "tests/rabbit-standard/mobile/15",
+      "frames": 180,
+      "sheets": 15,
+      "fps": 18,
+      "status": "ready"
+    }
+  ]
+}

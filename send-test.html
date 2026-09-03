@@ -38,6 +38,11 @@
   .emotions { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:8px 10px; margin:14px 0 8px; position:relative; z-index:30; max-width:min(94vw,520px); }
   .emotion { flex:0 0 auto; padding:7px 14px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:var(--muted); font-size:13px; font-weight:600; cursor:pointer; text-align:center; white-space:nowrap; }
   .emotion.active { color:#fff; border-color:var(--accent); background:rgba(125,139,255,.22); box-shadow:0 0 16px rgba(125,139,255,.28); }
+  #emotions { flex-wrap:nowrap; justify-content:flex-start; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; padding:2px 2px 8px; gap:8px; }
+  #emotions::-webkit-scrollbar { display:none; }
+  #emotions::after { content:""; flex:0 0 12px; }
+  #emotions { -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent); mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent); }
+  .emotion { flex:0 0 auto; }
   .sub-actions { display:flex; align-items:center; justify-content:center; gap:6px; margin:8px 0 0; flex-wrap:wrap; }
   .sub-actions .suggest { margin:0; flex:0 1 auto; min-width:0; height:34px; display:inline-flex; align-items:center; gap:6px; padding:0 10px; border:1px solid rgba(255,255,255,.14); border-radius:999px; background:rgba(255,255,255,.05); color:#b8c0ff; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; }
   .voice-mini { display:inline-flex; align-items:center; gap:6px; flex:0 1 auto; min-width:0; height:34px; padding:0 10px; border:1px solid rgba(255,255,255,.12); border-radius:999px; background:rgba(255,255,255,.05); }
@@ -210,21 +215,21 @@ window.__MAIN__ = function () {
   // 三情绪映射唯一来源：scripts/make-send-cloud/emotion-manifest.json（官方配置）。
   // 下方为离线/加载失败兜底；正常路径由 manifest 派生，前端不再自持第二套映射。
   var EMOTIONS_FALLBACK = [
-    { id:"1", name:"开心", item:"rabbit-happy", totalFrames:73, sheetCount:7, previewProxy:"mobile/1" },
-    { id:"2", name:"委屈", item:"rabbit-aggrieved", totalFrames:91, sheetCount:8, previewProxy:"mobile/2" },
-    { id:"3", name:"生气", item:"rabbit-angry", totalFrames:109, sheetCount:10, previewProxy:"mobile/3" },
-    { id:"4", name:"撒娇", item:"rabbit-sajiao", totalFrames:72, sheetCount:6, previewProxy:"mobile/4" },
-    { id:"5", name:"调皮", item:"rabbit-playful", totalFrames:72, sheetCount:6, previewProxy:"mobile/5" },
-    { id:"6", name:"吃醋", item:"rabbit-jealous", totalFrames:72, sheetCount:6, previewProxy:"mobile/6" },
-    { id:"7", name:"嘴硬不服", item:"rabbit-stubborn", totalFrames:72, sheetCount:6, previewProxy:"mobile/7" },
-    { id:"8", name:"意外惊喜", item:"rabbit-surprise", totalFrames:72, sheetCount:6, previewProxy:"mobile/8" },
-    { id:"9", name:"疑惑", item:"rabbit-confused", totalFrames:72, sheetCount:6, previewProxy:"mobile/9" },
-    { id:"10", name:"嫌弃", item:"rabbit-disgust", totalFrames:72, sheetCount:6, previewProxy:"mobile/10" },
-    { id:"11", name:"心虚", item:"rabbit-guilty", totalFrames:72, sheetCount:6, previewProxy:"mobile/11" },
-    { id:"12", name:"求原谅", item:"rabbit-apology", totalFrames:72, sheetCount:6, previewProxy:"mobile/12" },
-    { id:"13", name:"躺平摆烂", item:"rabbit-lowenergy", totalFrames:72, sheetCount:6, previewProxy:"mobile/13" },
-    { id:"14", name:"装酷", item:"rabbit-cool", totalFrames:72, sheetCount:6, previewProxy:"mobile/14" },
-    { id:"15", name:"幸灾乐祸", item:"rabbit-gloat", totalFrames:72, sheetCount:6, previewProxy:"mobile/15" }
+    { id:"1", name:"开心", item:"rabbit-happy", totalFrames:180, sheetCount:15, previewProxy:"mobile/1" },
+    { id:"2", name:"委屈", item:"rabbit-aggrieved", totalFrames:180, sheetCount:15, previewProxy:"mobile/2" },
+    { id:"3", name:"生气", item:"rabbit-angry", totalFrames:180, sheetCount:15, previewProxy:"mobile/3" },
+    { id:"4", name:"撒娇", item:"rabbit-sajiao", totalFrames:180, sheetCount:15, previewProxy:"mobile/4" },
+    { id:"5", name:"调皮", item:"rabbit-playful", totalFrames:180, sheetCount:15, previewProxy:"mobile/5" },
+    { id:"6", name:"吃醋", item:"rabbit-jealous", totalFrames:180, sheetCount:15, previewProxy:"mobile/6" },
+    { id:"7", name:"嘴硬不服", item:"rabbit-stubborn", totalFrames:180, sheetCount:15, previewProxy:"mobile/7" },
+    { id:"8", name:"意外惊喜", item:"rabbit-surprise", totalFrames:180, sheetCount:15, previewProxy:"mobile/8" },
+    { id:"9", name:"疑惑", item:"rabbit-confused", totalFrames:180, sheetCount:15, previewProxy:"mobile/9" },
+    { id:"10", name:"嫌弃", item:"rabbit-disgust", totalFrames:180, sheetCount:15, previewProxy:"mobile/10" },
+    { id:"11", name:"心虚", item:"rabbit-guilty", totalFrames:180, sheetCount:15, previewProxy:"mobile/11" },
+    { id:"12", name:"求原谅", item:"rabbit-apology", totalFrames:180, sheetCount:15, previewProxy:"mobile/12" },
+    { id:"13", name:"躺平摆烂", item:"rabbit-lowenergy", totalFrames:180, sheetCount:15, previewProxy:"mobile/13" },
+    { id:"14", name:"装酷", item:"rabbit-cool", totalFrames:180, sheetCount:15, previewProxy:"mobile/14" },
+    { id:"15", name:"幸灾乐祸", item:"rabbit-gloat", totalFrames:180, sheetCount:15, previewProxy:"mobile/15" }
   ];
   var EMOTIONS = EMOTIONS_FALLBACK.slice();
 
@@ -546,14 +551,23 @@ window.__MAIN__ = function () {
   var previewReqId=0;
   voiceSelect.addEventListener("change", invalidatePreviewToken);
 
+  function scrollEmotionTo(id){
+    Array.prototype.forEach.call(emotionsEl.children, function(b){
+      if(b.dataset && b.dataset.em === id){
+        try{ b.scrollIntoView({ behavior:"smooth", inline:"center", block:"nearest" }); }catch(e){}
+      }
+    });
+  }
   function renderEmotionButtons(){
     emotionsEl.innerHTML = "";
     EMOTIONS.forEach(function(e){
-      var b=document.createElement("button"); b.type="button"; b.className="emotion"; b.textContent=e.name;
+      var b=document.createElement("button"); b.type="button"; b.className="emotion";
+      b.dataset.em=e.id; b.textContent=e.name;
       b.addEventListener("click", function(){ selectEmotion(e.id); });
       emotionsEl.appendChild(b);
     });
     refreshUI(); renderGuide(); renderSuggest();
+    scrollEmotionTo(current.id);
   }
   renderEmotionButtons();
 
@@ -566,11 +580,12 @@ window.__MAIN__ = function () {
     if(typeof syncGenerateEnabled === "function") syncGenerateEnabled();
   });
 
-  function refreshUI(){ Array.prototype.forEach.call(emotionsEl.children, function(b,i){ b.classList.toggle("active", EMOTIONS[i].id===current.id); }); }
+  function refreshUI(){ Array.prototype.forEach.call(emotionsEl.children, function(b){ if(!b.dataset || !b.dataset.em) return; b.classList.toggle("active", b.dataset.em===current.id); }); }
   function selectEmotion(id){
     userCancelInFlight();
     var prevId = current.id;
     current = EMOTIONS.find(function(e){return e.id===id;}) || EMOTIONS[0];
+    scrollEmotionTo(current.id);
     if(prevId !== current.id){
       invalidatePreviewToken();
       textInput.value = "";
