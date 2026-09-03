@@ -3332,6 +3332,41 @@ font-size: 12px;
   .world-entry-text { display: flex; flex-direction: column; line-height: 1; }
   .world-entry-title { font-size: 15px; font-weight: 600; letter-spacing: 0; line-height: 1; white-space: nowrap; }
 </style>
+<style>
+/* RHYTHM TEST additions */
+.home-intro.is-visible { animation-duration: 3.2s; }
+.rhythm-guide-hint {
+position: fixed;
+left: 50%;
+top: max(150px, calc(env(safe-area-inset-top) + 132px));
+transform: translateX(-50%) translateY(8px);
+z-index: 6;
+pointer-events: none;
+text-align: center;
+color: rgba(246, 250, 255, .97);
+font-family: "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+font-size: 18px;
+font-weight: 400;
+letter-spacing: .14em;
+line-height: 1.7;
+text-shadow: 0 0 14px rgba(255, 247, 218, .5), 0 0 36px rgba(96, 166, 255, .3);
+opacity: 0;
+transition: opacity 1s ease, transform 1s ease;
+}
+.rhythm-guide-hint.is-visible {
+opacity: .97;
+transform: translateX(-50%) translateY(0);
+}
+.rhythm-guide-hint .rhythm-guide-en {
+display: block;
+margin-top: 6px;
+font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+font-size: 11px;
+font-weight: 300;
+letter-spacing: .2em;
+color: rgba(212, 226, 250, .62);
+}
+</style>
 </head>
 <body>
 <div style="position:fixed;top:8px;left:8px;right:8px;z-index:999999;background:rgba(10,12,24,.88);color:#ffd9a0;font-size:12px;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,200,120,.45);pointer-events:none">E04撒娇 / E13躺平 · 标准化精灵 + 同一套全局参数（关掉一个瓶子后可点下一颗星看另一只）</div>
@@ -4597,6 +4632,7 @@ const voiceMusicList = [
 ];
 const stars = new Set();
 let nextSpawn = 0;
+let voiceStarStartAt = 0;
 let lastLetterTilt = null;
 let heartStarCounter = 0;
 let musicFadeFrames = new Set();
@@ -5444,11 +5480,11 @@ startVoiceStars();
 function startVoiceStars() {
 if (voiceStarsEnabled) return;
 voiceStarsEnabled = true;
-nextSpawn = performance.now() + random(260, 720);
-
-for (let index = 0; index < 10; index += 1) {
-setTimeout(spawnVoiceStar, index * random(760, 1280));
-}
+voiceStarStartAt = performance.now();
+// RHYTHM TEST: only the first star appears now; later stars follow the slow
+// density gate in updateVoiceStars (sparse in the first ~15s).
+nextSpawn = performance.now() + random(4800, 6200);
+spawnVoiceStar();
 }
 
 function scheduleOpeningBackgroundMusic(delay = 1000) {
@@ -6562,7 +6598,9 @@ stars.delete(star);
 function updateVoiceStars(now) {
 if (voiceStarsEnabled && now > nextSpawn) {
 spawnVoiceStar();
-nextSpawn = now + random(880, 1900);
+// RHYTHM TEST: keep the sky sparse for the first ~15s after the first star.
+const starAge = now - (voiceStarStartAt || now);
+nextSpawn = now + (starAge < 15000 ? random(5000, 7000) : random(2000, 3200));
 }
 
 stars.forEach((star) => {
@@ -6857,7 +6895,7 @@ if (false && "serviceWorker" in navigator) {
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (cfg) { var m = resolveLocal(cfg); if (m) resolvedMsg = m; renderWelcome(); })
         .catch(function () {
-          resolvedMsg = { textZh: "这里，欢迎每一个愿意回到“初心”的人。", textEn: "Welcome to everyone willing to return to their true heart." };
+          resolvedMsg = { textZh: "欢迎来到这里，听见自己，也看见彼此", textEn: "Welcome. Hear yourself, and see each other." };
           renderWelcome();
         });
     });
@@ -6942,10 +6980,17 @@ window.__rhythmMarks = marks;
 var firstStar = null;
 var clickedStar = null;
 function setMark(key) { if (!(key in marks)) marks[key] = Math.round(performance.now()); }
-var labels = { pageStart: "页面开始", earthVisible: "地球可见", earthSpin: "地球转动", starVisible: "首星可见", starClickable: "首星可点", userClick: "点击", feedback: "点击反馈", bottleStart: "瓶出现", rabbitVisible: "兔可见", formalContent: "正式内容" };
-var order = ["pageStart", "earthVisible", "earthSpin", "starVisible", "starClickable", "userClick", "feedback", "bottleStart", "rabbitVisible", "formalContent"];
+var labels = { pageStart: "页面开始", earthVisible: "地球可见", earthSpin: "地球转动", guideHint: "轻抚提示", starVisible: "首星可见", starClickable: "首星可点", userClick: "点击", feedback: "点击反馈", bottleStart: "瓶出现", rabbitVisible: "兔可见", formalContent: "正式内容" };
+var order = ["pageStart", "earthVisible", "earthSpin", "guideHint", "starVisible", "starClickable", "userClick", "feedback", "bottleStart", "rabbitVisible", "formalContent"];
 
 setInterval(function () {
+  var intro = document.querySelector(".home-intro");
+  var wEl = document.getElementById("homeIntroWelcome");
+  if (intro && wEl && intro.classList.contains("is-visible")) {
+    var langEn = (document.documentElement.lang || "zh").indexOf("en") === 0;
+    var txt = langEn ? "Welcome. Hear yourself, and see each other." : "欢迎来到这里，听见自己，也看见彼此";
+    if (wEl.textContent !== txt) wEl.textContent = txt;
+  }
   var ap = document.querySelector(".approach");
   if (!("earthVisible" in marks) && ap) {
     var r = ap.getBoundingClientRect();
@@ -7004,6 +7049,20 @@ function render() {
   requestAnimationFrame(render);
 }
 requestAnimationFrame(render);
+
+/* "轻抚一颗心，遇见一个世界" light, non-blocking hint */
+var hint = document.createElement("div");
+hint.className = "rhythm-guide-hint";
+hint.innerHTML = "轻抚一颗心，遇见一个世界<span class=\"rhythm-guide-en\">Touch a heart star, meet a world.</span>";
+document.body.appendChild(hint);
+function scheduleAt(absMs, fn) {
+  setTimeout(fn, Math.max(0, absMs - performance.now()));
+}
+scheduleAt(6300, function () { hint.classList.add("is-visible"); setMark("guideHint"); });
+scheduleAt(11900, function () { hint.classList.remove("is-visible"); });
+document.addEventListener("click", function (e) {
+  if (e.target && e.target.closest && e.target.closest(".voice-star")) hint.classList.remove("is-visible");
+}, true);
 
 if (location.search.indexOf("auto=1") >= 0) {
   var tries = 0;
