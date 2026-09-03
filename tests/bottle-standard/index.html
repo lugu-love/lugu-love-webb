@@ -3822,6 +3822,36 @@ return image;
 });
 }
 let activeFengxinRabbitDemo = null;
+// Shared top-UI guard: the big performance picture must start below the real
+// top chrome (brand/logo), not at an arbitrary 24px.  Returns the first line
+// the rabbit's ears may reach (top UI bottom + safety gap).
+function voiceCardTopSafeLine() {
+const stageNode = stage || document.body;
+const stageRect = stageNode.getBoundingClientRect();
+let topUiBottom = -Infinity;
+document.querySelectorAll(".place-mark, .android-entry").forEach((el) => {
+if (!el.getClientRects().length) return;
+const bottom = el.getBoundingClientRect().bottom;
+if (bottom > 0) topUiBottom = Math.max(topUiBottom, bottom);
+});
+if (topUiBottom === -Infinity) return stageRect.top + 24;
+return topUiBottom + 12;
+}
+// Shared bottom-UI guard: the floating card must stay above the stage's bottom
+// entries, and the big-stage layout reserves room for the whole card below the
+// rabbit's feet.  Returns the highest line the card bottom may touch.
+function voiceCardBottomSafeLine() {
+const stageNode = stage || document.body;
+const stageRect = stageNode.getBoundingClientRect();
+let line = Infinity;
+document.querySelectorAll(".world-entry, .emotion-entry, .career-entry").forEach((el) => {
+if (!el.getClientRects().length) return;
+const top = el.getBoundingClientRect().top;
+if (top > 0) line = Math.min(line, top);
+});
+if (line === Infinity) line = stageRect.bottom - 110;
+return line - 12;
+}
 function playFengxinRabbitAngryDemo(container, existingCanvas = null, wakeDelay = 0, loopCount = 1) {
 // A new bottle must never inherit the previous bottle's playback lock.
 // Detaching the old canvas also lets its own timer clean itself up safely.
@@ -4297,9 +4327,54 @@ runSpritePlayback("large");
 function expandRabbitPerformance() {
 if (rabbitStage !== "large" || canvas.dataset.exiting === "1" || !canvas.isConnected) return;
 const entryStartRect = canvas.getBoundingClientRect();
-const targetSize = Math.min(window.innerWidth * 1.2, 510);
-const targetLeft = (window.innerWidth - targetSize) / 2;
-const targetTop = window.innerHeight * .5 - 62 - targetSize / 2;
+const stageRect = (stage || document.body).getBoundingClientRect();
+// The real usable content band: below the actual top chrome (brand/logo) and
+// above the bottom entry buttons.  The composition is centred inside it.
+const topSafe = voiceCardTopSafeLine();
+const bottomSafe = voiceCardBottomSafeLine();
+const usableHeight = Math.max(0, bottomSafe - topSafe);
+const cardGapBelowFeet = 12;
+const visibleSpanRatio = (renderY + renderSize - renderY) / canvasSize; // 400/540
+// The floating card is fully typed by now, so its real height is known.
+const floatingCard = document.querySelector(".voice-letter.is-floating-card");
+const actualCardHeight = floatingCard ? floatingCard.getBoundingClientRect().height : 0;
+const cardHeight = actualCardHeight > 40 ? actualCardHeight : 165;
+let rabbitSize = Math.min(window.innerWidth * 1.2, 510);
+// Scale decision uses one shared reserve that covers the tallest card (2-line),
+// so E04 and E13 always scale together on short screens and keep the same size.
+const fitCardReserve = 190;
+const compositionHeightForFit = (size) => size * visibleSpanRatio + cardGapBelowFeet + fitCardReserve;
+if (compositionHeightForFit(rabbitSize) > usableHeight) {
+rabbitSize *= .94;
+}
+// Centering uses the actual measured card height.
+const compositionHeightFor = (size) => size * visibleSpanRatio + cardGapBelowFeet + cardHeight;
+const targetLeft = (window.innerWidth - rabbitSize) / 2;
+const contentTopOffset = rabbitSize * (renderY / canvasSize);
+const feetOffset = rabbitSize * rabbitVisibleBottomRatio;
+// Rabbit visual + gap + card are one composition: centre it in the real usable
+// band.  E04/E13 share the exact same rule; only measured card height differs.
+const compositionHeight = compositionHeightFor(rabbitSize);
+const usableCenter = (topSafe + bottomSafe) / 2;
+const centerOffsetFromTop = contentTopOffset + compositionHeight / 2;
+let targetTop = usableCenter - centerOffsetFromTop;
+// Hard constraints: ears stay below the top chrome; card bottom stays above
+// the bottom entries.
+targetTop = Math.max(topSafe - contentTopOffset, Math.min(targetTop, bottomSafe - feetOffset - cardGapBelowFeet - cardHeight));
+// ---- One shared global knob for the whole big-performance rabbit ----
+// Lower the rabbit a bit more on screen while the card keeps its current
+// place.  The down-shift is capped so the rabbit's feet never come closer
+// than 8px to the first text line (feet-to-text target ~8-12px).  E04/E13
+// share this single parameter; no per-emotion top/left patches.
+const BIG_RABBIT_DOWN_PX = 18;
+const cardAnchorTop = targetTop; // card stays anchored to the unshifted rabbit
+const cardTextEl = floatingCard ? floatingCard.querySelector(".voice-letter-text") : null;
+const textOffsetInCard = floatingCard && cardTextEl ? (cardTextEl.getBoundingClientRect().top - floatingCard.getBoundingClientRect().top) : 10;
+// With the card held in place, the safe downward room equals the first line's
+// offset inside the card (~10px): lowering the rabbit by more would put its
+// feet inside the 8px text clearance.  Still capped by the shared 18px knob.
+const rabbitDown = Math.min(BIG_RABBIT_DOWN_PX, Math.max(0, textOffsetInCard + 5));
+targetTop = cardAnchorTop + rabbitDown;
 rabbitStage = "expanded";
 thirdStepReached = true;
 clearTimeout(largeBottleExitTimer);
@@ -4309,7 +4384,7 @@ container.dataset.rabbitReleased = "1";
 container.classList.add("is-rabbit-releasing");
 if (isNarrativeTest) container.classList.add("is-rabbit-emerging");
 container.dispatchEvent(new CustomEvent("rabbit-expanded", { detail: {
-toBottom: targetTop + targetSize * rabbitVisibleBottomRatio,
+toBottom: cardAnchorTop + rabbitSize * rabbitVisibleBottomRatio,
 duration: isNarrativeTest ? (narrativeReplayActive ? 1200 : 4000) : 450,
 easing: isNarrativeTest ? "cubic-bezier(.18, .7, .16, 1)" : "cubic-bezier(.2, .72, .2, 1)"
 }}));
@@ -4350,18 +4425,18 @@ if (rabbitStage !== "expanded" || !canvas.isConnected) return;
 foregroundEntryAnimation = canvas.animate([
 { left: `${entryStartRect.left}px`, top: `${entryStartRect.top}px`, width: `${entryStartRect.width}px`, height: `${entryStartRect.height}px`, transform: "translateY(0) scale(1)", opacity: 1, filter: entryStartFilter },
 { offset: .2, left: `${entryStartRect.left}px`, top: `${entryStartRect.top - 7}px`, width: `${entryStartRect.width * 1.12}px`, height: `${entryStartRect.height * 1.12}px`, transform: "translateY(-2px) scale(1)", opacity: 1, filter: entryStartFilter },
-{ left: `${targetLeft}px`, top: `${targetTop}px`, width: `${targetSize}px`, height: `${targetSize}px`, transform: "translateY(0) scale(1)", opacity: 1, filter: expandedFilter }
+{ left: `${targetLeft}px`, top: `${targetTop}px`, width: `${rabbitSize}px`, height: `${rabbitSize}px`, transform: "translateY(0) scale(1)", opacity: 1, filter: expandedFilter }
 ], { duration: foregroundEntryDuration, easing: "cubic-bezier(.18, .7, .16, 1)", fill: "forwards" });
 foregroundEntryAnimation.onfinish = () => {
 if (rabbitStage !== "expanded" || !canvas.isConnected) return;
 foregroundEntryAnimation.cancel();
 foregroundEntryAnimation = null;
 narrativeReplayActive = false;
-canvas.style.left = "50%";
-canvas.style.top = "calc(50svh - 62px - min(60vw, 255px))";
-canvas.style.width = "min(120vw, 510px)";
-canvas.style.height = "min(120vw, 510px)";
-canvas.style.transform = "translateX(-50%)";
+canvas.style.left = `${targetLeft}px`;
+canvas.style.top = `${targetTop}px`;
+canvas.style.width = `${rabbitSize}px`;
+canvas.style.height = `${rabbitSize}px`;
+canvas.style.transform = "none";
 canvas.style.pointerEvents = "auto";
 // The flight ended exactly on the expanded-class glow; drop the frozen entry
 // filter so the class value continues without a visible step.
@@ -6192,6 +6267,10 @@ openSendPreview(rabbitSequence);
 const prevButton = bottle.querySelector(".voice-page-prev");
 const nextButton = bottle.querySelector(".voice-page-next");
 const pageStatus = bottle.querySelector(".voice-page-status");
+// Floating-card binding: the first text line sits this far below the bottle's
+// flat bottom.  Small-bottle and enlarged-bottle states share the same value so
+// the text never jumps relative to the bottle during the zoom transition.
+const CARD_TEXT_BOTTLE_GAP = 17.5;
 function makeCardIndependent() {
 if (!letterNode || letterNode.classList.contains("is-floating-card") || closed) return;
 const stageNode = stage || document.body;
@@ -6226,8 +6305,7 @@ bottleRect.left - stageRect.left + (bottleRect.width - cardRect.width) / 2
 ));
 const firstCharacter = textNode?.firstElementChild;
 const currentTextTop = firstCharacter?.getBoundingClientRect().top ?? textRect?.top ?? cardRect.top;
-const textLineHeight = parseFloat(getComputedStyle(textNode).lineHeight) || 20;
-const top = cardRect.top - stageRect.top + (bottleRect.bottom + textLineHeight - currentTextTop);
+const top = cardRect.top - stageRect.top + (bottleRect.bottom + CARD_TEXT_BOTTLE_GAP - currentTextTop);
 letterNode.style.left = `${left}px`;
 letterNode.style.top = `${top}px`;
 }
@@ -6242,7 +6320,6 @@ const cardRect = letterNode.getBoundingClientRect();
 const textRect = textNode?.getBoundingClientRect();
 const firstCharacter = textNode?.firstElementChild;
 const currentTextTop = firstCharacter?.getBoundingClientRect().top ?? textRect?.top ?? cardRect.top;
-const textLineHeight = parseFloat(getComputedStyle(textNode).lineHeight) || 20;
 // The bottle transition intentionally centres the enlarged glass in the
 // stage. Its final bottom is therefore one unscaled glass-height below that
 // centre (the visual itself scales to 2×).
@@ -6251,17 +6328,36 @@ const left = Math.max(10, Math.min(
 stageRect.width - cardRect.width - 10,
 stageRect.width / 2 - cardRect.width / 2
 ));
-const top = cardRect.top - stageRect.top + (finalGlassBottom + textLineHeight - currentTextTop) - 6;
+const top = cardRect.top - stageRect.top + (finalGlassBottom + CARD_TEXT_BOTTLE_GAP - currentTextTop) - 6;
 letterNode.classList.add("is-following-large-bottle");
 letterNode.style.left = `${left}px`;
 letterNode.style.top = `${top}px`;
+}
+// The card grows with its text (1 vs 2 lines), so a rabbit-relative top alone
+// can push a tall card's action buttons onto the stage's bottom entries.
+// Clamp the top so the card bottom always stays clear of that bottom UI;
+// short content keeps its unclamped rabbit-relative position.
+function clampCardTopAboveBottomUI(top) {
+if (!letterNode?.isConnected) return top;
+const stageNode = stage || document.body;
+const stageRect = stageNode.getBoundingClientRect();
+let safeLine = Infinity;
+document.querySelectorAll(".world-entry, .emotion-entry, .career-entry").forEach((el) => {
+if (!el.getClientRects().length) return;
+const entryTop = el.getBoundingClientRect().top;
+if (entryTop > 0) safeLine = Math.min(safeLine, entryTop);
+});
+if (safeLine === Infinity) safeLine = stageRect.bottom - 110;
+const minClearance = 12;
+const maxTop = safeLine - minClearance - letterNode.getBoundingClientRect().height;
+return Math.max(10, Math.min(top, maxTop));
 }
 function followRabbitCard(detail) {
 if (!letterNode?.isConnected || !letterNode.classList.contains("is-floating-card")) return;
 const stageNode = stage || document.body;
 const stageRect = stageNode.getBoundingClientRect();
 const cardRect = letterNode.getBoundingClientRect();
-const targetTop = Math.max(10, (detail.toBottom - stageRect.top) + 10 - (detail.cardLift || 0));
+const targetTop = clampCardTopAboveBottomUI(Math.max(10, (detail.toBottom - stageRect.top) + 10 - (detail.cardLift || 0)));
 const targetLeft = Math.max(10, stageRect.width / 2 - cardRect.width / 2);
 
 letterNode.classList.remove("is-following-large-bottle", "is-following-rabbit-return");
@@ -6285,7 +6381,13 @@ letterNode?.classList.remove("is-following-rabbit-return");
 positionCardFromBottle();
 });
 bottle.addEventListener("rabbit-expanded", (event) => {
-if (event.detail) { event.detail.cardLift = 30; followRabbitCard(event.detail); }
+if (event.detail) {
+// The big rabbit pose already reserves room below its feet, so the card sits
+// BELOW the feet (gap 12) instead of being lifted over them: the first text
+// line is never covered and the buttons stay above the bottom entries.
+event.detail.cardLift = -2;
+followRabbitCard(event.detail);
+}
 });
 bottle.addEventListener("rabbit-return-start", (event) => {
 clearTimeout(cardReturnTimer);
