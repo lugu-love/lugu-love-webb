@@ -4003,6 +4003,9 @@ replayHint = null;
 returningToBottle = true;
 clearTimeout(bottleRevealTimer);
 const startRect = canvas.getBoundingClientRect();
+// Capture the actual big-stage glow so the return flight can end exactly on
+// the small in-bottle glow (no pop when the expanded class is removed).
+const returnStartFilter = getComputedStyle(canvas).filter;
 container?.style.removeProperty("--bottle-zoom-x");
 container?.style.removeProperty("--bottle-zoom-y");
 if (container) {
@@ -4034,6 +4037,7 @@ targetProbe.setAttribute("aria-hidden", "true");
 targetProbe.style.cssText = "visibility:hidden; pointer-events:none;";
 (rabbitSlot || bottleVisual).appendChild(targetProbe);
 const targetRect = targetProbe.getBoundingClientRect();
+const targetFilter = getComputedStyle(targetProbe).filter;
 targetProbe.remove();
 const targetWidth = targetRect.width;
 const targetHeight = targetRect.height;
@@ -4054,7 +4058,7 @@ top: `${startRect.top}px`,
 width: `${startRect.width}px`,
 height: `${startRect.height}px`,
 opacity: 1,
-filter: "drop-shadow(0 0 18px rgba(255, 235, 174, .8)) drop-shadow(0 0 38px rgba(111, 200, 255, .48))"
+filter: returnStartFilter
 },
 {
 left: `${targetLeft}px`,
@@ -4062,7 +4066,7 @@ top: `${targetTop}px`,
 width: `${targetWidth}px`,
 height: `${targetHeight}px`,
 opacity: 1,
-filter: "drop-shadow(0 0 9px rgba(255, 235, 174, .72)) drop-shadow(0 0 18px rgba(111, 200, 255, .34))"
+filter: targetFilter
 }
 ], {
 duration: 4200,
@@ -4311,7 +4315,12 @@ easing: isNarrativeTest ? "cubic-bezier(.18, .7, .16, 1)" : "cubic-bezier(.2, .7
 }}));
 }
 canvas.classList.remove("is-awakening");
+// Freeze the current in-bottle glow before the expanded class swaps it, so the
+// brighter stage glow ramps with the entry flight instead of popping on frame 1.
+const entryStartFilter = getComputedStyle(canvas).filter;
 canvas.classList.add("is-expanded-performance");
+const expandedFilter = getComputedStyle(canvas).filter;
+canvas.style.filter = entryStartFilter;
 container?.classList.add("rabbit-expanded");
 (stage || document.body).appendChild(canvas);
 // Write the foreground geometry inline as well as through CSS. Some mobile
@@ -4339,9 +4348,9 @@ canvas.style.transform = "none";
 requestAnimationFrame(() => {
 if (rabbitStage !== "expanded" || !canvas.isConnected) return;
 foregroundEntryAnimation = canvas.animate([
-{ left: `${entryStartRect.left}px`, top: `${entryStartRect.top}px`, width: `${entryStartRect.width}px`, height: `${entryStartRect.height}px`, transform: "translateY(0) scale(1)", opacity: 1 },
-{ offset: .2, left: `${entryStartRect.left}px`, top: `${entryStartRect.top - 7}px`, width: `${entryStartRect.width * 1.12}px`, height: `${entryStartRect.height * 1.12}px`, transform: "translateY(-2px) scale(1)", opacity: 1 },
-{ left: `${targetLeft}px`, top: `${targetTop}px`, width: `${targetSize}px`, height: `${targetSize}px`, transform: "translateY(0) scale(1)", opacity: 1 }
+{ left: `${entryStartRect.left}px`, top: `${entryStartRect.top}px`, width: `${entryStartRect.width}px`, height: `${entryStartRect.height}px`, transform: "translateY(0) scale(1)", opacity: 1, filter: entryStartFilter },
+{ offset: .2, left: `${entryStartRect.left}px`, top: `${entryStartRect.top - 7}px`, width: `${entryStartRect.width * 1.12}px`, height: `${entryStartRect.height * 1.12}px`, transform: "translateY(-2px) scale(1)", opacity: 1, filter: entryStartFilter },
+{ left: `${targetLeft}px`, top: `${targetTop}px`, width: `${targetSize}px`, height: `${targetSize}px`, transform: "translateY(0) scale(1)", opacity: 1, filter: expandedFilter }
 ], { duration: foregroundEntryDuration, easing: "cubic-bezier(.18, .7, .16, 1)", fill: "forwards" });
 foregroundEntryAnimation.onfinish = () => {
 if (rabbitStage !== "expanded" || !canvas.isConnected) return;
@@ -4354,6 +4363,9 @@ canvas.style.width = "min(120vw, 510px)";
 canvas.style.height = "min(120vw, 510px)";
 canvas.style.transform = "translateX(-50%)";
 canvas.style.pointerEvents = "auto";
+// The flight ended exactly on the expanded-class glow; drop the frozen entry
+// filter so the class value continues without a visible step.
+canvas.style.removeProperty("filter");
 spritesReady.then(() => {
 if (rabbitStage === "expanded" && canvas.isConnected) runSpritePlayback("narrative-replay", 1);
 }).catch(abortSpritePlayback);
