@@ -1,0 +1,30 @@
+{
+ "4": {
+  "union_src": [
+   0,
+   168,
+   719,
+   1101
+  ],
+  "factor": 0.60128,
+  "top_margin": 0.13,
+  "bottom_margin": 0.09,
+  "left_margin": 0.2,
+  "right_margin": 0.199,
+  "content_h_ratio": 0.78
+ },
+ "13": {
+  "union_src": [
+   0,
+   232,
+   719,
+   1086
+  ],
+  "factor": 0.65684,
+  "top_margin": 0.13,
+  "bottom_margin": 0.09,
+  "left_margin": 0.172,
+  "right_margin": 0.171,
+  "content_h_ratio": 0.78
+ }
+}

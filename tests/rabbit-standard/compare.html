@@ -1,0 +1,26 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>RCS 标准化对比 E04 vs E13</title>
+<style>
+ body{margin:0;background:#0b0c18;color:#eef0ff;font-family:-apple-system,"PingFang SC",sans-serif}
+ .wrap{max-width:820px;margin:0 auto;padding:16px}
+ h1{font-size:18px}.note{color:#9aa0c3;font-size:13px;line-height:1.7}
+ .row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+ .box{text-align:center;flex:1;min-width:230px}
+ canvas{width:min(260px,56vw);background:#0b0c18;border-radius:16px}
+ .m{font-size:12px;color:#b8c0ff}
+</style></head><body><div class="wrap">
+<h1>角色坐标标准化（RCS v1）· E04 撒娇 vs E13 躺平</h1>
+<div class="note">两条素材经<b>同一套自动标准化</b>（union bbox → 高占78%、顶部安全13%、底部安全9%、居中）。左边撒娇、右边躺平，应看到<b>同样占画布高度、同样留边</b>（躺平横向更宽是它本来就躺着的）。</div>
+<div class="row">
+ <div class="box"><div class="tag">E04 撒娇</div><canvas id="c4" width="540" height="540"></canvas><div class="m">top .13 / bottom .09 / h .78</div></div>
+ <div class="box"><div class="tag">E13 躺平</div><canvas id="c13" width="540" height="540"></canvas><div class="m">top .13 / bottom .09 / h .78</div></div>
+</div>
+</div>
+<script>
+var CFG={c4:"mobile/4",c13:"mobile/13"}, imgs={c4:[],c13:[]}, loaded={c4:0,c13:0}, SHEETS=6, FRAMES=72;
+Object.keys(CFG).forEach(function(k){ for(var i=0;i<SHEETS;i++){ (function(k,i){ var im=new Image(); im.onload=function(){imgs[k][i]=im; if(++loaded[k]===SHEETS) beacon(k+'ok');}; im.src=CFG[k]+'/sheet-'+String(i).padStart(2,'0')+'.webp'; })(k,i); } });
+function beacon(t){ try{fetch('__dbg?d='+t,{mode:'no-cors'});}catch(e){} }
+function paint(k,fi){ var cv=document.getElementById(k); var ctx=cv.getContext('2d'); var s=Math.floor(fi/12),l=fi%12; ctx.clearRect(0,0,540,540); var im=imgs[k][s]; if(!im)return; ctx.drawImage(im,(l%4)*270,Math.floor(l/4)*270,270,270,0,0,540,540); }
+var fi=0,last=0; function loop(t){ if(t-last>=1000/18){last=t;fi=(fi+1)%FRAMES;paint('c4',fi);paint('c13',fi);} requestAnimationFrame(loop); }
+requestAnimationFrame(loop);
+</script></body></html>
