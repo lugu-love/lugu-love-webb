@@ -7076,7 +7076,7 @@ function hideHint() {
   setTimeout(function () { hint.classList.remove("is-fading"); }, 2100);
 }
 scheduleAt(13000, function () { hint.classList.add("is-visible"); setMark("guideHint"); });
-scheduleAt(20000, hideHint);
+scheduleAt(17000, hideHint);
 document.addEventListener("click", function (e) {
   if (e.target && e.target.closest && e.target.closest(".voice-star")) hideHint();
 }, true);
