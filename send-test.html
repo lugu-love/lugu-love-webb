@@ -627,7 +627,7 @@ window.__MAIN__ = function () {
   function sheetUrl(id, i){
     var e = EMOTIONS.find(function(x){ return x.id === id; });
     var dir = (e && e.previewProxy) || ("mobile/" + id);
-    return "assets/video/fengxin-rabbit-sequence/" + dir + "/sheet-" + String(i).padStart(2,"0") + ".webp";
+    return "assets/video/fengxin-rabbit-sequence/" + dir + "/sheet-" + String(i).padStart(2,"0") + ".webp?v=e15-2026-09-03";
   }
 
   function ensureSheets(id, cb, errCb){

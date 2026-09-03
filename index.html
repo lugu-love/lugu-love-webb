@@ -3687,9 +3687,9 @@ const fengxinRabbitSequence = (fengxinNarrativeTestEnabled
 .filter((item) => !/^fox-/.test(item.id || ""))
 .map((item) => ({
 ...item,
-poster: `${item.poster || `${item.assetPath || `assets/video/fengxin-rabbit-sequence/${item.id}`}/poster.${item.spriteExtension || "webp"}`}${item.assetVersion ? `?v=${item.assetVersion}` : ""}`,
+poster: `${item.poster || `${item.assetPath || `assets/video/fengxin-rabbit-sequence/${item.id}`}/poster.${item.spriteExtension || "webp"}`}?v=e15-2026-09-03`,
 sprites: Array.from({ length: item.sheetCount }, (_, index) =>
-`${item.assetPath || `assets/video/fengxin-rabbit-sequence/${item.id}`}/sheet-${String(index).padStart(2, "0")}.${item.spriteExtension || "webp"}${item.assetVersion ? `?v=${item.assetVersion}` : ""}`
+`${item.assetPath || `assets/video/fengxin-rabbit-sequence/${item.id}`}/sheet-${String(index).padStart(2, "0")}.${item.spriteExtension || "webp"}?v=e15-2026-09-03`
 ),
 idle: item.idle ? {
 ...item.idle,
@@ -6917,7 +6917,7 @@ if ("serviceWorker" in navigator) {
     if (document.hidden) return;
     var urls = ["send-test.html", "scripts/make-send-cloud/emotion-manifest.json"];
     for (var i = 0; i < 15; i++) {
-      urls.push("assets/video/fengxin-rabbit-sequence/mobile/1/sheet-" + String(i).padStart(2, "0") + ".webp");
+      urls.push("assets/video/fengxin-rabbit-sequence/mobile/1/sheet-" + String(i).padStart(2, "0") + ".webp?v=e15-2026-09-03");
     }
     urls.forEach(function (u) {
       var l = document.createElement("link");
