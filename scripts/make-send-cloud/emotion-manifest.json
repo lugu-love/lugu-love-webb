@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "description": "七星使者·情绪表达 统一映射（单一事实源）。前端预览与后端生成共用此表，禁止各自硬编码情绪->视频逻辑。",
-  "updatedAt": "2026-09-02",
+  "updatedAt": "2026-09-03",
   "emotions": {
     "rabbit-happy": {
       "emotionId": "happy",
@@ -11,8 +11,8 @@
       "sequenceId": "1",
       "officialSource": "sequence/1",
       "previewProxy": "mobile/1",
-      "previewFrames": 73,
-      "previewSheets": 7,
+      "previewFrames": 72,
+      "previewSheets": 6,
       "renderMaster": "happy-master-v2.mp4",
       "status": "official",
       "speechStart": 1.4
@@ -25,8 +25,8 @@
       "sequenceId": "2",
       "officialSource": "sequence/2",
       "previewProxy": "mobile/2",
-      "previewFrames": 91,
-      "previewSheets": 8,
+      "previewFrames": 72,
+      "previewSheets": 6,
       "renderMaster": "wronged-master-v2.mp4",
       "status": "official",
       "speechStart": 2.4
@@ -39,8 +39,8 @@
       "sequenceId": "3",
       "officialSource": "sequence/3",
       "previewProxy": "mobile/3",
-      "previewFrames": 109,
-      "previewSheets": 10,
+      "previewFrames": 72,
+      "previewSheets": 6,
       "renderMaster": "angry-master-v2.mp4",
       "status": "official",
       "speechStart": 2.0
