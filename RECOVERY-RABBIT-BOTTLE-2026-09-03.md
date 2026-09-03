@@ -92,3 +92,27 @@ python3 -m http.server 8765 --bind 0.0.0.0
 
 说明：本文件本身位于收口之后的 docs commit 中；如从 tag 检出看不到本文件，可用
 `git show codex/home-rhythm-test:RECOVERY-RABBIT-BOTTLE-2026-09-03.md` 查看。
+
+---
+
+# 附：E01–E15 正式上线收口（2026-09-03 晚）
+
+## 最终发布信息
+- 正式线上（GitHub Pages，已发布新版）：**https://lugu-love.github.io/lugu-love-webb/**
+  - 首页 = 原版地球 7s + 新版标题/13s“轻抚”/首星~6s + E01–E15 漂流瓶；A 路 send-test = 15 情绪横向滑动
+- Frontend commit：`a999dcc`（main 已更新：7231dfe..a999dcc）
+- Frontend tag：`rabbit-bottle-e01e15-2026-09-03`
+- Backend commit：`4780314`（分支 speech-timing，已推送）
+- Backend tag：`rabbit-bottle-e01e15-backend-2026-09-03`
+- lugu.love 域名指向：未能确认（探测超时）；由用户侧 DNS 指向 Pages 或后端
+
+## 回退 / rollback 路径
+- 旧首页：`/tmp/index.pre-final-merge.html`；git 历史 `7231dfe`（旧 main 基线）
+- 旧 mobile：`assets/video/fengxin-rabbit-sequence/mobile-legacy-backup-2026-09-03/`
+- 旧 backend masters：`/private/tmp/lugu-p3-speech/scripts/make-send-cloud/masters-backup-2026-09-03/`
+- 恢复命令：`git checkout rabbit-bottle-e01e15-2026-09-03`（前端）/ `git -C /private/tmp/lugu-p3-speech checkout rabbit-bottle-e01e15-backend-2026-09-03`
+
+## 后端 Railway 部署状态（待办）
+- 本机 `/private/tmp/lugu-p3-speech` 未 link Railway 项目；CLI 已登录但无法自动选择项目。
+- 待执行：`cd /private/tmp/lugu-p3-speech && railway link && railway up --detach`
+- 或由后端主分支触发部署（后端 main 与前端同仓，禁止直接推 main 覆盖前端；需走单独 backend 仓库/分支）。
