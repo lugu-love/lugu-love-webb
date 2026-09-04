@@ -99,7 +99,7 @@ function loadEmotions(){
 // ============ 统一播放器实例（可整体 dispose，幂等） ============
 function makePlayer(emo, inject, onUpdate){
   var token=0, disposed=false;
-  var raf=0, lastFrameAt=0, frameIndex=0, finished=false, started=false;
+  var raf=0, lastFrameAt=0, frameIndex=0, finished=false, started=false, paused=false;
   var states=[], imgs=[], queue=[], activeLoads=0, timers=[];
   var posterImg=new Image();
   var metrics={ imagesCreated:0, posterStart:0, posterDone:0, firstSheetReadyAt:0, animStart:0, rafStarts:0, rafStops:0, timersStarted:0, timersCleared:0, okSheets:0, failSheets:0, timeoutSheets:0, frameIndex:0, disposed:false, pass:false, firstFail:"" };
@@ -194,7 +194,7 @@ function makePlayer(emo, inject, onUpdate){
   }
 
   function loop(now){
-    if(disposed||finished) return;
+    if(disposed||finished||paused) return;
     if(!lastFrameAt) lastFrameAt=now;
     if(now-lastFrameAt>=1000/FRAME_RATE){
       var si=Math.floor(frameIndex/FRAMES_PER_SHEET);
@@ -219,6 +219,21 @@ function makePlayer(emo, inject, onUpdate){
 
   for(var i=0;i<emo.sheets.length;i++) arm(i);
 
+  function pause(){
+    if(disposed||finished||paused) return;
+    paused=true;
+    if(raf){ cancelAnimationFrame(raf); raf=0; metrics.rafStops++; }
+    log("paused (background)");
+    publish();
+  }
+  function resume(){
+    if(disposed||finished||!paused) return;
+    paused=false; lastFrameAt=0;
+    raf=requestAnimationFrame(loop); metrics.rafStarts++;
+    log("resumed (foreground)");
+    publish();
+  }
+
   function dispose(){
     if(disposed) return;
     disposed=true; token++;
@@ -233,7 +248,7 @@ function makePlayer(emo, inject, onUpdate){
     publish();
   }
 
-  return { dispose:dispose, getMetrics:function(){ return metrics; }, publish:publish };
+  return { dispose:dispose, pause:pause, resume:resume, getMetrics:function(){ return metrics; }, publish:publish };
 }
 
 // ============ UI 状态渲染 ============
@@ -337,11 +352,11 @@ function quick4x(){
 }
 function simulateBg(){
   if(!player) return;
-  // 模拟切后台：只暂停时钟推进（保留实例），3s 后恢复
   var p=player;
-  setStatus("模拟切后台 3s（时钟暂停，实例保留）","warn");
+  setStatus("模拟切后台 3s（播放暂停，实例保留）","warn");
+  p.pause();
   return new Promise(function(res){
-    setTimeout(function(){ setStatus("已恢复（继续推进）","ok"); },3000);
+    setTimeout(function(){ if(p&&p.resume) p.resume(); setStatus("已恢复（继续播放）","ok"); },3000);
   });
 }
 
@@ -363,6 +378,10 @@ document.getElementById("btnBg").addEventListener("click", simulateBg);
 document.getElementById("btnAuto").addEventListener("click", function(){ runAuto(); });
 document.getElementById("btnCopy").addEventListener("click", copyDiag);
 document.getElementById("btnReset").addEventListener("click", resetAll);
+document.addEventListener("visibilitychange", function(){
+  if(player){ if(document.hidden){ player.pause(); } else { player.resume(); } }
+});
+window.addEventListener("pagehide", function(){ stopPlayer(); });
 window.__RP={ startEmo:startEmo, stopPlayer:stopPlayer, runAuto:runAuto, quickSwitch14:quickSwitch14, quick4x:quick4x, waitFinish:waitFinish, getEmo:function(){return EMO;}, loadEmotions:loadEmotions };
 
 loadEmotions().then(function(){ setStatus("就绪：选择情绪后点开始","ok"); });
