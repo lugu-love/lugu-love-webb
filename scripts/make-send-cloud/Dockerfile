@@ -15,11 +15,12 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY server.py tts_provider.py text_layout.py journey_store.py emotion-manifest.json ./
+COPY template/ template/
 
 # 素材（masters/*.mp4、poc/sample.mp4）体积较大，改为构建时从正式远端
 # lugu-love/lugu-love-webb 的代码分支拉取，避免每次本地上传大文件（当前网络受限）。
 # 若日后分支更名，可通过构建变量 MASTERS_REF 覆盖。
-ARG MASTERS_REF=codex/p3-cloud
+ARG MASTERS_REF=speech-timing
 RUN mkdir -p masters poc && \
     for f in happy-master.mp4 angry-master.mp4 wronged-master.mp4 \
              happy-master-v2.mp4 wronged-master-v2.mp4 angry-master-v2.mp4 playful-master-v2.mp4 \
