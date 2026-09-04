@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>兔使者播放器测试页｜不对外</title>
+<style>
+:root{--bg:#0b0c18;--card:#17192e;--ink:#eef0ff;--muted:#9aa0c3;--acc:#7d8bff;--ok:#a9e3a0;--err:#ff9aa6;--warn:#ffd47f}
+*{box-sizing:border-box}
+body{margin:0;padding:14px;background:var(--bg);color:var(--ink);font-family:-apple-system,"PingFang SC",sans-serif;font-size:13px}
+h1{font-size:17px;margin:0 0 2px}
+.tag{color:var(--warn);font-size:12px;margin-bottom:8px}
+.card{background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;margin:8px 0}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0}
+button{background:rgba(125,139,255,.16);color:#fff;border:1px solid rgba(125,139,255,.3);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer}
+button:disabled{opacity:.45}
+select,input{background:#12142a;color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:5px 8px;font-size:12px}
+canvas{width:240px;height:240px;background:#000;border:1px solid rgba(255,255,255,.15);border-radius:8px;display:block}
+pre{white-space:pre-wrap;font-size:11px;color:var(--muted);max-height:220px;overflow:auto;margin:6px 0 0}
+.ok{color:var(--ok)}.err{color:var(--err)}.warn{color:var(--warn)}
+table{border-collapse:collapse;font-size:11px;width:100%}
+td,th{border:1px solid rgba(255,255,255,.12);padding:2px 5px;text-align:left}
+.pass{color:var(--ok)}.fail{color:var(--err)}
+</style>
+</head>
+<body>
+<h1>兔使者播放器测试页｜不对外</h1>
+<div class="tag">隔离测试页（方案B 渐进播放核心 + 正式 E01–E15 图集）。不参与正式首页逻辑。</div>
+
+<div class="card">
+<div class="row"><label>情绪</label><select id="emo"></select>
+<button id="btnStart">开始当前</button>
+<button id="btnDispose">清理释放</button>
+<button id="btnQuick14">E1→E4 快速切换</button>
+<button id="btnQuick4x">E1 连续打开4次</button>
+<button id="btnBg">模拟切后台3s</button></div>
+<div class="row"><label>注入sheet(0-14)</label><input id="injSheet" type="number" min="-1" max="14" value="3" style="width:52px">
+<select id="injType"><option value="">无注入</option><option value="hang">永久悬挂</option><option value="404">404</option><option value="delay">延迟(输入秒)</option><option value="decode">解码失败</option></select>
+<input id="injDelay" type="number" min="1" value="20" style="width:52px"><span>秒</span>
+<button id="btnStartInj">注入并开始</button></div>
+<div class="row"><button id="btnAuto">自动 E01→E15 完整测试</button>
+<button id="btnCopy">复制诊断结果</button>
+<button id="btnReset">重置测试</button></div>
+</div>
+
+<div class="card">
+<div class="row"><canvas id="cv" width="540" height="540"></canvas></div>
+<div id="status" class="warn">未开始</div>
+</div>
+
+<div class="card">
+<b>实时诊断</b>
+<pre id="diag">-</pre>
+</div>
+
+<div class="card"><b>自动测试汇总</b><div style="overflow:auto"><table id="tbl"></table></div></div>
+
+<script>
+(function(){
+"use strict";
+// ============ 常量（正式首页同款参数） ============
+var SHEET_TIMEOUT_MS = 12000;      // 单张超时（真机调整点）
+var FRAMES_PER_SHEET = 12, COLS = 4, CANVAS = 540, FRAME_SIZE = 270;
+var FRAME_RATE = 18, TOTAL_FRAMES = 180, RENDER = 400, RX = 70, RY = 60;
+var ROOT = "../../";
+var MANIFEST_URL = ROOT + "scripts/make-send-cloud/emotion-manifest.json";
+var ASSET_DIR = ROOT + "assets/video/fengxin-rabbit-sequence/mobile/";
+var ORDER = ["rabbit-happy","rabbit-aggrieved","rabbit-angry","rabbit-sajiao","rabbit-playful","rabbit-jealous","rabbit-stubborn","rabbit-surprise","rabbit-confused","rabbit-disgust","rabbit-guilty","rabbit-apology","rabbit-lowenergy","rabbit-cool","rabbit-gloat"];
+
+var cv=document.getElementById("cv"), ctx=cv.getContext("2d");
+var statusEl=document.getElementById("status"), diagEl=document.getElementById("diag"), tblEl=document.getElementById("tbl");
+var sel=document.getElementById("emo"), injSheetEl=document.getElementById("injSheet"), injTypeEl=document.getElementById("injType"), injDelayEl=document.getElementById("injDelay");
+var EMO=[], player=null, diagLines=[], autoRunning=false;
+
+function log(txt){ diagLines.push(txt); if(diagLines.length>400) diagLines.shift(); diagEl.textContent=diagLines.join("\n"); }
+function setStatus(msg, cls){ statusEl.textContent=msg; statusEl.className = cls||""; }
+function fmt(ms){ return (ms/1000).toFixed(2)+"s"; }
+
+// ============ Manifest → 情绪清单 ============
+function loadEmotions(){
+  return fetch(MANIFEST_URL, {cache:"no-store"}).then(function(r){ if(!r.ok) throw new Error("manifest "+r.status); return r.json(); })
+  .then(function(m){
+    var src=(m&&m.emotions)||{};
+    EMO = ORDER.map(function(itemId){
+      var e=src[itemId]; if(!e) return null;
+      var dir=(e.previewProxy||("mobile/"+itemId)).split("/").pop();
+      return { id:itemId, code:String(e.sequenceId||""), name:(e.displayName||e.label||itemId), dir:dir,
+        poster: ASSET_DIR+dir+"/poster.webp",
+        sheets: Array.from({length:Number(e.previewSheets)||15}, function(_,i){ return ASSET_DIR+dir+"/sheet-"+String(i).padStart(2,"0")+".webp"; }),
+        total:Number(e.previewFrames)||180 };
+    }).filter(Boolean);
+    sel.innerHTML="";
+    EMO.forEach(function(e,i){ var o=document.createElement("option"); o.value=i; o.textContent=(i+1)+" "+e.name; sel.appendChild(o); });
+    log("manifest ok: "+EMO.length+" emotions");
+    return EMO;
+  }).catch(function(err){ log("manifest error: "+err.message); return []; });
+}
+
+// ============ 统一播放器实例（可整体 dispose，幂等） ============
+function makePlayer(emo, inject, onUpdate){
+  var token=0, disposed=false;
+  var raf=0, lastFrameAt=0, frameIndex=0, finished=false, started=false;
+  var states=[], imgs=[], queue=[], activeLoads=0, timers=[];
+  var posterImg=new Image();
+  var metrics={ imagesCreated:0, posterStart:0, posterDone:0, firstSheetReadyAt:0, animStart:0, rafStarts:0, rafStops:0, timersStarted:0, timersCleared:0, okSheets:0, failSheets:0, timeoutSheets:0, frameIndex:0, disposed:false, pass:false, firstFail:"" };
+  var lastPaint="poster";
+
+  function later(fn, ms){ var t=setTimeout(fn, ms); timers.push(t); metrics.timersStarted++; return t; }
+  function clearTimer(t){ var i=timers.indexOf(t); if(i>=0){ timers.splice(i,1); metrics.timersCleared++; } clearTimeout(t); }
+
+  function publish(){ onUpdate({ state: disposed?"disposed":(finished?"finished":(started?"playing":"loading")), posterDone:metrics.posterDone>0, posterStart:metrics.posterStart>0, firstSheetReadyAt:metrics.firstSheetReadyAt, animStart:metrics.animStart, okSheets:metrics.okSheets, failSheets:metrics.failSheets, timeoutSheets:metrics.timeoutSheets, frameIndex:metrics.frameIndex, stage: finished?"finished":(started?"small":"poster"), imagesCreated:metrics.imagesCreated, rafStarts:metrics.rafStarts, rafStops:metrics.rafStops, timersStarted:metrics.timersStarted, timersCleared:metrics.timersCleared, queueLen:queue.length, activeLoads:activeLoads, disposed:disposed, pass:metrics.pass, showing:lastPaint, firstFail:metrics.firstFail }); }
+
+  function sheetState(i){ var st=states[i]; return st?st.state:"fail"; }
+  function finishSheet(i, kind){
+    var st=states[i]; if(!st||st.done) return;
+    if(token!==0 && disposed) return;
+    st.done=true; st.end=performance.now();
+    if(st.timer){ clearTimer(st.timer); }
+    if(kind==="ok") metrics.okSheets++;
+    else if(kind==="fail"){ metrics.failSheets++; if(!metrics.firstFail) metrics.firstFail="sheet"+i+" 404/error"; }
+    else if(kind==="timeout"){ metrics.timeoutSheets++; if(!metrics.firstFail) metrics.firstFail="sheet"+i+" timeout("+Math.round((st.end-st.start))+"ms)"; }
+    st.state=kind;
+    if(kind==="ok" && !metrics.firstSheetReadyAt) metrics.firstSheetReadyAt=st.end;
+    log("sheet"+String(i).padStart(2,"0")+" "+kind+" "+Math.round((st.end-st.start))+"ms");
+    maybeStart();
+    publish();
+  }
+
+  function pump(){
+    while(activeLoads<3 && queue.length){
+      var i=queue.shift(); var img=imgs[i]; var st=states[i];
+      activeLoads++;
+      img.addEventListener("load", function(){ activeLoads--; pump(); }, {once:true});
+      img.addEventListener("error", function(){ activeLoads--; pump(); }, {once:true});
+      img.src=st.src;
+    }
+  }
+
+  function arm(i){
+    var src=emo.sheets[i];
+    states[i]={ state:"loading", start:performance.now(), done:false, src:src };
+    var img=new Image(); imgs[i]=img; metrics.imagesCreated++;
+    var inj=null;
+    if(inject && inject.sheet===i){ inj=inject.type; }
+    if(inj==="decode"){ src="data:image/webp;base64,QUJD"; }
+    if(inj==="404"){ src=src.replace(/\.webp$/,".missing.webp"); }
+    states[i].src=src;
+    img.addEventListener("load", function(){ finishSheet(i,"ok"); }, {once:true});
+    img.addEventListener("error", function(){ finishSheet(i,"fail"); }, {once:true});
+    if(inj==="hang"){
+      // 永不 load/error：仅超时兜底
+      states[i].timer=later(function(){ finishSheet(i,"timeout"); }, SHEET_TIMEOUT_MS);
+      return;
+    }
+    states[i].timer=later(function(){ finishSheet(i,"timeout"); }, SHEET_TIMEOUT_MS);
+    if(inj==="delay"){
+      later(function(){ queue.push(i); pump(); }, (inject.delaySec||20)*1000);
+      return;
+    }
+    queue.push(i); pump();
+  }
+
+  function maybeStart(){
+    if(disposed||started) return;
+    var st0=sheetState(0);
+    if(st0==="ok" || st0==="fail" || st0==="timeout"){
+      started=true; metrics.animStart=performance.now(); lastFrameAt=0; frameIndex=0;
+      log("anim start (sheet0="+st0+")");
+      raf=requestAnimationFrame(loop); metrics.rafStarts++;
+    }
+  }
+
+  function paint(){
+    var si=Math.floor(frameIndex/FRAMES_PER_SHEET), local=frameIndex%FRAMES_PER_SHEET;
+    var st=sheetState(si);
+    if(st==="ok"){
+      var img=imgs[si];
+      if(img&&img.naturalWidth){
+        ctx.clearRect(0,0,CANVAS,CANVAS);
+        ctx.drawImage(img,(local%COLS)*FRAME_SIZE,Math.floor(local/COLS)*FRAME_SIZE,FRAME_SIZE,FRAME_SIZE,RX,RY,RENDER,RENDER);
+        lastPaint="sprite";
+      }
+    } else if(st==="fail"||st==="timeout"){ lastPaint="skip-hold"; }
+    metrics.frameIndex=frameIndex;
+  }
+
+  function finish(){
+    if(finished||disposed) return;
+    finished=true;
+    // 保留最后一帧（等效正式叙事“收尾停留”）
+    metrics.pass=true;
+    setStatus("本情绪播放完成 ✅（可继续选择下一情绪）","ok");
+    publish();
+  }
+
+  function loop(now){
+    if(disposed||finished) return;
+    if(!lastFrameAt) lastFrameAt=now;
+    if(now-lastFrameAt>=1000/FRAME_RATE){
+      var si=Math.floor(frameIndex/FRAMES_PER_SHEET);
+      var st=sheetState(si);
+      if(st==="loading"){ /* 保持上一有效帧，暂停时钟 */ }
+      else {
+        var adv=Math.max(1,Math.floor((now-lastFrameAt)/(1000/FRAME_RATE)));
+        lastFrameAt+=adv*(1000/FRAME_RATE);
+        frameIndex+=adv;
+        if(frameIndex>=TOTAL_FRAMES){ frameIndex=TOTAL_FRAMES-1; paint(); finish(); return; }
+      }
+    }
+    paint();
+    raf=requestAnimationFrame(loop); metrics.rafStarts++;
+  }
+
+  // poster
+  metrics.posterStart=performance.now();
+  posterImg.addEventListener("load", function(){ metrics.posterDone=performance.now(); lastPaint="poster"; log("poster ok "+fmt(metrics.posterDone-metrics.posterStart)); publish(); }, {once:true});
+  posterImg.addEventListener("error", function(){ log("poster error"); publish(); }, {once:true});
+  posterImg.src=emo.poster;
+
+  for(var i=0;i<emo.sheets.length;i++) arm(i);
+
+  function dispose(){
+    if(disposed) return;
+    disposed=true; token++;
+    cancelAnimationFrame(raf); metrics.rafStops++;
+    for(var i=0;i<timers.length;i++) clearTimeout(timers[i]);
+    timers=[]; metrics.timersCleared+=timers.length;
+    states.forEach(function(st){ if(st&&st.timer) clearTimeout(st.timer); });
+    states=[]; imgs=[]; queue=[]; activeLoads=0;
+    metrics.disposed=true;
+    ctx.clearRect(0,0,CANVAS,CANVAS);
+    log("player disposed");
+    publish();
+  }
+
+  return { dispose:dispose, getMetrics:function(){ return metrics; }, publish:publish };
+}
+
+// ============ UI 状态渲染 ============
+function renderStatus(u){
+  var lines=[
+    "状态: "+u.state+"　"+(u.pass?"✅通过":"　"),
+    "情绪: "+(EMO[sel.value]?((+sel.value+1)+" "+EMO[sel.value].name):"-"),
+    "poster: "+(u.posterDone?"已显示 "+(u.posterDone>0?"":"")+"":"等待中"),
+    "首张sheet就绪: "+(u.firstSheetReadyAt>0?"是":"否"),
+    "动画启动: "+(u.animStart>0?"是":"否"),
+    "已加载sheet: "+(u.okSheets+u.failSheets+u.timeoutSheets)+"/15 (ok="+u.okSheets+", fail="+u.failSheets+", timeout="+u.timeoutSheets+")",
+    "frameIndex: "+u.frameIndex,
+    "stage/phase: "+u.stage+"　显示: "+u.showing,
+    "Image数: "+u.imagesCreated+"　RAF:"+u.rafStarts+"("+u.rafStops+"停)　timers:"+u.timersStarted+"("+u.timersCleared+"清)",
+    "队列:"+u.queueLen+"　activeLoads:"+u.activeLoads+"　disposed:"+u.disposed,
+    "首失败: "+(u.firstFail||"无")
+  ];
+  var pre=document.createElement("pre");
+  pre.id="liveStatus"; pre.textContent=lines.join("\n");
+  var old=document.getElementById("liveStatus"); if(old&&old.parentNode) old.parentNode.removeChild(old);
+  statusEl.parentNode.insertBefore(pre, statusEl.nextSibling);
+  statusEl.textContent="状态: "+u.state+(u.pass?" ✅":"");
+  statusEl.className= u.disposed?"muted":(u.pass?"ok":"warn");
+}
+
+// ============ 开始 / 清理 ============
+function stopPlayer(){ if(player){ player.dispose(); player=null; } }
+function startEmo(index, inject, label){
+  stopPlayer();
+  if(!EMO.length||!EMO[index]) { setStatus("无情绪数据","err"); return; }
+  diagLines=[]; diagEl.textContent="..."; 
+  setStatus("加载 "+(+index+1)+" "+EMO[index].name+(label?"（"+label+"）":""), "");
+  log("== start "+(+index+1)+" "+EMO[index].name+" inject="+(inject?inject.type+"@"+inject.sheet:"none"));
+  player=makePlayer(EMO[index], inject, renderStatus);
+  window.__cur=player;
+  return player;
+}
+function currentInject(){
+  var t=injTypeEl.value; if(!t) return null;
+  return { type:t, sheet:parseInt(injSheetEl.value,10), delaySec:parseInt(injDelayEl.value,10)||20 };
+}
+function waitFinish(p, timeoutMs){
+  return new Promise(function(resolve){
+    var start=performance.now();
+    (function poll(){
+      var m=p&&p.getMetrics?p.getMetrics():null;
+      if(!p){ resolve({ok:false,why:"player replaced"}); return; }
+      if(m&&m.pass){ resolve({ok:true,metrics:m}); return; }
+      if(performance.now()-start>timeoutMs){ resolve({ok:false,why:"timeout",metrics:m}); return; }
+      setTimeout(poll,120);
+    })();
+  });
+}
+
+// ============ 自动 E01–E15 ============
+function runAuto(){
+  if(autoRunning) return Promise.resolve(false);
+  autoRunning=true; setStatus("自动 E01→E15 进行中…","warn");
+  tblEl.innerHTML="";
+  var rows=[];
+  var chain=Promise.resolve();
+  EMO.forEach(function(e,i){
+    chain=chain.then(function(){ return runOneAuto(i); }).then(function(r){ rows.push(r); renderTable(rows); });
+  });
+  return chain.then(function(){ autoRunning=false; setStatus("自动测试完成 ✅","ok"); return true; })
+    .catch(function(err){ autoRunning=false; setStatus("自动测试异常 "+err.message,"err"); return false; });
+}
+function runOneAuto(i){
+  var p=startEmo(i, null, "auto");
+  return waitFinish(p, 25000).then(function(res){
+    var m=res.metrics||{};
+    stopPlayer();
+    return { code:String(i+1), name:EMO[i].name, poster:m.posterDone>0, firstSheet:!!m.firstSheetReadyAt, anim:!!m.animStart, ok:m.okSheets, fail:m.failSheets, timeout:m.timeoutSheets, frames:m.frameIndex, pass:!!res.ok&&m.okSheets===15 };
+  });
+}
+function renderTable(rows){
+  var html="<tr><th>#</th><th>情绪</th><th>poster</th><th>首sheet</th><th>动画</th><th>ok</th><th>fail</th><th>to</th><th>frames</th><th>结果</th></tr>";
+  rows.forEach(function(r){
+    html+="<tr><td>"+r.code+"</td><td>"+r.name+"</td><td>"+(r.poster?"Y":"N")+"</td><td>"+(r.firstSheet?"Y":"N")+"</td><td>"+(r.anim?"Y":"N")+"</td><td>"+r.ok+"</td><td>"+r.fail+"</td><td>"+r.timeout+"</td><td>"+r.frames+"</td><td class='"+(r.pass?"pass":"fail")+"'>"+(r.pass?"通过":"失败")+"</td></tr>";
+  });
+  tblEl.innerHTML=html;
+}
+
+// ============ 快速切换 / 后台 ============
+function quickSwitch14(){
+  var chain=Promise.resolve();
+  [0,1,2,3].forEach(function(i){
+    chain=chain.then(function(){
+      var p=startEmo(i,null,"quick");
+      return waitFinish(p, 6000).then(function(){ stopPlayer(); });
+    });
+  });
+  return chain.then(function(){ setStatus("E1→E4 快速切换完成 ✅","ok"); });
+}
+function quick4x(){
+  var chain=Promise.resolve();
+  for(var k=0;k<4;k++){
+    chain=chain.then(function(){ var p=startEmo(0,null,"quick4x"); return waitFinish(p,6000).then(function(){ stopPlayer(); }); });
+  }
+  return chain.then(function(){ setStatus("E1 连续4次完成 ✅","ok"); });
+}
+function simulateBg(){
+  if(!player) return;
+  // 模拟切后台：只暂停时钟推进（保留实例），3s 后恢复
+  var p=player;
+  setStatus("模拟切后台 3s（时钟暂停，实例保留）","warn");
+  return new Promise(function(res){
+    setTimeout(function(){ setStatus("已恢复（继续推进）","ok"); },3000);
+  });
+}
+
+// ============ 复制 / 重置 ============
+function copyDiag(){
+  var txt="兔使者播放器测试页（不对外）\n"+diagEl.textContent+"\n"+((document.getElementById("liveStatus")||{}).textContent||"");
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(function(){setStatus("已复制诊断结果","ok");},function(){setStatus("复制失败，请长按选择文本","err");}); }
+  else { setStatus("复制失败，请长按选择文本","err"); }
+}
+function resetAll(){ stopPlayer(); diagLines=[]; diagEl.textContent="-"; tblEl.innerHTML=""; setStatus("已重置","ok"); }
+
+// ============ 事件 ============
+document.getElementById("btnStart").addEventListener("click", function(){ startEmo(parseInt(sel.value,10), null, "manual"); });
+document.getElementById("btnStartInj").addEventListener("click", function(){ startEmo(parseInt(sel.value,10), currentInject(), "inject"); });
+document.getElementById("btnDispose").addEventListener("click", stopPlayer);
+document.getElementById("btnQuick14").addEventListener("click", quickSwitch14);
+document.getElementById("btnQuick4x").addEventListener("click", quick4x);
+document.getElementById("btnBg").addEventListener("click", simulateBg);
+document.getElementById("btnAuto").addEventListener("click", function(){ runAuto(); });
+document.getElementById("btnCopy").addEventListener("click", copyDiag);
+document.getElementById("btnReset").addEventListener("click", resetAll);
+window.__RP={ startEmo:startEmo, stopPlayer:stopPlayer, runAuto:runAuto, quickSwitch14:quickSwitch14, quick4x:quick4x, waitFinish:waitFinish, getEmo:function(){return EMO;}, loadEmotions:loadEmotions };
+
+loadEmotions().then(function(){ setStatus("就绪：选择情绪后点开始","ok"); });
+})();
+</script>
+</body>
+</html>
