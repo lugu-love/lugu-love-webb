@@ -209,6 +209,7 @@
 <script>
 window.__MAIN__ = function () {
   var MAKE_SEND_API = "https://api.lugu.love";
+  var EXPORT_FILE_NAME = "我的心情.mp4"; // 对外统一文件名（不暴露具体情绪）
   var GENERATE_TIMEOUT_MS = 55000;
   var BLOB_TIMEOUT_MS = 20000;
 
@@ -1176,7 +1177,7 @@ window.__MAIN__ = function () {
       var tBlob = performance.now();
       var blob=await withTimeout(vresp.blob(), BLOB_TIMEOUT_MS, activeController);
       if(!blob || blob.size===0) throw new Error("empty blob");
-      var file=new File([blob], "七星使者-" + current.name + ".mp4", { type:"video/mp4" });
+      var file=new File([blob], EXPORT_FILE_NAME, { type:"video/mp4" });
       lastBlob=blob; lastFile=file;
       lastUrl=URL.createObjectURL(blob);
       videoEl.src=lastUrl;
@@ -1274,7 +1275,7 @@ window.__MAIN__ = function () {
 
   function saveVideo(){
     if(!lastBlob){ showToast("请先生成视频"); return; }
-    downloadBlob(lastBlob, "七星使者-" + current.name + ".mp4");
+    downloadBlob(lastBlob, EXPORT_FILE_NAME);
     if(isIOS){
       setStatus("");
       setHint("打开后，点击右上角‘…’即可分享");
