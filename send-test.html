@@ -11,18 +11,18 @@
     font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;
     -webkit-font-smoothing:antialiased; overflow-x:hidden; overflow-y:auto; }
   .app { display:flex; flex-direction:column; min-height:100vh; min-height:100svh; height:auto; }
-  html:not(.state-done) .app { padding:calc(env(safe-area-inset-top,0px)+16px) 16px calc(env(safe-area-inset-bottom,0px)+86px); }
-  .edit-top { position:sticky; top:0; z-index:20; flex:0 0 auto; background:var(--bg); }
+  html:not(.state-done) .app { padding:calc(env(safe-area-inset-top, 0px) + 16px) 16px calc(env(safe-area-inset-bottom, 0px) + 86px); }
+  .edit-top { position:sticky; top:env(safe-area-inset-top,0px); z-index:20; flex:0 0 auto; background:var(--bg); }
   html:not(.state-done).keyboard-open .app { padding-top: calc(env(safe-area-inset-top,0px) + 6px); padding-bottom: calc(env(safe-area-inset-bottom,0px) + 10px); }
   html:not(.state-done).keyboard-open .edit-top .stage-wrap { margin-top: 0; }
   html:not(.state-done).keyboard-open .emotions { margin-top: 8px; margin-bottom: 6px; }
   html:not(.state-done).keyboard-open #stage { width: min(56vw, 232px); }
   html:not(.state-done).keyboard-open .emotion { padding: 4px 10px; font-size:12px; }
   html:not(.state-done).keyboard-open .cta { display: none !important; }
-  .brand { display:flex; align-items:center; gap:12px; margin:0; padding:2px 4px; position:relative; z-index:60; }
+  .brand { display:flex; align-items:center; gap:12px; margin:0; padding:2px 12px 2px 12px; position:relative; z-index:60; }
   .site-logo { display:inline-flex; align-items:center; gap:5px; color:rgba(238,240,255,.72); text-decoration:none; font-size:13px; font-weight:400; letter-spacing:.04em; padding:4px 6px 4px 0; border-radius:999px; }
   .site-logo img { width:26px; height:26px; flex:0 0 26px; filter:drop-shadow(0 0 4px rgba(255,222,143,.4)); }
-  .back-home { display:inline-flex; align-items:center; justify-content:center; gap:5px; min-width:68px; min-height:40px; padding:0 14px; border-radius:10px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); color:rgba(238,240,255,.92); text-decoration:none; font-size:14px; font-weight:600; letter-spacing:.02em; white-space:nowrap; }
+  .back-home { display:inline-flex; align-items:center; justify-content:center; gap:5px; min-width:68px; min-height:44px; padding:0 16px; border-radius:10px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); color:rgba(238,240,255,.92); text-decoration:none; font-size:14px; font-weight:600; letter-spacing:.02em; white-space:nowrap; }
   .back-home:active { opacity:.6; }
   html.is-app-bridge .site-logo { display:none !important; }
   .brand .heart { color:rgba(238,240,255,.82); margin-right:5px; font-weight:400; }
