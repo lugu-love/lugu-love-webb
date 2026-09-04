@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "description": "七星使者·情绪表达 统一映射（单一事实源）。前端预览与后端生成共用此表，禁止各自硬编码情绪->视频逻辑。",
-  "updatedAt": "2026-09-03",
+  "updatedAt": "2026-09-04",
   "emotions": {
     "rabbit-happy": {
       "emotionId": "happy",
@@ -11,11 +11,19 @@
       "sequenceId": "1",
       "officialSource": "sequence/1",
       "previewProxy": "mobile/1",
-      "previewFrames": 72,
-      "previewSheets": 6,
+      "previewFrames": 180,
+      "previewSheets": 15,
       "renderMaster": "happy-master-v2.mp4",
       "status": "official",
-      "speechStart": 1.4
+      "speechStart": 1.4,
+      "unionSource": [
+        0,
+        190,
+        719,
+        1053
+      ],
+      "code": "01",
+      "displayName": "开心"
     },
     "rabbit-aggrieved": {
       "emotionId": "wronged",
@@ -25,11 +33,19 @@
       "sequenceId": "2",
       "officialSource": "sequence/2",
       "previewProxy": "mobile/2",
-      "previewFrames": 72,
-      "previewSheets": 6,
+      "previewFrames": 180,
+      "previewSheets": 15,
       "renderMaster": "wronged-master-v2.mp4",
       "status": "official",
-      "speechStart": 2.4
+      "speechStart": 2.4,
+      "unionSource": [
+        0,
+        185,
+        719,
+        1075
+      ],
+      "code": "02",
+      "displayName": "委屈难过"
     },
     "rabbit-angry": {
       "emotionId": "angry",
@@ -39,11 +55,19 @@
       "sequenceId": "3",
       "officialSource": "sequence/3",
       "previewProxy": "mobile/3",
-      "previewFrames": 72,
-      "previewSheets": 6,
+      "previewFrames": 180,
+      "previewSheets": 15,
       "renderMaster": "angry-master-v2.mp4",
       "status": "official",
-      "speechStart": 2.0
+      "speechStart": 2.0,
+      "unionSource": [
+        0,
+        174,
+        719,
+        1075
+      ],
+      "code": "03",
+      "displayName": "生气愤怒"
     },
     "rabbit-playful": {
       "emotionId": "playful",
@@ -52,11 +76,19 @@
       "characterId": "fengxin-rabbit",
       "sequenceId": "5",
       "previewProxy": "mobile/5",
-      "previewFrames": 72,
-      "previewSheets": 6,
+      "previewFrames": 180,
+      "previewSheets": 15,
       "renderMaster": "rabbit-playful.mp4",
       "speechStart": 1.5,
-      "status": "official"
+      "status": "official",
+      "unionSource": [
+        0,
+        164,
+        637,
+        1079
+      ],
+      "code": "05",
+      "displayName": "调皮幽默"
     },
     "rabbit-sajiao": {
       "emotionId": "sajiao",
@@ -65,11 +97,19 @@
       "characterId": "fengxin-rabbit",
       "sequenceId": "4",
       "previewProxy": "mobile/4",
-      "previewFrames": 72,
-      "previewSheets": 6,
+      "previewFrames": 180,
+      "previewSheets": 15,
       "renderMaster": "rabbit-sajiao.mp4",
       "speechStart": 1.6,
-      "status": "official"
+      "status": "official",
+      "unionSource": [
+        0,
+        168,
+        719,
+        1101
+      ],
+      "code": "04",
+      "displayName": "撒娇"
     },
     "rabbit-jealous": {
       "emotionId": "jealous",
@@ -78,11 +118,19 @@
       "characterId": "fengxin-rabbit",
       "sequenceId": "6",
       "previewProxy": "mobile/6",
-      "previewFrames": 72,
-      "previewSheets": 6,
+      "previewFrames": 180,
+      "previewSheets": 15,
       "renderMaster": "rabbit-jealous.mp4",
       "speechStart": 2.0,
-      "status": "official"
+      "status": "official",
+      "unionSource": [
+        7,
+        63,
+        719,
+        1265
+      ],
+      "code": "06",
+      "displayName": "吃醋"
     },
     "rabbit-stubborn": {
       "emotionId": "stubborn",
@@ -91,11 +139,19 @@
       "characterId": "fengxin-rabbit",
       "sequenceId": "7",
       "previewProxy": "mobile/7",
-      "previewFrames": 72,
-      "previewSheets": 6,
+      "previewFrames": 180,
+      "previewSheets": 15,
       "renderMaster": "rabbit-stubborn.mp4",
       "speechStart": 2.0,
-      "status": "official"
+      "status": "official",
+      "unionSource": [
+        0,
+        38,
+        719,
+        1221
+      ],
+      "code": "07",
+      "displayName": "嘴硬不服"
     },
     "rabbit-surprise": {
       "emotionId": "surprised",
@@ -104,11 +160,19 @@
       "characterId": "fengxin-rabbit",
       "sequenceId": "8",
       "previewProxy": "mobile/8",
-      "previewFrames": 72,
-      "previewSheets": 6,
+      "previewFrames": 180,
+      "previewSheets": 15,
       "renderMaster": "rabbit-surprise.mp4",
       "speechStart": 1.2,
-      "status": "official"
+      "status": "official",
+      "unionSource": [
+        0,
+        68,
+        719,
+        1196
+      ],
+      "code": "08",
+      "displayName": "意外惊喜"
     },
     "rabbit-confused": {
       "emotionId": "confused",
@@ -117,11 +181,19 @@
       "characterId": "fengxin-rabbit",
       "sequenceId": "9",
       "previewProxy": "mobile/9",
-      "previewFrames": 72,
-      "previewSheets": 6,
+      "previewFrames": 180,
+      "previewSheets": 15,
       "renderMaster": "rabbit-confused.mp4",
       "speechStart": 1.8,
-      "status": "official"
+      "status": "official",
+      "unionSource": [
+        0,
+        238,
+        719,
+        1186
+      ],
+      "code": "09",
+      "displayName": "疑惑"
     },
     "rabbit-disgust": {
       "emotionId": "disgusted",
@@ -130,11 +202,19 @@
       "characterId": "fengxin-rabbit",
       "sequenceId": "10",
       "previewProxy": "mobile/10",
-      "previewFrames": 72,
-      "previewSheets": 6,
+      "previewFrames": 180,
+      "previewSheets": 15,
       "renderMaster": "rabbit-disgust.mp4",
       "speechStart": 1.6,
-      "status": "official"
+      "status": "official",
+      "unionSource": [
+        0,
+        63,
+        719,
+        1226
+      ],
+      "code": "10",
+      "displayName": "嫌弃"
     },
     "rabbit-guilty": {
       "emotionId": "guilty",
@@ -143,11 +223,19 @@
       "characterId": "fengxin-rabbit",
       "sequenceId": "11",
       "previewProxy": "mobile/11",
-      "previewFrames": 72,
-      "previewSheets": 6,
+      "previewFrames": 180,
+      "previewSheets": 15,
       "renderMaster": "rabbit-guilty.mp4",
       "speechStart": 1.8,
-      "status": "official"
+      "status": "official",
+      "unionSource": [
+        0,
+        98,
+        689,
+        1165
+      ],
+      "code": "11",
+      "displayName": "心虚"
     },
     "rabbit-apology": {
       "emotionId": "apologetic",
@@ -156,11 +244,19 @@
       "characterId": "fengxin-rabbit",
       "sequenceId": "12",
       "previewProxy": "mobile/12",
-      "previewFrames": 72,
-      "previewSheets": 6,
+      "previewFrames": 180,
+      "previewSheets": 15,
       "renderMaster": "rabbit-apology.mp4",
       "speechStart": 2.0,
-      "status": "official"
+      "status": "official",
+      "unionSource": [
+        0,
+        73,
+        719,
+        1206
+      ],
+      "code": "12",
+      "displayName": "求原谅"
     },
     "rabbit-lowenergy": {
       "emotionId": "lowenergy",
@@ -169,11 +265,19 @@
       "characterId": "fengxin-rabbit",
       "sequenceId": "13",
       "previewProxy": "mobile/13",
-      "previewFrames": 72,
-      "previewSheets": 6,
+      "previewFrames": 180,
+      "previewSheets": 15,
       "renderMaster": "rabbit-lowenergy.mp4",
       "speechStart": 2.2,
-      "status": "official"
+      "status": "official",
+      "unionSource": [
+        0,
+        232,
+        719,
+        1086
+      ],
+      "code": "13",
+      "displayName": "躺平摆烂"
     },
     "rabbit-cool": {
       "emotionId": "cool",
@@ -182,11 +286,19 @@
       "characterId": "fengxin-rabbit",
       "sequenceId": "14",
       "previewProxy": "mobile/14",
-      "previewFrames": 72,
-      "previewSheets": 6,
+      "previewFrames": 180,
+      "previewSheets": 15,
       "renderMaster": "rabbit-cool.mp4",
       "speechStart": 2.0,
-      "status": "official"
+      "status": "official",
+      "unionSource": [
+        0,
+        22,
+        678,
+        1233
+      ],
+      "code": "14",
+      "displayName": "装酷"
     },
     "rabbit-gloat": {
       "emotionId": "gloating",
@@ -195,11 +307,19 @@
       "characterId": "fengxin-rabbit",
       "sequenceId": "15",
       "previewProxy": "mobile/15",
-      "previewFrames": 72,
-      "previewSheets": 6,
+      "previewFrames": 180,
+      "previewSheets": 15,
       "renderMaster": "rabbit-gloat.mp4",
       "speechStart": 1.6,
-      "status": "official"
+      "status": "official",
+      "unionSource": [
+        0,
+        37,
+        704,
+        1241
+      ],
+      "code": "15",
+      "displayName": "幸灾乐祸"
     }
   }
 }
