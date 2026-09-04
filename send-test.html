@@ -525,6 +525,21 @@ window.__MAIN__ = function () {
   window.addEventListener("load", function(){ setTimeout(detectBridgeNow, 150); });
 
   var current=EMOTIONS[0];
+  // A路转发接收：?e=1..15 预选情绪；from=home 时“←首页”优先浏览器返回。
+  var fwdE = 0;
+  try { var _fe = parseInt(new URLSearchParams(location.search).get("e") || "", 10); if (_fe >= 1 && _fe <= 15) fwdE = _fe; } catch (err) {}
+  var fwdFromHome = false;
+  try { fwdFromHome = new URLSearchParams(location.search).get("from") === "home"; } catch (err) {}
+  function applyForwardText(){
+    var stored = null;
+    try { stored = window.sessionStorage.getItem("lugu_forward_text"); } catch (e) {}
+    try { window.sessionStorage.removeItem("lugu_forward_text"); } catch (e) {}
+    try { window.sessionStorage.removeItem("lugu_forward_emotion"); } catch (e) {}
+    if(!stored || !textInput) return;
+    textInput.value = stored;
+    textInput.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+
   var cache={}, preloadOrder=["2","3"], preloadStarted=false, activeUserLoad=false;
   var sheets=[], loaded=0, frameIndex=0, lastFrameAt=0, animId=null;
   var lastBlob=null, lastFile=null, lastUrl=null;
@@ -569,15 +584,21 @@ window.__MAIN__ = function () {
     refreshUI(); renderGuide(); renderSuggest();
     scrollEmotionTo(current.id);
   }
+  if (fwdE) {
+    var _fwdEmo = EMOTIONS.find(function (x) { return x.id === String(fwdE); });
+    if (_fwdEmo) current = _fwdEmo;
+  }
   renderEmotionButtons();
 
   loadEmotionManifest().then(function(ok){
-    if(!ok) return;
-    var keepId = current.id;
-    current = EMOTIONS.find(function(e){ return e.id === keepId; }) || EMOTIONS[0];
-    renderEmotionButtons();
-    renderDiag(); renderPreloadDiag();
+    if (ok) {
+      var keepId = current.id;
+      current = EMOTIONS.find(function(e){ return e.id === keepId; }) || EMOTIONS[0];
+      renderEmotionButtons();
+      renderDiag(); renderPreloadDiag();
+    }
     if(typeof syncGenerateEnabled === "function") syncGenerateEnabled();
+    applyForwardText();
   });
 
   function refreshUI(){ Array.prototype.forEach.call(emotionsEl.children, function(b){ if(!b.dataset || !b.dataset.em) return; b.classList.toggle("active", b.dataset.em===current.id); }); }
@@ -1315,7 +1336,19 @@ window.__MAIN__ = function () {
   btnSave.addEventListener("click", saveVideo);
   btnSend.addEventListener("click", sendVideo);
   btnReEdit.addEventListener("click", reEdit);
-  btnHome.addEventListener("click", function(){ location.href = "index.html"; });
+  function backHomeOrIndex(){
+    if (fwdFromHome) {
+      try { if (window.history && window.history.length > 1) { window.history.back(); return; } } catch (e) {}
+    }
+    location.href = "index.html";
+  }
+  btnHome.addEventListener("click", backHomeOrIndex);
+  var backHomeLink = document.querySelector(".back-home");
+  if (backHomeLink && fwdFromHome) {
+    backHomeLink.addEventListener("click", function (ev) {
+      try { if (window.history && window.history.length > 1) { ev.preventDefault(); window.history.back(); } } catch (e) {}
+    });
+  }
   btnSendWeChat.addEventListener("click", function(){
     if(!nativeReady){ setStatus("视频正在准备，请稍候…", ""); return; }
     try { window.AndroidShare.sharePreparedVideo(); } catch(err){ setStatus("无法打开系统分享，请重试", "err"); }

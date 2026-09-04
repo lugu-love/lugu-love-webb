@@ -4545,6 +4545,22 @@ else runSpritePlayback("initial");
 function removeSendOverlay() {
 document.querySelectorAll(".send-sticker-overlay").forEach((node) => node.remove());
 }
+// 首页“转发ta”正式入口：统一跳转 A路（send-test.html?e=<编号>&from=home），
+// 携带当前情绪编号与用户当前可见文案；文案经 sessionStorage 一次性传递，不放入 URL。
+// 旧 openSendPreview/saveAndForward 保留作回退参考，正式按钮不再调用（不再请求同源 /make-send）。
+function forwardToARoad(sequence, letterTextNode) {
+if (!sequence) return;
+var code = String(parseInt((sequence.emotionCode || sequence.sequenceId || ""), 10) || 1);
+var text = "";
+try { if (letterTextNode && letterTextNode.textContent) text = String(letterTextNode.textContent).trim(); } catch (e) {}
+if (!text) text = sequence.sendCopy || (sequence.copies && sequence.copies[0]) || "";
+try {
+if (text) window.sessionStorage.setItem("lugu_forward_text", text);
+window.sessionStorage.setItem("lugu_forward_emotion", String(code));
+} catch (e) {}
+window.location.href = "send-test.html?e=" + code + "&from=home";
+}
+
 function openSendPreview(sequence) {
 if (!sequence) return;
 removeSendOverlay();
@@ -6303,7 +6319,7 @@ const sendButton = bottle.querySelector(".voice-send-button");
 if (sendButton) sendButton.addEventListener("click", (event) => {
 event.stopPropagation();
 sendButton.blur();
-openSendPreview(rabbitSequence);
+forwardToARoad(rabbitSequence, textNode);
 });
 const prevButton = bottle.querySelector(".voice-page-prev");
 const nextButton = bottle.querySelector(".voice-page-next");
