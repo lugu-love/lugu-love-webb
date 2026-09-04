@@ -27,6 +27,7 @@ from tts_provider import (
     ELEVENLABS_OUTPUT_FORMAT,
 )
 import journey_store
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 MASTERS_DIR = os.path.join(ROOT, "masters")
@@ -550,6 +551,137 @@ def synthesize_tts(speech_text, voice_id, tts_path, tts=None):
     return provider_used
 
 
+
+
+# ===== A路成片 V1 统一模板（纯黑背景 + 暖金底部承托） =====
+TEMPLATE_ICON = os.path.join(ROOT, "template", "emotion-expression.png")
+V1_TEXT_Y = 820          # 字幕首行（兔脚约 768 下方）
+V1_BOTTOM_Y = 1000       # 底部设计区起点
+V1_TARGET_H = 704.0      # 兔子内容高 55%（1280 画布）
+V1_FEET_Y = 768          # 兔脚 60%
+
+def _font(size):
+    try:
+        return ImageFont.truetype(FONT_FILE, size, index=int(FONT_INDEX))
+    except Exception:
+        return ImageFont.truetype(FONT_FILE, size)
+
+def _v1_wrap(text, size, maxw):
+    f=_font(size); d=ImageDraw.Draw(Image.new("RGB",(8,8)))
+    lines=[]; cur=""; w=0.0
+    for ch in text:
+        cw=d.textlength(ch,font=f)
+        if cur and w+cw>maxw:
+            lines.append(cur); cur=ch; w=cw
+        else:
+            cur+=ch; w+=cw
+    if cur: lines.append(cur)
+    return lines
+
+def _v1_subtitle_png(text, path):
+    maxw=int(W*0.8); chosen=30; nlines=1
+    for size in range(46,20,-1):
+        n=len(_v1_wrap(text,size,maxw))
+        if n<=4:
+            chosen=size; nlines=n; break
+    cap={1:46,2:42,3:36,4:30}[nlines]
+    chosen=min(chosen,cap)
+    lines=_v1_wrap(text,chosen,maxw)
+    f=_font(chosen); lh=int(chosen*1.42)
+    im=Image.new("RGBA",(W,H),(0,0,0,0)); d=ImageDraw.Draw(im)
+    y=V1_TEXT_Y
+    for ln in lines:
+        w=d.textlength(ln,font=f); d.text(((W-w)/2,y),ln,font=f,fill=(255,243,222,255)); y+=lh
+    im.save(path)
+    return chosen, len(lines)
+
+def _v1_arc(cx,base,amp,hw,step=6):
+    pts=[]
+    for x in range(int(cx-hw),int(cx+hw)+1,step):
+        t=(x-(cx-hw))/(2*hw); pts.append((x,base-amp*(1-(2*t-1)**2)))
+    return pts
+
+def _v1_bottom_png(label, path):
+    im=Image.new("RGBA",(W,H),(0,0,0,0))
+    base=Image.new("RGBA",(W,H),(0,0,0,0)); bd=ImageDraw.Draw(base)
+    for yy in range(V1_BOTTOM_Y,H):
+        t=(yy-V1_BOTTOM_Y)/(H-V1_BOTTOM_Y)
+        if t<0.5:
+            u=t/0.5; col=(int(0+u*30),int(0+u*20),int(0+u*8))
+        else:
+            u=(t-0.5)/0.5; col=(int(30-u*24),int(20-u*16),int(8-u*6))
+        bd.line([(0,yy),(W,yy)],fill=col+(255,))
+    glow=Image.new("L",(W,H),0)
+    ImageDraw.Draw(glow).ellipse([70,1030,650,H+10],fill=120)
+    glow=glow.filter(ImageFilter.GaussianBlur(60))
+    stage=Image.new("RGBA",(W,H),(58,34,10,0)); stage.putalpha(glow.point(lambda v:int(v*0.35)))
+    im=Image.alpha_composite(im,base); im=Image.alpha_composite(im,stage)
+    d=ImageDraw.Draw(im)
+    d.line(_v1_arc(360,1062,22,290),fill=(255,199,120,120),width=1)
+    try:
+        icon=Image.open(TEMPLATE_ICON).convert("RGBA").resize((44,44),Image.LANCZOS)
+        a=icon.split()[3].point(lambda v:int(v*185))
+        gold=Image.new("RGBA",(44,44),(255,199,120,255))
+        ig=Image.composite(gold,Image.new("RGBA",(44,44),(0,0,0,0)),a)
+        gi=Image.new("RGBA",(72,72),(0,0,0,0))
+        ImageDraw.Draw(gi).ellipse([4,4,68,68],fill=(255,190,110,90))
+        gi=gi.filter(ImageFilter.GaussianBlur(6))
+        im.paste(gi,(338-14,1066-14),gi); im.paste(ig,(338,1066),ig)
+    except Exception:
+        pass
+    bf=_font(24); brand="心域 · 情绪表达"; bw=d.textlength(brand,font=bf)
+    d.text(((W-bw)/2,1122),brand,font=bf,fill=(224,190,132,166))
+    lnw=int(W*0.44); lx=(W-lnw)//2; ly=1170
+    d.line([(lx,ly),(lx+lnw,ly)],fill=(222,180,120,80),width=1)
+    for x in (lx-3,lx+lnw+3):
+        d.ellipse([x-2,ly-2,x+2,ly+2],fill=(232,192,132,100))
+    cf=_font(19); cw=d.textlength(label,font=cf)
+    d.rounded_rectangle([(W-cw)//2-16,1194,(W-cw)//2+cw+16,1224],radius=15,outline=(225,185,125,110),width=1)
+    d.text(((W-cw)/2,1198),label,font=cf,fill=(226,192,140,150))
+    im.save(path)
+
+
+
+def _v1_compose(item, text, master, tts_path, final, final_duration, speech_start, master_dur, workdir):
+    emo=_emotions.get(item) or {}
+    un=emo.get("unionSource") or [0,0,719,1280]
+    x0,y0,x1,y1=un
+    s=V1_TARGET_H/(y1-y0)
+    sw=max(2,(int(round(720*s))//2)*2); sh=int(round(1280*s))
+    top=int(round(V1_FEET_Y-(y1+1)*s)); left=(720-sw)//2
+    r0=max(0,-top); hc=min(sh-r0,H); pt=max(0,top)
+    name=emo.get("displayName") or emo.get("label") or item
+    code=emo.get("code") or "00"
+    bp=os.path.join(workdir,"v1_bottom.png"); sp=os.path.join(workdir,"v1_sub.png")
+    _v1_bottom_png("%s · E%s"%(name,code), bp)
+    fsize, nlines=_v1_subtitle_png(text, sp)
+    chain=("[0:v]scale=%d:%d,crop=%d:%d:0:%d,pad=%d:%d:%d:%d:black[base];"
+           "[2:v]format=rgba[bp];[3:v]format=rgba[sp];"
+           "[base][bp]overlay=0:0:shortest=1[b1];[b1][sp]overlay=0:0:shortest=1[ov];"
+           "[ov]fps=%d[vo]" % (sw,sh,sw,hc,r0,W,H,left,pt,FPS))
+    map_v="[vo]"
+    if final_duration > master_dur + 0.05:
+        chain += ";%s[vo]tpad=stop_mode=clone:stop_duration=%.3f[vout]" % ("", final_duration-master_dur)
+        # ffmpeg chain cannot start ';' after fps label; rebuild below
+        chain = chain.replace(";%s[vo]tpad=" % "", ";")
+        chain += ";" if False else ""
+        # simpler: add tpad directly on [vo] without extra ';'
+        chain = chain[:chain.rfind("[vo]")] + "[vo];[vo]tpad=stop_mode=clone:stop_duration=%.3f[vout]" % (final_duration-master_dur)
+        map_v="[vout]"
+    if speech_start>0:
+        audio="[1:a]adelay=%.0f:all=1,apad[aout]"%(speech_start*1000)
+    else:
+        audio="[1:a]apad[aout]"
+    chain += ";"+audio
+    cmd=[FFMPEG,"-y","-i",master,"-i",tts_path,"-loop","1","-framerate",str(FPS),"-i",bp,"-loop","1","-framerate",str(FPS),"-i",sp,
+         "-filter_complex",chain,"-map",map_v,"-map","[aout]",
+         "-threads",str(FFMPEG_THREADS),"-c:v","libx264","-pix_fmt","yuv420p","-r",str(FPS),
+         "-b:v","%dk"%BITRATE_KBPS,"-c:a","aac","-ar","44100","-b:a","96k","-t","%.3f"%final_duration,final]
+    r=subprocess.run(cmd,capture_output=True,text=True,timeout=240)
+    if r.returncode!=0:
+        raise RuntimeError("v1 ffmpeg rc=%d %s"%(r.returncode, r.stderr[-2500:]))
+    return fsize, nlines
+
 def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts_audio_path=None):
     master_rel, _emotion = MASTERS[item]
     master = os.path.join(MASTERS_DIR, master_rel)
@@ -604,36 +736,12 @@ def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts
     final_duration = max(BASE_MIN_DURATION, speech_start + tts_dur + ENDING_HOLD)
     final_duration = min(final_duration, MAX_FINAL_DURATION)
     master_dur = _probe_duration(master) or float(DURATION)
-
-    # 视频：超出母版长度时用尾帧静帧 hold 补齐（不循环、不跳帧、无机械重复）；
-    # 短于母版则按 final_duration 裁剪。tpad 作为 filter_complex 内独立链，
-    # 用输出标签 [vout] 供 -map 使用（过滤表达式不能直接塞进 -map）。
-    extra = []
-    map_video = vlabel
-    if final_duration > master_dur + 0.05:
-        extra.append("%stpad=stop_mode=clone:stop_duration=%.3f[vout]" % (vlabel, final_duration - master_dur))
-        map_video = "[vout]"
-    # 音频：语音按 speechStart 延迟进入（情绪建立后再开口）；adelay 仅前置静音，
-    # 不裁切 TTS、不加 fade，保证首字完整；再 apad 补尾段静音
-    if speech_start > 0:
-        extra.append("[1:a]adelay=%.0f:all=1,apad[aout]" % (speech_start * 1000))
-    else:
-        extra.append("[1:a]apad[aout]")
-    filter_complex = filtergraph if not extra else "%s;%s" % (filtergraph, ";".join(extra))
-    cmd = [
-        FFMPEG, "-y", "-i", master, "-i", tts_path,
-        "-filter_complex", filter_complex,
-        "-map", map_video, "-map", "[aout]",
-        "-threads", str(FFMPEG_THREADS),
-        "-c:v", "libx264", "-pix_fmt", "yuv420p",
-        "-r", str(FPS), "-b:v", "%dk" % BITRATE_KBPS,
-        "-c:a", "aac", "-ar", "44100", "-b:a", "96k",
-        "-t", "%.3f" % final_duration, final,
-    ]
-    r = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
+    # V1 统一成片模板（union 自动布局 + 字幕自适应 + 纯黑/暖金底部承托）
+    v1_text = text if speech_text is None else text
+    fsize, nlines = _v1_compose(item, text, master, tts_path, final, final_duration, speech_start, master_dur, workdir)
+    meta["lines"] = nlines
+    meta["font_size"] = fsize
     meta["ffmpeg"] = time.time() - t0
-    if r.returncode != 0:
-        raise RuntimeError("ffmpeg rc=%d stderr=%s" % (r.returncode, r.stderr[-2000:]))
     meta["size"] = os.path.getsize(final)
     meta["tts_duration"] = tts_dur
     meta["final_duration"] = final_duration
