@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b0c18">
-<title>七星使者 · 情绪表达</title>
+<title>七星使者 · 心情表达</title>
 <style>  :root { --bg:#0b0c18; --card:#17192e; --ink:#eef0ff; --muted:#9aa0c3; --accent:#7d8bff; }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   html,body { margin:0; padding:0; height:100%; background:var(--bg); color:var(--ink);
@@ -118,13 +118,13 @@
 </head>
 <body>
 <div class="site-paused-overlay" id="pauseScreen">
-  <div class="t1">七星使者 · 情绪表达</div>
+  <div class="t1">七星使者 · 心情表达</div>
   <div class="t2">当前正在内部测试中。<br>正式开放后再见。</div>
 </div>
 
   <div class="app">
     <div class="edit-top">
-      <div class="brand" id="brand"><a class="back-home" href="index.html" aria-label="返回首页">← 首页</a><span class="brand-title"><span class="brand-main">七星使者</span><span class="brand-sub">· 情绪表达</span></span></div>
+      <div class="brand" id="brand"><a class="back-home" href="index.html" aria-label="返回首页">← 首页</a><span class="brand-title"><span class="brand-main">七星使者</span><span class="brand-sub">· 心情表达</span></span></div>
 
       <div class="stage-wrap"><canvas id="stage" width="540" height="540"></canvas></div>
 
@@ -1107,6 +1107,7 @@ window.__MAIN__ = function () {
           try { var j=JSON.parse(errText); errMsg=(j && (j.message || j.error)) || null; } catch(e){ errMsg=errText ? errText.slice(0,120) : null; }
         } catch(e){ /* 错误响应体读取超时也直接按通用错误处理 */ }
         var err=new Error("HTTP "+resp.status);
+        err.status=resp.status;
         if(errMsg){ err.backendMessage=errMsg; }
         throw err;
       }
@@ -1222,6 +1223,9 @@ window.__MAIN__ = function () {
       } else if(timedOut){
         setStatus("生成时间有点久，请再试一次。", "err");
         showToast("生成时间有点久，请再试一次。");
+      } else if(err.status === 429 || (err.backendMessage && /server\s*busy/i.test(String(err.backendMessage)))){
+        setStatus("同时生成的视频有点多，请稍等几秒再试", "err");
+        showToast("同时生成的视频有点多，请稍等几秒再试");
       } else if(err && err.backendMessage){
         setStatus(err.backendMessage, "err");
         showToast(err.backendMessage);
@@ -1263,7 +1267,7 @@ window.__MAIN__ = function () {
     if(!lastFile){ showToast("请先生成视频"); return; }
     if(navigator.canShare && navigator.canShare({files:[lastFile]})){
       if(isAndroid) setStatus("正在打开系统分享…");
-      navigator.share({ files:[lastFile], title:"情绪表达", text:textInput.value }).then(function(){
+      navigator.share({ files:[lastFile], title:"心情表达", text:textInput.value }).then(function(){
         setStatus("已调起系统分享", "ok");
       }).catch(function(e){
         console.error("share error:", e);
