@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+**/__pycache__/
+.env
+.env.*
+!.env.example
+tmp/
+output/
+test-output/

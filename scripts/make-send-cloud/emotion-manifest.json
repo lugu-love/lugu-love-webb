@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "description": "七星使者·情绪表达 统一映射（单一事实源）。前端预览与后端生成共用此表，禁止各自硬编码情绪->视频逻辑。",
-  "updatedAt": "2026-09-03",
+  "updatedAt": "2026-09-04",
   "emotions": {
     "rabbit-happy": {
       "emotionId": "happy",
@@ -15,7 +15,15 @@
       "previewSheets": 15,
       "renderMaster": "happy-master-v2.mp4",
       "status": "official",
-      "speechStart": 1.4
+      "speechStart": 1.4,
+      "code": "01",
+      "displayName": "开心",
+      "unionSource": [
+        0,
+        190,
+        719,
+        1053
+      ]
     },
     "rabbit-aggrieved": {
       "emotionId": "wronged",
@@ -29,7 +37,15 @@
       "previewSheets": 15,
       "renderMaster": "wronged-master-v2.mp4",
       "status": "official",
-      "speechStart": 2.4
+      "speechStart": 2.4,
+      "code": "02",
+      "displayName": "委屈难过",
+      "unionSource": [
+        0,
+        185,
+        719,
+        1075
+      ]
     },
     "rabbit-angry": {
       "emotionId": "angry",
@@ -43,7 +59,15 @@
       "previewSheets": 15,
       "renderMaster": "angry-master-v2.mp4",
       "status": "official",
-      "speechStart": 2.0
+      "speechStart": 2.0,
+      "code": "03",
+      "displayName": "生气愤怒",
+      "unionSource": [
+        0,
+        174,
+        719,
+        1075
+      ]
     },
     "rabbit-playful": {
       "emotionId": "playful",
@@ -56,7 +80,15 @@
       "previewSheets": 15,
       "renderMaster": "rabbit-playful.mp4",
       "speechStart": 1.5,
-      "status": "official"
+      "status": "official",
+      "code": "05",
+      "displayName": "调皮幽默",
+      "unionSource": [
+        0,
+        164,
+        637,
+        1079
+      ]
     },
     "rabbit-sajiao": {
       "emotionId": "sajiao",
@@ -69,7 +101,15 @@
       "previewSheets": 15,
       "renderMaster": "rabbit-sajiao.mp4",
       "speechStart": 1.6,
-      "status": "official"
+      "status": "official",
+      "code": "04",
+      "displayName": "撒娇",
+      "unionSource": [
+        0,
+        168,
+        719,
+        1101
+      ]
     },
     "rabbit-jealous": {
       "emotionId": "jealous",
@@ -82,7 +122,15 @@
       "previewSheets": 15,
       "renderMaster": "rabbit-jealous.mp4",
       "speechStart": 2.0,
-      "status": "official"
+      "status": "official",
+      "code": "06",
+      "displayName": "吃醋",
+      "unionSource": [
+        7,
+        63,
+        719,
+        1265
+      ]
     },
     "rabbit-stubborn": {
       "emotionId": "stubborn",
@@ -95,7 +143,15 @@
       "previewSheets": 15,
       "renderMaster": "rabbit-stubborn.mp4",
       "speechStart": 2.0,
-      "status": "official"
+      "status": "official",
+      "code": "07",
+      "displayName": "嘴硬不服",
+      "unionSource": [
+        0,
+        38,
+        719,
+        1221
+      ]
     },
     "rabbit-surprise": {
       "emotionId": "surprised",
@@ -108,7 +164,15 @@
       "previewSheets": 15,
       "renderMaster": "rabbit-surprise.mp4",
       "speechStart": 1.2,
-      "status": "official"
+      "status": "official",
+      "code": "08",
+      "displayName": "意外惊喜",
+      "unionSource": [
+        0,
+        68,
+        719,
+        1196
+      ]
     },
     "rabbit-confused": {
       "emotionId": "confused",
@@ -121,7 +185,15 @@
       "previewSheets": 15,
       "renderMaster": "rabbit-confused.mp4",
       "speechStart": 1.8,
-      "status": "official"
+      "status": "official",
+      "code": "09",
+      "displayName": "疑惑",
+      "unionSource": [
+        0,
+        238,
+        719,
+        1186
+      ]
     },
     "rabbit-disgust": {
       "emotionId": "disgusted",
@@ -134,7 +206,15 @@
       "previewSheets": 15,
       "renderMaster": "rabbit-disgust.mp4",
       "speechStart": 1.6,
-      "status": "official"
+      "status": "official",
+      "code": "10",
+      "displayName": "嫌弃",
+      "unionSource": [
+        0,
+        63,
+        719,
+        1226
+      ]
     },
     "rabbit-guilty": {
       "emotionId": "guilty",
@@ -147,7 +227,15 @@
       "previewSheets": 15,
       "renderMaster": "rabbit-guilty.mp4",
       "speechStart": 1.8,
-      "status": "official"
+      "status": "official",
+      "code": "11",
+      "displayName": "心虚",
+      "unionSource": [
+        0,
+        98,
+        689,
+        1165
+      ]
     },
     "rabbit-apology": {
       "emotionId": "apologetic",
@@ -160,7 +248,15 @@
       "previewSheets": 15,
       "renderMaster": "rabbit-apology.mp4",
       "speechStart": 2.0,
-      "status": "official"
+      "status": "official",
+      "code": "12",
+      "displayName": "求原谅",
+      "unionSource": [
+        0,
+        73,
+        719,
+        1206
+      ]
     },
     "rabbit-lowenergy": {
       "emotionId": "lowenergy",
@@ -173,7 +269,15 @@
       "previewSheets": 15,
       "renderMaster": "rabbit-lowenergy.mp4",
       "speechStart": 2.2,
-      "status": "official"
+      "status": "official",
+      "code": "13",
+      "displayName": "躺平摆烂",
+      "unionSource": [
+        0,
+        232,
+        719,
+        1086
+      ]
     },
     "rabbit-cool": {
       "emotionId": "cool",
@@ -186,7 +290,15 @@
       "previewSheets": 15,
       "renderMaster": "rabbit-cool.mp4",
       "speechStart": 2.0,
-      "status": "official"
+      "status": "official",
+      "code": "14",
+      "displayName": "装酷",
+      "unionSource": [
+        0,
+        22,
+        678,
+        1233
+      ]
     },
     "rabbit-gloat": {
       "emotionId": "gloating",
@@ -199,7 +311,15 @@
       "previewSheets": 15,
       "renderMaster": "rabbit-gloat.mp4",
       "speechStart": 1.6,
-      "status": "official"
+      "status": "official",
+      "code": "15",
+      "displayName": "幸灾乐祸",
+      "unionSource": [
+        0,
+        37,
+        704,
+        1241
+      ]
     }
   }
 }
