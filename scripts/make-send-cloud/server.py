@@ -120,6 +120,10 @@ ADMIN_MAX_FAILS = int(os.environ.get("ADMIN_MAX_FAILS", "5"))
 ADMIN_FAIL_WINDOW = int(os.environ.get("ADMIN_FAIL_WINDOW", "600"))
 FFMPEG_THREADS = int(os.environ.get("FFMPEG_THREADS", "2"))
 BITRATE_KBPS = int(os.environ.get("BITRATE_KBPS", "2500"))
+AUDIO_NORMALIZE = os.environ.get("AUDIO_NORMALIZE", "1").lower() in ("1", "true", "yes", "on")
+AUDIO_LOUDNESS_I = float(os.environ.get("AUDIO_LOUDNESS_I", "-16.0"))
+AUDIO_LOUDNESS_TP = float(os.environ.get("AUDIO_LOUDNESS_TP", "-2.0"))
+AUDIO_LOUDNESS_LRA = float(os.environ.get("AUDIO_LOUDNESS_LRA", "11.0"))
 W, H = 720, 1280
 DURATION = 10
 TEXT_MAX = int(os.environ.get("TEXT_MAX", "120"))
@@ -668,15 +672,25 @@ def _v1_compose(item, text, master, tts_path, final, final_duration, speech_star
         # simpler: add tpad directly on [vo] without extra ';'
         chain = chain[:chain.rfind("[vo]")] + "[vo];[vo]tpad=stop_mode=clone:stop_duration=%.3f[vout]" % (final_duration-master_dur)
         map_v="[vout]"
-    if speech_start>0:
-        audio="[1:a]adelay=%.0f:all=1,apad[aout]"%(speech_start*1000)
+    if AUDIO_NORMALIZE:
+        loudness = "loudnorm=I=%.1f:TP=%.1f:LRA=%.1f" % (
+            AUDIO_LOUDNESS_I, AUDIO_LOUDNESS_TP, AUDIO_LOUDNESS_LRA)
+        if speech_start > 0:
+            audio = "[1:a]adelay=%.0f:all=1,apad,%s[aout]" % (
+                speech_start * 1000, loudness)
+        else:
+            audio = "[1:a]apad,%s[aout]" % loudness
     else:
-        audio="[1:a]apad[aout]"
+        if speech_start > 0:
+            audio = "[1:a]adelay=%.0f:all=1,apad[aout]" % (speech_start * 1000)
+        else:
+            audio = "[1:a]apad[aout]"
     chain += ";"+audio
     cmd=[FFMPEG,"-y","-i",master,"-i",tts_path,"-loop","1","-framerate",str(FPS),"-i",bp,"-loop","1","-framerate",str(FPS),"-i",sp,
          "-filter_complex",chain,"-map",map_v,"-map","[aout]",
          "-threads",str(FFMPEG_THREADS),"-c:v","libx264","-pix_fmt","yuv420p","-r",str(FPS),
-         "-b:v","%dk"%BITRATE_KBPS,"-c:a","aac","-ar","44100","-b:a","96k","-t","%.3f"%final_duration,final]
+         "-b:v","%dk"%BITRATE_KBPS,"-c:a","aac","-ar","44100","-b:a","96k",
+         "-movflags","+faststart","-t","%.3f"%final_duration,final]
     r=subprocess.run(cmd,capture_output=True,text=True,timeout=240)
     if r.returncode!=0:
         raise RuntimeError("v1 ffmpeg rc=%d %s"%(r.returncode, r.stderr[-2500:]))

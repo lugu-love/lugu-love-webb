@@ -8,6 +8,7 @@
 import http.server
 import json
 import os
+import re
 import shutil
 import socket
 import subprocess
@@ -131,6 +132,26 @@ def volumedetect(path):
     return mean, peak
 
 
+def loudnorm_stats(path):
+    r = subprocess.run(
+        ["ffmpeg", "-i", path,
+         "-af", "loudnorm=I=-16:TP=-2:LRA=11:print_format=json",
+         "-f", "null", "-"],
+        capture_output=True,
+        text=True,
+        timeout=180,
+    )
+    m = re.search(r"\{.*\}", r.stderr, re.S)
+    if not m:
+        return None
+    data = json.loads(m.group(0))
+    return {
+        "i": float(data.get("input_i") or 0),
+        "tp": float(data.get("input_tp") or 0),
+        "lra": float(data.get("input_lra") or 0),
+    }
+
+
 def faststart(path):
     with open(path, "rb") as f:
         data = f.read()
@@ -217,6 +238,8 @@ def main():
 
         fs = faststart(final_path)
         report("faststart=%s" % ("是" if fs is True else ("否" if fs is False else "无法判断")))
+        if fs is not True:
+            raise RuntimeError("faststart 未开启：moov 不在 mdat 之前")
 
         dec = subprocess.run(
             ["ffmpeg", "-v", "error", "-i", final_path, "-f", "null", "-"],
@@ -258,24 +281,18 @@ def main():
         )
         report("抽帧成功（用于人工检查中文文字是否渲染与安全区）: %s" % frame_path)
 
+        loud = loudnorm_stats(final_path)
         mean0, peak0 = volumedetect(final_path)
-        report("[5/6] 原始音量 mean_volume=%s dB max_volume=%s dB" % (mean0, peak0))
-        norm_path = None
-        if mean0 is not None and float(mean0) < -23 and float(peak0) <= -1.5:
-            norm_path = os.path.join(out_root, "final-loudnorm-16.mp4")
-            subprocess.run(
-                ["ffmpeg", "-y", "-i", final_path, "-af",
-                 "loudnorm=I=-16:TP=-1.5:LRA=11", "-c:v", "copy",
-                 "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart", norm_path],
-                capture_output=True,
-                text=True,
-                timeout=300,
-                check=True,
-            )
-            mean1, peak1 = volumedetect(norm_path)
-            report("[6/6] 音量标准化 mean_volume=%s dB max_volume=%s dB（无削波，faststart=是）" % (mean1, peak1))
-        else:
-            report("[6/6] 原始音量无需调整或存在削波风险，未生成标准化版本")
+        report("[5/6] Integrated Loudness=%.2f LUFS True Peak=%.2f dBTP LRA=%.2f" % (
+            loud["i"], loud["tp"], loud["lra"]))
+        report("mean_volume=%s dB max_volume=%s dB" % (mean0, peak0))
+        if not (-18.0 <= loud["i"] <= -14.0):
+            raise RuntimeError("Integrated Loudness 不在目标范围（-18~-14 LUFS）")
+        if loud["tp"] > -1.5:
+            raise RuntimeError("True Peak 高于 -1.5 dBTP，存在不安全风险")
+        if float(peak0) >= 0:
+            raise RuntimeError("max_volume 达到或超过 0 dB，疑似削波")
+        report("[6/6] 响度标准通过，无削波")
     finally:
         if server_thread is not None:
             server_thread.stop()

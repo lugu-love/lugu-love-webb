@@ -73,4 +73,26 @@ scripts\make-send-cloud\tmp\
 ```text
 start-windows.cmd     启动本地服务
 verify-windows.cmd    一键验证环境
+smoke-windows.cmd     一键端到端验收
+```
+
+## 八、正式输出标准（手机与微信）
+
+引擎默认按以下标准输出 MP4，参数均可通过环境变量调整：
+
+- 分辨率：720 × 1280（手机竖屏）
+- 视频编码：H.264，yuv420p，18 fps
+- 音频编码：AAC，44,100 Hz
+- faststart：开启，moov 位于 mdat 之前
+- 响度：Integrated Loudness ≈ −16 LUFS
+- 安全裕度：True Peak 不高于约 −1.5 dBTP（滤波器按 −2.0 dBTP 留余量）
+- 视频/音频时长保持一致，不做截断处理
+
+相关环境变量见 `.env.example`：
+
+```text
+AUDIO_NORMALIZE
+AUDIO_LOUDNESS_I
+AUDIO_LOUDNESS_TP
+AUDIO_LOUDNESS_LRA
 ```
