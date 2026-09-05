@@ -519,9 +519,18 @@ window.__MAIN__ = function () {
   if(isAppBridge){ document.documentElement.classList.add("is-app-bridge"); }
   if(debugMode && debugDetailsEl){ debugDetailsEl.hidden = false; debugDetailsEl.open = true; }
   scheduleBridgeChecks();
-  window.addEventListener("pageshow", function(){ setTimeout(detectBridgeNow, 0); });
+  window.addEventListener("pageshow", function(ev){
+    setTimeout(detectBridgeNow, 0);
+    if(ev && ev.persisted) resumePreviewForForeground();
+  });
+  window.addEventListener("pagehide", function(ev){ pausePreviewForPageHide(ev); });
   document.addEventListener("visibilitychange", function(){
-    if(document.visibilityState === "visible"){ setTimeout(detectBridgeNow, 0); }
+    if(document.visibilityState === "visible"){
+      setTimeout(detectBridgeNow, 0);
+      resumePreviewForForeground();
+    } else {
+      pausePreviewForBackground();
+    }
   });
   window.addEventListener("load", function(){ setTimeout(detectBridgeNow, 150); });
 
@@ -544,6 +553,9 @@ window.__MAIN__ = function () {
   var cache={}, preloadOrder=["2","3"], preloadStarted=false, activeUserLoad=false;
   var sheets=[], loaded=0, frameIndex=0, lastFrameAt=0, animId=null;
   var lastBlob=null, lastFile=null, lastUrl=null;
+  var previewRafLive=false;
+  var previewMediaCleanup={ loadeddata:null, tap:null, ensurePlay:null };
+  var pageLifecycle={ disposed:false, backgroundPaused:false, persistedPaused:false, animWasRunning:false, audioWasPlaying:false, videoWasPlaying:false, emotionAtPause:null };
 
   var VOICES = [
     {name:"Lulu", label:"甜脆", id:"ocZQ262SsZb9RIxcQBOj"},
@@ -691,6 +703,7 @@ window.__MAIN__ = function () {
 
   function loadSheets(){
     cancelAnimationFrame(animId);
+    previewRafLive=false;
     activeUserLoad = true;
     ensureSheets(current.id, function(sheetsReady){
       sheets = sheetsReady;
@@ -738,8 +751,8 @@ window.__MAIN__ = function () {
     ctx.clearRect(0,0,540,540); var img=sheets[sheetIndex];
     if(img&&img.complete) ctx.drawImage(img,sx,sy,FRAME_SIZE,FRAME_SIZE,RENDER_X,RENDER_Y,RENDER_SIZE,RENDER_SIZE);
   }
-  function startLoop(){ frameIndex=0; lastFrameAt=0; paintFrame(); cancelAnimationFrame(animId); animId=requestAnimationFrame(loop); }
-  function loop(now){ if(!lastFrameAt) lastFrameAt=now; if(now-lastFrameAt>=1000/FRAME_RATE){ lastFrameAt=now; frameIndex=(frameIndex+1)%current.totalFrames; paintFrame(); } animId=requestAnimationFrame(loop); }
+  function startLoop(){ frameIndex=0; lastFrameAt=0; paintFrame(); cancelAnimationFrame(animId); animId=requestAnimationFrame(loop); previewRafLive=true; }
+  function loop(now){ if(!lastFrameAt) lastFrameAt=now; if(now-lastFrameAt>=1000/FRAME_RATE){ lastFrameAt=now; frameIndex=(frameIndex+1)%current.totalFrames; paintFrame(); } animId=requestAnimationFrame(loop); previewRafLive=true; }
 
   var longTextHintShown=false;
   function countChars(str){ return Array.from((str||"").trim()).length; }  // 与后端 Python len() 一致：按 Unicode 码点计数（中文/标点/英文/数字/空格/换行/emoji 均算 1）
@@ -927,6 +940,21 @@ window.__MAIN__ = function () {
     videoEl.removeAttribute("src");
     videoEl.load();
     videoEl.hidden=true;
+    if(previewMediaCleanup){
+      if(previewMediaCleanup.ensurePlay){
+        document.removeEventListener("touchstart", previewMediaCleanup.ensurePlay);
+        document.removeEventListener("click", previewMediaCleanup.ensurePlay);
+        previewMediaCleanup.ensurePlay=null;
+      }
+      if(previewMediaCleanup.tap){
+        videoEl.removeEventListener("click", previewMediaCleanup.tap);
+        previewMediaCleanup.tap=null;
+      }
+      if(previewMediaCleanup.loadeddata){
+        videoEl.removeEventListener("loadeddata", previewMediaCleanup.loadeddata);
+        previewMediaCleanup.loadeddata=null;
+      }
+    }
     if(btnSound){ btnSound.hidden=true; }
     btnOpen.hidden=true; btnSave.hidden=true; btnSend.hidden=true; btnReEdit.hidden=true; btnHome.hidden=true;
     setStatus("");
@@ -1185,7 +1213,7 @@ window.__MAIN__ = function () {
       if(btnSound){ btnSound.hidden=false; syncSoundBtn(); }
       videoEl.play().catch(function(){});
       // 首帧设为 poster：个别 WebView 拦截自动播放时，预览区仍显示视频首帧而非空白
-      videoEl.addEventListener("loadeddata", function onFirstFrame(){
+      var onFirstFrame=function onFirstFrame(){
         videoEl.removeEventListener("loadeddata", onFirstFrame);
         try {
           var fc=document.createElement("canvas");
@@ -1193,16 +1221,21 @@ window.__MAIN__ = function () {
           fc.getContext("2d").drawImage(videoEl, 0, 0);
           videoEl.poster=fc.toDataURL("image/jpeg", 0.7);
         } catch(e){}
-      });
+      };
+      videoEl.addEventListener("loadeddata", onFirstFrame);
+      previewMediaCleanup.loadeddata=onFirstFrame;
       // poster 仅作兜底：自动播放被拦截时，首次任意交互（或点击视频）即恢复真实视频播放
       var ensurePlay = function(){
         document.removeEventListener("touchstart", ensurePlay);
         document.removeEventListener("click", ensurePlay);
         try { if(videoEl.paused) videoEl.play().catch(function(){}); } catch(e){}
       };
+      previewMediaCleanup.ensurePlay=ensurePlay;
       document.addEventListener("touchstart", ensurePlay, { passive:true });
       document.addEventListener("click", ensurePlay);
-      videoEl.addEventListener("click", function(){ try { videoEl.play().catch(function(){}); } catch(e){} });
+      var videoTapHandler=function(){ try { videoEl.play().catch(function(){}); } catch(e){} };
+      previewMediaCleanup.tap=videoTapHandler;
+      videoEl.addEventListener("click", videoTapHandler);
       var tDone = performance.now();
       lastTiming = { clickToFetchMs: Math.round(tFetchStart-tClick), fetchMs: Math.round(tHeaders-tFetchStart), blobMs: Math.round(tBlob-tHeaders), totalMs: Math.round(tDone-tClick) };
       generatePhase="success";
@@ -1355,6 +1388,178 @@ window.__MAIN__ = function () {
     try { window.AndroidShare.sharePreparedVideo(); } catch(err){ setStatus("无法打开系统分享，请重试", "err"); }
     renderBridgeDiag();
   });
+
+  // ===== 页面生命周期（只适配 send-test 现有架构；不改动加载/生成/分享状态机） =====
+  function audioPlayingNow(){
+    if(previewState !== "playing") return false;
+    if(previewHtmlAudio && !previewHtmlAudio.paused && !previewHtmlAudio.ended) return true;
+    if(previewAudio && !previewAudio.paused && !previewAudio.ended) return true;
+    if(previewSource) return true;
+    if(previewAudioCtx && previewAudioCtx.state === "running") return true;
+    return false;
+  }
+  function pauseAudioWithoutReset(){
+    try { if(previewHtmlAudio && !previewHtmlAudio.paused) previewHtmlAudio.pause(); } catch(e){}
+    try { if(previewAudio && !previewAudio.paused) previewAudio.pause(); } catch(e){}
+    try {
+      if(previewAudioCtx && previewAudioCtx.state === "running"){
+        var p = previewAudioCtx.suspend();
+        if(p && p.catch) p.catch(function(){});
+      }
+    } catch(e){}
+  }
+  function resumeAudioWithoutReset(){
+    try {
+      if(previewHtmlAudio && previewHtmlAudio.paused && !previewHtmlAudio.ended){
+        var p1 = previewHtmlAudio.play();
+        if(p1 && p1.catch) p1.catch(function(){});
+      }
+    } catch(e){}
+    try {
+      if(previewAudio && previewAudio.paused && !previewAudio.ended){
+        var p2 = previewAudio.play();
+        if(p2 && p2.catch) p2.catch(function(){});
+      }
+    } catch(e){}
+    try {
+      if(previewAudioCtx && previewAudioCtx.state === "suspended"){
+        var p3 = previewAudioCtx.resume();
+        if(p3 && p3.catch) p3.catch(function(){});
+      }
+    } catch(e){}
+  }
+  function freezePreviewState(){
+    pageLifecycle.animWasRunning = previewRafLive;
+    pageLifecycle.emotionAtPause = current ? current.id : null;
+    pageLifecycle.videoWasPlaying = !!(lastUrl && !videoEl.hidden && !videoEl.paused);
+    pageLifecycle.audioWasPlaying = audioPlayingNow();
+    if(previewRafLive){
+      try { cancelAnimationFrame(animId); } catch(e){}
+      animId = null;
+      previewRafLive = false;
+    }
+    if(pageLifecycle.videoWasPlaying){
+      try { videoEl.pause(); } catch(e){}
+    }
+    if(pageLifecycle.audioWasPlaying) pauseAudioWithoutReset();
+  }
+  function pausePreviewForBackground(){
+    if(pageLifecycle.disposed || pageLifecycle.backgroundPaused || pageLifecycle.persistedPaused) return;
+    pageLifecycle.backgroundPaused = true;
+    freezePreviewState();
+  }
+  function pausePreviewForPageHide(ev){
+    if(pageLifecycle.disposed) return;
+    var persisted = !!(ev && ev.persisted);
+    if(persisted){
+      if(pageLifecycle.backgroundPaused || pageLifecycle.persistedPaused) return;
+      pageLifecycle.persistedPaused = true;
+      freezePreviewState();
+    } else {
+      disposePreviewForRealLeave();
+    }
+  }
+  function resumePreviewForForeground(){
+    if(pageLifecycle.disposed) return;
+    if(document.hidden) return;
+    var shouldAnim = pageLifecycle.animWasRunning;
+    var shouldAudio = pageLifecycle.audioWasPlaying;
+    var shouldVideo = pageLifecycle.videoWasPlaying;
+    var emotionAtPause = pageLifecycle.emotionAtPause;
+    pageLifecycle.backgroundPaused = false;
+    pageLifecycle.persistedPaused = false;
+    pageLifecycle.animWasRunning = false;
+    pageLifecycle.audioWasPlaying = false;
+    pageLifecycle.videoWasPlaying = false;
+    pageLifecycle.emotionAtPause = null;
+    if(shouldAnim && !previewRafLive && emotionAtPause === current.id){
+      var cc = cache[current.id];
+      if(sheets && sheets.length && (!cc || cc.state === "ready")){
+        lastFrameAt = 0;
+        animId = requestAnimationFrame(loop);
+        previewRafLive = true;
+      }
+    }
+    if(shouldVideo){
+      try {
+        if(lastUrl && !videoEl.hidden && videoEl.paused){
+          var pv = videoEl.play();
+          if(pv && pv.catch) pv.catch(function(){});
+        }
+      } catch(e){}
+    }
+    if(shouldAudio && previewState === "playing") resumeAudioWithoutReset();
+  }
+  function disposePreviewForRealLeave(){
+    if(pageLifecycle.disposed) return;
+    pageLifecycle.disposed = true;
+    pageLifecycle.backgroundPaused = false;
+    pageLifecycle.persistedPaused = false;
+    pageLifecycle.animWasRunning = false;
+    pageLifecycle.audioWasPlaying = false;
+    pageLifecycle.videoWasPlaying = false;
+    pageLifecycle.emotionAtPause = null;
+    if(previewRafLive || animId){
+      try { cancelAnimationFrame(animId); } catch(e){}
+      animId = null;
+      previewRafLive = false;
+    }
+    try { if(videoEl && !videoEl.paused) videoEl.pause(); } catch(e){}
+    try { stopPreviewAudio(); } catch(e){}
+    try {
+      if(previewAudioCtx && previewAudioCtx.state !== "closed"){
+        var pc = previewAudioCtx.close();
+        if(pc && pc.catch) pc.catch(function(){});
+      }
+      previewAudioCtx = null;
+    } catch(e){}
+    Object.keys(cache).forEach(function(id){
+      var c = cache[id];
+      if(c){
+        if(c.timer){ clearTimeout(c.timer); c.timer = null; }
+        c.waiting = [];
+        c.errWaiting = [];
+      }
+    });
+    try { if(kbFocusTimer){ clearTimeout(kbFocusTimer); kbFocusTimer = 0; } } catch(e){}
+    try { if(kbPollTimer){ clearInterval(kbPollTimer); kbPollTimer = 0; } } catch(e){}
+    try { if(showToast && showToast._t){ clearTimeout(showToast._t); showToast._t = 0; } } catch(e){}
+    if(isGenerating){
+      cancelReason = "leave";
+      genToken++;
+    }
+    try { resetGenerateState(); } catch(e){}
+    try { clearGenerated(); } catch(e){}
+    try { ctx.clearRect(0, 0, 540, 540); } catch(e){}
+  }
+  if(debugMode){
+    window.__RABBIT_LIFE_DEBUG__ = {
+      snapshot: function(){
+        return {
+          hidden: document.hidden,
+          visibilityState: document.visibilityState,
+          animRunning: previewRafLive,
+          rafId: animId,
+          frameIndex: frameIndex,
+          emotionId: current ? current.id : null,
+          emotionAtPause: pageLifecycle.emotionAtPause,
+          animWasRunning: pageLifecycle.animWasRunning,
+          audioWasPlaying: pageLifecycle.audioWasPlaying,
+          videoWasPlaying: pageLifecycle.videoWasPlaying,
+          audioState: previewState,
+          videoPaused: videoEl.paused,
+          videoHidden: videoEl.hidden,
+          hasResult: !!lastUrl,
+          isGenerating: isGenerating,
+          generatePhase: generatePhase,
+          backgroundPaused: pageLifecycle.backgroundPaused,
+          persistedPaused: pageLifecycle.persistedPaused,
+          disposed: pageLifecycle.disposed,
+          sheetsReady: !!(cache[current.id] && cache[current.id].state === "ready")
+        };
+      }
+    };
+  }
 
   if (debugMode) {
     document.addEventListener("click", function(e){
