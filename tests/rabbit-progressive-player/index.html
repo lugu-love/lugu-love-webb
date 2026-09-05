@@ -33,7 +33,9 @@ td,th{border:1px solid rgba(255,255,255,.12);padding:2px 5px;text-align:left}
 <button id="btnDispose">清理释放</button>
 <button id="btnQuick14">E1→E4 快速切换</button>
 <button id="btnQuick4x">E1 连续打开4次</button>
-<button id="btnBg">模拟切后台3s</button></div>
+<button id="btnBg">模拟切后台3s</button>
+<button id="btnPause">手动暂停</button>
+<button id="btnResume">手动恢复</button></div>
 <div class="row"><label>注入sheet(0-14)</label><input id="injSheet" type="number" min="-1" max="14" value="3" style="width:52px">
 <select id="injType"><option value="">无注入</option><option value="hang">永久悬挂</option><option value="404">404</option><option value="delay">延迟(输入秒)</option><option value="decode">解码失败</option></select>
 <input id="injDelay" type="number" min="1" value="20" style="width:52px"><span>秒</span>
@@ -70,7 +72,7 @@ var ORDER = ["rabbit-happy","rabbit-aggrieved","rabbit-angry","rabbit-sajiao","r
 var cv=document.getElementById("cv"), ctx=cv.getContext("2d");
 var statusEl=document.getElementById("status"), diagEl=document.getElementById("diag"), tblEl=document.getElementById("tbl");
 var sel=document.getElementById("emo"), injSheetEl=document.getElementById("injSheet"), injTypeEl=document.getElementById("injType"), injDelayEl=document.getElementById("injDelay");
-var EMO=[], player=null, diagLines=[], autoRunning=false;
+var EMO=[], player=null, diagLines=[], autoRunning=false, pageHidden=!!document.hidden, pageClosing=false, foregroundWaiters=[];
 
 function log(txt){ diagLines.push(txt); if(diagLines.length>400) diagLines.shift(); diagEl.textContent=diagLines.join("\n"); }
 function setStatus(msg, cls){ statusEl.textContent=msg; statusEl.className = cls||""; }
@@ -99,21 +101,31 @@ function loadEmotions(){
 // ============ 统一播放器实例（可整体 dispose，幂等） ============
 function makePlayer(emo, inject, onUpdate){
   var token=0, disposed=false;
-  var raf=0, lastFrameAt=0, frameIndex=0, finished=false, started=false, paused=false;
+  var raf=0, lastFrameAt=0, frameIndex=0, finished=false, started=false;
+  var userPaused=false, bgHidden=!!document.hidden, resumeOnForeground=false, hiddenBeforeStart=false;
   var states=[], imgs=[], queue=[], activeLoads=0, timers=[];
-  var posterImg=new Image();
-  var metrics={ imagesCreated:0, posterStart:0, posterDone:0, firstSheetReadyAt:0, animStart:0, rafStarts:0, rafStops:0, timersStarted:0, timersCleared:0, okSheets:0, failSheets:0, timeoutSheets:0, frameIndex:0, disposed:false, pass:false, firstFail:"" };
+  var posterImg=new Image(), posterOk=null, posterErr=null;
+  var metrics={ imagesCreated:0, posterStart:0, posterDone:0, firstSheetReadyAt:0, animStart:0, rafStarts:0, rafStops:0, timersStarted:0, timersCleared:0, okSheets:0, failSheets:0, timeoutSheets:0, frameIndex:0, disposed:false, pass:false, firstFail:"", pausedBy:"", wasPlayingAtHide:false, backgroundPauses:0, foregroundResumes:0, manualPauses:0, manualResumes:0, resumedFromBackground:0, listenersRemoved:0, mediaReleased:0 };
   var lastPaint="poster";
 
   function later(fn, ms){ var t=setTimeout(fn, ms); timers.push(t); metrics.timersStarted++; return t; }
   function clearTimer(t){ var i=timers.indexOf(t); if(i>=0){ timers.splice(i,1); metrics.timersCleared++; } clearTimeout(t); }
 
-  function publish(){ onUpdate({ state: disposed?"disposed":(finished?"finished":(started?"playing":"loading")), posterDone:metrics.posterDone>0, posterStart:metrics.posterStart>0, firstSheetReadyAt:metrics.firstSheetReadyAt, animStart:metrics.animStart, okSheets:metrics.okSheets, failSheets:metrics.failSheets, timeoutSheets:metrics.timeoutSheets, frameIndex:metrics.frameIndex, stage: finished?"finished":(started?"small":"poster"), imagesCreated:metrics.imagesCreated, rafStarts:metrics.rafStarts, rafStops:metrics.rafStops, timersStarted:metrics.timersStarted, timersCleared:metrics.timersCleared, queueLen:queue.length, activeLoads:activeLoads, disposed:disposed, pass:metrics.pass, showing:lastPaint, firstFail:metrics.firstFail }); }
+  function runtimeState(){
+    if(disposed) return "disposed";
+    if(finished) return "finished";
+    if(userPaused||bgHidden) return "paused";
+    return started?(raf?"playing":"idle"):"loading";
+  }
+  function canRun(){ return started&&!finished&&!disposed&&!userPaused&&!bgHidden; }
+  function stopRaf(){ if(raf){ cancelAnimationFrame(raf); raf=0; metrics.rafStops++; } }
+  function startRaf(){ if(!raf&&canRun()){ lastFrameAt=0; raf=requestAnimationFrame(loop); metrics.rafStarts++; } }
+
+  function publish(){ onUpdate({ state: runtimeState(), pausedBy: userPaused?"user":(bgHidden?"background":""), wasPlayingAtHide:metrics.wasPlayingAtHide, backgroundPauses:metrics.backgroundPauses, foregroundResumes:metrics.foregroundResumes, manualPauses:metrics.manualPauses, manualResumes:metrics.manualResumes, resumedFromBackground:metrics.resumedFromBackground, listenersRemoved:metrics.listenersRemoved, mediaReleased:metrics.mediaReleased, posterDone:metrics.posterDone>0, posterStart:metrics.posterStart>0, firstSheetReadyAt:metrics.firstSheetReadyAt, animStart:metrics.animStart, okSheets:metrics.okSheets, failSheets:metrics.failSheets, timeoutSheets:metrics.timeoutSheets, frameIndex:metrics.frameIndex, stage: finished?"finished":(started?"small":"poster"), imagesCreated:metrics.imagesCreated, rafStarts:metrics.rafStarts, rafStops:metrics.rafStops, timersStarted:metrics.timersStarted, timersCleared:metrics.timersCleared, queueLen:queue.length, activeLoads:activeLoads, disposed:disposed, pass:metrics.pass, showing:lastPaint, firstFail:metrics.firstFail }); }
 
   function sheetState(i){ var st=states[i]; return st?st.state:"fail"; }
   function finishSheet(i, kind){
-    var st=states[i]; if(!st||st.done) return;
-    if(token!==0 && disposed) return;
+    var st=states[i]; if(!st||st.done||disposed) return;
     st.done=true; st.end=performance.now();
     if(st.timer){ clearTimer(st.timer); }
     if(kind==="ok") metrics.okSheets++;
@@ -127,34 +139,43 @@ function makePlayer(emo, inject, onUpdate){
   }
 
   function pump(){
+    if(disposed||bgHidden) return;
     while(activeLoads<3 && queue.length){
-      var i=queue.shift(); var img=imgs[i]; var st=states[i];
+      var i=queue.shift(); var st=states[i]; var img=imgs[i];
+      if(!st||!img||st.done||st.busy) continue;
+      st.busy=true;
       activeLoads++;
-      img.addEventListener("load", function(){ activeLoads--; pump(); }, {once:true});
-      img.addEventListener("error", function(){ activeLoads--; pump(); }, {once:true});
       img.src=st.src;
     }
+  }
+  function loadSettled(i){
+    var st=states[i];
+    if(st&&st.busy){ st.busy=false; if(activeLoads>0) activeLoads--; }
+    if(!disposed&&!bgHidden) pump();
   }
 
   function arm(i){
     var src=emo.sheets[i];
-    states[i]={ state:"loading", start:performance.now(), done:false, src:src };
+    states[i]={ state:"loading", start:performance.now(), done:false, src:src, timer:0, busy:false, onLoad:null, onError:null };
     var img=new Image(); imgs[i]=img; metrics.imagesCreated++;
     var inj=null;
     if(inject && inject.sheet===i){ inj=inject.type; }
     if(inj==="decode"){ src="data:image/webp;base64,QUJD"; }
     if(inj==="404"){ src=src.replace(/\.webp$/,".missing.webp"); }
-    states[i].src=src;
-    img.addEventListener("load", function(){ finishSheet(i,"ok"); }, {once:true});
-    img.addEventListener("error", function(){ finishSheet(i,"fail"); }, {once:true});
+    var st=states[i]; st.src=src;
+    function sheetOk(){ finishSheet(i,"ok"); loadSettled(i); }
+    function sheetErr(){ finishSheet(i,"fail"); loadSettled(i); }
+    st.onLoad=sheetOk; st.onError=sheetErr;
+    img.addEventListener("load", sheetOk, {once:true});
+    img.addEventListener("error", sheetErr, {once:true});
     if(inj==="hang"){
       // 永不 load/error：仅超时兜底
-      states[i].timer=later(function(){ finishSheet(i,"timeout"); }, SHEET_TIMEOUT_MS);
+      st.timer=later(function(){ finishSheet(i,"timeout"); }, SHEET_TIMEOUT_MS);
       return;
     }
-    states[i].timer=later(function(){ finishSheet(i,"timeout"); }, SHEET_TIMEOUT_MS);
+    st.timer=later(function(){ finishSheet(i,"timeout"); }, SHEET_TIMEOUT_MS);
     if(inj==="delay"){
-      later(function(){ queue.push(i); pump(); }, (inject.delaySec||20)*1000);
+      later(function(){ if(!disposed){ queue.push(i); pump(); } }, (inject.delaySec||20)*1000);
       return;
     }
     queue.push(i); pump();
@@ -166,7 +187,8 @@ function makePlayer(emo, inject, onUpdate){
     if(st0==="ok" || st0==="fail" || st0==="timeout"){
       started=true; metrics.animStart=performance.now(); lastFrameAt=0; frameIndex=0;
       log("anim start (sheet0="+st0+")");
-      raf=requestAnimationFrame(loop); metrics.rafStarts++;
+      if(!userPaused&&!bgHidden&&!hiddenBeforeStart){ raf=requestAnimationFrame(loop); metrics.rafStarts++; }
+      else { log("anim start held (paused/background/no auto-start after hidden)"); }
     }
   }
 
@@ -194,7 +216,7 @@ function makePlayer(emo, inject, onUpdate){
   }
 
   function loop(now){
-    if(disposed||finished||paused) return;
+    if(disposed||finished||userPaused||bgHidden) return;
     if(!lastFrameAt) lastFrameAt=now;
     if(now-lastFrameAt>=1000/FRAME_RATE){
       var si=Math.floor(frameIndex/FRAMES_PER_SHEET);
@@ -213,42 +235,87 @@ function makePlayer(emo, inject, onUpdate){
 
   // poster
   metrics.posterStart=performance.now();
-  posterImg.addEventListener("load", function(){ metrics.posterDone=performance.now(); lastPaint="poster"; log("poster ok "+fmt(metrics.posterDone-metrics.posterStart)); publish(); }, {once:true});
-  posterImg.addEventListener("error", function(){ log("poster error"); publish(); }, {once:true});
+  function posterLoaded(){ metrics.posterDone=performance.now(); lastPaint="poster"; log("poster ok "+fmt(metrics.posterDone-metrics.posterStart)); publish(); }
+  function posterFailed(){ log("poster error"); publish(); }
+  posterOk=posterLoaded; posterErr=posterFailed;
+  posterImg.addEventListener("load", posterLoaded, {once:true});
+  posterImg.addEventListener("error", posterFailed, {once:true});
   posterImg.src=emo.poster;
 
   for(var i=0;i<emo.sheets.length;i++) arm(i);
 
   function pause(){
-    if(disposed||finished||paused) return;
-    paused=true;
-    if(raf){ cancelAnimationFrame(raf); raf=0; metrics.rafStops++; }
-    log("paused (background)");
+    if(disposed||finished||userPaused) return;
+    userPaused=true; metrics.manualPauses++; metrics.pausedBy="user";
+    stopRaf();
+    log("paused (manual)");
     publish();
   }
   function resume(){
-    if(disposed||finished||!paused) return;
-    paused=false; lastFrameAt=0;
-    raf=requestAnimationFrame(loop); metrics.rafStarts++;
-    log("resumed (foreground)");
+    if(disposed||finished||!userPaused) return;
+    userPaused=false; metrics.manualResumes++;
+    metrics.pausedBy= bgHidden?"background":"";
+    if(canRun()) startRaf();
+    log("resumed (manual)"+(bgHidden?"，仍处后台":""));
     publish();
+  }
+  function onHidden(){
+    if(disposed||finished||bgHidden) return;
+    bgHidden=true; metrics.backgroundPauses++; metrics.pausedBy="background";
+    if(!started) hiddenBeforeStart=true;
+    var playingBefore=started&&!userPaused&&!finished;
+    resumeOnForeground=playingBefore;
+    metrics.wasPlayingAtHide=playingBefore;
+    stopRaf();
+    log("background hidden: "+(playingBefore?"was playing → will auto-resume":"not playing → no auto-resume"));
+    publish();
+  }
+  function onVisible(){
+    if(disposed) return;
+    if(!bgHidden){ publish(); return; }
+    bgHidden=false; metrics.foregroundResumes++;
+    var shouldResume=resumeOnForeground;
+    resumeOnForeground=false;
+    metrics.pausedBy= userPaused?"user":"";
+    if(shouldResume&&!userPaused&&!finished&&!disposed&&!raf){ startRaf(); metrics.resumedFromBackground++; log("foreground visible: auto-resumed (was playing before background)"); }
+    else { log("foreground visible: no auto-resume ("+(userPaused?"user paused":(finished?"finished":(started?"was not playing before":"never started before")))+")"); }
+    if(!disposed&&!bgHidden) pump();
+    publish();
+  }
+
+  function releaseImage(img, st){
+    if(!img) return;
+    if(st){
+      if(st.onLoad){ img.removeEventListener("load", st.onLoad); st.onLoad=null; metrics.listenersRemoved++; }
+      if(st.onError){ img.removeEventListener("error", st.onError); st.onError=null; metrics.listenersRemoved++; }
+    }
+    img.onload=null; img.onerror=null;
+    try{ img.removeAttribute("src"); }catch(e){}
+    try{ img.src=""; }catch(e){}
+    metrics.mediaReleased++;
   }
 
   function dispose(){
     if(disposed) return;
     disposed=true; token++;
-    cancelAnimationFrame(raf); metrics.rafStops++;
-    for(var i=0;i<timers.length;i++) clearTimeout(timers[i]);
-    timers=[]; metrics.timersCleared+=timers.length;
+    stopRaf();
+    while(timers.length){ var t=timers.shift(); clearTimeout(t); metrics.timersCleared++; }
     states.forEach(function(st){ if(st&&st.timer) clearTimeout(st.timer); });
+    for(var i=0;i<imgs.length;i++) releaseImage(imgs[i], states[i]||null);
+    releaseImage(posterImg, { onLoad:posterOk, onError:posterErr });
+    posterOk=posterErr=null;
     states=[]; imgs=[]; queue=[]; activeLoads=0;
     metrics.disposed=true;
     ctx.clearRect(0,0,CANVAS,CANVAS);
-    log("player disposed");
+    log("player disposed（解除监听="+metrics.listenersRemoved+"，释放图片="+metrics.mediaReleased+"，清理定时器="+metrics.timersCleared+"）");
     publish();
   }
 
-  return { dispose:dispose, pause:pause, resume:resume, getMetrics:function(){ return metrics; }, publish:publish };
+  function getState(){
+    return { state:runtimeState(), disposed:disposed, finished:finished, started:started, userPaused:userPaused, bgHidden:bgHidden, rafActive:!!raf, resumeOnForeground:resumeOnForeground, timersLeft:timers.length, queueLeft:queue.length, activeLoads:activeLoads, frameIndex:metrics.frameIndex, counts:{ manualPauses:metrics.manualPauses, manualResumes:metrics.manualResumes, backgroundPauses:metrics.backgroundPauses, foregroundResumes:metrics.foregroundResumes, resumedFromBackground:metrics.resumedFromBackground, wasPlayingAtHide:metrics.wasPlayingAtHide, listenersRemoved:metrics.listenersRemoved, mediaReleased:metrics.mediaReleased, timersStarted:metrics.timersStarted, timersCleared:metrics.timersCleared, rafStarts:metrics.rafStarts, rafStops:metrics.rafStops } };
+  }
+
+  return { dispose:dispose, pause:pause, resume:resume, onHidden:onHidden, onVisible:onVisible, getState:getState, getMetrics:function(){ return metrics; }, isDisposed:function(){ return disposed; }, publish:publish };
 }
 
 // ============ UI 状态渲染 ============
@@ -264,6 +331,8 @@ function renderStatus(u){
     "stage/phase: "+u.stage+"　显示: "+u.showing,
     "Image数: "+u.imagesCreated+"　RAF:"+u.rafStarts+"("+u.rafStops+"停)　timers:"+u.timersStarted+"("+u.timersCleared+"清)",
     "队列:"+u.queueLen+"　activeLoads:"+u.activeLoads+"　disposed:"+u.disposed,
+    "生命周期: 暂停原因="+(u.pausedBy||"无")+"　切后台前在播放="+(u.wasPlayingAtHide?"是":"否")+"　后台N="+u.backgroundPauses+"　恢复N="+u.resumedFromBackground,
+    "清理: 已解除监听="+u.listenersRemoved+"　已释放图片="+u.mediaReleased,
     "首失败: "+(u.firstFail||"无")
   ];
   var pre=document.createElement("pre");
@@ -275,10 +344,11 @@ function renderStatus(u){
 }
 
 // ============ 开始 / 清理 ============
-function stopPlayer(){ if(player){ player.dispose(); player=null; } }
+function stopPlayer(){ if(player){ player.dispose(); player=null; } window.__cur=null; }
 function startEmo(index, inject, label){
   stopPlayer();
   if(!EMO.length||!EMO[index]) { setStatus("无情绪数据","err"); return; }
+  if(pageHidden){ log("hidden: 页面在后台，不启动（返回前台后再开始）"); setStatus("页面在后台：已阻止启动，返回前台后重试","warn"); return null; }
   diagLines=[]; diagEl.textContent="..."; 
   setStatus("加载 "+(+index+1)+" "+EMO[index].name+(label?"（"+label+"）":""), "");
   log("== start "+(+index+1)+" "+EMO[index].name+" inject="+(inject?inject.type+"@"+inject.sheet:"none"));
@@ -311,7 +381,7 @@ function runAuto(){
   var rows=[];
   var chain=Promise.resolve();
   EMO.forEach(function(e,i){
-    chain=chain.then(function(){ return runOneAuto(i); }).then(function(r){ rows.push(r); renderTable(rows); });
+    chain=chain.then(function(){ return whenForeground(); }).then(function(){ return runOneAuto(i); }).then(function(r){ rows.push(r); renderTable(rows); });
   });
   return chain.then(function(){ autoRunning=false; setStatus("自动测试完成 ✅","ok"); return true; })
     .catch(function(err){ autoRunning=false; setStatus("自动测试异常 "+err.message,"err"); return false; });
@@ -332,11 +402,55 @@ function renderTable(rows){
   tblEl.innerHTML=html;
 }
 
+// ============ 前台等待 / 页面生命周期 / 手动暂停 ============
+function whenForeground(){
+  if(!pageHidden&&!document.hidden) return Promise.resolve();
+  return new Promise(function(resolve){ foregroundWaiters.push(resolve); });
+}
+function resolveForegroundWaiters(){
+  var ws=foregroundWaiters; foregroundWaiters=[];
+  ws.forEach(function(fn){ try{ fn(); }catch(e){} });
+}
+function enterBackground(){
+  pageHidden=true;
+  if(player) player.onHidden();
+}
+function returnForeground(){
+  pageHidden=false;
+  resolveForegroundWaiters();
+  if(player) player.onVisible();
+}
+function resetPage(){
+  pageClosing=false; pageHidden=!!document.hidden;
+  if(!pageHidden) resolveForegroundWaiters();
+  setStatus("页面已重置：可从干净状态重新开始","ok");
+}
+function teardownPage(){
+  if(pageClosing) return;
+  pageClosing=true; autoRunning=false; pageHidden=true;
+  stopPlayer();
+  foregroundWaiters=[];
+}
+function manualPause(){
+  if(!player){ setStatus("无播放实例，无法暂停","err"); return; }
+  player.pause();
+  setStatus("已手动暂停（返回前台不会自动恢复）","warn");
+}
+function manualResume(){
+  if(!player){ setStatus("无播放实例，无法恢复","err"); return; }
+  player.resume();
+  setStatus("已手动恢复","ok");
+}
+function snapshot(){
+  var m=player&&player.getMetrics?player.getMetrics():null;
+  return { pageHidden:pageHidden, hasPlayer:!!player, state:player&&player.getState?player.getState():null, metrics:m, status:statusEl.textContent, live:((document.getElementById("liveStatus")||{}).textContent||""), diag:diagEl.textContent };
+}
+
 // ============ 快速切换 / 后台 ============
 function quickSwitch14(){
   var chain=Promise.resolve();
   [0,1,2,3].forEach(function(i){
-    chain=chain.then(function(){
+    chain=chain.then(function(){ return whenForeground(); }).then(function(){
       var p=startEmo(i,null,"quick");
       return waitFinish(p, 6000).then(function(){ stopPlayer(); });
     });
@@ -346,17 +460,17 @@ function quickSwitch14(){
 function quick4x(){
   var chain=Promise.resolve();
   for(var k=0;k<4;k++){
-    chain=chain.then(function(){ var p=startEmo(0,null,"quick4x"); return waitFinish(p,6000).then(function(){ stopPlayer(); }); });
+    chain=chain.then(function(){ return whenForeground(); }).then(function(){ var p=startEmo(0,null,"quick4x"); return waitFinish(p,6000).then(function(){ stopPlayer(); }); });
   }
   return chain.then(function(){ setStatus("E1 连续4次完成 ✅","ok"); });
 }
-function simulateBg(){
-  if(!player) return;
-  var p=player;
-  setStatus("模拟切后台 3s（播放暂停，实例保留）","warn");
-  p.pause();
+function simulateBg(ms){
+  if(!player){ setStatus("无播放实例，先开始一个情绪","err"); return Promise.resolve(false); }
+  var delay=ms||3000;
+  setStatus("模拟切后台 "+delay+"ms（走真实 hidden→visible 路径）","warn");
+  enterBackground();
   return new Promise(function(res){
-    setTimeout(function(){ if(p&&p.resume) p.resume(); setStatus("已恢复（继续播放）","ok"); },3000);
+    setTimeout(function(){ returnForeground(); setStatus("已返回前台","ok"); res(true); }, delay);
   });
 }
 
@@ -374,15 +488,21 @@ document.getElementById("btnStartInj").addEventListener("click", function(){ sta
 document.getElementById("btnDispose").addEventListener("click", stopPlayer);
 document.getElementById("btnQuick14").addEventListener("click", quickSwitch14);
 document.getElementById("btnQuick4x").addEventListener("click", quick4x);
-document.getElementById("btnBg").addEventListener("click", simulateBg);
+document.getElementById("btnBg").addEventListener("click", function(){ simulateBg(3000); });
+document.getElementById("btnPause").addEventListener("click", manualPause);
+document.getElementById("btnResume").addEventListener("click", manualResume);
 document.getElementById("btnAuto").addEventListener("click", function(){ runAuto(); });
 document.getElementById("btnCopy").addEventListener("click", copyDiag);
 document.getElementById("btnReset").addEventListener("click", resetAll);
 document.addEventListener("visibilitychange", function(){
-  if(player){ if(document.hidden){ player.pause(); } else { player.resume(); } }
+  if(document.hidden){ enterBackground(); } else { returnForeground(); }
 });
-window.addEventListener("pagehide", function(){ stopPlayer(); });
-window.__RP={ startEmo:startEmo, stopPlayer:stopPlayer, runAuto:runAuto, quickSwitch14:quickSwitch14, quick4x:quick4x, waitFinish:waitFinish, getEmo:function(){return EMO;}, loadEmotions:loadEmotions };
+window.addEventListener("pagehide", teardownPage);
+window.addEventListener("beforeunload", teardownPage);
+window.addEventListener("pageshow", function(){
+  resetPage();
+});
+window.__RP={ startEmo:startEmo, stopPlayer:stopPlayer, manualPause:manualPause, manualResume:manualResume, simulateBg:simulateBg, enterBackground:enterBackground, returnForeground:returnForeground, teardownPage:teardownPage, resetPage:resetPage, runAuto:runAuto, quickSwitch14:quickSwitch14, quick4x:quick4x, waitFinish:waitFinish, snapshot:snapshot, getEmo:function(){return EMO;}, loadEmotions:loadEmotions };
 
 loadEmotions().then(function(){ setStatus("就绪：选择情绪后点开始","ok"); });
 })();
