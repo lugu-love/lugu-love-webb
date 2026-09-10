@@ -40,6 +40,26 @@
         "sha256": "7ca273464ec9288e4a048b0a17f67656ee1ce27905392ea0a96d54e4a122ca37",
         "size_bytes": 76619177,
         "status": "official"
+      },
+      {
+        "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_navy_angry_birefnet_alpha_v1.mov",
+        "sha256": "b0635e84c7d74263ffba28f439a76f4ea2d6abafa4edf4441bbf7951a85ded79",
+        "size_bytes": 79327601,
+        "status": "approved/formal-master",
+        "order": 2,
+        "emotion": "生气愤怒",
+        "outfit": "藏蓝色套装",
+        "character": "狐使者／青年女性",
+        "generation_mode": "Seedance first_frame",
+        "matting_standard": "七星使者自动抠像标准 V1",
+        "spec": "ProRes 4444 / yuva444p12le / 834x1112 / 24fps / 121 frames / 5.041667s",
+        "preview": {
+          "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_navy_angry_birefnet_gray_preview_v1.mp4",
+          "sha256": "e6ee782b396a853066df3c5b6b53c499b25fe41193e128019d862597fb38a082",
+          "size_bytes": 1344195
+        },
+        "human_review": "正式通过",
+        "purpose": "七星使者情绪表达系统正式透明素材"
       }
     ],
     "performance_reference_only": [
