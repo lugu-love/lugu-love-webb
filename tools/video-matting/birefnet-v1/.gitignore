@@ -1,0 +1,48 @@
+# ---- 七星使者抠像标准 V1：禁止入库的内容 ----
+# 模型权重
+models/
+*.safetensors
+*.pth
+*.ckpt
+*.bin
+# Python 环境与缓存
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+.python-version
+# uv / HuggingFace / pip 缓存
+.cache/
+uv-cache/
+huggingface/
+.cache-huggingface/
+# 抽帧与测试缓存
+frames/
+frames_in/
+frames9/
+rgba/
+gray/
+preview/
+tmp/
+*.tmp
+# 视频与图片母版（不得入库）
+*.mp4
+*.mov
+*.mkv
+*.avi
+*.webm
+*.png
+*.jpg
+*.jpeg
+*.tif
+*.exr
+# 密钥与凭据（严禁入库）
+.env
+.env.*
+*.key
+*apikey*
+*api_key*
+*_key.txt
+*credentials*
+secrets*

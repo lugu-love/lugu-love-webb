@@ -1,0 +1,74 @@
+{
+  "standard": "七星使者自动抠像标准 V1",
+  "locked_at": "2026-09-10",
+  "repo_path": "tools/video-matting/birefnet-v1",
+  "model": {
+    "repo": "ZhengPeng7/BiRefNet",
+    "license": "MIT",
+    "weights_path_env": "BIREFNET_WEIGHTS",
+    "weights_default": "$HOME/models/birefnet-weights",
+    "weights_in_git": false,
+    "sha256": "9ab37426bf4de0567af6b5d21b16151357149139362e6e8992021b8ce356a154",
+    "size_bytes": 444473596
+  },
+  "env": {
+    "venv_env": "BIREFNET_VENV",
+    "venv_default": "$HOME/venvs/birefnet-matte",
+    "python": "3.12.14",
+    "torch": "2.14.0",
+    "device": "mps",
+    "dtype": "float16",
+    "infer_size": 1024,
+    "ffmpeg_env": "FFMPEG"
+  },
+  "pipeline": {
+    "rgb_source": "original_video_frames",
+    "alpha_source": "birefnet_soft_mask",
+    "temporal": "sliding_median_3_frames",
+    "edge_handling": "replicate_first_last",
+    "despill": "soft_edge_only(0.02<a<0.98)",
+    "interior": "untouched(a>=0.98)",
+    "outputs": [
+      "prores4444_alpha_mov",
+      "gray_3C3C3C_preview_mp4"
+    ]
+  },
+  "assets": {
+    "official_master": [
+      {
+        "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_white_hurt_sad_birefnet_alpha_v1.mov",
+        "sha256": "7ca273464ec9288e4a048b0a17f67656ee1ce27905392ea0a96d54e4a122ca37",
+        "size_bytes": 76619177,
+        "status": "official"
+      }
+    ],
+    "performance_reference_only": [
+      {
+        "path": "~/Desktop/seedance20_fox_emotion_batch_H01/成片/fox_navy_surprised_H_v1.mp4",
+        "status": "reference_only",
+        "issue": "reference_image 尺寸放大/裁切"
+      },
+      {
+        "path": "~/Desktop/seedance20_fox_emotion_batch_H01/成片/fox_pink_coquettish_H_v1.mp4",
+        "status": "reference_only",
+        "issue": "reference_image 尺寸放大/裁切"
+      },
+      {
+        "path": "~/Desktop/seedance20_fox_emotion_batch_H01/成片/fox_black_angry_H_v1.mp4",
+        "status": "reference_only",
+        "issue": "reference_image 尺寸放大/裁切"
+      },
+      {
+        "path": "~/Desktop/seedance20_fox_emotion_batch_H01/成片/fox_red_happy_H_v1.mp4",
+        "status": "reference_only",
+        "issue": "reference_image 尺寸放大/裁切"
+      },
+      {
+        "path": "~/Desktop/seedance20_fox_emotion_batch_H01/成片/fox_teal_playful_H_v1.mp4",
+        "status": "reference_only",
+        "issue": "reference_image 尺寸放大/裁切"
+      }
+    ]
+  },
+  "script": "tools/video-matting/birefnet-v1/scripts/birefnet_matte_v1.py"
+}
