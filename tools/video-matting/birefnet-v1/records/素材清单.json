@@ -328,6 +328,27 @@
         "human_review": "正式通过",
         "purpose": "七星使者情绪表达系统正式透明素材",
         "protection": "禁止覆盖或删除原始视频、首帧及透明母版"
+      },
+      {
+        "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_pleading_birefnet_alpha_v1.mov",
+        "sha256": "27d48bfe60b1e572281cc306d7807c76347ab1f142e3b24ece60a2bd117bb52c",
+        "size_bytes": 75478116,
+        "status": "approved/formal-master",
+        "order": 15,
+        "emotion": "求饶求原谅",
+        "outfit": "蜜桃粉层叠连衣裙＋淡紫灰披肩＋米白针织帽",
+        "character": "狐使者／青年女性",
+        "generation_mode": "Seedance first_frame",
+        "matting_standard": "七星使者自动抠像标准 V1",
+        "spec": "ProRes 4444 / yuva444p12le / 834x1112 / 24fps / 121 frames / 5.041667s",
+        "preview": {
+          "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_pleading_birefnet_gray_preview_v1.mp4",
+          "sha256": "4fd84ed3c8acc428b4f732fdebf136c11214ba5720ac72a63d4b6a033a581495",
+          "size_bytes": 1266806
+        },
+        "human_review": "正式通过",
+        "purpose": "七星使者情绪表达系统正式透明素材",
+        "protection": "禁止覆盖或删除原始视频、首帧及透明母版"
       }
     ],
     "performance_reference_only": [
