@@ -53,7 +53,8 @@
           "size_bytes": 1182722
         },
         "human_review": "正式通过",
-        "purpose": "七星使者情绪表达系统正式透明素材"
+        "purpose": "七星使者情绪表达系统正式透明素材",
+        "protection": "禁止覆盖或删除原始视频、首帧及透明母版"
       },
       {
         "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_navy_angry_birefnet_alpha_v1.mov",
@@ -73,7 +74,8 @@
           "size_bytes": 1344195
         },
         "human_review": "正式通过",
-        "purpose": "七星使者情绪表达系统正式透明素材"
+        "purpose": "七星使者情绪表达系统正式透明素材",
+        "protection": "禁止覆盖或删除原始视频、首帧及透明母版"
       },
       {
         "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_pink_coquettish_birefnet_alpha_v1.mov",
@@ -93,7 +95,8 @@
           "size_bytes": 1416778
         },
         "human_review": "正式通过",
-        "purpose": "七星使者情绪表达系统正式透明素材"
+        "purpose": "七星使者情绪表达系统正式透明素材",
+        "protection": "禁止覆盖或删除原始视频、首帧及透明母版"
       },
       {
         "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_black_playful_birefnet_alpha_v1.mov",
@@ -113,7 +116,8 @@
           "size_bytes": 1101298
         },
         "human_review": "正式通过",
-        "purpose": "七星使者情绪表达系统正式透明素材"
+        "purpose": "七星使者情绪表达系统正式透明素材",
+        "protection": "禁止覆盖或删除原始视频、首帧及透明母版"
       },
       {
         "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_red_happy_birefnet_alpha_v1.mov",
@@ -133,7 +137,8 @@
           "size_bytes": 1649681
         },
         "human_review": "正式通过",
-        "purpose": "七星使者情绪表达系统正式透明素材"
+        "purpose": "七星使者情绪表达系统正式透明素材",
+        "protection": "禁止覆盖或删除原始视频、首帧及透明母版"
       },
       {
         "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_teal_surprised_birefnet_alpha_v1.mov",
@@ -153,7 +158,176 @@
           "size_bytes": 1441846
         },
         "human_review": "正式通过",
-        "purpose": "七星使者情绪表达系统正式透明素材"
+        "purpose": "七星使者情绪表达系统正式透明素材",
+        "protection": "禁止覆盖或删除原始视频、首帧及透明母版"
+      },
+      {
+        "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_defiant_birefnet_alpha_v1.mov",
+        "sha256": "439ff81450a76709ec8916ba0c0cfa1af71d12112242690d2a96ae7d5d8708ea",
+        "size_bytes": 72486028,
+        "status": "approved/formal-master",
+        "order": 7,
+        "emotion": "嘴硬不服",
+        "outfit": "石板灰高领针织连衣裙＋墨绿色收腰短外套＋灰绿色不规则A字裙摆＋焦糖棕短靴",
+        "character": "狐使者／青年女性",
+        "generation_mode": "Seedance first_frame",
+        "matting_standard": "七星使者自动抠像标准 V1",
+        "spec": "ProRes 4444 / yuva444p12le / 834x1112 / 24fps / 121 frames / 5.041667s",
+        "preview": {
+          "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_defiant_birefnet_gray_preview_v1.mp4",
+          "sha256": "48395c1d0b1db608c1cbab80fcf9eea4740b87c81e828098e7cd8c4a4bfd2611",
+          "size_bytes": 906995
+        },
+        "human_review": "正式通过",
+        "purpose": "七星使者情绪表达系统正式透明素材",
+        "protection": "禁止覆盖或删除原始视频、首帧及透明母版"
+      },
+      {
+        "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_giveup_birefnet_alpha_v1.mov",
+        "sha256": "3a95d861b36e125ab99442b24656c6e9eab35316d29d0d8d945054b08af8e04f",
+        "size_bytes": 73672072,
+        "status": "approved/formal-master",
+        "order": 8,
+        "emotion": "躺平摆烂",
+        "outfit": "（专用造型，名称待补充）",
+        "character": "狐使者／青年女性",
+        "generation_mode": "Seedance first_frame",
+        "matting_standard": "七星使者自动抠像标准 V1",
+        "spec": "ProRes 4444 / yuva444p12le / 834x1112 / 24fps / 121 frames / 5.041667s",
+        "preview": {
+          "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_giveup_birefnet_gray_preview_v1.mp4",
+          "sha256": "ebb5bd4a3d10125803f14d2e00276c89c4bec728e8459e3c0273cf7969e67646",
+          "size_bytes": 1077044
+        },
+        "human_review": "正式通过",
+        "purpose": "七星使者情绪表达系统正式透明素材",
+        "protection": "禁止覆盖或删除原始视频、首帧及透明母版"
+      },
+      {
+        "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_confused_birefnet_alpha_v1.mov",
+        "sha256": "c26d30837c99c02e16a983363292e0718adeb19cc01c8f85eb9fc16705574faf",
+        "size_bytes": 76620248,
+        "status": "approved/formal-master",
+        "order": 9,
+        "emotion": "疑惑",
+        "outfit": "（专用造型，名称待补充）",
+        "character": "狐使者／青年女性",
+        "generation_mode": "Seedance first_frame",
+        "matting_standard": "七星使者自动抠像标准 V1",
+        "spec": "ProRes 4444 / yuva444p12le / 834x1112 / 24fps / 121 frames / 5.041667s",
+        "preview": {
+          "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_confused_birefnet_gray_preview_v1.mp4",
+          "sha256": "ac1b944051a979282b56852440d06d757deeccf9342bd2aa353636efd84d17b3",
+          "size_bytes": 1160642
+        },
+        "human_review": "正式通过",
+        "purpose": "七星使者情绪表达系统正式透明素材",
+        "protection": "禁止覆盖或删除原始视频、首帧及透明母版"
+      },
+      {
+        "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_disgusted_birefnet_alpha_v1.mov",
+        "sha256": "bd0bf1bf1952e58f44905da58e0439237738286631ecf03742a9923f6c9a4c30",
+        "size_bytes": 74858269,
+        "status": "approved/formal-master",
+        "order": 10,
+        "emotion": "嫌弃",
+        "outfit": "（专用造型，名称待补充）",
+        "character": "狐使者／青年女性",
+        "generation_mode": "Seedance first_frame",
+        "matting_standard": "七星使者自动抠像标准 V1",
+        "spec": "ProRes 4444 / yuva444p12le / 834x1112 / 24fps / 121 frames / 5.041667s",
+        "preview": {
+          "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_disgusted_birefnet_gray_preview_v1.mp4",
+          "sha256": "b4030108801ef4fdc99d443043fe0923a4afb15a76954f769c265d45f28e57e9",
+          "size_bytes": 1096653
+        },
+        "human_review": "正式通过",
+        "purpose": "七星使者情绪表达系统正式透明素材",
+        "protection": "禁止覆盖或删除原始视频、首帧及透明母版"
+      },
+      {
+        "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_schadenfreude_birefnet_alpha_v1.mov",
+        "sha256": "623c73e487b573aaffe4d0f8a62ea775fe42ee23045e1ea3922d5a9c50c33390",
+        "size_bytes": 78350470,
+        "status": "approved/formal-master",
+        "order": 11,
+        "emotion": "幸灾乐祸",
+        "outfit": "（专用造型，名称待补充）",
+        "character": "狐使者／青年女性",
+        "generation_mode": "Seedance first_frame",
+        "matting_standard": "七星使者自动抠像标准 V1",
+        "spec": "ProRes 4444 / yuva444p12le / 834x1112 / 24fps / 121 frames / 5.041667s",
+        "preview": {
+          "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_schadenfreude_birefnet_gray_preview_v1.mp4",
+          "sha256": "71d51061a3eac4222c8d9fbc3790a22572f805cb76d47e82b96690b4ddb52718",
+          "size_bytes": 1371703
+        },
+        "human_review": "正式通过",
+        "purpose": "七星使者情绪表达系统正式透明素材",
+        "protection": "禁止覆盖或删除原始视频、首帧及透明母版"
+      },
+      {
+        "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_cool_birefnet_alpha_v1.mov",
+        "sha256": "231e53a8a57a98153a98efa0f20bd6f69de52dcf2cc8b7d122352a5ef78bd3f8",
+        "size_bytes": 74422373,
+        "status": "approved/formal-master",
+        "order": 12,
+        "emotion": "装酷",
+        "outfit": "（专用造型，名称待补充）",
+        "character": "狐使者／青年女性",
+        "generation_mode": "Seedance first_frame",
+        "matting_standard": "七星使者自动抠像标准 V1",
+        "spec": "ProRes 4444 / yuva444p12le / 834x1112 / 24fps / 121 frames / 5.041667s",
+        "preview": {
+          "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_cool_birefnet_gray_preview_v1.mp4",
+          "sha256": "39019a409ec3dd74cf0cbf02533658c0d52e3ecbd85c043f15547cda3202c2ce",
+          "size_bytes": 1341544
+        },
+        "human_review": "正式通过",
+        "purpose": "七星使者情绪表达系统正式透明素材",
+        "protection": "禁止覆盖或删除原始视频、首帧及透明母版"
+      },
+      {
+        "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_jealous_birefnet_alpha_v1.mov",
+        "sha256": "0e70b2b9b79bb64a4115640a8c1501296eedcae3b06a853c8b779e802845b6f2",
+        "size_bytes": 79427801,
+        "status": "approved/formal-master",
+        "order": 13,
+        "emotion": "吃醋",
+        "outfit": "（专用造型，名称待补充）",
+        "character": "狐使者／青年女性",
+        "generation_mode": "Seedance first_frame",
+        "matting_standard": "七星使者自动抠像标准 V1",
+        "spec": "ProRes 4444 / yuva444p12le / 834x1112 / 24fps / 121 frames / 5.041667s",
+        "preview": {
+          "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_jealous_birefnet_gray_preview_v1.mp4",
+          "sha256": "65f6177edd4c87aa212b20cccb08e7e0f6d46f33a4967566973565dd66b6ec68",
+          "size_bytes": 1121615
+        },
+        "human_review": "正式通过",
+        "purpose": "七星使者情绪表达系统正式透明素材",
+        "protection": "禁止覆盖或删除原始视频、首帧及透明母版"
+      },
+      {
+        "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_guilty_birefnet_alpha_v1.mov",
+        "sha256": "31e0aed3633f313fa4426a3c99f82d24a5ad9bdf20e62b89a4791d6b21f15010",
+        "size_bytes": 74530710,
+        "status": "approved/formal-master",
+        "order": 14,
+        "emotion": "心虚装傻",
+        "outfit": "（专用造型，名称待补充）",
+        "character": "狐使者／青年女性",
+        "generation_mode": "Seedance first_frame",
+        "matting_standard": "七星使者自动抠像标准 V1",
+        "spec": "ProRes 4444 / yuva444p12le / 834x1112 / 24fps / 121 frames / 5.041667s",
+        "preview": {
+          "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_guilty_birefnet_gray_preview_v1.mp4",
+          "sha256": "b3d66824e8dac1a9e8aff0ecc961650d08c363a17ebb503efa9944875260a8ca",
+          "size_bytes": 1142117
+        },
+        "human_review": "正式通过",
+        "purpose": "七星使者情绪表达系统正式透明素材",
+        "protection": "禁止覆盖或删除原始视频、首帧及透明母版"
       }
     ],
     "performance_reference_only": [
