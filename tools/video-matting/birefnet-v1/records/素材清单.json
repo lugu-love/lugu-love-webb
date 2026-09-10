@@ -39,7 +39,21 @@
         "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_white_hurt_sad_birefnet_alpha_v1.mov",
         "sha256": "7ca273464ec9288e4a048b0a17f67656ee1ce27905392ea0a96d54e4a122ca37",
         "size_bytes": 76619177,
-        "status": "official"
+        "status": "approved/formal-master",
+        "order": 1,
+        "emotion": "委屈难过",
+        "outfit": "白色套装",
+        "character": "狐使者／青年女性",
+        "generation_mode": "Seedance first_frame",
+        "matting_standard": "七星使者自动抠像标准 V1",
+        "spec": "ProRes 4444 / yuva444p12le / 834x1112 / 24fps / 121 frames / 5.041667s",
+        "preview": {
+          "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_white_hurt_sad_birefnet_gray_preview_v1.mp4",
+          "sha256": "583faa56e417dcfeb252bdb88afeba979d90986354f0a356d66968c47a9e3010",
+          "size_bytes": 1182722
+        },
+        "human_review": "正式通过",
+        "purpose": "七星使者情绪表达系统正式透明素材"
       },
       {
         "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_navy_angry_birefnet_alpha_v1.mov",
@@ -57,6 +71,86 @@
           "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_navy_angry_birefnet_gray_preview_v1.mp4",
           "sha256": "e6ee782b396a853066df3c5b6b53c499b25fe41193e128019d862597fb38a082",
           "size_bytes": 1344195
+        },
+        "human_review": "正式通过",
+        "purpose": "七星使者情绪表达系统正式透明素材"
+      },
+      {
+        "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_pink_coquettish_birefnet_alpha_v1.mov",
+        "sha256": "4629af9a4605c6a977959f4fffd68bd8f16dd9a66821beac62197d227c4ef039",
+        "size_bytes": 80709718,
+        "status": "approved/formal-master",
+        "order": 3,
+        "emotion": "撒娇",
+        "outfit": "粉紫色花瓣套装",
+        "character": "狐使者／青年女性",
+        "generation_mode": "Seedance first_frame",
+        "matting_standard": "七星使者自动抠像标准 V1",
+        "spec": "ProRes 4444 / yuva444p12le / 834x1112 / 24fps / 121 frames / 5.041667s",
+        "preview": {
+          "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_pink_coquettish_birefnet_gray_preview_v1.mp4",
+          "sha256": "3069d6652345e4f57e75cc51c59435677f6d4226c7a81e407efd6d3fbf793759",
+          "size_bytes": 1416778
+        },
+        "human_review": "正式通过",
+        "purpose": "七星使者情绪表达系统正式透明素材"
+      },
+      {
+        "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_black_playful_birefnet_alpha_v1.mov",
+        "sha256": "3cc99ea0c3aae8d29d6bb658d8004ab47e58153e90ea97e77f605d784a8b1691",
+        "size_bytes": 76279484,
+        "status": "approved/formal-master",
+        "order": 4,
+        "emotion": "调皮幽默",
+        "outfit": "黑色街头套装",
+        "character": "狐使者／青年女性",
+        "generation_mode": "Seedance first_frame",
+        "matting_standard": "七星使者自动抠像标准 V1",
+        "spec": "ProRes 4444 / yuva444p12le / 834x1112 / 24fps / 121 frames / 5.041667s",
+        "preview": {
+          "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_black_playful_birefnet_gray_preview_v1.mp4",
+          "sha256": "92412f789339fb107422b2aab8a633617768a372e5dffdc814cb54091b7e676b",
+          "size_bytes": 1101298
+        },
+        "human_review": "正式通过",
+        "purpose": "七星使者情绪表达系统正式透明素材"
+      },
+      {
+        "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_red_happy_birefnet_alpha_v1.mov",
+        "sha256": "b27154c0acf4022a9c7226b2da2dba9c1215923e96df3884811240dfe7893928",
+        "size_bytes": 80936581,
+        "status": "approved/formal-master",
+        "order": 5,
+        "emotion": "开心快乐",
+        "outfit": "红色冬日套装",
+        "character": "狐使者／青年女性",
+        "generation_mode": "Seedance first_frame",
+        "matting_standard": "七星使者自动抠像标准 V1",
+        "spec": "ProRes 4444 / yuva444p12le / 834x1112 / 24fps / 121 frames / 5.041667s",
+        "preview": {
+          "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_red_happy_birefnet_gray_preview_v1.mp4",
+          "sha256": "7cbb482c562423b5de8c32d135b77237ad8f6201b56cbac3a81f9591814d962f",
+          "size_bytes": 1649681
+        },
+        "human_review": "正式通过",
+        "purpose": "七星使者情绪表达系统正式透明素材"
+      },
+      {
+        "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_teal_surprised_birefnet_alpha_v1.mov",
+        "sha256": "f8f6d7988a6cec2451e9859921c1b7e685785a7fd7423cb78e5845c5910e8750",
+        "size_bytes": 79396667,
+        "status": "approved/formal-master",
+        "order": 6,
+        "emotion": "意外惊喜",
+        "outfit": "湖青裙装",
+        "character": "狐使者／青年女性",
+        "generation_mode": "Seedance first_frame",
+        "matting_standard": "七星使者自动抠像标准 V1",
+        "spec": "ProRes 4444 / yuva444p12le / 834x1112 / 24fps / 121 frames / 5.041667s",
+        "preview": {
+          "path": "~/Desktop/seedance20_fox_emotion_batch_H01/情绪首帧测试/fox_teal_surprised_birefnet_gray_preview_v1.mp4",
+          "sha256": "4c47c833867eb5772a74ad313c89a938eea7b4ee83714246f1fdc8d97801f927",
+          "size_bytes": 1441846
         },
         "human_review": "正式通过",
         "purpose": "七星使者情绪表达系统正式透明素材"
