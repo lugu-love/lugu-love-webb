@@ -15,7 +15,23 @@
       "previewSheets": 15,
       "renderMaster": "happy-master-v2.mp4",
       "status": "official",
-      "speechStart": 1.4
+      "speechStart": 1.4,
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/01-rabbit-happy/delivery/rabbit_01_happy_alpha_vp9.webm",
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/01-rabbit-happy/delivery/rabbit_01_happy_alpha_hevc.mov",
+        "vp9Size": 1445463,
+        "hevcSize": 2476316,
+        "vp9Sha256": "1d77065800331d8ab641287f4f85b92cf151bbd15016573616a8ee7e7ef523cd",
+        "hevcSha256": "9a08cffa52bde9a2614b19a32e8a6bca558975338c15ec468d4fe4de38e1ace7",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      },
+      "webPlayable": true,
+      "pendingTranscode": false
     },
     "rabbit-aggrieved": {
       "emotionId": "wronged",
@@ -43,7 +59,23 @@
       "previewSheets": 15,
       "renderMaster": "angry-master-v2.mp4",
       "status": "official",
-      "speechStart": 2.0
+      "speechStart": 2.0,
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/03-rabbit-angry/delivery/rabbit_03_angry_alpha_vp9.webm",
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/03-rabbit-angry/delivery/rabbit_03_angry_alpha_hevc.mov",
+        "vp9Size": 854469,
+        "hevcSize": 2213160,
+        "vp9Sha256": "6f2f8528fcd0318f80efcc0eb4986b5ee8c70052d32617187f3b516d82f3f789",
+        "hevcSha256": "352b42139e70999c11a0438c1125271fc413e062aac336cea1bd52deb4fde66a",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      },
+      "webPlayable": true,
+      "pendingTranscode": false
     },
     "rabbit-playful": {
       "emotionId": "playful",
@@ -56,7 +88,23 @@
       "previewSheets": 15,
       "renderMaster": "rabbit-playful.mp4",
       "speechStart": 1.5,
-      "status": "official"
+      "status": "official",
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/05-rabbit-playful/delivery/rabbit_05_playful_alpha_vp9.webm",
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/05-rabbit-playful/delivery/rabbit_05_playful_alpha_hevc.mov",
+        "vp9Size": 913484,
+        "hevcSize": 2358791,
+        "vp9Sha256": "9938b6b901808dd8f847f173034968704d46d03f838ef5ab213c91d3275ee932",
+        "hevcSha256": "eb26a93117843ba698c0b3303dd2a29202d6ad6c255a671b816ec97d503d2a32",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      },
+      "webPlayable": true,
+      "pendingTranscode": false
     },
     "rabbit-sajiao": {
       "emotionId": "sajiao",
@@ -92,7 +140,10 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/06-rabbit-jealous/delivery/rabbit_06_jealous_alpha_hevc.mov",
+        "hevcSize": 2356964,
+        "hevcSha256": "3d8daf139232b2d438a6840f7b5897a5cd719c189b3ffef78a4ce16ccf74e39a"
       },
       "webPlayable": true,
       "pendingTranscode": false
@@ -108,7 +159,23 @@
       "previewSheets": 15,
       "renderMaster": "rabbit-stubborn.mp4",
       "speechStart": 2.0,
-      "status": "official"
+      "status": "official",
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/07-rabbit-stubborn/delivery/rabbit_07_stubborn_alpha_vp9.webm",
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/07-rabbit-stubborn/delivery/rabbit_07_stubborn_alpha_hevc.mov",
+        "vp9Size": 905167,
+        "hevcSize": 2304880,
+        "vp9Sha256": "7ddf1bdec3b7a0ac5cd59a3712a51278aec34ff8a9e063942371d65c7d8085d8",
+        "hevcSha256": "7880dc97e833ef3dd1b9191f0aac4b42f14df7eeb678f009851699a64e03b45e",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      },
+      "webPlayable": true,
+      "pendingTranscode": false
     },
     "rabbit-surprise": {
       "emotionId": "surprised",
@@ -121,7 +188,23 @@
       "previewSheets": 15,
       "renderMaster": "rabbit-surprise.mp4",
       "speechStart": 1.2,
-      "status": "official"
+      "status": "official",
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/08-rabbit-surprise/delivery/rabbit_08_surprise_alpha_vp9.webm",
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/08-rabbit-surprise/delivery/rabbit_08_surprise_alpha_hevc.mov",
+        "vp9Size": 953043,
+        "hevcSize": 2343553,
+        "vp9Sha256": "2e5375cfb32492a9be410a16336ab1f9c261811fed6faa9f75613c70e0db10e2",
+        "hevcSha256": "beee57f68f6c2f23deebff9e335805340600df28f76dd1da3ccaa7bca65d7a86",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      },
+      "webPlayable": true,
+      "pendingTranscode": false
     },
     "rabbit-confused": {
       "emotionId": "confused",
@@ -144,7 +227,10 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/09-rabbit-confused/delivery/rabbit_09_confused_alpha_hevc.mov",
+        "hevcSize": 2409496,
+        "hevcSha256": "b15e997aa3f4ae46a8b9632934f593113f38d8ea6fe9049177ac024a5ad53b63"
       },
       "webPlayable": true,
       "pendingTranscode": false
@@ -160,7 +246,23 @@
       "previewSheets": 15,
       "renderMaster": "rabbit-disgust.mp4",
       "speechStart": 1.6,
-      "status": "official"
+      "status": "official",
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/10-rabbit-disgust/delivery/rabbit_10_disgust_alpha_vp9.webm",
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/10-rabbit-disgust/delivery/rabbit_10_disgust_alpha_hevc.mov",
+        "vp9Size": 689239,
+        "hevcSize": 2252114,
+        "vp9Sha256": "26f0126909cd957aa154b7a9d251cf4ad6e14d60b10d18a294815c7c308003ca",
+        "hevcSha256": "6dd2b4c22c5081ebf93a86695dddabd7ed49c9430d49f7fc8bd679d69eda4309",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      },
+      "webPlayable": true,
+      "pendingTranscode": false
     },
     "rabbit-guilty": {
       "emotionId": "guilty",
@@ -186,7 +288,23 @@
       "previewSheets": 15,
       "renderMaster": "rabbit-apology.mp4",
       "speechStart": 2.0,
-      "status": "official"
+      "status": "official",
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/12-rabbit-apology/delivery/rabbit_12_apology_alpha_vp9.webm",
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/12-rabbit-apology/delivery/rabbit_12_apology_alpha_hevc.mov",
+        "vp9Size": 1118009,
+        "hevcSize": 2411536,
+        "vp9Sha256": "9f58d18459b90c4455418872bd334b9430cece2cf92c55b826284252d1af607f",
+        "hevcSha256": "1e8272f15f545483163a7621fbd99f4051bdccb0175557cdc79d360351f1468b",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      },
+      "webPlayable": true,
+      "pendingTranscode": false
     },
     "rabbit-lowenergy": {
       "emotionId": "lowenergy",
@@ -212,7 +330,23 @@
       "previewSheets": 15,
       "renderMaster": "rabbit-cool.mp4",
       "speechStart": 2.0,
-      "status": "official"
+      "status": "official",
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/14-rabbit-cool/delivery/rabbit_14_cool_alpha_vp9.webm",
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/14-rabbit-cool/delivery/rabbit_14_cool_alpha_hevc.mov",
+        "vp9Size": 976663,
+        "hevcSize": 2409465,
+        "vp9Sha256": "54347d2187b55e3f6a4137772d21fe65181c6efb6021b11b43422cca76c34d35",
+        "hevcSha256": "b614714d703a7c098d02fe0ff33981d6fdbb30cb1a214367baba84cb7a282f04",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      },
+      "webPlayable": true,
+      "pendingTranscode": false
     },
     "rabbit-gloat": {
       "emotionId": "gloating",
@@ -235,7 +369,10 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/15-rabbit-gloat/delivery/rabbit_15_gloat_alpha_hevc.mov",
+        "hevcSize": 2479626,
+        "hevcSha256": "5c379a4483962d72c9ec49a127d8df700439a29171a8e7cb9ca93ea166d48bd0"
       },
       "webPlayable": true,
       "pendingTranscode": false
