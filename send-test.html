@@ -1405,11 +1405,14 @@ window.__MAIN__ = function () {
           document.documentElement.classList.add("show-save-fallback");
         }
       }
-      if(!isWeChat && canShareFile){
+      if(!isWeChat && !isAppBridge){
         btnSend.hidden=false;
-      } else if(!isWeChat && !isAppBridge){
-        btnSave.hidden=false;
-        setHint("点击“保存到手机”下载视频后，可从微信发送。");
+        if(canShareFile){
+          setHint("点击“发给TA”，可选择微信或其他应用。");
+        } else {
+          btnSave.hidden=false;
+          setHint("当前浏览器不能直接分享，点击“发给TA”将保存视频，再打开微信发送。");
+        }
       }
     } catch(err){
       if(myToken !== genToken) return;
@@ -1481,8 +1484,9 @@ window.__MAIN__ = function () {
         }
       });
     } else {
-      setStatus("当前浏览器不支持直接发送视频文件", "err");
-      setHint("请点“保存到手机”后从微信发送。");
+      downloadBlob(lastBlob, EXPORT_FILE_NAME);
+      setStatus("视频已保存，请从微信发送", "ok");
+      setHint("当前浏览器不能直接分享，视频已保存；请打开微信发送。");
     }
   }
 
