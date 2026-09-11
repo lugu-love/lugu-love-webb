@@ -657,6 +657,20 @@ window.__MAIN__ = function () {
         setStatus("当前浏览器暂时无法播放该透明视频", "err");
       }
     }
+    if (VIDEO_IS_MOBILE && delivery.mobileFallback) {
+      canvas.hidden = true;
+      alphaVideo.hidden = false;
+      alphaVideo.onerror = null;
+      alphaVideo.src = delivery.mobileFallback;
+      try { alphaVideo.load(); } catch(e) {}
+      var mobilePlay = alphaVideo.play();
+      if(mobilePlay && mobilePlay.catch) mobilePlay.catch(function(){});
+      alphaVideo.onerror = function(){
+        if(token !== alphaVideoToken) return;
+        fallbackCanvas();
+      };
+      return true;
+    }
     function trySource(url){
       if(token !== alphaVideoToken) return;
       if(!url){ fallbackCanvas(); return; }
