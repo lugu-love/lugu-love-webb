@@ -6714,7 +6714,7 @@ setTimeout(syncUI, 300);
 // PWA：注册 service worker（版本参数强制刷新旧设备缓存；v2-e15 会清掉旧 v1 缓存）
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function () {
-    navigator.serviceWorker.register("sw.js?v=e15-2026-09-03").catch(function () {});
+    navigator.serviceWorker.register("sw.js?v=2026-09-12-v3").catch(function () {});
   });
 }
 </script>
