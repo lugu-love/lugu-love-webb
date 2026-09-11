@@ -35,6 +35,10 @@
   .guide { margin:6px 0 0 16px; font-size:13px; color:rgba(207,198,235,.58); transition:opacity .2s ease; }
   .stage-wrap { display:flex; align-items:center; justify-content:center; min-height:0; pointer-events:none; margin-top:8px; }
   #stage { width:min(68vw,300px); height:auto; border-radius:18px; pointer-events:none; mix-blend-mode:lighten; }   /* 去黑底：黑色精灵背景与深色页面混合消失，只留兔子 */
+  #alphaVideo { display:block; width:min(68vw,300px); height:min(68vw,300px); object-fit:contain; pointer-events:none; border-radius:18px; background:transparent; }
+  #alphaVideo[hidden], #stage[hidden] { display:none !important; }
+  .character-mini { height:30px; display:inline-flex; align-items:center; gap:4px; padding:0 7px; border:1px solid rgba(255,255,255,.14); border-radius:999px; background:rgba(255,255,255,.05); color:var(--muted); font-size:12px; font-weight:600; }
+  .character-select { height:28px; max-width:110px; min-width:0; padding:0 2px; border:none; background:transparent; color:#b8c0ff; font-size:12px; font-weight:600; outline:none; }
   .emotions { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:8px 10px; margin:14px 0 8px; position:relative; z-index:30; max-width:min(94vw,520px); }
   .emotion { flex:0 0 auto; padding:7px 14px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:var(--muted); font-size:13px; font-weight:600; cursor:pointer; text-align:center; white-space:nowrap; }
   .emotion.active { color:#fff; border-color:var(--accent); background:rgba(125,139,255,.22); box-shadow:0 0 16px rgba(125,139,255,.28); }
@@ -126,7 +130,8 @@
     <div class="edit-top">
       <div class="brand" id="brand"><a class="back-home" href="index.html" aria-label="返回首页">← 首页</a><span class="brand-title"><span class="brand-main">七星使者</span><span class="brand-sub">· 心情表达</span></span></div>
 
-      <div class="stage-wrap"><canvas id="stage" width="540" height="540"></canvas></div>
+      <div class="stage-wrap"><canvas id="stage" width="540" height="540"></canvas><video id="alphaVideo" autoplay muted loop playsinline webkit-playsinline preload="metadata" hidden></video></div>
+
 
       <div class="emotions" id="emotions"></div>
     </div>
@@ -135,6 +140,7 @@
     <div class="guide" id="guide"></div>
     <div class="sub-actions">
       <button class="suggest" id="btnSuggest" type="button">✨ 帮我选一句</button>
+      <label class="character-mini"><span>使者</span><select id="characterSelect" class="character-select" aria-label="选择使者"></select></label>
       <label class="voice-mini"><span class="voice-icon">🔊</span><select id="voiceSelect" class="voice-select"></select></label>
       <button class="voice-preview" id="btnPreviewVoice" type="button">🔊 试听</button>
     </div>
@@ -212,50 +218,74 @@ window.__MAIN__ = function () {
   var EXPORT_FILE_NAME = "我的心情.mp4"; // 对外统一文件名（不暴露具体情绪）
   var GENERATE_TIMEOUT_MS = 55000;
   var BLOB_TIMEOUT_MS = 20000;
+  var VIDEO_UA = navigator.userAgent || "";
+  var VIDEO_PREFER_HEVC = /iPad|iPhone|iPod/.test(VIDEO_UA) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) || (/Safari/.test(VIDEO_UA) && !/Chrome|Chromium|CriOS|Edg|OPR|Android/.test(VIDEO_UA));
 
-  // 三情绪映射唯一来源：scripts/make-send-cloud/emotion-manifest.json（官方配置）。
-  // 下方为离线/加载失败兜底；正常路径由 manifest 派生，前端不再自持第二套映射。
-  var EMOTIONS_FALLBACK = [
-    { id:"1", name:"开心", item:"rabbit-happy", totalFrames:180, sheetCount:15, previewProxy:"mobile/1" },
-    { id:"2", name:"委屈", item:"rabbit-aggrieved", totalFrames:180, sheetCount:15, previewProxy:"mobile/2" },
-    { id:"3", name:"生气", item:"rabbit-angry", totalFrames:180, sheetCount:15, previewProxy:"mobile/3" },
-    { id:"4", name:"撒娇", item:"rabbit-sajiao", totalFrames:180, sheetCount:15, previewProxy:"mobile/4" },
-    { id:"5", name:"调皮", item:"rabbit-playful", totalFrames:180, sheetCount:15, previewProxy:"mobile/5" },
-    { id:"6", name:"吃醋", item:"rabbit-jealous", totalFrames:180, sheetCount:15, previewProxy:"mobile/6" },
-    { id:"7", name:"嘴硬不服", item:"rabbit-stubborn", totalFrames:180, sheetCount:15, previewProxy:"mobile/7" },
-    { id:"8", name:"意外惊喜", item:"rabbit-surprise", totalFrames:180, sheetCount:15, previewProxy:"mobile/8" },
-    { id:"9", name:"疑惑", item:"rabbit-confused", totalFrames:180, sheetCount:15, previewProxy:"mobile/9" },
-    { id:"10", name:"嫌弃", item:"rabbit-disgust", totalFrames:180, sheetCount:15, previewProxy:"mobile/10" },
-    { id:"11", name:"心虚", item:"rabbit-guilty", totalFrames:180, sheetCount:15, previewProxy:"mobile/11" },
-    { id:"12", name:"求原谅", item:"rabbit-apology", totalFrames:180, sheetCount:15, previewProxy:"mobile/12" },
-    { id:"13", name:"躺平摆烂", item:"rabbit-lowenergy", totalFrames:180, sheetCount:15, previewProxy:"mobile/13" },
-    { id:"14", name:"装酷", item:"rabbit-cool", totalFrames:180, sheetCount:15, previewProxy:"mobile/14" },
-    { id:"15", name:"幸灾乐祸", item:"rabbit-gloat", totalFrames:180, sheetCount:15, previewProxy:"mobile/15" }
+  // 角色与情绪映射唯一来源：scripts/make-send-cloud/emotion-manifest.json（官方配置）。
+  // 下方为离线/加载失败兜底；正常路径由 manifest 派生，前端不再自持第二套角色映射。
+  var RABBIT_ITEM_ORDER = ["rabbit-happy","rabbit-aggrieved","rabbit-angry","rabbit-sajiao","rabbit-playful","rabbit-jealous","rabbit-stubborn","rabbit-surprise","rabbit-confused","rabbit-disgust","rabbit-guilty","rabbit-apology","rabbit-lowenergy","rabbit-cool","rabbit-gloat"];
+  var FOX_ITEM_ORDER = ["fox-white-hurt","fox-navy-angry","fox-pink-coquettish","fox-black-playful","fox-red-happy","fox-teal-surprised","fox-defiant","fox-giveup","fox-confused","fox-disgusted","fox-schadenfreude","fox-cool","fox-jealous","fox-guilty","fox-pleading"];
+  var RABBIT_FALLBACK = [
+    { id:"1", name:"开心", item:"rabbit-happy", characterId:"fengxin-rabbit", emotionId:"happy", totalFrames:180, sheetCount:15, previewProxy:"mobile/1" },
+    { id:"2", name:"委屈", item:"rabbit-aggrieved", characterId:"fengxin-rabbit", emotionId:"wronged", totalFrames:180, sheetCount:15, previewProxy:"mobile/2" },
+    { id:"3", name:"生气", item:"rabbit-angry", characterId:"fengxin-rabbit", emotionId:"angry", totalFrames:180, sheetCount:15, previewProxy:"mobile/3" },
+    { id:"4", name:"撒娇", item:"rabbit-sajiao", characterId:"fengxin-rabbit", emotionId:"sajiao", totalFrames:180, sheetCount:15, previewProxy:"mobile/4" },
+    { id:"5", name:"调皮", item:"rabbit-playful", characterId:"fengxin-rabbit", emotionId:"playful", totalFrames:180, sheetCount:15, previewProxy:"mobile/5" },
+    { id:"6", name:"吃醋", item:"rabbit-jealous", characterId:"fengxin-rabbit", emotionId:"jealous", totalFrames:180, sheetCount:15, previewProxy:"mobile/6" },
+    { id:"7", name:"嘴硬不服", item:"rabbit-stubborn", characterId:"fengxin-rabbit", emotionId:"stubborn", totalFrames:180, sheetCount:15, previewProxy:"mobile/7" },
+    { id:"8", name:"意外惊喜", item:"rabbit-surprise", characterId:"fengxin-rabbit", emotionId:"surprised", totalFrames:180, sheetCount:15, previewProxy:"mobile/8" },
+    { id:"9", name:"疑惑", item:"rabbit-confused", characterId:"fengxin-rabbit", emotionId:"confused", totalFrames:180, sheetCount:15, previewProxy:"mobile/9" },
+    { id:"10", name:"嫌弃", item:"rabbit-disgust", characterId:"fengxin-rabbit", emotionId:"disgusted", totalFrames:180, sheetCount:15, previewProxy:"mobile/10" },
+    { id:"11", name:"心虚", item:"rabbit-guilty", characterId:"fengxin-rabbit", emotionId:"guilty", totalFrames:180, sheetCount:15, previewProxy:"mobile/11" },
+    { id:"12", name:"求原谅", item:"rabbit-apology", characterId:"fengxin-rabbit", emotionId:"apologetic", totalFrames:180, sheetCount:15, previewProxy:"mobile/12" },
+    { id:"13", name:"躺平摆烂", item:"rabbit-lowenergy", characterId:"fengxin-rabbit", emotionId:"lowenergy", totalFrames:180, sheetCount:15, previewProxy:"mobile/13" },
+    { id:"14", name:"装酷", item:"rabbit-cool", characterId:"fengxin-rabbit", emotionId:"cool", totalFrames:180, sheetCount:15, previewProxy:"mobile/14" },
+    { id:"15", name:"幸灾乐祸", item:"rabbit-gloat", characterId:"fengxin-rabbit", emotionId:"gloating", totalFrames:180, sheetCount:15, previewProxy:"mobile/15" }
   ];
-  var EMOTIONS = EMOTIONS_FALLBACK.slice();
+  var CHARACTERS = {
+    "fengxin-rabbit": { id:"fengxin-rabbit", name:"风信兔", emotions:RABBIT_FALLBACK },
+    "xinguang-fox": { id:"xinguang-fox", name:"狐使者", emotions:[] }
+  };
+  var currentCharacterId = "fengxin-rabbit";
+  var requestedCharacterId = currentCharacterId;
+  try {
+    var _qc = new URLSearchParams(location.search).get("character") || "";
+    if(_qc === "xinguang-fox" || _qc === "fengxin-rabbit") requestedCharacterId = _qc;
+  } catch(e) {}
+  var EMOTIONS = CHARACTERS[currentCharacterId].emotions;
+
+  function mapManifestEntry(e, itemId){
+    if(!e) return null;
+    return {
+      id: String(e.sequenceId || ""),
+      name: e.label || itemId,
+      item: e.itemId || itemId,
+      characterId: e.characterId || "",
+      emotionId: e.emotionId || "",
+      totalFrames: e.previewFrames || (e.delivery && e.delivery.frames) || 0,
+      sheetCount: e.previewSheets || 0,
+      previewProxy: e.previewProxy || null,
+      delivery: e.delivery || null
+    };
+  }
 
   function loadEmotionManifest(){
     return fetch("scripts/make-send-cloud/emotion-manifest.json", { cache:"no-store" })
       .then(function(r){ if(!r.ok) throw new Error("manifest " + r.status); return r.json(); })
       .then(function(m){
         var src = (m && m.emotions) || {};
-        var list = ["rabbit-happy","rabbit-aggrieved","rabbit-angry","rabbit-sajiao","rabbit-playful","rabbit-jealous","rabbit-stubborn","rabbit-surprise","rabbit-confused","rabbit-disgust","rabbit-guilty","rabbit-apology","rabbit-lowenergy","rabbit-cool","rabbit-gloat"].map(function(itemId){
-          var e = src[itemId];
-          if(!e) return null;
-          return {
-            id: String(e.sequenceId || ""),
-            name: e.label || itemId,
-            item: e.itemId || itemId,
-            totalFrames: e.previewFrames,
-            sheetCount: e.previewSheets,
-            previewProxy: e.previewProxy
-          };
-        });
-        if(list.length === 15 && list.every(function(x){ return x && x.id && x.sheetCount > 0; })){
-          EMOTIONS = list;
-          return true;
+        function build(ids){
+          return ids.map(function(itemId){ return mapManifestEntry(src[itemId], itemId); }).filter(function(x){ return !!x; });
         }
-        return false;
+        var rabbit = build(RABBIT_ITEM_ORDER);
+        var fox = build(FOX_ITEM_ORDER);
+        var rabbitOk = rabbit.length === 15 && rabbit.every(function(x){ return x.id && x.sheetCount > 0; });
+        var foxOk = fox.length === 15 && fox.every(function(x){ return x.id && x.delivery && (x.delivery.vp9 || x.delivery.hevc); });
+        if(rabbitOk) CHARACTERS["fengxin-rabbit"].emotions = rabbit;
+        if(foxOk) CHARACTERS["xinguang-fox"].emotions = fox;
+        if(requestedCharacterId === "xinguang-fox" && foxOk){ currentCharacterId = "xinguang-fox"; }
+        EMOTIONS = CHARACTERS[currentCharacterId].emotions;
+        return EMOTIONS.length === 15;
       })
       .catch(function(){ return false; });
   }
@@ -277,6 +307,12 @@ window.__MAIN__ = function () {
     "14": "表面很酷，心里其实早就动了。",
     "15": "忍不住笑了一下，别介意呀。"
   };
+
+  var FOX_UI_KEY = {"1":"2","2":"3","3":"4","4":"5","5":"1","6":"8","7":"7","8":"13","9":"9","10":"10","11":"15","12":"14","13":"6","14":"11","15":"12"};
+  function uiKey(){
+    if(current && current.characterId === "xinguang-fox") return FOX_UI_KEY[current.id] || current.id;
+    return current ? current.id : "1";
+  }
 
   var SUGGESTIONS = {
     "1": [
@@ -398,6 +434,8 @@ window.__MAIN__ = function () {
   var statusEl=document.getElementById("status");
   var hintEl=document.getElementById("hint");
   var videoEl=document.getElementById("videoPreview");
+  var alphaVideo=document.getElementById("alphaVideo");
+  var characterSelect=document.getElementById("characterSelect");
   var diagEl=document.getElementById("diag");
   var preloadDiagEl=document.getElementById("preloadDiag");
   var tapDiagEl=document.getElementById("tapDiag");
@@ -574,6 +612,101 @@ window.__MAIN__ = function () {
       }
     });
   }
+  function renderCharacterSelect(){
+    if(!characterSelect) return;
+    characterSelect.innerHTML = "";
+    Object.keys(CHARACTERS).forEach(function(id){
+      var c = CHARACTERS[id];
+      if(!c.emotions || c.emotions.length !== 15) return;
+      var o = document.createElement("option"); o.value = id; o.textContent = c.name; characterSelect.appendChild(o);
+    });
+    characterSelect.value = currentCharacterId;
+  }
+
+  var alphaVideoToken = 0;
+  function releaseAlphaVideo(){
+    alphaVideoToken++;
+    if(!alphaVideo) return;
+    alphaVideo.onerror = null;
+    alphaVideo.pause();
+    alphaVideo.removeAttribute("src");
+    try { alphaVideo.load(); } catch(e) {}
+    alphaVideo.hidden = true;
+  }
+
+  function playAlphaVideo(delivery){
+    if(!alphaVideo || !delivery) return false;
+    var first = VIDEO_PREFER_HEVC ? delivery.hevc : delivery.vp9;
+    var alternate = VIDEO_PREFER_HEVC ? delivery.vp9 : delivery.hevc;
+    if(!first) first = alternate;
+    if(!first){
+      setStatus("当前情绪暂无浏览器可用透明视频，已切换备用动画", "err");
+      return false;
+    }
+    var token = ++alphaVideoToken;
+    var triedAlternate = false;
+    function fallbackCanvas(){
+      if(token !== alphaVideoToken) return;
+      alphaVideo.hidden = true;
+      canvas.hidden = false;
+      if(current && current.sheetCount > 0){
+        setStatus("当前浏览器透明视频不可用，已切换备用动画", "err");
+        loadSheets();
+      } else {
+        setStatus("当前浏览器暂时无法播放该透明视频", "err");
+      }
+    }
+    function trySource(url){
+      if(token !== alphaVideoToken) return;
+      if(!url){ fallbackCanvas(); return; }
+      canvas.hidden = true;
+      alphaVideo.hidden = false;
+      alphaVideo.onerror = null;
+      alphaVideo.src = url;
+      try { alphaVideo.load(); } catch(e) {}
+      var pr = alphaVideo.play();
+      if(pr && pr.catch) pr.catch(function(){});
+      alphaVideo.onerror = function(){
+        if(token !== alphaVideoToken) return;
+        if(!triedAlternate && alternate && alternate !== url){
+          triedAlternate = true;
+          trySource(alternate);
+        } else {
+          fallbackCanvas();
+        }
+      };
+    }
+    trySource(first);
+    return true;
+  }
+
+  function loadEmotionVisual(){
+    cancelAnimationFrame(animId);
+    if(current && current.delivery && (current.delivery.vp9 || current.delivery.hevc)){
+      playAlphaVideo(current.delivery);
+      return;
+    }
+    releaseAlphaVideo();
+    canvas.hidden = false;
+    loadSheets();
+  }
+
+  function switchCharacter(id){
+    if(!CHARACTERS[id] || !CHARACTERS[id].emotions || CHARACTERS[id].emotions.length !== 15) return;
+    userCancelInFlight();
+    releaseAlphaVideo();
+    cancelAnimationFrame(animId);
+    currentCharacterId = id;
+    EMOTIONS = CHARACTERS[id].emotions;
+    current = EMOTIONS[0];
+    renderCharacterSelect();
+    renderEmotionButtons();
+    clearGenerated();
+    loadEmotionVisual();
+    renderDiag();
+    renderPreloadDiag();
+  }
+
   function renderEmotionButtons(){
     emotionsEl.innerHTML = "";
     EMOTIONS.forEach(function(e){
@@ -585,6 +718,10 @@ window.__MAIN__ = function () {
     refreshUI(); renderGuide(); renderSuggest();
     scrollEmotionTo(current.id);
   }
+  if(characterSelect){
+    characterSelect.addEventListener("change", function(){ switchCharacter(this.value); });
+  }
+  renderCharacterSelect();
   if (fwdE) {
     var _fwdEmo = EMOTIONS.find(function (x) { return x.id === String(fwdE); });
     if (_fwdEmo) current = _fwdEmo;
@@ -593,9 +730,15 @@ window.__MAIN__ = function () {
 
   loadEmotionManifest().then(function(ok){
     if (ok) {
-      var keepId = current.id;
+      if(requestedCharacterId !== currentCharacterId && CHARACTERS[requestedCharacterId].emotions.length === 15){
+        currentCharacterId = requestedCharacterId;
+        EMOTIONS = CHARACTERS[currentCharacterId].emotions;
+      }
+      var keepId = fwdE ? String(fwdE) : current.id;
       current = EMOTIONS.find(function(e){ return e.id === keepId; }) || EMOTIONS[0];
+      renderCharacterSelect();
       renderEmotionButtons();
+      loadEmotionVisual();
       renderDiag(); renderPreloadDiag();
     }
     if(typeof syncGenerateEnabled === "function") syncGenerateEnabled();
@@ -615,17 +758,17 @@ window.__MAIN__ = function () {
       suggestBox.hidden = true;
     }
     updateCharCount();
-    refreshUI(); clearGenerated(); loadSheets(); renderDiag(); renderPreloadDiag(); renderSuggest(); renderGuide(); syncGenerateEnabled();
+    refreshUI(); clearGenerated(); loadEmotionVisual(); renderDiag(); renderPreloadDiag(); renderSuggest(); renderGuide(); syncGenerateEnabled();
   }
 
   function renderGuide(){
-    var txt = GUIDES[current.id] || "";
+    var txt = GUIDES[uiKey()] || "";
     guideEl.style.opacity = 0;
     setTimeout(function(){ guideEl.textContent = txt; guideEl.style.opacity = 1; }, 80);
   }
 
   function renderSuggest(){
-    var list = SUGGESTIONS[current.id] || [];
+    var list = SUGGESTIONS[uiKey()] || [];
     suggestBox.innerHTML = "";
     list.forEach(function(txt){
       var b = document.createElement("button");
@@ -1366,7 +1509,7 @@ window.__MAIN__ = function () {
 
 
   refreshUI();
-  loadSheets();
+  loadEmotionVisual();
   renderDiag();
   renderBridgeDiag();
   renderPreloadDiag();
