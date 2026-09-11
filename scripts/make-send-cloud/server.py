@@ -655,7 +655,7 @@ def _v1_compose(item, text, master, tts_path, final, final_duration, speech_star
     bp=os.path.join(workdir,"v1_bottom.png"); sp=os.path.join(workdir,"v1_sub.png")
     _v1_bottom_png("%s · E%s"%(name,code), bp)
     fsize, nlines=_v1_subtitle_png(text, sp)
-    chain=("[0:v]scale=%d:%d,crop=%d:%d:0:%d,pad=%d:%d:%d:%d:black[base];"
+    chain=("[0:v]format=yuva420p,scale=%d:%d,crop=%d:%d:0:%d,pad=%d:%d:%d:%d:black[base];"
            "[2:v]format=rgba[bp];[3:v]format=rgba[sp];"
            "[base][bp]overlay=0:0:shortest=1[b1];[b1][sp]overlay=0:0:shortest=1[ov];"
            "[ov]fps=%d[vo]" % (sw,sh,sw,hc,r0,W,H,left,pt,FPS))
@@ -1032,7 +1032,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
         if path == "/status":
-            return self._send_json(200, {"enabled": read_enabled()})
+            return self._send_json(200, {"enabled": read_enabled(), "fox_masters": sum(1 for k in MASTERS if k.startswith("fox-")), "fps": FPS, "bitrate_kbps": BITRATE_KBPS})
         if path == "/welcome":
             return self._welcome_public()
         if path == "/.well-known/assetlinks.json":

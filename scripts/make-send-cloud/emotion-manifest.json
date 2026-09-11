@@ -327,7 +327,7 @@
       "label": "委屈难过",
       "characterId": "xinguang-fox",
       "sequenceId": "1",
-      "renderMaster": "fox_white_hurt_sad_alpha_hevc.mov",
+      "renderMaster": "fox_white_hurt_sad_alpha_vp9.webm",
       "sourceProtected": "fox_white_hurt_sad_H_firstframe_sizecontrol_v1.mp4",
       "previewProxy": "fox_white_hurt_sad_birefnet_gray_preview_v1.mp4",
       "status": "approved/formal-master",
@@ -351,7 +351,14 @@
         "mobileFallbackSize": 628423,
         "mobileFallbackSha256": "c2e59ce1267c5ee2350cbece9b36eb2ea91d1e1ab604a325319e8065fb310a5f",
         "mobileFallbackType": "video/mp4"
-      }
+      },
+      "unionSource": [
+        0,
+        0,
+        833,
+        1111
+      ],
+      "speechStart": 1.5
     },
     "fox-navy-angry": {
       "emotionId": "angry",
@@ -359,7 +366,7 @@
       "label": "生气愤怒",
       "characterId": "xinguang-fox",
       "sequenceId": "2",
-      "renderMaster": "fox_navy_angry_alpha_hevc.mov",
+      "renderMaster": "fox_navy_angry_alpha_vp9.webm",
       "sourceProtected": "fox_navy_angry_H_firstframe_sizecontrol_v1.mp4",
       "previewProxy": "fox_navy_angry_birefnet_gray_preview_v1.mp4",
       "status": "approved/formal-master",
@@ -383,7 +390,14 @@
         "mobileFallbackSize": 702093,
         "mobileFallbackSha256": "0006a96c4e5e72ddbbe77b95670a5d89d2aa542d16fb50c6d7267105cedefa21",
         "mobileFallbackType": "video/mp4"
-      }
+      },
+      "unionSource": [
+        0,
+        0,
+        833,
+        1111
+      ],
+      "speechStart": 1.5
     },
     "fox-pink-coquettish": {
       "emotionId": "sajiao",
@@ -391,7 +405,7 @@
       "label": "撒娇",
       "characterId": "xinguang-fox",
       "sequenceId": "3",
-      "renderMaster": "fox_pink_coquettish_alpha_hevc.mov",
+      "renderMaster": "fox_pink_coquettish_alpha_vp9.webm",
       "sourceProtected": "fox_pink_coquettish_H_firstframe_v1.mp4",
       "previewProxy": "fox_pink_coquettish_birefnet_gray_preview_v1.mp4",
       "status": "approved/formal-master",
@@ -415,7 +429,14 @@
         "mobileFallbackSize": 727643,
         "mobileFallbackSha256": "cf04350f4b5d43b1758bec274437ec3ca10ba97818bcb708ff7310b86da9ee89",
         "mobileFallbackType": "video/mp4"
-      }
+      },
+      "unionSource": [
+        0,
+        0,
+        833,
+        1111
+      ],
+      "speechStart": 1.5
     },
     "fox-black-playful": {
       "emotionId": "playful",
@@ -423,7 +444,7 @@
       "label": "调皮幽默",
       "characterId": "xinguang-fox",
       "sequenceId": "4",
-      "renderMaster": "fox_black_playful_alpha_hevc.mov",
+      "renderMaster": "fox_black_playful_alpha_vp9.webm",
       "sourceProtected": "fox_black_playful_H_firstframe_v1.mp4",
       "previewProxy": "fox_black_playful_birefnet_gray_preview_v1.mp4",
       "status": "approved/formal-master",
@@ -447,7 +468,14 @@
         "mobileFallbackSize": 615932,
         "mobileFallbackSha256": "770d69cd5ee30c3f6bc0c924145acae32571e83e308f86cd4ce3269f390cab75",
         "mobileFallbackType": "video/mp4"
-      }
+      },
+      "unionSource": [
+        0,
+        0,
+        833,
+        1111
+      ],
+      "speechStart": 1.5
     },
     "fox-red-happy": {
       "emotionId": "happy",
@@ -455,7 +483,7 @@
       "label": "开心快乐",
       "characterId": "xinguang-fox",
       "sequenceId": "5",
-      "renderMaster": "fox_red_happy_alpha_hevc.mov",
+      "renderMaster": "fox_red_happy_alpha_vp9.webm",
       "sourceProtected": "fox_red_happy_H_firstframe_v1.mp4",
       "previewProxy": "fox_red_happy_birefnet_gray_preview_v1.mp4",
       "status": "approved/formal-master",
@@ -479,7 +507,14 @@
         "mobileFallbackSize": 872819,
         "mobileFallbackSha256": "a1064c3bcd64bea8c617d4fb0f3a79e650b07a47b8933ce80d44a29299a1a998",
         "mobileFallbackType": "video/mp4"
-      }
+      },
+      "unionSource": [
+        0,
+        0,
+        833,
+        1111
+      ],
+      "speechStart": 1.5
     },
     "fox-teal-surprised": {
       "emotionId": "surprised",
@@ -487,7 +522,7 @@
       "label": "意外惊喜",
       "characterId": "xinguang-fox",
       "sequenceId": "6",
-      "renderMaster": "fox_teal_surprised_alpha_hevc.mov",
+      "renderMaster": "fox_teal_surprised_alpha_vp9.webm",
       "sourceProtected": "fox_teal_surprised_H_firstframe_v1.mp4",
       "previewProxy": "fox_teal_surprised_birefnet_gray_preview_v1.mp4",
       "status": "approved/formal-master",
@@ -511,7 +546,14 @@
         "mobileFallbackSize": 749172,
         "mobileFallbackSha256": "9799813b7817f10d62b52ec27503b019e738189a0cb1d047d4d475b1e946c6d0",
         "mobileFallbackType": "video/mp4"
-      }
+      },
+      "unionSource": [
+        0,
+        0,
+        833,
+        1111
+      ],
+      "speechStart": 1.5
     },
     "fox-defiant": {
       "emotionId": "defiant",
@@ -519,7 +561,7 @@
       "label": "嘴硬不服",
       "characterId": "xinguang-fox",
       "sequenceId": "7",
-      "renderMaster": "fox_defiant_alpha_hevc.mov",
+      "renderMaster": "fox_defiant_alpha_vp9.webm",
       "sourceProtected": "fox_defiant_H_firstframe_v1.mp4",
       "previewProxy": "fox_defiant_birefnet_gray_preview_v1.mp4",
       "status": "approved/formal-master",
@@ -543,7 +585,14 @@
         "mobileFallbackSize": 483133,
         "mobileFallbackSha256": "81414e70040dae3fce98e09cf00c7e209fc847d384925bb2409b6199a2ee7455",
         "mobileFallbackType": "video/mp4"
-      }
+      },
+      "unionSource": [
+        0,
+        0,
+        833,
+        1111
+      ],
+      "speechStart": 1.5
     },
     "fox-giveup": {
       "emotionId": "lowenergy",
@@ -551,7 +600,7 @@
       "label": "躺平摆烂",
       "characterId": "xinguang-fox",
       "sequenceId": "8",
-      "renderMaster": "fox_giveup_alpha_hevc.mov",
+      "renderMaster": "fox_giveup_alpha_vp9.webm",
       "sourceProtected": "fox_giveup_H_firstframe_v1.mp4",
       "previewProxy": "fox_giveup_birefnet_gray_preview_v1.mp4",
       "status": "approved/formal-master",
@@ -575,7 +624,14 @@
         "mobileFallbackSize": 558036,
         "mobileFallbackSha256": "17305658bb2da7cb8f05e4563a2f9b9ef73369d9fc9a316bf149cffe4d2676fe",
         "mobileFallbackType": "video/mp4"
-      }
+      },
+      "unionSource": [
+        0,
+        0,
+        833,
+        1111
+      ],
+      "speechStart": 1.5
     }
   }
 }
