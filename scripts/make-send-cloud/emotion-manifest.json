@@ -446,7 +446,11 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/07-fox-defiant/mobile/fox_defiant_mobile_black_v1.mp4",
+        "mobileFallbackSize": 483133,
+        "mobileFallbackSha256": "81414e70040dae3fce98e09cf00c7e209fc847d384925bb2409b6199a2ee7455",
+        "mobileFallbackType": "video/mp4"
       }
     },
     "fox-giveup": {
@@ -474,7 +478,11 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/08-fox-giveup/mobile/fox_giveup_mobile_black_v1.mp4",
+        "mobileFallbackSize": 558036,
+        "mobileFallbackSha256": "17305658bb2da7cb8f05e4563a2f9b9ef73369d9fc9a316bf149cffe4d2676fe",
+        "mobileFallbackType": "video/mp4"
       }
     },
     "fox-confused": {
@@ -670,7 +678,11 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/01-fox-white-hurt/mobile/fox_white_hurt_sad_mobile_black_v1.mp4",
+        "mobileFallbackSize": 628423,
+        "mobileFallbackSha256": "c2e59ce1267c5ee2350cbece9b36eb2ea91d1e1ab604a325319e8065fb310a5f",
+        "mobileFallbackType": "video/mp4"
       }
     },
     "fox-navy-angry": {
@@ -698,7 +710,11 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/02-fox-navy-angry/mobile/fox_navy_angry_mobile_black_v1.mp4",
+        "mobileFallbackSize": 702093,
+        "mobileFallbackSha256": "0006a96c4e5e72ddbbe77b95670a5d89d2aa542d16fb50c6d7267105cedefa21",
+        "mobileFallbackType": "video/mp4"
       }
     },
     "fox-pink-coquettish": {
@@ -726,7 +742,11 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/03-fox-pink-coquettish/mobile/fox_pink_coquettish_mobile_black_v1.mp4",
+        "mobileFallbackSize": 727643,
+        "mobileFallbackSha256": "cf04350f4b5d43b1758bec274437ec3ca10ba97818bcb708ff7310b86da9ee89",
+        "mobileFallbackType": "video/mp4"
       }
     },
     "fox-black-playful": {
@@ -754,7 +774,11 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/04-fox-black-playful/mobile/fox_black_playful_mobile_black_v1.mp4",
+        "mobileFallbackSize": 615932,
+        "mobileFallbackSha256": "770d69cd5ee30c3f6bc0c924145acae32571e83e308f86cd4ce3269f390cab75",
+        "mobileFallbackType": "video/mp4"
       }
     },
     "fox-red-happy": {
@@ -782,7 +806,11 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/05-fox-red-happy/mobile/fox_red_happy_mobile_black_v1.mp4",
+        "mobileFallbackSize": 872819,
+        "mobileFallbackSha256": "a1064c3bcd64bea8c617d4fb0f3a79e650b07a47b8933ce80d44a29299a1a998",
+        "mobileFallbackType": "video/mp4"
       }
     },
     "fox-teal-surprised": {
@@ -810,7 +838,11 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/06-fox-teal-surprised/mobile/fox_teal_surprised_mobile_black_v1.mp4",
+        "mobileFallbackSize": 749172,
+        "mobileFallbackSha256": "9799813b7817f10d62b52ec27503b019e738189a0cb1d047d4d475b1e946c6d0",
+        "mobileFallbackType": "video/mp4"
       }
     },
     "fox-pleading": {

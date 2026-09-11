@@ -225,7 +225,7 @@ window.__MAIN__ = function () {
   // 角色与情绪映射唯一来源：scripts/make-send-cloud/emotion-manifest.json（官方配置）。
   // 下方为离线/加载失败兜底；正常路径由 manifest 派生，前端不再自持第二套角色映射。
   var RABBIT_ITEM_ORDER = ["rabbit-happy","rabbit-aggrieved","rabbit-angry","rabbit-sajiao","rabbit-playful","rabbit-jealous","rabbit-stubborn","rabbit-surprise","rabbit-confused","rabbit-disgust","rabbit-guilty","rabbit-apology","rabbit-lowenergy","rabbit-cool","rabbit-gloat"];
-  var FOX_ITEM_ORDER = ["fox-white-hurt","fox-navy-angry","fox-pink-coquettish","fox-black-playful","fox-red-happy","fox-teal-surprised","fox-defiant","fox-giveup","fox-confused","fox-disgusted","fox-schadenfreude","fox-cool","fox-jealous","fox-guilty","fox-pleading"];
+  var FOX_ITEM_ORDER = ["fox-white-hurt","fox-navy-angry","fox-pink-coquettish","fox-black-playful","fox-red-happy","fox-teal-surprised","fox-defiant","fox-giveup"];
   var RABBIT_FALLBACK = [
     { id:"1", name:"开心", item:"rabbit-happy", characterId:"fengxin-rabbit", emotionId:"happy", totalFrames:180, sheetCount:15, previewProxy:"mobile/1" },
     { id:"2", name:"委屈", item:"rabbit-aggrieved", characterId:"fengxin-rabbit", emotionId:"wronged", totalFrames:180, sheetCount:15, previewProxy:"mobile/2" },
@@ -281,12 +281,13 @@ window.__MAIN__ = function () {
         var rabbit = build(RABBIT_ITEM_ORDER);
         var fox = build(FOX_ITEM_ORDER);
         var rabbitOk = rabbit.length === 15 && rabbit.every(function(x){ return x.id && x.sheetCount > 0; });
-        var foxOk = fox.length === 15 && fox.every(function(x){ return x.id && x.delivery && (x.delivery.vp9 || x.delivery.hevc); });
+        var foxOk = fox.length === FOX_ITEM_ORDER.length && fox.every(function(x){ return x.id && x.delivery && (x.delivery.vp9 || x.delivery.hevc); });
         if(rabbitOk) CHARACTERS["fengxin-rabbit"].emotions = rabbit;
         if(foxOk) CHARACTERS["xinguang-fox"].emotions = fox;
         if(requestedCharacterId === "xinguang-fox" && foxOk){ currentCharacterId = "xinguang-fox"; }
         EMOTIONS = CHARACTERS[currentCharacterId].emotions;
-        return EMOTIONS.length === 15;
+        var expected = currentCharacterId === "xinguang-fox" ? FOX_ITEM_ORDER.length : RABBIT_ITEM_ORDER.length;
+        return EMOTIONS.length === expected;
       })
       .catch(function(){ return false; });
   }
@@ -618,7 +619,7 @@ window.__MAIN__ = function () {
     characterSelect.innerHTML = "";
     Object.keys(CHARACTERS).forEach(function(id){
       var c = CHARACTERS[id];
-      if(!c.emotions || c.emotions.length !== 15) return;
+      if(!c.emotions || c.emotions.length === 0) return;
       var o = document.createElement("option"); o.value = id; o.textContent = c.name; characterSelect.appendChild(o);
     });
     characterSelect.value = currentCharacterId;
@@ -724,7 +725,7 @@ window.__MAIN__ = function () {
   }
 
   function switchCharacter(id){
-    if(!CHARACTERS[id] || !CHARACTERS[id].emotions || CHARACTERS[id].emotions.length !== 15) return;
+    if(!CHARACTERS[id] || !CHARACTERS[id].emotions || CHARACTERS[id].emotions.length === 0) return;
     userCancelInFlight();
     releaseAlphaVideo();
     cancelAnimationFrame(animId);
@@ -762,7 +763,7 @@ window.__MAIN__ = function () {
 
   loadEmotionManifest().then(function(ok){
     if (ok) {
-      if(requestedCharacterId !== currentCharacterId && CHARACTERS[requestedCharacterId].emotions.length === 15){
+      if(requestedCharacterId !== currentCharacterId && CHARACTERS[requestedCharacterId].emotions.length > 0){
         currentCharacterId = requestedCharacterId;
         EMOTIONS = CHARACTERS[currentCharacterId].emotions;
       }
