@@ -1,0 +1,11 @@
+{
+  "releaseId": "release-20260912-01",
+  "buildId": "release-20260912-01",
+  "manifestVersion": "20260912-01",
+  "manifestSha256": "7289c06ad26ae8d5dad33f68209dd090330a7009b9f693ac847a62983a998411",
+  "canonicalUrl": "https://lugu.love/",
+  "releasePath": "/release-20260912-01/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-11T19:05:08Z",
+  "pwaEnabled": false
+}
