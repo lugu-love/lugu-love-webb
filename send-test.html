@@ -4,25 +4,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b0c18">
-<title>七星使者 · 情绪表达</title>
+<title>七星使者 · 心情表达</title>
 <style>  :root { --bg:#0b0c18; --card:#17192e; --ink:#eef0ff; --muted:#9aa0c3; --accent:#7d8bff; }
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   html,body { margin:0; padding:0; height:100%; background:var(--bg); color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;
     -webkit-font-smoothing:antialiased; overflow-x:hidden; overflow-y:auto; }
   .app { display:flex; flex-direction:column; min-height:100vh; min-height:100svh; height:auto; }
-  html:not(.state-done) .app { padding:calc(env(safe-area-inset-top,0px)+16px) 16px calc(env(safe-area-inset-bottom,0px)+86px); }
-  .edit-top { position:sticky; top:0; z-index:20; flex:0 0 auto; background:var(--bg); }
+  html:not(.state-done) .app { padding:calc(env(safe-area-inset-top, 0px) + 16px) 16px calc(env(safe-area-inset-bottom, 0px) + 86px); }
+  .edit-top { position:sticky; top:env(safe-area-inset-top,0px); z-index:20; flex:0 0 auto; background:var(--bg); }
   html:not(.state-done).keyboard-open .app { padding-top: calc(env(safe-area-inset-top,0px) + 6px); padding-bottom: calc(env(safe-area-inset-bottom,0px) + 10px); }
   html:not(.state-done).keyboard-open .edit-top .stage-wrap { margin-top: 0; }
   html:not(.state-done).keyboard-open .emotions { margin-top: 8px; margin-bottom: 6px; }
   html:not(.state-done).keyboard-open #stage { width: min(56vw, 232px); }
   html:not(.state-done).keyboard-open .emotion { padding: 4px 10px; font-size:12px; }
   html:not(.state-done).keyboard-open .cta { display: none !important; }
-  .brand { display:flex; align-items:center; gap:12px; margin:0; padding:2px 4px; position:relative; z-index:60; }
+  .brand { display:flex; align-items:center; gap:12px; margin:0; padding:2px 12px 2px 12px; position:relative; z-index:60; }
   .site-logo { display:inline-flex; align-items:center; gap:5px; color:rgba(238,240,255,.72); text-decoration:none; font-size:13px; font-weight:400; letter-spacing:.04em; padding:4px 6px 4px 0; border-radius:999px; }
   .site-logo img { width:26px; height:26px; flex:0 0 26px; filter:drop-shadow(0 0 4px rgba(255,222,143,.4)); }
-  .back-home { display:inline-flex; align-items:center; justify-content:center; gap:5px; min-width:68px; min-height:40px; padding:0 14px; border-radius:10px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); color:rgba(238,240,255,.92); text-decoration:none; font-size:14px; font-weight:600; letter-spacing:.02em; white-space:nowrap; }
+  .back-home { display:inline-flex; align-items:center; justify-content:center; gap:5px; min-width:68px; min-height:44px; padding:0 16px; border-radius:10px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); color:rgba(238,240,255,.92); text-decoration:none; font-size:14px; font-weight:600; letter-spacing:.02em; white-space:nowrap; }
   .back-home:active { opacity:.6; }
   html.is-app-bridge .site-logo { display:none !important; }
   .brand .heart { color:rgba(238,240,255,.82); margin-right:5px; font-weight:400; }
@@ -35,6 +35,10 @@
   .guide { margin:6px 0 0 16px; font-size:13px; color:rgba(207,198,235,.58); transition:opacity .2s ease; }
   .stage-wrap { display:flex; align-items:center; justify-content:center; min-height:0; pointer-events:none; margin-top:8px; }
   #stage { width:min(68vw,300px); height:auto; border-radius:18px; pointer-events:none; mix-blend-mode:lighten; }   /* 去黑底：黑色精灵背景与深色页面混合消失，只留兔子 */
+  #alphaVideo { display:block; width:min(68vw,300px); height:min(68vw,300px); object-fit:contain; pointer-events:none; border-radius:18px; background:transparent; }
+  #alphaVideo[hidden], #stage[hidden] { display:none !important; }
+  .character-mini { height:30px; display:inline-flex; align-items:center; gap:4px; padding:0 7px; border:1px solid rgba(255,255,255,.14); border-radius:999px; background:rgba(255,255,255,.05); color:var(--muted); font-size:12px; font-weight:600; }
+  .character-select { height:28px; max-width:110px; min-width:0; padding:0 2px; border:none; background:transparent; color:#b8c0ff; font-size:12px; font-weight:600; outline:none; }
   .emotions { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:8px 10px; margin:14px 0 8px; position:relative; z-index:30; max-width:min(94vw,520px); }
   .emotion { flex:0 0 auto; padding:7px 14px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:var(--muted); font-size:13px; font-weight:600; cursor:pointer; text-align:center; white-space:nowrap; }
   .emotion.active { color:#fff; border-color:var(--accent); background:rgba(125,139,255,.22); box-shadow:0 0 16px rgba(125,139,255,.28); }
@@ -118,15 +122,15 @@
 </head>
 <body>
 <div class="site-paused-overlay" id="pauseScreen">
-  <div class="t1">七星使者 · 情绪表达</div>
+  <div class="t1">七星使者 · 心情表达</div>
   <div class="t2">当前正在内部测试中。<br>正式开放后再见。</div>
 </div>
 
   <div class="app">
     <div class="edit-top">
-      <div class="brand" id="brand"><a class="back-home" href="index.html" aria-label="返回首页">← 首页</a><span class="brand-title"><span class="brand-main">七星使者</span><span class="brand-sub">· 情绪表达</span></span></div>
+      <div class="brand" id="brand"><a class="back-home" href="index.html" aria-label="返回首页">← 首页</a><span class="brand-title"><span class="brand-main">七星使者</span><span class="brand-sub">· 心情表达</span></span></div>
 
-      <div class="stage-wrap"><canvas id="stage" width="540" height="540"></canvas></div>
+      <div class="stage-wrap"><canvas id="stage" width="540" height="540"></canvas><video id="alphaVideo" autoplay muted loop playsinline webkit-playsinline preload="metadata" hidden></video></div>
 
       <div class="emotions" id="emotions"></div>
     </div>
@@ -135,6 +139,7 @@
     <div class="guide" id="guide"></div>
     <div class="sub-actions">
       <button class="suggest" id="btnSuggest" type="button">✨ 帮我选一句</button>
+      <label class="character-mini"><span>使者</span><select id="characterSelect" class="character-select" aria-label="选择使者"></select></label>
       <label class="voice-mini"><span class="voice-icon">🔊</span><select id="voiceSelect" class="voice-select"></select></label>
       <button class="voice-preview" id="btnPreviewVoice" type="button">🔊 试听</button>
     </div>
@@ -209,52 +214,77 @@
 <script>
 window.__MAIN__ = function () {
   var MAKE_SEND_API = "https://api.lugu.love";
+  var EXPORT_FILE_NAME = "我的心情.mp4"; // 对外统一文件名（不暴露具体情绪）
   var GENERATE_TIMEOUT_MS = 55000;
   var BLOB_TIMEOUT_MS = 20000;
+  var VIDEO_UA = navigator.userAgent || "";
+  var VIDEO_PREFER_HEVC = /iPad|iPhone|iPod/.test(VIDEO_UA) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) || (/Safari/.test(VIDEO_UA) && !/Chrome|Chromium|CriOS|Edg|OPR|Android/.test(VIDEO_UA));
 
-  // 三情绪映射唯一来源：scripts/make-send-cloud/emotion-manifest.json（官方配置）。
-  // 下方为离线/加载失败兜底；正常路径由 manifest 派生，前端不再自持第二套映射。
-  var EMOTIONS_FALLBACK = [
-    { id:"1", name:"开心", item:"rabbit-happy", totalFrames:180, sheetCount:15, previewProxy:"mobile/1" },
-    { id:"2", name:"委屈", item:"rabbit-aggrieved", totalFrames:180, sheetCount:15, previewProxy:"mobile/2" },
-    { id:"3", name:"生气", item:"rabbit-angry", totalFrames:180, sheetCount:15, previewProxy:"mobile/3" },
-    { id:"4", name:"撒娇", item:"rabbit-sajiao", totalFrames:180, sheetCount:15, previewProxy:"mobile/4" },
-    { id:"5", name:"调皮", item:"rabbit-playful", totalFrames:180, sheetCount:15, previewProxy:"mobile/5" },
-    { id:"6", name:"吃醋", item:"rabbit-jealous", totalFrames:180, sheetCount:15, previewProxy:"mobile/6" },
-    { id:"7", name:"嘴硬不服", item:"rabbit-stubborn", totalFrames:180, sheetCount:15, previewProxy:"mobile/7" },
-    { id:"8", name:"意外惊喜", item:"rabbit-surprise", totalFrames:180, sheetCount:15, previewProxy:"mobile/8" },
-    { id:"9", name:"疑惑", item:"rabbit-confused", totalFrames:180, sheetCount:15, previewProxy:"mobile/9" },
-    { id:"10", name:"嫌弃", item:"rabbit-disgust", totalFrames:180, sheetCount:15, previewProxy:"mobile/10" },
-    { id:"11", name:"心虚", item:"rabbit-guilty", totalFrames:180, sheetCount:15, previewProxy:"mobile/11" },
-    { id:"12", name:"求原谅", item:"rabbit-apology", totalFrames:180, sheetCount:15, previewProxy:"mobile/12" },
-    { id:"13", name:"躺平摆烂", item:"rabbit-lowenergy", totalFrames:180, sheetCount:15, previewProxy:"mobile/13" },
-    { id:"14", name:"装酷", item:"rabbit-cool", totalFrames:180, sheetCount:15, previewProxy:"mobile/14" },
-    { id:"15", name:"幸灾乐祸", item:"rabbit-gloat", totalFrames:180, sheetCount:15, previewProxy:"mobile/15" }
+  // 角色与情绪映射唯一来源：scripts/make-send-cloud/emotion-manifest.json（官方配置）。
+  // 下方为离线/加载失败兜底；正常路径由 manifest 派生，前端不再自持第二套角色映射。
+  var RABBIT_ITEM_ORDER = ["rabbit-happy","rabbit-aggrieved","rabbit-angry","rabbit-sajiao","rabbit-playful","rabbit-jealous","rabbit-stubborn","rabbit-surprise","rabbit-confused","rabbit-disgust","rabbit-guilty","rabbit-apology","rabbit-lowenergy","rabbit-cool","rabbit-gloat"];
+  var FOX_ITEM_ORDER = ["fox-white-hurt","fox-navy-angry","fox-pink-coquettish","fox-black-playful","fox-red-happy","fox-teal-surprised","fox-defiant","fox-giveup","fox-confused","fox-disgusted","fox-schadenfreude","fox-cool","fox-jealous","fox-guilty","fox-pleading"];
+  var RABBIT_FALLBACK = [
+    { id:"1", name:"开心", item:"rabbit-happy", characterId:"fengxin-rabbit", emotionId:"happy", totalFrames:180, sheetCount:15, previewProxy:"mobile/1" },
+    { id:"2", name:"委屈", item:"rabbit-aggrieved", characterId:"fengxin-rabbit", emotionId:"wronged", totalFrames:180, sheetCount:15, previewProxy:"mobile/2" },
+    { id:"3", name:"生气", item:"rabbit-angry", characterId:"fengxin-rabbit", emotionId:"angry", totalFrames:180, sheetCount:15, previewProxy:"mobile/3" },
+    { id:"4", name:"撒娇", item:"rabbit-sajiao", characterId:"fengxin-rabbit", emotionId:"sajiao", totalFrames:180, sheetCount:15, previewProxy:"mobile/4" },
+    { id:"5", name:"调皮", item:"rabbit-playful", characterId:"fengxin-rabbit", emotionId:"playful", totalFrames:180, sheetCount:15, previewProxy:"mobile/5" },
+    { id:"6", name:"吃醋", item:"rabbit-jealous", characterId:"fengxin-rabbit", emotionId:"jealous", totalFrames:180, sheetCount:15, previewProxy:"mobile/6" },
+    { id:"7", name:"嘴硬不服", item:"rabbit-stubborn", characterId:"fengxin-rabbit", emotionId:"stubborn", totalFrames:180, sheetCount:15, previewProxy:"mobile/7" },
+    { id:"8", name:"意外惊喜", item:"rabbit-surprise", characterId:"fengxin-rabbit", emotionId:"surprised", totalFrames:180, sheetCount:15, previewProxy:"mobile/8" },
+    { id:"9", name:"疑惑", item:"rabbit-confused", characterId:"fengxin-rabbit", emotionId:"confused", totalFrames:180, sheetCount:15, previewProxy:"mobile/9" },
+    { id:"10", name:"嫌弃", item:"rabbit-disgust", characterId:"fengxin-rabbit", emotionId:"disgusted", totalFrames:180, sheetCount:15, previewProxy:"mobile/10" },
+    { id:"11", name:"心虚", item:"rabbit-guilty", characterId:"fengxin-rabbit", emotionId:"guilty", totalFrames:180, sheetCount:15, previewProxy:"mobile/11" },
+    { id:"12", name:"求原谅", item:"rabbit-apology", characterId:"fengxin-rabbit", emotionId:"apologetic", totalFrames:180, sheetCount:15, previewProxy:"mobile/12" },
+    { id:"13", name:"躺平摆烂", item:"rabbit-lowenergy", characterId:"fengxin-rabbit", emotionId:"lowenergy", totalFrames:180, sheetCount:15, previewProxy:"mobile/13" },
+    { id:"14", name:"装酷", item:"rabbit-cool", characterId:"fengxin-rabbit", emotionId:"cool", totalFrames:180, sheetCount:15, previewProxy:"mobile/14" },
+    { id:"15", name:"幸灾乐祸", item:"rabbit-gloat", characterId:"fengxin-rabbit", emotionId:"gloating", totalFrames:180, sheetCount:15, previewProxy:"mobile/15" }
   ];
-  var EMOTIONS = EMOTIONS_FALLBACK.slice();
+  var CHARACTERS = {
+    "fengxin-rabbit": { id:"fengxin-rabbit", name:"风信兔", emotions:RABBIT_FALLBACK },
+    "xinguang-fox": { id:"xinguang-fox", name:"狐使者", emotions:[] }
+  };
+  var currentCharacterId = "fengxin-rabbit";
+  var requestedCharacterId = currentCharacterId;
+  try {
+    var _qc = new URLSearchParams(location.search).get("character") || "";
+    if(_qc === "xinguang-fox" || _qc === "fengxin-rabbit") requestedCharacterId = _qc;
+  } catch(e) {}
+  var EMOTIONS = CHARACTERS[currentCharacterId].emotions;
+
+  function mapManifestEntry(e, itemId){
+    if(!e) return null;
+    return {
+      id: String(e.sequenceId || ""),
+      name: e.label || itemId,
+      item: e.itemId || itemId,
+      characterId: e.characterId || "",
+      emotionId: e.emotionId || "",
+      totalFrames: e.previewFrames || (e.delivery && e.delivery.frames) || 0,
+      sheetCount: e.previewSheets || 0,
+      previewProxy: e.previewProxy || null,
+      delivery: e.delivery || null
+    };
+  }
 
   function loadEmotionManifest(){
     return fetch("scripts/make-send-cloud/emotion-manifest.json", { cache:"no-store" })
       .then(function(r){ if(!r.ok) throw new Error("manifest " + r.status); return r.json(); })
       .then(function(m){
         var src = (m && m.emotions) || {};
-        var list = ["rabbit-happy","rabbit-aggrieved","rabbit-angry","rabbit-sajiao","rabbit-playful","rabbit-jealous","rabbit-stubborn","rabbit-surprise","rabbit-confused","rabbit-disgust","rabbit-guilty","rabbit-apology","rabbit-lowenergy","rabbit-cool","rabbit-gloat"].map(function(itemId){
-          var e = src[itemId];
-          if(!e) return null;
-          return {
-            id: String(e.sequenceId || ""),
-            name: e.label || itemId,
-            item: e.itemId || itemId,
-            totalFrames: e.previewFrames,
-            sheetCount: e.previewSheets,
-            previewProxy: e.previewProxy
-          };
-        });
-        if(list.length === 15 && list.every(function(x){ return x && x.id && x.sheetCount > 0; })){
-          EMOTIONS = list;
-          return true;
+        function build(ids){
+          return ids.map(function(itemId){ return mapManifestEntry(src[itemId], itemId); }).filter(function(x){ return !!x; });
         }
-        return false;
+        var rabbit = build(RABBIT_ITEM_ORDER);
+        var fox = build(FOX_ITEM_ORDER);
+        var rabbitOk = rabbit.length === 15 && rabbit.every(function(x){ return x.id && x.sheetCount > 0; });
+        var foxOk = fox.length === 15 && fox.every(function(x){ return x.id && x.delivery && (x.delivery.vp9 || x.delivery.hevc); });
+        if(rabbitOk) CHARACTERS["fengxin-rabbit"].emotions = rabbit;
+        if(foxOk) CHARACTERS["xinguang-fox"].emotions = fox;
+        if(requestedCharacterId === "xinguang-fox" && foxOk){ currentCharacterId = "xinguang-fox"; }
+        EMOTIONS = CHARACTERS[currentCharacterId].emotions;
+        return EMOTIONS.length === 15;
       })
       .catch(function(){ return false; });
   }
@@ -276,6 +306,11 @@ window.__MAIN__ = function () {
     "14": "表面很酷，心里其实早就动了。",
     "15": "忍不住笑了一下，别介意呀。"
   };
+  var FOX_UI_KEY = {"1":"2","2":"3","3":"4","4":"5","5":"1","6":"8","7":"7","8":"13","9":"9","10":"10","11":"15","12":"14","13":"6","14":"11","15":"12"};
+  function uiKey(){
+    if(current && current.characterId === "xinguang-fox") return FOX_UI_KEY[current.id] || current.id;
+    return current ? current.id : "1";
+  }
 
   var SUGGESTIONS = {
     "1": [
@@ -397,6 +432,8 @@ window.__MAIN__ = function () {
   var statusEl=document.getElementById("status");
   var hintEl=document.getElementById("hint");
   var videoEl=document.getElementById("videoPreview");
+  var alphaVideo=document.getElementById("alphaVideo");
+  var characterSelect=document.getElementById("characterSelect");
   var diagEl=document.getElementById("diag");
   var preloadDiagEl=document.getElementById("preloadDiag");
   var tapDiagEl=document.getElementById("tapDiag");
@@ -525,6 +562,21 @@ window.__MAIN__ = function () {
   window.addEventListener("load", function(){ setTimeout(detectBridgeNow, 150); });
 
   var current=EMOTIONS[0];
+  // A路转发接收：?e=1..15 预选情绪；from=home 时“←首页”优先浏览器返回。
+  var fwdE = 0;
+  try { var _fe = parseInt(new URLSearchParams(location.search).get("e") || "", 10); if (_fe >= 1 && _fe <= 15) fwdE = _fe; } catch (err) {}
+  var fwdFromHome = false;
+  try { fwdFromHome = new URLSearchParams(location.search).get("from") === "home"; } catch (err) {}
+  function applyForwardText(){
+    var stored = null;
+    try { stored = window.sessionStorage.getItem("lugu_forward_text"); } catch (e) {}
+    try { window.sessionStorage.removeItem("lugu_forward_text"); } catch (e) {}
+    try { window.sessionStorage.removeItem("lugu_forward_emotion"); } catch (e) {}
+    if(!stored || !textInput) return;
+    textInput.value = stored;
+    textInput.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+
   var cache={}, preloadOrder=["2","3"], preloadStarted=false, activeUserLoad=false;
   var sheets=[], loaded=0, frameIndex=0, lastFrameAt=0, animId=null;
   var lastBlob=null, lastFile=null, lastUrl=null;
@@ -558,6 +610,101 @@ window.__MAIN__ = function () {
       }
     });
   }
+  function renderCharacterSelect(){
+    if(!characterSelect) return;
+    characterSelect.innerHTML = "";
+    Object.keys(CHARACTERS).forEach(function(id){
+      var c = CHARACTERS[id];
+      if(!c.emotions || c.emotions.length !== 15) return;
+      var o = document.createElement("option"); o.value = id; o.textContent = c.name; characterSelect.appendChild(o);
+    });
+    characterSelect.value = currentCharacterId;
+  }
+
+  var alphaVideoToken = 0;
+  function releaseAlphaVideo(){
+    alphaVideoToken++;
+    if(!alphaVideo) return;
+    alphaVideo.onerror = null;
+    alphaVideo.pause();
+    alphaVideo.removeAttribute("src");
+    try { alphaVideo.load(); } catch(e) {}
+    alphaVideo.hidden = true;
+  }
+
+  function playAlphaVideo(delivery){
+    if(!alphaVideo || !delivery) return false;
+    var first = VIDEO_PREFER_HEVC ? delivery.hevc : delivery.vp9;
+    var alternate = VIDEO_PREFER_HEVC ? delivery.vp9 : delivery.hevc;
+    if(!first) first = alternate;
+    if(!first){
+      setStatus("当前情绪暂无浏览器可用透明视频，已切换备用动画", "err");
+      return false;
+    }
+    var token = ++alphaVideoToken;
+    var triedAlternate = false;
+    function fallbackCanvas(){
+      if(token !== alphaVideoToken) return;
+      alphaVideo.hidden = true;
+      canvas.hidden = false;
+      if(current && current.sheetCount > 0){
+        setStatus("当前浏览器透明视频不可用，已切换备用动画", "err");
+        loadSheets();
+      } else {
+        setStatus("当前浏览器暂时无法播放该透明视频", "err");
+      }
+    }
+    function trySource(url){
+      if(token !== alphaVideoToken) return;
+      if(!url){ fallbackCanvas(); return; }
+      canvas.hidden = true;
+      alphaVideo.hidden = false;
+      alphaVideo.onerror = null;
+      alphaVideo.src = url;
+      try { alphaVideo.load(); } catch(e) {}
+      var pr = alphaVideo.play();
+      if(pr && pr.catch) pr.catch(function(){});
+      alphaVideo.onerror = function(){
+        if(token !== alphaVideoToken) return;
+        if(!triedAlternate && alternate && alternate !== url){
+          triedAlternate = true;
+          trySource(alternate);
+        } else {
+          fallbackCanvas();
+        }
+      };
+    }
+    trySource(first);
+    return true;
+  }
+
+  function loadEmotionVisual(){
+    cancelAnimationFrame(animId);
+    if(current && current.delivery && (current.delivery.vp9 || current.delivery.hevc)){
+      playAlphaVideo(current.delivery);
+      return;
+    }
+    releaseAlphaVideo();
+    canvas.hidden = false;
+    loadSheets();
+  }
+
+  function switchCharacter(id){
+    if(!CHARACTERS[id] || !CHARACTERS[id].emotions || CHARACTERS[id].emotions.length !== 15) return;
+    userCancelInFlight();
+    releaseAlphaVideo();
+    cancelAnimationFrame(animId);
+    currentCharacterId = id;
+    EMOTIONS = CHARACTERS[id].emotions;
+    current = EMOTIONS[0];
+    renderCharacterSelect();
+    renderEmotionButtons();
+    clearGenerated();
+    loadEmotionVisual();
+    renderDiag();
+    renderPreloadDiag();
+  }
+
   function renderEmotionButtons(){
     emotionsEl.innerHTML = "";
     EMOTIONS.forEach(function(e){
@@ -569,15 +716,31 @@ window.__MAIN__ = function () {
     refreshUI(); renderGuide(); renderSuggest();
     scrollEmotionTo(current.id);
   }
+  if(characterSelect){
+    characterSelect.addEventListener("change", function(){ switchCharacter(this.value); });
+  }
+  renderCharacterSelect();
+  if (fwdE) {
+    var _fwdEmo = EMOTIONS.find(function (x) { return x.id === String(fwdE); });
+    if (_fwdEmo) current = _fwdEmo;
+  }
   renderEmotionButtons();
 
   loadEmotionManifest().then(function(ok){
-    if(!ok) return;
-    var keepId = current.id;
-    current = EMOTIONS.find(function(e){ return e.id === keepId; }) || EMOTIONS[0];
-    renderEmotionButtons();
-    renderDiag(); renderPreloadDiag();
+    if (ok) {
+      if(requestedCharacterId !== currentCharacterId && CHARACTERS[requestedCharacterId].emotions.length === 15){
+        currentCharacterId = requestedCharacterId;
+        EMOTIONS = CHARACTERS[currentCharacterId].emotions;
+      }
+      var keepId = fwdE ? String(fwdE) : current.id;
+      current = EMOTIONS.find(function(e){ return e.id === keepId; }) || EMOTIONS[0];
+      renderCharacterSelect();
+      renderEmotionButtons();
+      loadEmotionVisual();
+      renderDiag(); renderPreloadDiag();
+    }
     if(typeof syncGenerateEnabled === "function") syncGenerateEnabled();
+    applyForwardText();
   });
 
   function refreshUI(){ Array.prototype.forEach.call(emotionsEl.children, function(b){ if(!b.dataset || !b.dataset.em) return; b.classList.toggle("active", b.dataset.em===current.id); }); }
@@ -593,17 +756,17 @@ window.__MAIN__ = function () {
       suggestBox.hidden = true;
     }
     updateCharCount();
-    refreshUI(); clearGenerated(); loadSheets(); renderDiag(); renderPreloadDiag(); renderSuggest(); renderGuide(); syncGenerateEnabled();
+    refreshUI(); clearGenerated(); loadEmotionVisual(); renderDiag(); renderPreloadDiag(); renderSuggest(); renderGuide(); syncGenerateEnabled();
   }
 
   function renderGuide(){
-    var txt = GUIDES[current.id] || "";
+    var txt = GUIDES[uiKey()] || "";
     guideEl.style.opacity = 0;
     setTimeout(function(){ guideEl.textContent = txt; guideEl.style.opacity = 1; }, 80);
   }
 
   function renderSuggest(){
-    var list = SUGGESTIONS[current.id] || [];
+    var list = SUGGESTIONS[uiKey()] || [];
     suggestBox.innerHTML = "";
     list.forEach(function(txt){
       var b = document.createElement("button");
@@ -1107,6 +1270,7 @@ window.__MAIN__ = function () {
           try { var j=JSON.parse(errText); errMsg=(j && (j.message || j.error)) || null; } catch(e){ errMsg=errText ? errText.slice(0,120) : null; }
         } catch(e){ /* 错误响应体读取超时也直接按通用错误处理 */ }
         var err=new Error("HTTP "+resp.status);
+        err.status=resp.status;
         if(errMsg){ err.backendMessage=errMsg; }
         throw err;
       }
@@ -1154,7 +1318,7 @@ window.__MAIN__ = function () {
       var tBlob = performance.now();
       var blob=await withTimeout(vresp.blob(), BLOB_TIMEOUT_MS, activeController);
       if(!blob || blob.size===0) throw new Error("empty blob");
-      var file=new File([blob], "七星使者-" + current.name + ".mp4", { type:"video/mp4" });
+      var file=new File([blob], EXPORT_FILE_NAME, { type:"video/mp4" });
       lastBlob=blob; lastFile=file;
       lastUrl=URL.createObjectURL(blob);
       videoEl.src=lastUrl;
@@ -1222,6 +1386,9 @@ window.__MAIN__ = function () {
       } else if(timedOut){
         setStatus("生成时间有点久，请再试一次。", "err");
         showToast("生成时间有点久，请再试一次。");
+      } else if(err.status === 429 || (err.backendMessage && /server\s*busy/i.test(String(err.backendMessage)))){
+        setStatus("同时生成的视频有点多，请稍等几秒再试", "err");
+        showToast("同时生成的视频有点多，请稍等几秒再试");
       } else if(err && err.backendMessage){
         setStatus(err.backendMessage, "err");
         showToast(err.backendMessage);
@@ -1249,7 +1416,7 @@ window.__MAIN__ = function () {
 
   function saveVideo(){
     if(!lastBlob){ showToast("请先生成视频"); return; }
-    downloadBlob(lastBlob, "七星使者-" + current.name + ".mp4");
+    downloadBlob(lastBlob, EXPORT_FILE_NAME);
     if(isIOS){
       setStatus("");
       setHint("打开后，点击右上角‘…’即可分享");
@@ -1263,7 +1430,7 @@ window.__MAIN__ = function () {
     if(!lastFile){ showToast("请先生成视频"); return; }
     if(navigator.canShare && navigator.canShare({files:[lastFile]})){
       if(isAndroid) setStatus("正在打开系统分享…");
-      navigator.share({ files:[lastFile], title:"情绪表达", text:textInput.value }).then(function(){
+      navigator.share({ files:[lastFile], title:"心情表达", text:textInput.value }).then(function(){
         setStatus("已调起系统分享", "ok");
       }).catch(function(e){
         console.error("share error:", e);
@@ -1311,7 +1478,19 @@ window.__MAIN__ = function () {
   btnSave.addEventListener("click", saveVideo);
   btnSend.addEventListener("click", sendVideo);
   btnReEdit.addEventListener("click", reEdit);
-  btnHome.addEventListener("click", function(){ location.href = "index.html"; });
+  function backHomeOrIndex(){
+    if (fwdFromHome) {
+      try { if (window.history && window.history.length > 1) { window.history.back(); return; } } catch (e) {}
+    }
+    location.href = "index.html";
+  }
+  btnHome.addEventListener("click", backHomeOrIndex);
+  var backHomeLink = document.querySelector(".back-home");
+  if (backHomeLink && fwdFromHome) {
+    backHomeLink.addEventListener("click", function (ev) {
+      try { if (window.history && window.history.length > 1) { ev.preventDefault(); window.history.back(); } } catch (e) {}
+    });
+  }
   btnSendWeChat.addEventListener("click", function(){
     if(!nativeReady){ setStatus("视频正在准备，请稍候…", ""); return; }
     try { window.AndroidShare.sharePreparedVideo(); } catch(err){ setStatus("无法打开系统分享，请重试", "err"); }
@@ -1328,7 +1507,7 @@ window.__MAIN__ = function () {
 
 
   refreshUI();
-  loadSheets();
+  loadEmotionVisual();
   renderDiag();
   renderBridgeDiag();
   renderPreloadDiag();

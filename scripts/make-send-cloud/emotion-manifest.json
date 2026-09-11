@@ -82,7 +82,20 @@
       "previewSheets": 15,
       "renderMaster": "rabbit-jealous.mp4",
       "speechStart": 2.0,
-      "status": "official"
+      "status": "official",
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/06-rabbit-jealous/delivery/rabbit_06_jealous_alpha_web_v1.webm",
+        "vp9Size": 946436,
+        "vp9Sha256": "25c36f4f8f69172d68a0024cad7d6d7b02f3334a1a8130eba3b256e94d14f79d",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      },
+      "webPlayable": true,
+      "pendingTranscode": false
     },
     "rabbit-stubborn": {
       "emotionId": "stubborn",
@@ -121,7 +134,20 @@
       "previewSheets": 15,
       "renderMaster": "rabbit-confused.mp4",
       "speechStart": 1.8,
-      "status": "official"
+      "status": "official",
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/09-rabbit-confused/delivery/rabbit_09_confused_alpha_web_v1.webm",
+        "vp9Size": 1065385,
+        "vp9Sha256": "7663631d3952c8bb8905431e8c92a5bae0794a9fb6b9813efaf90660341dc54f",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      },
+      "webPlayable": true,
+      "pendingTranscode": false
     },
     "rabbit-disgust": {
       "emotionId": "disgusted",
@@ -199,7 +225,20 @@
       "previewSheets": 15,
       "renderMaster": "rabbit-gloat.mp4",
       "speechStart": 1.6,
-      "status": "official"
+      "status": "official",
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/15-rabbit-gloat/delivery/rabbit_15_gloat_alpha_web_v1.webm",
+        "vp9Size": 1344512,
+        "vp9Sha256": "e46f215d9e4a1bf47681ed225ab5768ca5c1f5c1a5539c0142bb3ba415e930f3",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      },
+      "webPlayable": true,
+      "pendingTranscode": false
     },
     "fox-defiant": {
       "emotionId": "defiant",
@@ -211,10 +250,23 @@
       "sourceProtected": "fox_defiant_H_firstframe_v1.mp4",
       "previewProxy": "fox_defiant_birefnet_gray_preview_v1.mp4",
       "status": "approved/formal-master",
-      "webPlayable": false,
-      "pendingTranscode": true,
-      "transcodeNote": "透明 ProRes 4444 母版不可直接用于网页播放；需转码为支持 Alpha 的 WebM/HEVC 后上线（本轮不转码、不修改播放器）",
-      "assetPrefix": "fox_defiant"
+      "webPlayable": true,
+      "pendingTranscode": false,
+      "assetPrefix": "fox_defiant",
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/07-fox-defiant/delivery/fox_defiant_alpha_vp9.webm",
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/07-fox-defiant/delivery/fox_defiant_alpha_hevc.mov",
+        "vp9Size": 779374,
+        "hevcSize": 2326318,
+        "vp9Sha256": "b964a54a0628d00ba5290eaaef9191fb9bcb84b83b354683922a3dc56c1321ff",
+        "hevcSha256": "b8837d1b9fc60379b7f1b350372b1ef21f6cafa04312359dec2415f524c71906",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      }
     },
     "fox-giveup": {
       "emotionId": "lowenergy",
@@ -226,10 +278,23 @@
       "sourceProtected": "fox_giveup_H_firstframe_v1.mp4",
       "previewProxy": "fox_giveup_birefnet_gray_preview_v1.mp4",
       "status": "approved/formal-master",
-      "webPlayable": false,
-      "pendingTranscode": true,
-      "transcodeNote": "透明 ProRes 4444 母版不可直接用于网页播放；需转码为支持 Alpha 的 WebM/HEVC 后上线（本轮不转码、不修改播放器）",
-      "assetPrefix": "fox_giveup"
+      "webPlayable": true,
+      "pendingTranscode": false,
+      "assetPrefix": "fox_giveup",
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/08-fox-giveup/delivery/fox_giveup_alpha_vp9.webm",
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/08-fox-giveup/delivery/fox_giveup_alpha_hevc.mov",
+        "vp9Size": 872442,
+        "hevcSize": 2274023,
+        "vp9Sha256": "ffb1228fa2697e8d1e59fa7cbd6af70d51c86bfec899b391fe68951cb7f5b3d2",
+        "hevcSha256": "ad59451f7c8cabc2f2c2f80ceb444230de58fdfe832cd9afb7ff69423dd84759",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      }
     },
     "fox-confused": {
       "emotionId": "confused",
@@ -241,10 +306,23 @@
       "sourceProtected": "fox_confused_H_firstframe_v1.mp4",
       "previewProxy": "fox_confused_birefnet_gray_preview_v1.mp4",
       "status": "approved/formal-master",
-      "webPlayable": false,
-      "pendingTranscode": true,
-      "transcodeNote": "透明 ProRes 4444 母版不可直接用于网页播放；需转码为支持 Alpha 的 WebM/HEVC 后上线（本轮不转码、不修改播放器）",
-      "assetPrefix": "fox_confused"
+      "webPlayable": true,
+      "pendingTranscode": false,
+      "assetPrefix": "fox_confused",
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/09-fox-confused/delivery/fox_confused_alpha_vp9.webm",
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/09-fox-confused/delivery/fox_confused_alpha_hevc.mov",
+        "vp9Size": 1001559,
+        "hevcSize": 2429835,
+        "vp9Sha256": "4829ce4988bb62363adbff7d1afab045b48cdd0df873ec437944643a4be31e8c",
+        "hevcSha256": "4ef93036f527baa5d47199f749e1ff67b3d3358ff2b72d147dbbf0d8ad22f740",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      }
     },
     "fox-disgusted": {
       "emotionId": "disgusted",
@@ -256,10 +334,23 @@
       "sourceProtected": "fox_disgusted_H_firstframe_v1.mp4",
       "previewProxy": "fox_disgusted_birefnet_gray_preview_v1.mp4",
       "status": "approved/formal-master",
-      "webPlayable": false,
-      "pendingTranscode": true,
-      "transcodeNote": "透明 ProRes 4444 母版不可直接用于网页播放；需转码为支持 Alpha 的 WebM/HEVC 后上线（本轮不转码、不修改播放器）",
-      "assetPrefix": "fox_disgusted"
+      "webPlayable": true,
+      "pendingTranscode": false,
+      "assetPrefix": "fox_disgusted",
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/10-fox-disgusted/delivery/fox_disgusted_alpha_vp9.webm",
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/10-fox-disgusted/delivery/fox_disgusted_alpha_hevc.mov",
+        "vp9Size": 858917,
+        "hevcSize": 2335644,
+        "vp9Sha256": "156445e70efe86e105d161b1c3145dfe6698d0dd33e638d2cfac51374620d975",
+        "hevcSha256": "821011f38eabd16e1b41f2e8d5e690dc51c4e105df7082ddc84d07f7d7e6314d",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      }
     },
     "fox-schadenfreude": {
       "emotionId": "gloating",
@@ -271,10 +362,23 @@
       "sourceProtected": "fox_schadenfreude_H_firstframe_v1.mp4",
       "previewProxy": "fox_schadenfreude_birefnet_gray_preview_v1.mp4",
       "status": "approved/formal-master",
-      "webPlayable": false,
-      "pendingTranscode": true,
-      "transcodeNote": "透明 ProRes 4444 母版不可直接用于网页播放；需转码为支持 Alpha 的 WebM/HEVC 后上线（本轮不转码、不修改播放器）",
-      "assetPrefix": "fox_schadenfreude"
+      "webPlayable": true,
+      "pendingTranscode": false,
+      "assetPrefix": "fox_schadenfreude",
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/11-fox-schadenfreude/delivery/fox_schadenfreude_alpha_vp9.webm",
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/11-fox-schadenfreude/delivery/fox_schadenfreude_alpha_hevc.mov",
+        "vp9Size": 1080819,
+        "hevcSize": 2397164,
+        "vp9Sha256": "18c5a70f943bef48bcda581c4db47ecde8902c466cdc743877442eb00e6988e7",
+        "hevcSha256": "966f54d1d434505b8634e869157a221583e19e80170e19c879656388fa4568a2",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      }
     },
     "fox-cool": {
       "emotionId": "cool",
@@ -286,10 +390,23 @@
       "sourceProtected": "fox_cool_H_firstframe_v1.mp4",
       "previewProxy": "fox_cool_birefnet_gray_preview_v1.mp4",
       "status": "approved/formal-master",
-      "webPlayable": false,
-      "pendingTranscode": true,
-      "transcodeNote": "透明 ProRes 4444 母版不可直接用于网页播放；需转码为支持 Alpha 的 WebM/HEVC 后上线（本轮不转码、不修改播放器）",
-      "assetPrefix": "fox_cool"
+      "webPlayable": true,
+      "pendingTranscode": false,
+      "assetPrefix": "fox_cool",
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/12-fox-cool/delivery/fox_cool_alpha_vp9.webm",
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/12-fox-cool/delivery/fox_cool_alpha_hevc.mov",
+        "vp9Size": 1185064,
+        "hevcSize": 2442223,
+        "vp9Sha256": "833ebd12d3bfca46b6ff6821c3e8fede897f1979794b1e8ae50102419f8183f7",
+        "hevcSha256": "5c3f7e97b0bf03b83e62dccf36c582e8e24a5afa2db6401a1afbb42692bb8d3c",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      }
     },
     "fox-jealous": {
       "emotionId": "jealous",
@@ -301,10 +418,23 @@
       "sourceProtected": "fox_jealous_H_firstframe_v1.mp4",
       "previewProxy": "fox_jealous_birefnet_gray_preview_v1.mp4",
       "status": "approved/formal-master",
-      "webPlayable": false,
-      "pendingTranscode": true,
-      "transcodeNote": "透明 ProRes 4444 母版不可直接用于网页播放；需转码为支持 Alpha 的 WebM/HEVC 后上线（本轮不转码、不修改播放器）",
-      "assetPrefix": "fox_jealous"
+      "webPlayable": true,
+      "pendingTranscode": false,
+      "assetPrefix": "fox_jealous",
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/13-fox-jealous/delivery/fox_jealous_alpha_vp9.webm",
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/13-fox-jealous/delivery/fox_jealous_alpha_hevc.mov",
+        "vp9Size": 910965,
+        "hevcSize": 2366774,
+        "vp9Sha256": "78aff62c9cc07aa8975e8b1644fcfe8ad1057f9ede014ae443cda64401bbc47f",
+        "hevcSha256": "55e2909be768cc417a0f5c737e909dfe238ba256beff3280278e25d336090025",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      }
     },
     "fox-guilty": {
       "emotionId": "guilty",
@@ -316,10 +446,23 @@
       "sourceProtected": "fox_guilty_H_firstframe_v1.mp4",
       "previewProxy": "fox_guilty_birefnet_gray_preview_v1.mp4",
       "status": "approved/formal-master",
-      "webPlayable": false,
-      "pendingTranscode": true,
-      "transcodeNote": "透明 ProRes 4444 母版不可直接用于网页播放；需转码为支持 Alpha 的 WebM/HEVC 后上线（本轮不转码、不修改播放器）",
-      "assetPrefix": "fox_guilty"
+      "webPlayable": true,
+      "pendingTranscode": false,
+      "assetPrefix": "fox_guilty",
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/14-fox-guilty/delivery/fox_guilty_alpha_vp9.webm",
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/14-fox-guilty/delivery/fox_guilty_alpha_hevc.mov",
+        "vp9Size": 931276,
+        "hevcSize": 2383534,
+        "vp9Sha256": "3f1ad308eaf6cc957661e288a1f8eb31d6437189b679f61edebcf4f27039a033",
+        "hevcSha256": "a2d065124f4257a8d451bd9b8801bad93b9887e95175c81557513195786a7069",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      }
     },
     "fox-white-hurt": {
       "emotionId": "wronged",
@@ -331,10 +474,23 @@
       "sourceProtected": "fox_white_hurt_sad_H_firstframe_sizecontrol_v1.mp4",
       "previewProxy": "fox_white_hurt_sad_birefnet_gray_preview_v1.mp4",
       "status": "approved/formal-master",
-      "webPlayable": false,
-      "pendingTranscode": true,
-      "transcodeNote": "透明 ProRes 4444 母版不可直接用于网页播放；需转码为支持 Alpha 的 WebM/HEVC 后上线（本轮不转码、不修改播放器）",
-      "assetPrefix": "fox_white_hurt_sad"
+      "webPlayable": true,
+      "pendingTranscode": false,
+      "assetPrefix": "fox_white_hurt_sad",
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/01-fox-white-hurt/delivery/fox_white_hurt_sad_alpha_vp9.webm",
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/01-fox-white-hurt/delivery/fox_white_hurt_sad_alpha_hevc.mov",
+        "vp9Size": 876119,
+        "hevcSize": 2376192,
+        "vp9Sha256": "9bf72a951df2dd0892f14362f3a73a64eccd84eef78c2671716c1506436cdbf1",
+        "hevcSha256": "7a5f2c7e176e2b5ea73366c303da9f913ff8751e9d39906b420a433ad09464f5",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      }
     },
     "fox-navy-angry": {
       "emotionId": "angry",
@@ -346,10 +502,23 @@
       "sourceProtected": "fox_navy_angry_H_firstframe_sizecontrol_v1.mp4",
       "previewProxy": "fox_navy_angry_birefnet_gray_preview_v1.mp4",
       "status": "approved/formal-master",
-      "webPlayable": false,
-      "pendingTranscode": true,
-      "transcodeNote": "透明 ProRes 4444 母版不可直接用于网页播放；需转码为支持 Alpha 的 WebM/HEVC 后上线（本轮不转码、不修改播放器）",
-      "assetPrefix": "fox_navy_angry"
+      "webPlayable": true,
+      "pendingTranscode": false,
+      "assetPrefix": "fox_navy_angry",
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/02-fox-navy-angry/delivery/fox_navy_angry_alpha_vp9.webm",
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/02-fox-navy-angry/delivery/fox_navy_angry_alpha_hevc.mov",
+        "vp9Size": 1139621,
+        "hevcSize": 2445400,
+        "vp9Sha256": "ece51656606218a8a5e53e3ffbe9685dfa6f256b4d8481dae67d38708c75abc4",
+        "hevcSha256": "343be36c23b55aad72de9978d3680fd705ff703f957a3604237446fbfd97d56d",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      }
     },
     "fox-pink-coquettish": {
       "emotionId": "sajiao",
@@ -361,10 +530,23 @@
       "sourceProtected": "fox_pink_coquettish_H_firstframe_v1.mp4",
       "previewProxy": "fox_pink_coquettish_birefnet_gray_preview_v1.mp4",
       "status": "approved/formal-master",
-      "webPlayable": false,
-      "pendingTranscode": true,
-      "transcodeNote": "透明 ProRes 4444 母版不可直接用于网页播放；需转码为支持 Alpha 的 WebM/HEVC 后上线（本轮不转码、不修改播放器）",
-      "assetPrefix": "fox_pink_coquettish"
+      "webPlayable": true,
+      "pendingTranscode": false,
+      "assetPrefix": "fox_pink_coquettish",
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/03-fox-pink-coquettish/delivery/fox_pink_coquettish_alpha_vp9.webm",
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/03-fox-pink-coquettish/delivery/fox_pink_coquettish_alpha_hevc.mov",
+        "vp9Size": 1167935,
+        "hevcSize": 2469016,
+        "vp9Sha256": "ef5677d95c9bcb5bc8e461bd0e2fb0e56f6ad8a627ce12119c0f5b056dfb2f4e",
+        "hevcSha256": "e822370e6295aec9be70ddcd31ba78e7aa8e627213bd5bcd3d1e7790c7a05652",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      }
     },
     "fox-black-playful": {
       "emotionId": "playful",
@@ -376,10 +558,23 @@
       "sourceProtected": "fox_black_playful_H_firstframe_v1.mp4",
       "previewProxy": "fox_black_playful_birefnet_gray_preview_v1.mp4",
       "status": "approved/formal-master",
-      "webPlayable": false,
-      "pendingTranscode": true,
-      "transcodeNote": "透明 ProRes 4444 母版不可直接用于网页播放；需转码为支持 Alpha 的 WebM/HEVC 后上线（本轮不转码、不修改播放器）",
-      "assetPrefix": "fox_black_playful"
+      "webPlayable": true,
+      "pendingTranscode": false,
+      "assetPrefix": "fox_black_playful",
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/04-fox-black-playful/delivery/fox_black_playful_alpha_vp9.webm",
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/04-fox-black-playful/delivery/fox_black_playful_alpha_hevc.mov",
+        "vp9Size": 920502,
+        "hevcSize": 2353822,
+        "vp9Sha256": "d724278b8c2742ff6db0e3013453d27d7ecaa33f55ca46bbc930f9e8d1ac20c5",
+        "hevcSha256": "6a1a7bc395b22596c8c3a43b8455f5c66db8f524c3f24a9e268bb49c55aabff6",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      }
     },
     "fox-red-happy": {
       "emotionId": "happy",
@@ -391,10 +586,23 @@
       "sourceProtected": "fox_red_happy_H_firstframe_v1.mp4",
       "previewProxy": "fox_red_happy_birefnet_gray_preview_v1.mp4",
       "status": "approved/formal-master",
-      "webPlayable": false,
-      "pendingTranscode": true,
-      "transcodeNote": "透明 ProRes 4444 母版不可直接用于网页播放；需转码为支持 Alpha 的 WebM/HEVC 后上线（本轮不转码、不修改播放器）",
-      "assetPrefix": "fox_red_happy"
+      "webPlayable": true,
+      "pendingTranscode": false,
+      "assetPrefix": "fox_red_happy",
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/05-fox-red-happy/delivery/fox_red_happy_alpha_vp9.webm",
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/05-fox-red-happy/delivery/fox_red_happy_alpha_hevc.mov",
+        "vp9Size": 1223878,
+        "hevcSize": 2489164,
+        "vp9Sha256": "43e81e9f07ee5c004f110ee09ecf835408b1eb7186e8c1898347f3fd017ec8f7",
+        "hevcSha256": "5f6f8536cf37f58375ea1107f2aa9821a18ec037f08125d7f416b0feb9c9dd7c",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      }
     },
     "fox-teal-surprised": {
       "emotionId": "surprised",
@@ -406,10 +614,23 @@
       "sourceProtected": "fox_teal_surprised_H_firstframe_v1.mp4",
       "previewProxy": "fox_teal_surprised_birefnet_gray_preview_v1.mp4",
       "status": "approved/formal-master",
-      "webPlayable": false,
-      "pendingTranscode": true,
-      "transcodeNote": "透明 ProRes 4444 母版不可直接用于网页播放；需转码为支持 Alpha 的 WebM/HEVC 后上线（本轮不转码、不修改播放器）",
-      "assetPrefix": "fox_teal_surprised"
+      "webPlayable": true,
+      "pendingTranscode": false,
+      "assetPrefix": "fox_teal_surprised",
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/06-fox-teal-surprised/delivery/fox_teal_surprised_alpha_vp9.webm",
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/06-fox-teal-surprised/delivery/fox_teal_surprised_alpha_hevc.mov",
+        "vp9Size": 1176623,
+        "hevcSize": 2465700,
+        "vp9Sha256": "54cad45544ec7d2674d289b52832968671304383f1d72a043c33d003ae8cf52c",
+        "hevcSha256": "339ffd8380663ac8c5498115d0f9102498bea54bf08202c1c08128f00062ccd5",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      }
     },
     "fox-pleading": {
       "emotionId": "apologetic",
@@ -421,10 +642,23 @@
       "sourceProtected": "fox_pleading_H_firstframe_v2.mp4",
       "previewProxy": "fox_pleading_birefnet_gray_preview_v1.mp4",
       "status": "approved/formal-master",
-      "webPlayable": false,
-      "pendingTranscode": true,
-      "transcodeNote": "透明 ProRes 4444 母版不可直接用于网页播放；需转码为支持 Alpha 的 WebM/HEVC 后上线（本轮不转码、不修改播放器）",
-      "assetPrefix": "fox_pleading"
+      "webPlayable": true,
+      "pendingTranscode": false,
+      "assetPrefix": "fox_pleading",
+      "delivery": {
+        "vp9": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/15-fox-pleading/delivery/fox_pleading_alpha_vp9.webm",
+        "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/15-fox-pleading/delivery/fox_pleading_alpha_hevc.mov",
+        "vp9Size": 982609,
+        "hevcSize": 2389971,
+        "vp9Sha256": "b3cd845bb6c692b08b490c40d3ee235d6f9cbf9cc189b2c23ab4cc7ef55ad5e5",
+        "hevcSha256": "da00d4e1f9c7c417507ade99cd558904d56c3e5b8b55bfeaac8e62ac64abd0bb",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true
+      }
     }
   }
 }
