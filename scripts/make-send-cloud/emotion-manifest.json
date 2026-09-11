@@ -28,14 +28,14 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/01-rabbit-happy/mobile/rabbit_01_happy_mobile_black_v1.mp4",
+        "mobileFallbackSize": 908874,
+        "mobileFallbackSha256": "8965b41ea45d0fa80a16497476600991f74b3675fd4725df77e7f5d287c51de5",
+        "mobileFallbackType": "video/mp4"
       },
       "webPlayable": true,
-      "pendingTranscode": false,
-      "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/01-rabbit-happy/mobile/rabbit_01_happy_mobile_black_v1.mp4",
-      "mobileFallbackSize": 908874,
-      "mobileFallbackSha256": "8965b41ea45d0fa80a16497476600991f74b3675fd4725df77e7f5d287c51de5",
-      "mobileFallbackType": "video/mp4"
+      "pendingTranscode": false
     },
     "rabbit-aggrieved": {
       "emotionId": "wronged",
@@ -76,14 +76,14 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/03-rabbit-angry/mobile/rabbit_03_angry_mobile_black_v1.mp4",
+        "mobileFallbackSize": 489684,
+        "mobileFallbackSha256": "1f8237b750dcbc38f8c5b23ae929309ae57f2f48a65247a81f0ae80f08ec3190",
+        "mobileFallbackType": "video/mp4"
       },
       "webPlayable": true,
-      "pendingTranscode": false,
-      "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/03-rabbit-angry/mobile/rabbit_03_angry_mobile_black_v1.mp4",
-      "mobileFallbackSize": 489684,
-      "mobileFallbackSha256": "1f8237b750dcbc38f8c5b23ae929309ae57f2f48a65247a81f0ae80f08ec3190",
-      "mobileFallbackType": "video/mp4"
+      "pendingTranscode": false
     },
     "rabbit-playful": {
       "emotionId": "playful",
@@ -109,14 +109,14 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/05-rabbit-playful/mobile/rabbit_05_playful_mobile_black_v1.mp4",
+        "mobileFallbackSize": 582272,
+        "mobileFallbackSha256": "b2635e044a3e6fdb78973fbb2cf372291b23582b13b6e28ba556fea9ff348757",
+        "mobileFallbackType": "video/mp4"
       },
       "webPlayable": true,
-      "pendingTranscode": false,
-      "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/05-rabbit-playful/mobile/rabbit_05_playful_mobile_black_v1.mp4",
-      "mobileFallbackSize": 582272,
-      "mobileFallbackSha256": "b2635e044a3e6fdb78973fbb2cf372291b23582b13b6e28ba556fea9ff348757",
-      "mobileFallbackType": "video/mp4"
+      "pendingTranscode": false
     },
     "rabbit-sajiao": {
       "emotionId": "sajiao",
@@ -155,14 +155,14 @@
         "alpha": true,
         "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/06-rabbit-jealous/delivery/rabbit_06_jealous_alpha_hevc.mov",
         "hevcSize": 2356964,
-        "hevcSha256": "3d8daf139232b2d438a6840f7b5897a5cd719c189b3ffef78a4ce16ccf74e39a"
+        "hevcSha256": "3d8daf139232b2d438a6840f7b5897a5cd719c189b3ffef78a4ce16ccf74e39a",
+        "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/06-rabbit-jealous/mobile/rabbit_06_jealous_mobile_black_v1.mp4",
+        "mobileFallbackSize": 587946,
+        "mobileFallbackSha256": "33aa2115ba323e23523ac6ccf4c649c73df0e596bcd719bb839ff2354db67035",
+        "mobileFallbackType": "video/mp4"
       },
       "webPlayable": true,
-      "pendingTranscode": false,
-      "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/06-rabbit-jealous/mobile/rabbit_06_jealous_mobile_black_v1.mp4",
-      "mobileFallbackSize": 587946,
-      "mobileFallbackSha256": "33aa2115ba323e23523ac6ccf4c649c73df0e596bcd719bb839ff2354db67035",
-      "mobileFallbackType": "video/mp4"
+      "pendingTranscode": false
     },
     "rabbit-stubborn": {
       "emotionId": "stubborn",
@@ -188,14 +188,14 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/07-rabbit-stubborn/mobile/rabbit_07_stubborn_mobile_black_v1.mp4",
+        "mobileFallbackSize": 574170,
+        "mobileFallbackSha256": "5e23368eed9492a6c5bcb0e06662da8091633221c3f4d73eec98d65c2e87e9d4",
+        "mobileFallbackType": "video/mp4"
       },
       "webPlayable": true,
-      "pendingTranscode": false,
-      "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/07-rabbit-stubborn/mobile/rabbit_07_stubborn_mobile_black_v1.mp4",
-      "mobileFallbackSize": 574170,
-      "mobileFallbackSha256": "5e23368eed9492a6c5bcb0e06662da8091633221c3f4d73eec98d65c2e87e9d4",
-      "mobileFallbackType": "video/mp4"
+      "pendingTranscode": false
     },
     "rabbit-surprise": {
       "emotionId": "surprised",
@@ -221,14 +221,14 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/08-rabbit-surprise/mobile/rabbit_08_surprise_mobile_black_v1.mp4",
+        "mobileFallbackSize": 629412,
+        "mobileFallbackSha256": "f7cb0340a38149adbfc0d0abd898260ace3e7bac5999f29f042f1f80733bd3d5",
+        "mobileFallbackType": "video/mp4"
       },
       "webPlayable": true,
-      "pendingTranscode": false,
-      "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/08-rabbit-surprise/mobile/rabbit_08_surprise_mobile_black_v1.mp4",
-      "mobileFallbackSize": 629412,
-      "mobileFallbackSha256": "f7cb0340a38149adbfc0d0abd898260ace3e7bac5999f29f042f1f80733bd3d5",
-      "mobileFallbackType": "video/mp4"
+      "pendingTranscode": false
     },
     "rabbit-confused": {
       "emotionId": "confused",
@@ -254,14 +254,14 @@
         "alpha": true,
         "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/09-rabbit-confused/delivery/rabbit_09_confused_alpha_hevc.mov",
         "hevcSize": 2409496,
-        "hevcSha256": "b15e997aa3f4ae46a8b9632934f593113f38d8ea6fe9049177ac024a5ad53b63"
+        "hevcSha256": "b15e997aa3f4ae46a8b9632934f593113f38d8ea6fe9049177ac024a5ad53b63",
+        "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/09-rabbit-confused/mobile/rabbit_09_confused_mobile_black_v1.mp4",
+        "mobileFallbackSize": 635930,
+        "mobileFallbackSha256": "2cf56ebaf7058e7c252ab8aa5838397a364a1355f9bc103f6b3159819e59bb7c",
+        "mobileFallbackType": "video/mp4"
       },
       "webPlayable": true,
-      "pendingTranscode": false,
-      "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/09-rabbit-confused/mobile/rabbit_09_confused_mobile_black_v1.mp4",
-      "mobileFallbackSize": 635930,
-      "mobileFallbackSha256": "2cf56ebaf7058e7c252ab8aa5838397a364a1355f9bc103f6b3159819e59bb7c",
-      "mobileFallbackType": "video/mp4"
+      "pendingTranscode": false
     },
     "rabbit-disgust": {
       "emotionId": "disgusted",
@@ -287,14 +287,14 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/10-rabbit-disgust/mobile/rabbit_10_disgust_mobile_black_v1.mp4",
+        "mobileFallbackSize": 482260,
+        "mobileFallbackSha256": "7a6b1e20e2f4704e60eb2188bd6ebd1ffdd8f6b3cb2853fbfdc86ba81309d793",
+        "mobileFallbackType": "video/mp4"
       },
       "webPlayable": true,
-      "pendingTranscode": false,
-      "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/10-rabbit-disgust/mobile/rabbit_10_disgust_mobile_black_v1.mp4",
-      "mobileFallbackSize": 482260,
-      "mobileFallbackSha256": "7a6b1e20e2f4704e60eb2188bd6ebd1ffdd8f6b3cb2853fbfdc86ba81309d793",
-      "mobileFallbackType": "video/mp4"
+      "pendingTranscode": false
     },
     "rabbit-guilty": {
       "emotionId": "guilty",
@@ -333,14 +333,14 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/12-rabbit-apology/mobile/rabbit_12_apology_mobile_black_v1.mp4",
+        "mobileFallbackSize": 681715,
+        "mobileFallbackSha256": "09e0e48ec0bf8bd0d8a1064c34912b3c9ded18a6519123be6e4832ea35a613cd",
+        "mobileFallbackType": "video/mp4"
       },
       "webPlayable": true,
-      "pendingTranscode": false,
-      "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/12-rabbit-apology/mobile/rabbit_12_apology_mobile_black_v1.mp4",
-      "mobileFallbackSize": 681715,
-      "mobileFallbackSha256": "09e0e48ec0bf8bd0d8a1064c34912b3c9ded18a6519123be6e4832ea35a613cd",
-      "mobileFallbackType": "video/mp4"
+      "pendingTranscode": false
     },
     "rabbit-lowenergy": {
       "emotionId": "lowenergy",
@@ -379,14 +379,14 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/14-rabbit-cool/mobile/rabbit_14_cool_mobile_black_v1.mp4",
+        "mobileFallbackSize": 608164,
+        "mobileFallbackSha256": "c562c8a75327952bb446adc2503a79ec32021e9f6cafa54eb2309da68b80a58a",
+        "mobileFallbackType": "video/mp4"
       },
       "webPlayable": true,
-      "pendingTranscode": false,
-      "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/14-rabbit-cool/mobile/rabbit_14_cool_mobile_black_v1.mp4",
-      "mobileFallbackSize": 608164,
-      "mobileFallbackSha256": "c562c8a75327952bb446adc2503a79ec32021e9f6cafa54eb2309da68b80a58a",
-      "mobileFallbackType": "video/mp4"
+      "pendingTranscode": false
     },
     "rabbit-gloat": {
       "emotionId": "gloating",
@@ -412,14 +412,14 @@
         "alpha": true,
         "hevc": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/15-rabbit-gloat/delivery/rabbit_15_gloat_alpha_hevc.mov",
         "hevcSize": 2479626,
-        "hevcSha256": "5c379a4483962d72c9ec49a127d8df700439a29171a8e7cb9ca93ea166d48bd0"
+        "hevcSha256": "5c379a4483962d72c9ec49a127d8df700439a29171a8e7cb9ca93ea166d48bd0",
+        "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/15-rabbit-gloat/mobile/rabbit_15_gloat_mobile_black_v1.mp4",
+        "mobileFallbackSize": 786399,
+        "mobileFallbackSha256": "011f422b51ede28211de49cc09804fe574576994c213f0789baa78f1bf828edc",
+        "mobileFallbackType": "video/mp4"
       },
       "webPlayable": true,
-      "pendingTranscode": false,
-      "mobileFallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/15-rabbit-gloat/mobile/rabbit_15_gloat_mobile_black_v1.mp4",
-      "mobileFallbackSize": 786399,
-      "mobileFallbackSha256": "011f422b51ede28211de49cc09804fe574576994c213f0789baa78f1bf828edc",
-      "mobileFallbackType": "video/mp4"
+      "pendingTranscode": false
     },
     "fox-defiant": {
       "emotionId": "defiant",
