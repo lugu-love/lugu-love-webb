@@ -14,7 +14,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY server.py tts_provider.py text_layout.py journey_store.py ./
+COPY server.py tts_provider.py text_layout.py journey_store.py emotion-manifest.json ./
 COPY template/ template/
 
 # 素材（masters/*.mp4、poc/sample.mp4）体积较大，改为构建时从正式远端
@@ -29,16 +29,15 @@ RUN mkdir -p masters poc && \
              rabbit-lowenergy.mp4 rabbit-cool.mp4 rabbit-gloat.mp4; do \
       curl -fsSL -o "masters/$f" "https://raw.githubusercontent.com/lugu-love/lugu-love-webb/${MASTERS_REF}/scripts/make-send-cloud/masters/$f" || exit 1; \
     done && \
+    curl -fsSL -o "masters/fox_white_hurt_sad_alpha_vp9.webm" "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/01-fox-white-hurt/delivery/fox_white_hurt_sad_alpha_vp9.webm" || exit 1; \
+    curl -fsSL -o "masters/fox_navy_angry_alpha_vp9.webm" "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/02-fox-navy-angry/delivery/fox_navy_angry_alpha_vp9.webm" || exit 1; \
+    curl -fsSL -o "masters/fox_pink_coquettish_alpha_vp9.webm" "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/03-fox-pink-coquettish/delivery/fox_pink_coquettish_alpha_vp9.webm" || exit 1; \
+    curl -fsSL -o "masters/fox_black_playful_alpha_vp9.webm" "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/04-fox-black-playful/delivery/fox_black_playful_alpha_vp9.webm" || exit 1; \
+    curl -fsSL -o "masters/fox_red_happy_alpha_vp9.webm" "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/05-fox-red-happy/delivery/fox_red_happy_alpha_vp9.webm" || exit 1; \
+    curl -fsSL -o "masters/fox_teal_surprised_alpha_vp9.webm" "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/06-fox-teal-surprised/delivery/fox_teal_surprised_alpha_vp9.webm" || exit 1; \
+    curl -fsSL -o "masters/fox_defiant_alpha_vp9.webm" "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/07-fox-defiant/delivery/fox_defiant_alpha_vp9.webm" || exit 1; \
+    curl -fsSL -o "masters/fox_giveup_alpha_vp9.webm" "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/08-fox-giveup/delivery/fox_giveup_alpha_vp9.webm" || exit 1; \
     curl -fsSL -o "poc/sample.mp4" "https://raw.githubusercontent.com/lugu-love/lugu-love-webb/${MASTERS_REF}/scripts/make-send-cloud/poc/sample.mp4" || exit 1
-
-# 狐狸生成母版与 web delivery 完全分离：只复制独立 generation-masters。
-COPY generation-masters/ generation-masters/
-
-# 唯一生产资产契约由前端不可变 Release 固定 SHA 拉取。
-ARG RELEASE_MANIFEST_URL=https://raw.githubusercontent.com/lugu-love/lugu-love-webb/1ffa1c0befdb608cd09e41ea6ad3d3bde4c472a9/dist/release-20260912-01/asset-manifest.json
-ARG RELEASE_MANIFEST_SHA256=7289c06ad26ae8d5dad33f68209dd090330a7009b9f693ac847a62983a998411
-RUN curl -fsSL "$RELEASE_MANIFEST_URL" -o asset-manifest.json && \
-    echo "$RELEASE_MANIFEST_SHA256  asset-manifest.json" | sha256sum -c -
 
 ENV PORT=8000 \
     FONT_FILE=/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc \
@@ -48,7 +47,6 @@ ENV PORT=8000 \
     FFMPEG_THREADS=2 \
     TTS_PROVIDER=edge-tts \
     SERVICE_ENABLED=true \
-    GENERATION_MASTERS_DIR=/app/generation-masters \
     SITE_STATE_FILE=/data/site_state.json \
     FPS=24 \
     BITRATE_KBPS=6000 \
