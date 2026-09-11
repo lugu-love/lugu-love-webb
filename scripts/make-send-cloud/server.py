@@ -31,49 +31,86 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 MASTERS_DIR = os.path.join(ROOT, "masters")
-MANIFEST_FILE = os.path.join(ROOT, "emotion-manifest.json")
+GENERATION_MASTERS_DIR = os.environ.get("GENERATION_MASTERS_DIR", MASTERS_DIR)
+ASSET_MANIFEST_FILE = os.environ.get("ASSET_MANIFEST_FILE", os.path.join(ROOT, "asset-manifest.json"))
 POC_SAMPLE_FILE = os.path.join(ROOT, "poc", "sample.mp4")
 FFMPEG = os.environ.get("FFMPEG_BIN", "ffmpeg")
 FONT_FILE = os.environ.get("FONT_FILE", "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc")
 FONT_INDEX = int(os.environ.get("FONT_INDEX", "2"))
 FONT_FC = os.environ.get("FONT_FC", "Noto Sans CJK SC")
 
-# 兜底映射：仅当 emotion-manifest.json 缺失/损坏时使用。
-_FALLBACK_MASTERS = {
-    "rabbit-happy":     ("happy-master-v2.mp4", "开心"),
-    "rabbit-aggrieved": ("wronged-master-v2.mp4", "委屈"),
-    "rabbit-angry":     ("angry-master-v2.mp4", "生气"),
-    "rabbit-playful":   ("playful-master-v2.mp4", "调皮"),
-}
-_FALLBACK_JOURNEY_META = {
-    "rabbit-happy":     ("fengxin-rabbit", "happy"),
-    "rabbit-aggrieved": ("fengxin-rabbit", "wronged"),
-    "rabbit-angry":     ("fengxin-rabbit", "angry"),
-    "rabbit-playful":   ("fengxin-rabbit", "playful"),
-}
+
+def _load_asset_manifest():
+    """Load the one production asset manifest. There is no runtime fallback."""
+    with open(ASSET_MANIFEST_FILE, "r", encoding="utf-8") as f:
+        manifest = json.load(f)
+    if manifest.get("schemaVersion") != 2:
+        raise RuntimeError("unsupported asset manifest schema")
+    release_id = manifest.get("releaseId")
+    build_id = manifest.get("buildId")
+    manifest_version = manifest.get("manifestVersion")
+    items = manifest.get("items") or {}
+    characters = ((manifest.get("production") or {}).get("characters") or [])
+    expected = {"fengxin-rabbit": 11, "xinguang-fox": 8}
+    seen = {}
+    for character in characters:
+        cid = character.get("characterId")
+        order = character.get("itemOrder") or []
+        if cid not in expected or len(order) != expected[cid]:
+            raise RuntimeError("invalid production character order")
+        seen[cid] = set(order)
+    if set(seen) != set(expected) or len(items) != sum(expected.values()):
+        raise RuntimeError("invalid production item count")
+    for item_id, item in items.items():
+        if item.get("itemId") != item_id or item.get("status") != "production":
+            raise RuntimeError("invalid item identity: %s" % item_id)
+        cid = item.get("characterId")
+        if cid not in seen or item_id not in seen[cid]:
+            raise RuntimeError("item is outside production order: %s" % item_id)
+        master = item.get("generationMaster") or {}
+        if not master.get("ref") or not master.get("sha256"):
+            raise RuntimeError("missing generation master: %s" % item_id)
+        for key in ("webVp9", "webHevc", "mobileFallback"):
+            delivery = item.get(key) or {}
+            if not delivery.get("url") or not delivery.get("sha256") or not delivery.get("size"):
+                raise RuntimeError("missing %s delivery: %s" % (key, item_id))
+    return manifest
 
 
-def _load_emotion_manifest():
-    """读取统一映射 emotion-manifest.json；失败返回 {}，交由兜底逻辑处理。"""
-    try:
-        with open(MANIFEST_FILE, "r", encoding="utf-8") as f:
-            return json.load(f).get("emotions") or {}
-    except Exception:
-        return {}
-
-
-_emotions = _load_emotion_manifest()
+ASSET_MANIFEST = _load_asset_manifest()
+RELEASE_ID = ASSET_MANIFEST["releaseId"]
+BUILD_ID = ASSET_MANIFEST["buildId"]
+MANIFEST_VERSION = ASSET_MANIFEST["manifestVersion"]
+_emotions = ASSET_MANIFEST["items"]
 MASTERS = {}
 JOURNEY_META = {}
 for _item_id, _e in _emotions.items():
-    _master = _e.get("renderMaster")
-    if _master:
-        MASTERS[_item_id] = (_master, _e.get("label", _item_id))
-    JOURNEY_META[_item_id] = (_e.get("characterId", "fengxin-rabbit"), _e.get("emotionId", _item_id))
-if not MASTERS:
-    MASTERS = dict(_FALLBACK_MASTERS)
-if not JOURNEY_META:
-    JOURNEY_META = dict(_FALLBACK_JOURNEY_META)
+    _master = (_e.get("generationMaster") or {}).get("ref")
+    if not _master:
+        raise RuntimeError("missing generation master: %s" % _item_id)
+    MASTERS[_item_id] = (_master, _e.get("label", _item_id))
+    JOURNEY_META[_item_id] = (_e.get("characterId", ""), _e.get("emotionId", _item_id))
+
+
+def _contract_error(item, requested_character, build_id, manifest_version):
+    if build_id != BUILD_ID or manifest_version != MANIFEST_VERSION:
+        return 409, {
+            "error": "VERSION_MISMATCH",
+            "message": "页面版本与生成服务不一致，请刷新页面后重试。",
+            "buildId": BUILD_ID,
+            "manifestVersion": MANIFEST_VERSION,
+        }
+    if item not in _emotions:
+        return 404, {"error": "item not found", "item": item}
+    actual_character = _emotions[item].get("characterId")
+    if not requested_character or requested_character != actual_character:
+        return 409, {
+            "error": "CHARACTER_MISMATCH",
+            "message": "角色与情绪映射不一致，请刷新页面后重试。",
+            "itemId": item,
+            "characterId": actual_character,
+        }
+    return None
 
 # 七星使者 · 测试声音池（ElevenLabs premade，voice_id 为稳定引用）
 VOICE_LIBRARY = {
@@ -164,7 +201,7 @@ ANDROID_DEBUG_CERT_SHA256 = os.environ.get(
     "3E:0B:BE:A2:D5:2C:BD:05:7E:84:FB:2D:E6:11:F9:6A:B5:AC:96:57:10:98:2E:A0:50:3F:AA:87:56:F1:2A:F7",
 )
 
-# JOURNEY_META 已由 emotion-manifest.json 统一派生（见上方 _load_emotion_manifest）。
+# JOURNEY_META 由唯一 asset-manifest.json 派生。
 APP_VIDEO_DIR = os.environ.get("APP_VIDEO_DIR", "/tmp/app-video-cache")
 TTS_CACHE_DIR = os.environ.get("TTS_CACHE_DIR", "/tmp/tts-cache")
 TTS_CACHE_TTL = int(os.environ.get("TTS_CACHE_TTL", "600"))
@@ -442,11 +479,13 @@ _jobs = {}
 _jobs_lock = threading.Lock()
 
 
-def _run_job_async(job_id, text, item, voice_id, tts_audio_path=None):
+def _run_job_async(job_id, text, item, voice_id, tts_audio_path=None, requested_character="", build_id="", manifest_version=""):
     workdir = None
     try:
         workdir = tempfile.mkdtemp(prefix="make-send-")
-        final, meta = generate(item, text, workdir, voice_id=voice_id, speech_text=None, tts_audio_path=tts_audio_path)
+        final, meta = generate(item, text, workdir, voice_id=voice_id, speech_text=None, tts_audio_path=tts_audio_path,
+                               requested_item=item, requested_character=requested_character,
+                               build_id=build_id, manifest_version=manifest_version)
         with open(final, "rb") as f:
             data = f.read()
         token = store_app_video(data)
@@ -644,6 +683,8 @@ def _v1_bottom_png(label, path):
 
 def _v1_compose(item, text, master, tts_path, final, final_duration, speech_start, master_dur, workdir):
     emo=_emotions.get(item) or {}
+    backend = emo.get("backend") or {}
+    emo = {**emo, **backend}
     un=emo.get("unionSource") or [0,0,719,1280]
     x0,y0,x1,y1=un
     s=V1_TARGET_H/(y1-y0)
@@ -682,17 +723,40 @@ def _v1_compose(item, text, master, tts_path, final, final_duration, speech_star
         raise RuntimeError("v1 ffmpeg rc=%d %s"%(r.returncode, r.stderr[-2500:]))
     return fsize, nlines
 
-def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts_audio_path=None):
-    master_rel, _emotion = MASTERS[item]
-    master = os.path.join(MASTERS_DIR, master_rel)
+def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts_audio_path=None,
+             requested_item=None, requested_character=None, build_id=None, manifest_version=None):
+    actual_item = item
+    actual_entry = _emotions.get(actual_item)
+    if not actual_entry or actual_item not in MASTERS:
+        raise RuntimeError("item not found")
+    actual_character = actual_entry.get("characterId")
+    if build_id and build_id != BUILD_ID:
+        raise RuntimeError("build id mismatch")
+    if manifest_version and manifest_version != MANIFEST_VERSION:
+        raise RuntimeError("manifest version mismatch")
+    if requested_item and requested_item != actual_item:
+        raise RuntimeError("requested item mismatch")
+    if requested_character and requested_character != actual_character:
+        raise RuntimeError("requested character mismatch")
+    master_rel, _emotion = MASTERS[actual_item]
+    master_root = GENERATION_MASTERS_DIR if actual_item.startswith("fox-") else MASTERS_DIR
+    master = os.path.join(master_root, master_rel)
     final = os.path.join(workdir, "final.mp4")
     tts_path = os.path.join(workdir, "tts.mp3")
-    meta = {}
+    meta = {
+        "requestedItem": requested_item or actual_item,
+        "actualItem": actual_item,
+        "requestedCharacter": requested_character or actual_character,
+        "actualCharacter": actual_character,
+        "releaseId": RELEASE_ID,
+        "buildId": BUILD_ID,
+        "manifestVersion": MANIFEST_VERSION,
+    }
     # 发声时机：speechStart（秒）= 该条视频里角色完成初步情绪建立、最适合开口的时间。
     # 不同情绪/不同动作可不同；最低门槛 1.2s，负值/非法按 0 处理（不早于视频开头）。
     speech_start = 0.0
     try:
-        speech_start = float((_emotions.get(item) or {}).get("speechStart") or 0.0)
+        speech_start = float((_emotions.get(actual_item) or {}).get("backend", {}).get("speechStart") or 0.0)
     except Exception:
         speech_start = 0.0
     if speech_start < 0:
@@ -1032,7 +1096,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
         if path == "/status":
-            return self._send_json(200, {"enabled": read_enabled(), "fox_masters": sum(1 for k in MASTERS if k.startswith("fox-")), "fps": FPS, "bitrate_kbps": BITRATE_KBPS})
+            return self._send_json(200, {"enabled": read_enabled(), "releaseId": RELEASE_ID, "buildId": BUILD_ID, "manifestVersion": MANIFEST_VERSION, "rabbitMasters": sum(1 for k in MASTERS if k.startswith("rabbit-")), "foxMasters": sum(1 for k in MASTERS if k.startswith("fox-")), "productionItems": len(MASTERS), "fps": FPS, "bitrate_kbps": BITRATE_KBPS})
         if path == "/welcome":
             return self._welcome_public()
         if path == "/.well-known/assetlinks.json":
@@ -1097,9 +1161,19 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             speech_text = (qs.get("speechText") or qs.get("speech_text") or [""])[0] or None
             tts_token = (qs.get("ttsToken") or [""])[0] or None
             return self._serve(
-                qs.get("text", [""])[0], qs.get("item", ["rabbit-happy"])[0], app_bridge,
-                journey_v1, qs.get("remix_token", [""])[0], qs.get("source_channel", ["h5"])[0],
-                voice_id, speech_text, async_mode, tts_token,
+                text=qs.get("text", [""])[0],
+                item=(qs.get("item") or [""])[0],
+                app_bridge=app_bridge,
+                journey_v1=journey_v1,
+                remix_token=(qs.get("remix_token") or [""])[0],
+                source_channel=(qs.get("source_channel") or ["h5"])[0],
+                voice_id=voice_id,
+                speech_text=speech_text,
+                async_mode=async_mode,
+                tts_token=tts_token,
+                requested_character=(qs.get("characterId") or [""])[0],
+                build_id=(qs.get("buildId") or [""])[0],
+                manifest_version=(qs.get("manifestVersion") or [""])[0],
             )
         return self._not_found()
 
@@ -1146,10 +1220,19 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             speech_text = data.get("speechText") or data.get("speech_text") or None
             tts_token = data.get("ttsToken") or None
             return self._serve(
-                data.get("text", "") or "", data.get("item", "rabbit-happy") or "rabbit-happy",
-                bool(data.get("app_bridge")), bool(data.get("journey_v1")),
-                data.get("remix_token", "") or "", data.get("source_channel", "h5") or "h5",
-                voice_id, speech_text, bool(data.get("async")), tts_token,
+                text=data.get("text", "") or "",
+                item=data.get("item", "") or "",
+                app_bridge=bool(data.get("app_bridge")),
+                journey_v1=bool(data.get("journey_v1")),
+                remix_token=data.get("remix_token", "") or "",
+                source_channel=data.get("source_channel", "h5") or "h5",
+                voice_id=voice_id,
+                speech_text=speech_text,
+                async_mode=bool(data.get("async")),
+                tts_token=tts_token,
+                requested_character=data.get("characterId", "") or "",
+                build_id=data.get("buildId", "") or "",
+                manifest_version=data.get("manifestVersion", "") or "",
             )
         return self._not_found()
 
@@ -1186,13 +1269,14 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         log("ADMIN-TOGGLE enabled=%s" % enabled)
         return self._send_json(200, {"enabled": enabled})
 
-    def _serve(self, text, item, app_bridge=False, journey_v1=False, remix_token="", source_channel="h5", voice_id=None, speech_text=None, async_mode=False, tts_token=None):
+    def _serve(self, text, item, app_bridge=False, journey_v1=False, remix_token="", source_channel="h5", voice_id=None, speech_text=None, async_mode=False, tts_token=None, requested_character="", build_id="", manifest_version=""):
+        contract_error = _contract_error(item, requested_character, build_id, manifest_version)
+        if contract_error:
+            return self._send_json(contract_error[0], contract_error[1])
         if not read_enabled():
             return self._send_json(503, {"error": "service temporarily unavailable"})
         start = time.time()
         text = (text or DEFAULT_TEXT).strip()
-        if item not in MASTERS:
-            return self._send_json(404, {"error": "item not found", "item": item})
         if len(text) > TEXT_MAX:
             return self._send_json(400, {"error": "TEXT_TOO_LONG", "message": "这段内容较长，当前最多支持 %d 字，请适当精简后重试。" % TEXT_MAX})
         if has_unsupported(text):
@@ -1213,13 +1297,17 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
                 for jid in [j for j, r in list(_jobs.items()) if now - r.get("t0", 0) > 900]:
                     _jobs.pop(jid, None)
                 _jobs[job_id] = {"status": "pending", "t0": now, "text_len": len(text)}
-            threading.Thread(target=_run_job_async, args=(job_id, text, item, voice_id, tts_audio_path), daemon=True).start()
+            threading.Thread(target=_run_job_async, args=(job_id, text, item, voice_id, tts_audio_path, requested_character, build_id, manifest_version), daemon=True).start()
             return self._send_json(202, {"job": job_id, "status": "pending"})
 
         workdir = None
         try:
             workdir = tempfile.mkdtemp(prefix="make-send-")
-            final, meta = generate(item, text, workdir, voice_id=voice_id, speech_text=speech_text, tts_audio_path=tts_audio_path)
+            final, meta = generate(item, text, workdir, voice_id=voice_id, speech_text=speech_text, tts_audio_path=tts_audio_path,
+                                   requested_item=item, requested_character=requested_character,
+                                   build_id=build_id, manifest_version=manifest_version)
+            if meta.get("requestedItem") != meta.get("actualItem") or meta.get("requestedCharacter") != meta.get("actualCharacter"):
+                raise RuntimeError("requested/actual identity mismatch")
             with open(final, "rb") as f:
                 data = f.read()
             journey_record = None
@@ -1243,6 +1331,9 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             self.send_header("Content-Length", str(len(data)))
             self.send_header("Content-Disposition", 'attachment; filename="%s.mp4"' % item)
             self.send_header("Cache-Control", "no-store")
+            self.send_header("X-Release-Id", RELEASE_ID)
+            self.send_header("X-Build-Id", BUILD_ID)
+            self.send_header("X-Manifest-Version", MANIFEST_VERSION)
             self.send_header("X-TTS-Provider", meta.get("tts_provider", ""))
             self.send_header("X-TTS-Voice", meta.get("voice_id", ""))
             self.send_header("X-TTS-Duration-Sec", "%.3f" % (meta.get("tts_duration") or 0.0))
