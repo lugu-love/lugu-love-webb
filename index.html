@@ -31,7 +31,7 @@ min-height: 100svh;
 background-color: #020407;
 background-image:
 radial-gradient(circle at 50% 12%, rgba(82, 129, 189, .18), rgba(2, 4, 7, 0) 34%),
-url("space-bg.webp");
+url("https://pub-baeb836de8654e238577516dce76dea3.r2.dev/site-assets/home/earth/v1/space-bg.webp");
 background-position: center center;
 background-size: cover;
 background-repeat: no-repeat;
@@ -47,7 +47,7 @@ height: var(--stage-height);
 max-height: 100dvh;
 overflow: hidden;
 background-color: #000;
-background-image: url("space-bg.webp");
+background-image: url("https://pub-baeb836de8654e238577516dce76dea3.r2.dev/site-assets/home/earth/v1/space-bg.webp");
 background-position: center center;
 background-size: cover;
 background-repeat: no-repeat;
@@ -3410,7 +3410,7 @@ color: rgba(212, 226, 250, .62);
 <div class="heart-star-layer" data-i18n-aria="launchedStars" aria-label="已发射心星"></div>
 <div class="approach">
 <div class="earth">
-<img src="earth.webp" alt="">
+<img src="https://pub-baeb836de8654e238577516dce76dea3.r2.dev/site-assets/home/earth/v1/earth.webp" alt="" fetchpriority="high" decoding="async">
 </div>
 </div>
 <section class="home-intro" data-i18n-aria="introLabel" aria-label="心域介绍">
@@ -3450,20 +3450,20 @@ color: rgba(212, 226, 250, .62);
 </div>
 <div class="guide-final-heart" aria-hidden="true">♥</div>
 <a class="career-entry" href="co-create.html" data-i18n-aria="coCreate" aria-label="事业共创">
-<span class="career-entry-emoji" aria-hidden="true"><img src="assets/icons/career-cocreation.png" alt="" width="24" height="24" style="display:block;object-fit:contain"></span>
+<span class="career-entry-emoji" aria-hidden="true"><img src="https://pub-baeb836de8654e238577516dce76dea3.r2.dev/site-assets/home/ui/v1/career-cocreation.webp" alt="" width="24" height="24" style="display:block;object-fit:contain"></span>
 <span class="career-entry-text">
 <span class="career-entry-title" data-i18n="coCreate">事业共创</span>
 </span>
 </a>
 <a class="emotion-entry" href="send-test.html" data-i18n-aria="emotion" aria-label="我想表达">
-<span class="emotion-entry-emoji" aria-hidden="true"><img src="assets/icons/emotion-expression.png" alt="" width="24" height="24" style="display:block;object-fit:contain"></span>
+<span class="emotion-entry-emoji" aria-hidden="true"><img src="https://pub-baeb836de8654e238577516dce76dea3.r2.dev/site-assets/home/ui/v1/emotion-expression.webp" alt="" width="24" height="24" style="display:block;object-fit:contain"></span>
 <span class="emotion-entry-text">
 <span class="emotion-entry-title" data-i18n="emotion">我想表达</span>
 </span>
 </a>
 <a class="world-entry" href="lugu/index.html?from=earth" data-i18n-aria="world" aria-label="心域世界">
 <span class="world-entry-emoji" aria-hidden="true">
-<img src="assets/icons/home-world.png" alt="" width="38" height="38" style="display:block;object-fit:contain">
+<img src="https://pub-baeb836de8654e238577516dce76dea3.r2.dev/site-assets/home/ui/v1/home-world.webp" alt="" width="38" height="38" style="display:block;object-fit:contain">
 </span>
 <span class="world-entry-text">
 <span class="world-entry-title" data-i18n="world">心域世界</span>
@@ -3844,7 +3844,7 @@ var image = new Image();
 image.src = sequence.poster;
 });
 }
-setTimeout(preloadRabbitPosters, 400);
+/* Rabbit posters are not preloaded on the homepage. */
 function preloadFengxinRabbitAngryAssets(sequence = fengxinRabbitSequence[fengxinRabbitSequenceIndex]) {
 if (fengxinRabbitPreloadedId === sequence.id && fengxinRabbitPreloadedImages) return;
 fengxinRabbitPreloadedId = sequence.id;
@@ -6925,30 +6925,6 @@ if ("serviceWorker" in navigator) {
 </script>
 
 
-<script>
-// 性能：首页空闲后低优先级预载 A 路（情绪表达）最小资源，
-// 不阻塞首页首屏；点击“情绪表达”时页面框架尽量秒开。
-(function () {
-  function preloadARoute() {
-    if (document.hidden) return;
-    var urls = ["send-test.html", "scripts/make-send-cloud/emotion-manifest.json"];
-    for (var i = 0; i < 15; i++) {
-      urls.push("assets/video/fengxin-rabbit-sequence/mobile/1/sheet-" + String(i).padStart(2, "0") + ".webp?v=e15-2026-09-03");
-    }
-    urls.forEach(function (u) {
-      var l = document.createElement("link");
-      l.rel = "prefetch";
-      l.href = u;
-      document.head.appendChild(l);
-    });
-  }
-  if ("requestIdleCallback" in window) {
-    window.requestIdleCallback(preloadARoute, { timeout: 10000 });
-  } else {
-    setTimeout(preloadARoute, 5000);
-  }
-})();
-</script>
 <script>
 // 诊断模式（仅 ?perf=1）：首页各阶段耗时（相对导航开始，毫秒）。
 (function () {
