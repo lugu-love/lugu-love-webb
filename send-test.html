@@ -130,7 +130,7 @@
     <div class="edit-top">
       <div class="brand" id="brand"><a class="back-home" href="index.html" aria-label="返回首页">← 首页</a><span class="brand-title"><span class="brand-main">七星使者</span><span class="brand-sub">· 心情表达</span></span></div>
 
-      <div class="stage-wrap"><canvas id="stage" width="540" height="540"></canvas><video id="alphaVideo" autoplay muted loop playsinline webkit-playsinline preload="metadata" hidden></video></div>
+      <div class="stage-wrap"><canvas id="stage" width="540" height="540"></canvas><video id="alphaVideo" autoplay muted loop playsinline webkit-playsinline preload="metadata" crossorigin="anonymous" hidden></video></div>
 
 
       <div class="emotions" id="emotions"></div>
@@ -220,6 +220,7 @@ window.__MAIN__ = function () {
   var BLOB_TIMEOUT_MS = 20000;
   var VIDEO_UA = navigator.userAgent || "";
   var VIDEO_PREFER_HEVC = /iPad|iPhone|iPod/.test(VIDEO_UA) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) || (/Safari/.test(VIDEO_UA) && !/Chrome|Chromium|CriOS|Edg|OPR|Android/.test(VIDEO_UA));
+  var VIDEO_IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(VIDEO_UA) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
   // 角色与情绪映射唯一来源：scripts/make-send-cloud/emotion-manifest.json（官方配置）。
   // 下方为离线/加载失败兜底；正常路径由 manifest 派生，前端不再自持第二套角色映射。
@@ -664,6 +665,23 @@ window.__MAIN__ = function () {
       alphaVideo.onerror = null;
       alphaVideo.src = url;
       try { alphaVideo.load(); } catch(e) {}
+      var checkAlpha = function(){
+        alphaVideo.removeEventListener("loadeddata", checkAlpha);
+        if(token !== alphaVideoToken) return;
+        if(!VIDEO_IS_MOBILE) return;
+        try {
+          var c=document.createElement("canvas"); c.width=8; c.height=8;
+          var cx=c.getContext("2d"); cx.drawImage(alphaVideo,0,0,8,8);
+          var d=cx.getImageData(0,0,8,8).data;
+          var transparent=0, opaqueGreen=0;
+          for(var i=0;i<d.length;i+=4){
+            if(d[i+3] < 20) transparent++;
+            else if(d[i+1] > d[i]+30 && d[i+1] > d[i+2]+30) opaqueGreen++;
+          }
+          if(transparent < 8 && opaqueGreen > 24) fallbackCanvas();
+        } catch(e) { fallbackCanvas(); }
+      };
+      alphaVideo.addEventListener("loadeddata", checkAlpha, {once:true});
       var pr = alphaVideo.play();
       if(pr && pr.catch) pr.catch(function(){});
       alphaVideo.onerror = function(){
