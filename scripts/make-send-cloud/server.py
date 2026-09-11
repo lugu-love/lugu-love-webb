@@ -1192,7 +1192,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         start = time.time()
         text = (text or DEFAULT_TEXT).strip()
         if item not in MASTERS:
-            item = "rabbit-happy"
+            return self._send_json(404, {"error": "item not found", "item": item})
         if len(text) > TEXT_MAX:
             return self._send_json(400, {"error": "TEXT_TOO_LONG", "message": "这段内容较长，当前最多支持 %d 字，请适当精简后重试。" % TEXT_MAX})
         if has_unsupported(text):
