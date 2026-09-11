@@ -29,6 +29,14 @@ RUN mkdir -p masters poc && \
              rabbit-lowenergy.mp4 rabbit-cool.mp4 rabbit-gloat.mp4; do \
       curl -fsSL -o "masters/$f" "https://raw.githubusercontent.com/lugu-love/lugu-love-webb/${MASTERS_REF}/scripts/make-send-cloud/masters/$f" || exit 1; \
     done && \
+    curl -fsSL -o "masters/fox_white_hurt_sad_alpha_hevc.mov" "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/01-fox-white-hurt/delivery/fox_white_hurt_sad_alpha_hevc.mov" || exit 1; \
+    curl -fsSL -o "masters/fox_navy_angry_alpha_hevc.mov" "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/02-fox-navy-angry/delivery/fox_navy_angry_alpha_hevc.mov" || exit 1; \
+    curl -fsSL -o "masters/fox_pink_coquettish_alpha_hevc.mov" "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/03-fox-pink-coquettish/delivery/fox_pink_coquettish_alpha_hevc.mov" || exit 1; \
+    curl -fsSL -o "masters/fox_black_playful_alpha_hevc.mov" "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/04-fox-black-playful/delivery/fox_black_playful_alpha_hevc.mov" || exit 1; \
+    curl -fsSL -o "masters/fox_red_happy_alpha_hevc.mov" "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/05-fox-red-happy/delivery/fox_red_happy_alpha_hevc.mov" || exit 1; \
+    curl -fsSL -o "masters/fox_teal_surprised_alpha_hevc.mov" "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/06-fox-teal-surprised/delivery/fox_teal_surprised_alpha_hevc.mov" || exit 1; \
+    curl -fsSL -o "masters/fox_defiant_alpha_hevc.mov" "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/07-fox-defiant/delivery/fox_defiant_alpha_hevc.mov" || exit 1; \
+    curl -fsSL -o "masters/fox_giveup_alpha_hevc.mov" "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/08-fox-giveup/delivery/fox_giveup_alpha_hevc.mov" || exit 1; \
     curl -fsSL -o "poc/sample.mp4" "https://raw.githubusercontent.com/lugu-love/lugu-love-webb/${MASTERS_REF}/scripts/make-send-cloud/poc/sample.mp4" || exit 1
 
 ENV PORT=8000 \
