@@ -48,7 +48,7 @@
   .character-avatar.active { border-color:#96a4ff; box-shadow:0 0 0 2px rgba(125,139,255,.18), 0 0 14px rgba(125,139,255,.28); transform:translateY(-1px); }
   .character-avatar[hidden] { display:none !important; }
   .emotions { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:8px 10px; margin:14px 0 8px; position:relative; z-index:30; max-width:min(94vw,520px); }
-  .emotion { flex:0 0 auto; min-height:34px; padding:5px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:var(--muted); font-size:12px; font-weight:600; cursor:pointer; text-align:center; white-space:nowrap; }
+  .emotion { flex:0 0 auto; min-width:0; min-height:34px; height:auto; line-height:1.2; padding:5px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:var(--muted); font-size:12px; font-weight:600; cursor:pointer; text-align:center; white-space:nowrap; }
   .emotion.active { color:#fff; border-color:var(--accent); background:rgba(125,139,255,.22); box-shadow:0 0 16px rgba(125,139,255,.28); }
   #emotions { flex-wrap:nowrap; justify-content:flex-start; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; padding:2px 2px 8px; gap:6px; }
   #emotions::-webkit-scrollbar { display:none; }
@@ -509,6 +509,7 @@ window.__MAIN__ = function () {
   var generationProgressLabel=document.getElementById("generationProgressLabel");
   var generationProgressText=document.getElementById("generationProgressText");
   var generationProgressTimer=null;
+  var generationProgressStartedAt=0;
   var bridgeDiagEl=document.getElementById("bridgeDiag");
   var debugDetailsEl=document.getElementById("debugDetails");
   var debugMode = /[?&]debug=1/.test(location.search);
@@ -1218,6 +1219,7 @@ window.__MAIN__ = function () {
   function setStatus(msg, cls){ statusEl.textContent=msg; statusEl.className="status" + (cls ? " "+cls : ""); }
   function setGenerationProgress(phase, label, text){
     if(!generationProgress) return;
+    if(phase === "preparing") generationProgressStartedAt = Date.now();
     generationProgress.hidden = false;
     generationProgress.setAttribute("data-phase", phase);
     generationProgress.setAttribute("aria-valuetext", label);
@@ -1529,11 +1531,14 @@ window.__MAIN__ = function () {
       try { jobData=await withTimeout(resp.json(), 4000, activeController); } catch(e){}
       if(!jobData || !jobData.job){ throw new Error("invalid job response"); }
       var job=jobData.job;
+      var stageDelay = Math.max(0, 300 - (Date.now() - generationProgressStartedAt));
       if(text && !ttsToken){
-        setGenerationProgress("voice", "生成声音", "正在生成语音与字幕");
-        generationProgressTimer=setTimeout(function(){ setGenerationProgress("compose", "合成视频", "正在合成情绪视频"); }, 3500);
+        generationProgressTimer=setTimeout(function(){
+          setGenerationProgress("voice", "生成声音", "正在生成语音与字幕");
+          generationProgressTimer=setTimeout(function(){ setGenerationProgress("compose", "合成视频", "正在合成情绪视频"); }, 3500);
+        }, stageDelay);
       } else {
-        setGenerationProgress("compose", "合成视频", "正在合成情绪视频");
+        generationProgressTimer=setTimeout(function(){ setGenerationProgress("compose", "合成视频", "正在合成情绪视频"); }, stageDelay);
       }
       // 长文本异步生成：后端立即返回 202 {job}，前端轮询 /make-send/result 拿 videoPath，
       // 避免单次长连接等待超过网络/代理容忍窗口而被切断。
