@@ -170,6 +170,28 @@ def main():
             if pa.get("sha256") != ca.get("sha256"):
                 errors.append("%s.%s sha256 mismatch" % (item_id, key))
 
+    avatar_checks = 0
+    for character_id in ("fengxin-rabbit", "xinguang-fox"):
+        rel = "assets/characters/seven-stars/%s/main.png" % character_id
+        try:
+            a = fetch(args.prod_asset_base.rstrip("/") + "/" + rel)
+            b = fetch(args.candidate_asset_base.rstrip("/") + "/" + rel)
+        except Exception as exc:  # noqa: BLE001
+            errors.append("%s avatar fetch failed: %s" % (character_id, exc))
+            continue
+        if sha256(a) != sha256(b):
+            errors.append("%s avatar sha256 mismatch" % character_id)
+        avatar_checks += 1
+
+    try:
+        candidate_html = fetch(args.candidate_asset_base.rstrip("/") + "/send-test.html").decode("utf-8", "replace")
+        for character_id in ("fengxin-rabbit", "xinguang-fox"):
+            marker = "assets/characters/seven-stars/%s/main.png" % character_id
+            if marker not in candidate_html:
+                errors.append("%s avatar marker missing from Candidate page" % character_id)
+    except Exception as exc:  # noqa: BLE001
+        errors.append("candidate page avatar check failed: %s" % exc)
+
     preview_checks = 0
     for item_id, item in prod["items"].items():
         if item.get("characterId") != "fengxin-rabbit":
@@ -233,6 +255,7 @@ def main():
         "candidate_manifest_version": cand_build.get("manifestVersion"),
         "items_checked": len(prod.get("items", {})),
         "rabbit_preview_files_checked": preview_checks,
+        "avatar_files_checked": avatar_checks,
         "retired_item_http": old_item_status,
         "generation_checked": len(generation),
         "errors": errors,
