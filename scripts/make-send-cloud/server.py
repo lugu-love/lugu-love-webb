@@ -31,8 +31,7 @@ import journey_store
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
-MASTERS_DIR = os.path.join(ROOT, "masters")
-GENERATION_MASTERS_DIR = os.environ.get("GENERATION_MASTERS_DIR", MASTERS_DIR)
+GENERATION_MASTERS_DIR = os.environ.get("GENERATION_MASTERS_DIR", os.path.join(ROOT, "generation-masters"))
 ASSET_MANIFEST_FILE = os.environ.get("ASSET_MANIFEST_FILE", os.path.join(ROOT, "asset-manifest.json"))
 POC_SAMPLE_FILE = os.path.join(ROOT, "poc", "sample.mp4")
 FFMPEG = os.environ.get("FFMPEG_BIN", "ffmpeg")
@@ -68,6 +67,8 @@ def _load_asset_manifest():
         cid = item.get("characterId")
         if cid not in seen or item_id not in seen[cid]:
             raise RuntimeError("item is outside production order: %s" % item_id)
+        if not item.get("assetVersion"):
+            raise RuntimeError("missing asset version: %s" % item_id)
         master = item.get("generationMaster") or {}
         if not master.get("ref") or not master.get("sha256"):
             raise RuntimeError("missing generation master: %s" % item_id)
@@ -87,8 +88,8 @@ MASTERS = {}
 JOURNEY_META = {}
 
 
-def _master_root(item_id):
-    return GENERATION_MASTERS_DIR if item_id.startswith("fox-") else MASTERS_DIR
+def _master_root():
+    return GENERATION_MASTERS_DIR
 
 
 def _sha256_file(path):
@@ -104,7 +105,7 @@ for _item_id, _e in _emotions.items():
     _master = _generation.get("ref")
     if not _master:
         raise RuntimeError("missing generation master: %s" % _item_id)
-    _path = os.path.join(_master_root(_item_id), _master)
+    _path = os.path.join(_master_root(), _master)
     if not os.path.isfile(_path):
         raise RuntimeError("generation master file missing: %s" % _item_id)
     if _sha256_file(_path) != _generation.get("sha256"):
@@ -113,7 +114,7 @@ for _item_id, _e in _emotions.items():
     JOURNEY_META[_item_id] = (_e.get("characterId", ""), _e.get("emotionId", _item_id))
 
 
-def _contract_error(item, requested_character, build_id, manifest_version):
+def _contract_error(item, requested_character, build_id, manifest_version, asset_version="", expected_master_sha256=""):
     if build_id != BUILD_ID or manifest_version != MANIFEST_VERSION:
         return 409, {
             "error": "VERSION_MISMATCH",
@@ -130,6 +131,22 @@ def _contract_error(item, requested_character, build_id, manifest_version):
             "message": "角色与情绪映射不一致，请刷新页面后重试。",
             "itemId": item,
             "characterId": actual_character,
+        }
+    actual_asset_version = _emotions[item].get("assetVersion")
+    if not asset_version or asset_version != actual_asset_version:
+        return 409, {
+            "error": "ASSET_VERSION_MISMATCH",
+            "message": "页面素材版本与生成服务不一致，请刷新页面后重试。",
+            "itemId": item,
+            "assetVersion": actual_asset_version,
+        }
+    expected_master = (_emotions[item].get("generationMaster") or {}).get("sha256")
+    if not expected_master_sha256 or expected_master_sha256 != expected_master:
+        return 409, {
+            "error": "MASTER_HASH_MISMATCH",
+            "message": "生成母版哈希校验失败，已拒绝生成。",
+            "itemId": item,
+            "expectedMasterSHA256": expected_master,
         }
     return None
 
@@ -565,22 +582,23 @@ _jobs = {}
 _jobs_lock = threading.Lock()
 
 
-def _run_job_async(job_id, text, item, voice_id, tts_audio_path=None, tts_audio_info=None, requested_character="", build_id="", manifest_version=""):
+def _run_job_async(job_id, text, item, voice_id, tts_audio_path=None, tts_audio_info=None, requested_character="", build_id="", manifest_version="", requested_asset_version="", expected_master_sha256=""):
     workdir = None
     try:
         workdir = tempfile.mkdtemp(prefix="make-send-")
         final, meta = generate(item, text, workdir, voice_id=voice_id, speech_text=None, tts_audio_path=tts_audio_path,
                                tts_audio_info=tts_audio_info,
                                requested_item=item, requested_character=requested_character,
-                               build_id=build_id, manifest_version=manifest_version)
+                               build_id=build_id, manifest_version=manifest_version,
+                               requested_asset_version=requested_asset_version, expected_master_sha256=expected_master_sha256)
         with open(final, "rb") as f:
             data = f.read()
         token = store_app_video(data)
         with _jobs_lock:
             t0 = _jobs.get(job_id, {}).get("t0", time.time())
             _jobs[job_id] = {"status": "done", "token": token, "text_len": len(text), "meta": meta}
-        log("JOB-DONE job=%s item=%s requested_voice=%s actual_voice=%s provider=%s style=%s fallback=%s text_len=%d lines=%d font=%d tts=%.2fs tts_dur=%.2fs vdur=%.2fs ffmpeg=%.2fs total=%.2fs size=%d"
-            % (job_id, item, meta.get("requestedVoiceId") or "-", meta.get("actualVoiceId") or "-", meta.get("actualProvider") or "-", meta.get("emotionStyle") or "-", meta.get("fallbackReason") or "-", len(text), meta.get("lines", 0), meta.get("font_size", 0),
+        log("JOB-DONE job=%s item=%s asset=%s expected_master=%s actual_master=%s requested_voice=%s actual_voice=%s provider=%s style=%s fallback=%s text_len=%d lines=%d font=%d tts=%.2fs tts_dur=%.2fs vdur=%.2fs ffmpeg=%.2fs total=%.2fs size=%d"
+            % (job_id, item, meta.get("actualAssetVersion") or "-", meta.get("expectedMasterSHA256") or "-", meta.get("actualMasterSHA256") or "-", meta.get("requestedVoiceId") or "-", meta.get("actualVoiceId") or "-", meta.get("actualProvider") or "-", meta.get("emotionStyle") or "-", meta.get("fallbackReason") or "-", len(text), meta.get("lines", 0), meta.get("font_size", 0),
                meta.get("tts", 0), meta.get("tts_duration") or 0.0, meta.get("video_duration") or 0.0,
                meta.get("ffmpeg", 0), time.time() - t0, len(data)))
     except Exception as e:
@@ -834,7 +852,8 @@ def _v1_compose(item, text, master, tts_path, final, final_duration, speech_star
     return fsize, nlines
 
 def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts_audio_path=None, tts_audio_info=None,
-             requested_item=None, requested_character=None, build_id=None, manifest_version=None):
+             requested_item=None, requested_character=None, build_id=None, manifest_version=None,
+             requested_asset_version=None, expected_master_sha256=None):
     actual_item = item
     actual_entry = _emotions.get(actual_item)
     if not actual_entry or actual_item not in MASTERS:
@@ -848,8 +867,17 @@ def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts
         raise RuntimeError("requested item mismatch")
     if requested_character and requested_character != actual_character:
         raise RuntimeError("requested character mismatch")
+    actual_asset_version = actual_entry.get("assetVersion")
+    if requested_asset_version and requested_asset_version != actual_asset_version:
+        raise RuntimeError("requested asset version mismatch")
+    expected_master = (actual_entry.get("generationMaster") or {}).get("sha256")
+    if expected_master_sha256 and expected_master_sha256 != expected_master:
+        raise RuntimeError("expected master SHA mismatch")
     master_rel, _emotion = MASTERS[actual_item]
-    master = os.path.join(_master_root(actual_item), master_rel)
+    master = os.path.join(_master_root(), master_rel)
+    actual_master_sha256 = _sha256_file(master)
+    if actual_master_sha256 != expected_master:
+        raise RuntimeError("actual master SHA mismatch")
     final = os.path.join(workdir, "final.mp4")
     tts_path = os.path.join(workdir, "tts.mp3")
     meta = {
@@ -860,6 +888,10 @@ def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts
         "releaseId": RELEASE_ID,
         "buildId": BUILD_ID,
         "manifestVersion": MANIFEST_VERSION,
+        "requestedAssetVersion": requested_asset_version or actual_asset_version,
+        "actualAssetVersion": actual_asset_version,
+        "expectedMasterSHA256": expected_master,
+        "actualMasterSHA256": actual_master_sha256,
     }
     # 发声时机：speechStart（秒）= 该条视频里角色完成初步情绪建立、最适合开口的时间。
     # 不同情绪/不同动作可不同；最低门槛 1.2s，负值/非法按 0 处理（不早于视频开头）。
@@ -1024,7 +1056,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
             "Access-Control-Expose-Headers",
             "X-Video-Path, X-Video-Expires-In, X-Video-Id, X-Journey-Id, "
             "X-Parent-Video-Id, X-Generation, X-Remix-Entry, "
-            "X-TTS-Token, X-TTS-Provider, X-TTS-Voice, X-TTS-Requested-Voice, X-TTS-Emotion-Style, X-TTS-Fallback-Reason",
+            "X-TTS-Token, X-TTS-Provider, X-TTS-Voice, X-TTS-Requested-Voice, X-TTS-Emotion-Style, X-TTS-Fallback-Reason, X-Asset-Version, X-Master-SHA256",
         )
 
     def _send_json(self, code, obj):
@@ -1298,6 +1330,8 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
                 requested_character=(qs.get("characterId") or [""])[0],
                 build_id=(qs.get("buildId") or [""])[0],
                 manifest_version=(qs.get("manifestVersion") or [""])[0],
+                asset_version=(qs.get("assetVersion") or [""])[0],
+                expected_master_sha256=(qs.get("expectedMasterSHA256") or [""])[0],
             )
         return self._not_found()
 
@@ -1357,6 +1391,8 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
                 requested_character=data.get("characterId", "") or "",
                 build_id=data.get("buildId", "") or "",
                 manifest_version=data.get("manifestVersion", "") or "",
+                asset_version=data.get("assetVersion", "") or "",
+                expected_master_sha256=data.get("expectedMasterSHA256", "") or "",
             )
         return self._not_found()
 
@@ -1393,8 +1429,8 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         log("ADMIN-TOGGLE enabled=%s" % enabled)
         return self._send_json(200, {"enabled": enabled})
 
-    def _serve(self, text, item, app_bridge=False, journey_v1=False, remix_token="", source_channel="h5", voice_id=None, speech_text=None, async_mode=False, tts_token=None, requested_character="", build_id="", manifest_version=""):
-        contract_error = _contract_error(item, requested_character, build_id, manifest_version)
+    def _serve(self, text, item, app_bridge=False, journey_v1=False, remix_token="", source_channel="h5", voice_id=None, speech_text=None, async_mode=False, tts_token=None, requested_character="", build_id="", manifest_version="", asset_version="", expected_master_sha256=""):
+        contract_error = _contract_error(item, requested_character, build_id, manifest_version, asset_version, expected_master_sha256)
         if contract_error:
             return self._send_json(contract_error[0], contract_error[1])
         if not read_enabled():
@@ -1424,7 +1460,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
                 for jid in [j for j, r in list(_jobs.items()) if now - r.get("t0", 0) > 900]:
                     _jobs.pop(jid, None)
                 _jobs[job_id] = {"status": "pending", "t0": now, "text_len": len(text)}
-            threading.Thread(target=_run_job_async, args=(job_id, text, item, voice_id, tts_audio_path, tts_audio_info, requested_character, build_id, manifest_version), daemon=True).start()
+            threading.Thread(target=_run_job_async, args=(job_id, text, item, voice_id, tts_audio_path, tts_audio_info, requested_character, build_id, manifest_version, asset_version, expected_master_sha256), daemon=True).start()
             return self._send_json(202, {"job": job_id, "status": "pending"})
 
         workdir = None
@@ -1432,7 +1468,8 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             workdir = tempfile.mkdtemp(prefix="make-send-")
             final, meta = generate(item, text, workdir, voice_id=voice_id, speech_text=speech_text, tts_audio_path=tts_audio_path, tts_audio_info=tts_audio_info,
                                    requested_item=item, requested_character=requested_character,
-                                   build_id=build_id, manifest_version=manifest_version)
+                                   build_id=build_id, manifest_version=manifest_version,
+                                   requested_asset_version=asset_version, expected_master_sha256=expected_master_sha256)
             if meta.get("requestedItem") != meta.get("actualItem") or meta.get("requestedCharacter") != meta.get("actualCharacter"):
                 raise RuntimeError("requested/actual identity mismatch")
             with open(final, "rb") as f:
@@ -1466,6 +1503,8 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             self.send_header("X-TTS-Requested-Voice", meta.get("requestedVoiceId", ""))
             self.send_header("X-TTS-Emotion-Style", meta.get("emotionStyle", ""))
             self.send_header("X-TTS-Fallback-Reason", meta.get("fallbackReason", ""))
+            self.send_header("X-Asset-Version", meta.get("actualAssetVersion", ""))
+            self.send_header("X-Master-SHA256", meta.get("actualMasterSHA256", ""))
             self.send_header("X-TTS-Duration-Sec", "%.3f" % (meta.get("tts_duration") or 0.0))
             self.send_header("X-Video-Duration-Sec", "%.3f" % (meta.get("video_duration") or 0.0))
             self.send_header("X-Subtitle-Lines", str(meta.get("lines", 0)))
@@ -1496,7 +1535,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
 def main():
     port = int(os.environ.get("PORT", "8000"))
     log("start port=%d concurrent=%d masters=%s font=%s ffmpeg=%s state=%s"
-        % (port, MAX_CONCURRENT, MASTERS_DIR, FONT_FILE, FFMPEG, SITE_STATE_FILE))
+        % (port, MAX_CONCURRENT, GENERATION_MASTERS_DIR, FONT_FILE, FFMPEG, SITE_STATE_FILE))
     httpd = http.server.ThreadingHTTPServer(("0.0.0.0", port), Handler)
     httpd.serve_forever()
 

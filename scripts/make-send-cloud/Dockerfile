@@ -17,26 +17,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY server.py tts_provider.py text_layout.py journey_store.py ./
 COPY template/ template/
 
-# 素材（masters/*.mp4、poc/sample.mp4）体积较大，改为构建时从正式远端
-# lugu-love/lugu-love-webb 的代码分支拉取，避免每次本地上传大文件（当前网络受限）。
-# 若日后分支更名，可通过构建变量 MASTERS_REF 覆盖。
-ARG MASTERS_REF=codex/p3-cloud
-RUN mkdir -p masters poc && \
-    for f in happy-master.mp4 angry-master.mp4 wronged-master.mp4 \
-             happy-master-v2.mp4 wronged-master-v2.mp4 angry-master-v2.mp4 playful-master-v2.mp4 \
-             rabbit-sajiao.mp4 rabbit-playful.mp4 rabbit-jealous.mp4 rabbit-stubborn.mp4 rabbit-surprise.mp4 \
-             rabbit-confused.mp4 rabbit-disgust.mp4 rabbit-guilty.mp4 rabbit-apology.mp4 \
-             rabbit-lowenergy.mp4 rabbit-cool.mp4 rabbit-gloat.mp4; do \
-      curl -fsSL -o "masters/$f" "https://raw.githubusercontent.com/lugu-love/lugu-love-webb/${MASTERS_REF}/scripts/make-send-cloud/masters/$f" || exit 1; \
-    done && \
-    curl -fsSL -o "poc/sample.mp4" "https://raw.githubusercontent.com/lugu-love/lugu-love-webb/${MASTERS_REF}/scripts/make-send-cloud/poc/sample.mp4" || exit 1
-
-# 狐狸生成母版与 web delivery 完全分离：只复制独立 generation-masters。
+# generationMaster 只能来自 manifest 声明的目录，不再下载或猜测历史 masters。
 COPY generation-masters/ generation-masters/
+COPY poc/ poc/
 
 # 唯一生产资产契约由前端不可变 Release 固定 SHA 拉取。
 ARG RELEASE_MANIFEST_URL=https://pub-baeb836de8654e238577516dce76dea3.r2.dev/site-candidates/20260912-01/release-20260912-01/asset-manifest.json
-ARG RELEASE_MANIFEST_SHA256=848199accd0e0c3d1000c00a1309f80d80a6d7ef85d9167bc78b6a8294283223
+ARG RELEASE_MANIFEST_SHA256=9a4cc405d12c84ad42a60ebdaafc107e60c3198dcc6ca7cfbf505a825b4b52aa
 RUN curl -fsSL "$RELEASE_MANIFEST_URL" -o asset-manifest.json && \
     echo "$RELEASE_MANIFEST_SHA256  asset-manifest.json" | sha256sum -c -
 
