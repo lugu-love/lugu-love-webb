@@ -190,9 +190,9 @@ MAX_HEIGHT = 3 * BASE_FONT_SIZE + 2 * LINE_SPACING   # 最多 3 行 = 190
 MIN_FONT_SIZE = int(os.environ.get("MIN_FONT_SIZE", "36"))   # 可读字号下限
 
 # 动态时长实验（第一版简单规则；具体数值待 12 条实测后确定）：
-# finalDuration = max(BASE_MIN_DURATION, ttsDuration + ENDING_HOLD)
+# finalDuration = max(masterDuration, speechStart + ttsDuration + ENDING_HOLD)
 BASE_MIN_DURATION = float(os.environ.get("BASE_MIN_DURATION", "5.0"))
-ENDING_HOLD = float(os.environ.get("ENDING_HOLD", "2.0"))
+ENDING_HOLD = min(0.5, max(0.3, float(os.environ.get("ENDING_HOLD", "0.4"))))
 MAX_FINAL_DURATION = float(os.environ.get("MAX_FINAL_DURATION", "30.0"))
 
 MAX_CONCURRENT = int(os.environ.get("MAX_CONCURRENT", "2"))
@@ -732,23 +732,15 @@ def _v1_compose(item, text, master, tts_path, final, final_duration, speech_star
            "[bg][fg]overlay=x=%d:y=%d:shortest=1[base];"
            "[2:v]format=rgba[bp];[3:v]format=rgba[sp];"
            "[base][bp]overlay=0:0:shortest=1[b1];[b1][sp]overlay=0:0:shortest=1[ov];"
-           "[ov]fps=%d[vo]" % (sw,sh,W,H,FPS,master_dur+0.1,left,top,FPS))
+           "[ov]fps=%d,trim=duration=%.3f,setpts=PTS-STARTPTS[vo]" % (sw,sh,W,H,FPS,final_duration+0.1,left,top,FPS,final_duration))
     map_v="[vo]"
-    if final_duration > master_dur + 0.05:
-        chain += ";%s[vo]tpad=stop_mode=clone:stop_duration=%.3f[vout]" % ("", final_duration-master_dur)
-        # ffmpeg chain cannot start ';' after fps label; rebuild below
-        chain = chain.replace(";%s[vo]tpad=" % "", ";")
-        chain += ";" if False else ""
-        # simpler: add tpad directly on [vo] without extra ';'
-        chain = chain[:chain.rfind("[vo]")] + "[vo];[vo]tpad=stop_mode=clone:stop_duration=%.3f[vout]" % (final_duration-master_dur)
-        map_v="[vout]"
     if speech_start>0:
         audio="[1:a]adelay=%.0f:all=1,apad[aout]"%(speech_start*1000)
     else:
         audio="[1:a]apad[aout]"
     chain += ";"+audio
     input_codec = ["-c:v", "libvpx-vp9"] if item.startswith("fox-") else []
-    cmd=[FFMPEG,"-y"] + input_codec + ["-i",master,"-i",tts_path,"-loop","1","-framerate",str(FPS),"-i",bp,"-loop","1","-framerate",str(FPS),"-i",sp,
+    cmd=[FFMPEG,"-y"] + input_codec + ["-stream_loop","-1","-i",master,"-i",tts_path,"-loop","1","-framerate",str(FPS),"-i",bp,"-loop","1","-framerate",str(FPS),"-i",sp,
          "-filter_complex",chain,"-map",map_v,"-map","[aout]",
          "-threads",str(FFMPEG_THREADS),"-c:v","libx264","-preset","medium","-crf","18","-maxrate","%dk"%BITRATE_KBPS,
          "-bufsize","%dk"%(BITRATE_KBPS*2),"-pix_fmt","yuv420p","-r",str(FPS),"-movflags","+faststart",
@@ -831,9 +823,8 @@ def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts
     t0 = time.time()
     # 动态时长：最终视频时长 = max(保底, TTS 实测时长 + 尾段预留)
     tts_dur = _probe_duration(tts_path) or 0.0
-    final_duration = max(BASE_MIN_DURATION, speech_start + tts_dur + ENDING_HOLD)
-    final_duration = min(final_duration, MAX_FINAL_DURATION)
     master_dur = _probe_duration(master) or float(DURATION)
+    final_duration = max(master_dur, speech_start + tts_dur + ENDING_HOLD)
     # V1 统一成片模板（union 自动布局 + 字幕自适应 + 纯黑/暖金底部承托）
     v1_text = text if speech_text is None else text
     fsize, nlines = _v1_compose(item, text, master, tts_path, final, final_duration, speech_start, master_dur, workdir)
