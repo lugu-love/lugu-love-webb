@@ -1,0 +1,35 @@
+name: Candidate Release Gate
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_manifest_url:
+        description: Candidate asset-manifest.json URL
+        required: true
+      candidate_build_url:
+        description: Candidate build.json URL
+        required: true
+      candidate_asset_base:
+        description: Candidate release base URL
+        required: true
+      candidate_backend:
+        description: Candidate backend base URL
+        required: true
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run Preview -> Generation gate
+        run: |
+          python tests/release-gates/verify_candidate_consistency.py \
+            --identity-mode candidate \
+            --generation-scope all \
+            --candidate-manifest-url "${{ inputs.candidate_manifest_url }}" \
+            --candidate-build-url "${{ inputs.candidate_build_url }}" \
+            --candidate-asset-base "${{ inputs.candidate_asset_base }}" \
+            --candidate-backend "${{ inputs.candidate_backend }}"
