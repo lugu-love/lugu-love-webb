@@ -232,7 +232,7 @@
 
 <script>
 window.__MAIN__ = function () {
-  var MAKE_SEND_API = "https://api.lugu.love";
+  var MAKE_SEND_API = window.LUGU_API_BASE || "https://api.lugu.love";
   var EXPORT_FILE_NAME = "我的心情.mp4"; // 对外统一文件名（不暴露具体情绪）
   var GENERATE_TIMEOUT_MS = 55000;
   var BLOB_TIMEOUT_MS = 20000;
