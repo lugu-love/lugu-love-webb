@@ -152,18 +152,24 @@ def _contract_error(item, requested_character, build_id, manifest_version, asset
 
 # 七星使者 · Candidate 默认声音系统（Edge TTS 稳定优先）
 VOICE_PRESETS = {
-    # 儿童：三种明显不同的节奏、音高和基础音色
-    "child-bright":   {"category": "child",  "label": "儿童·明亮活泼", "provider": "edge-tts", "voiceId": "zh-CN-YunxiaNeural",     "rate": 12, "pitch": 28, "volume": 0},
-    "child-soft":     {"category": "child",  "label": "儿童·软糯委屈", "provider": "edge-tts", "voiceId": "zh-CN-YunxiaNeural",     "rate": -8, "pitch": 18, "volume": 0},
-    "child-spirited": {"category": "child",  "label": "儿童·有脾气",   "provider": "edge-tts", "voiceId": "zh-CN-YunxiaNeural",     "rate": 5, "pitch": 8, "volume": 0},
-    # 女性：明亮、细腻、成熟力量
-    "female-bright":  {"category": "female", "label": "女性·年轻明亮", "provider": "edge-tts", "voiceId": "zh-CN-XiaoxiaoNeural",   "rate": 8, "pitch": 5, "volume": 0},
-    "female-gentle":  {"category": "female", "label": "女性·温柔细腻", "provider": "edge-tts", "voiceId": "zh-CN-XiaoxiaoNeural",   "rate": -8, "pitch": -18, "volume": 0},
-    "female-powerful":{"category": "female", "label": "女性·成熟有力量", "provider": "edge-tts", "voiceId": "zh-CN-XiaoyiNeural",   "rate": -6, "pitch": -28, "volume": 0},
-    # 男性：青年阳光、克制温柔、成熟力量
-    "male-sunny":     {"category": "male",   "label": "男性·青年阳光", "provider": "edge-tts", "voiceId": "zh-CN-YunxiNeural",      "rate": 8, "pitch": 12, "volume": 0},
-    "male-gentle":    {"category": "male",   "label": "男性·青年温柔", "provider": "edge-tts", "voiceId": "zh-CN-YunyangNeural",    "rate": -8, "pitch": -2, "volume": 0},
-    "male-powerful":  {"category": "male",   "label": "男性·成熟有力量", "provider": "edge-tts", "voiceId": "zh-CN-YunjianNeural",  "rate": -3, "pitch": -12, "volume": 5},
+    # 儿童 5：全部使用不同底层 voiceId
+    "child-bright":   {"category": "child",  "label": "儿童·明亮活泼", "provider": "edge-tts", "voiceId": "zh-CN-YunxiaNeural",                 "rate": 8,   "pitch": 20, "volume": 0},
+    "child-soft":     {"category": "child",  "label": "儿童·软糯委屈", "provider": "edge-tts", "voiceId": "en-US-EmmaMultilingualNeural",       "rate": -8,  "pitch": 32, "volume": 0},
+    "child-spirited": {"category": "child",  "label": "儿童·有脾气",   "provider": "edge-tts", "voiceId": "zh-CN-XiaoyiNeural",                 "rate": 10,  "pitch": 24, "volume": 0},
+    "child-tiny":     {"category": "child",  "label": "儿童·超软幼龄", "provider": "edge-tts", "voiceId": "en-US-AvaMultilingualNeural",        "rate": -12, "pitch": 38, "volume": -3},
+    "child-dramatic": {"category": "child",  "label": "儿童·淘气戏剧", "provider": "edge-tts", "voiceId": "zh-TW-HsiaoChenNeural",              "rate": 12,  "pitch": 28, "volume": 2},
+    # 女性 5：底层 voice 全部为女性且各不相同
+    "female-bright":  {"category": "female", "label": "女性·年轻明亮", "provider": "edge-tts", "voiceId": "zh-CN-XiaoxiaoNeural",               "rate": 8,   "pitch": 6,  "volume": 0},
+    "female-gentle":  {"category": "female", "label": "女性·温柔细腻", "provider": "edge-tts", "voiceId": "zh-CN-shaanxi-XiaoniNeural",         "rate": -8,  "pitch": -8, "volume": 0},
+    "female-sweet":   {"category": "female", "label": "女性·甜美少女", "provider": "edge-tts", "voiceId": "zh-TW-HsiaoYuNeural",                "rate": 6,   "pitch": 8,  "volume": 0},
+    "female-magnetic":{"category": "female", "label": "女性·成熟磁性", "provider": "edge-tts", "voiceId": "fr-FR-VivienneMultilingualNeural",   "rate": -8,  "pitch": -16,"volume": 0},
+    "female-soft":    {"category": "female", "label": "女性·轻柔安定", "provider": "edge-tts", "voiceId": "de-DE-SeraphinaMultilingualNeural",  "rate": -10, "pitch": -4, "volume": -2},
+    # 男性 5：底层 voice 全部为男性且各不相同
+    "male-sunny":     {"category": "male",   "label": "男性·青年阳光", "provider": "edge-tts", "voiceId": "zh-CN-YunxiNeural",                  "rate": 8,   "pitch": 10, "volume": 0},
+    "male-gentle":    {"category": "male",   "label": "男性·青年温柔", "provider": "edge-tts", "voiceId": "zh-CN-YunyangNeural",                "rate": -8,  "pitch": -2, "volume": 0},
+    "male-powerful":  {"category": "male",   "label": "男性·成熟有力量", "provider": "edge-tts", "voiceId": "zh-CN-YunjianNeural",              "rate": -3,  "pitch": -12,"volume": 5},
+    "male-youth":     {"category": "male",   "label": "男性·少年清亮", "provider": "edge-tts", "voiceId": "zh-TW-YunJheNeural",                 "rate": 10,  "pitch": 8,  "volume": 0},
+    "male-deep":      {"category": "male",   "label": "男性·低沉磁性", "provider": "edge-tts", "voiceId": "en-US-AndrewMultilingualNeural",      "rate": -10, "pitch": -12,"volume": 2},
 }
 # 兼容旧 Candidate 页面 send 的三个 ElevenLabs ID，避免旧链接直接报错。
 VOICE_ALIASES = {
@@ -192,9 +198,9 @@ EMOTION_STYLES = {
     "neutral":    {"style": "neutral",   "rate": 0,  "pitch": 0,   "volume": 0},
 }
 CATEGORY_FALLBACKS = {
-    "child":  ["child-soft", "child-bright", "child-spirited"],
-    "female": ["female-gentle", "female-bright", "female-powerful"],
-    "male":   ["male-sunny", "male-gentle", "male-powerful"],
+    "child":  ["child-soft", "child-bright", "child-spirited", "child-tiny", "child-dramatic"],
+    "female": ["female-gentle", "female-bright", "female-sweet", "female-soft", "female-magnetic"],
+    "male":   ["male-sunny", "male-gentle", "male-youth", "male-powerful", "male-deep"],
 }
 DEFAULT_VOICE_ID = "female-bright"
 
