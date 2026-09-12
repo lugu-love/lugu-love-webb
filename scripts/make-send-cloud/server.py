@@ -24,6 +24,8 @@ from tts_provider import (
     make_tts_provider,
     EdgeTTSProvider,
     ElevenLabsProvider,
+    QwenTTSProvider,
+    CosyVoiceProvider,
     ELEVENLABS_MODEL_ID_DEFAULT,
     ELEVENLABS_OUTPUT_FORMAT,
 )
@@ -170,7 +172,25 @@ VOICE_PRESETS = {
     "male-powerful":  {"category": "male",   "label": "男性·成熟有力量", "provider": "edge-tts", "voiceId": "zh-CN-YunjianNeural",              "rate": -3,  "pitch": -18,"volume": 5},
     "male-youth":     {"category": "male",   "label": "男性·少年清亮", "provider": "edge-tts", "voiceId": "zh-TW-YunJheNeural",                 "rate": 10,  "pitch": 18, "volume": 0},
     "male-deep":      {"category": "male",   "label": "男性·低沉磁性", "provider": "edge-tts", "voiceId": "en-US-AndrewMultilingualNeural",      "rate": -10, "pitch": -20,"volume": 2},
+    # Voice V1.1 大众方言第一批：仅使用官方原生方言系统音色。
+    "dialect-sichuan-female":  {"category": "dialect", "label": "四川话 · 晴儿（女）", "provider": "qwen3-tts", "voiceId": "Sunny",           "rate": 0, "pitch": 0, "volume": 0, "dialectId": "sichuan",   "gender": "female"},
+    "dialect-sichuan-male":    {"category": "dialect", "label": "四川话 · 程川（男）", "provider": "qwen3-tts", "voiceId": "Eric",            "rate": 0, "pitch": 0, "volume": 0, "dialectId": "sichuan",   "gender": "male"},
+    "dialect-cantonese-female":{"category": "dialect", "label": "粤语 · 阿清（女）",   "provider": "qwen3-tts", "voiceId": "Kiki",            "rate": 0, "pitch": 0, "volume": 0, "dialectId": "cantonese", "gender": "female"},
+    "dialect-cantonese-male":  {"category": "dialect", "label": "粤语 · 阿强（男）",   "provider": "qwen3-tts", "voiceId": "Rocky",           "rate": 0, "pitch": 0, "volume": 0, "dialectId": "cantonese", "gender": "male"},
+    "dialect-northeast-male":  {"category": "dialect", "label": "东北话 · 龙老铁（男）","provider": "cosyvoice", "voiceId": "longlaotie_v3", "rate": 0, "pitch": 0, "volume": 0, "dialectId": "northeast", "gender": "male"},
+    "dialect-shanghai-female": {"category": "dialect", "label": "上海话 · 阿珍（女）", "provider": "qwen3-tts", "voiceId": "Jada",            "rate": 0, "pitch": 0, "volume": 0, "dialectId": "shanghai",  "gender": "female"},
+    "dialect-hokkien-female":  {"category": "dialect", "label": "闽南语 · 龙安闽（女）","provider": "cosyvoice", "voiceId": "longanmin_v3",  "rate": 0, "pitch": 0, "volume": 0, "dialectId": "hokkien",   "gender": "female"},
+    "dialect-shaanxi-male":    {"category": "dialect", "label": "陕西话 · 秦川（男）", "provider": "qwen3-tts", "voiceId": "Marcus",          "rate": 0, "pitch": 0, "volume": 0, "dialectId": "shaanxi",   "gender": "male"},
 }
+DIALECTS = {
+    "sichuan":   "四川话 / 川渝",
+    "cantonese": "广东话 / 粤语",
+    "northeast": "东北话",
+    "shanghai":  "上海话",
+    "hokkien":   "闽南语",
+    "shaanxi":   "陕西话",
+}
+DASHSCOPE_CHAT_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
 # 兼容旧 Candidate 页面 send 的三个 ElevenLabs ID，避免旧链接直接报错。
 VOICE_ALIASES = {
     "ocZQ262SsZb9RIxcQBOj": "female-bright",
@@ -230,17 +250,32 @@ def _resolve_voice_preset(requested):
 
 def _styled_voice(key, preset, emotion_id):
     style = EMOTION_STYLES.get(emotion_id or "neutral") or EMOTION_STYLES["neutral"]
+    provider = preset.get("provider", "edge-tts")
+    if provider == "edge-tts":
+        rate = _clamp_number(preset["rate"] + style["rate"], -50, 50)
+        pitch = _clamp_number(preset["pitch"] + style["pitch"], -50, 50)
+        volume = _clamp_number(preset["volume"] + style["volume"], -50, 50)
+    else:
+        # 原生方言 provider 自行把 emotionStyle 映射为 instruction / speech rate / pitch。
+        rate = int(preset.get("rate", 0))
+        pitch = int(preset.get("pitch", 0))
+        volume = int(preset.get("volume", 0))
     return {
         "requestedVoiceId": key,
-        "requestedProvider": preset["provider"],
+        "requestedProvider": provider,
         "actualVoiceId": preset["voiceId"],
-        "actualProvider": "edge-tts",
+        "actualProvider": provider,
         "emotionId": emotion_id or "neutral",
         "emotionStyle": style["style"],
         "category": preset["category"],
-        "rate": _clamp_number(preset["rate"] + style["rate"], -50, 50),
-        "pitch": _clamp_number(preset["pitch"] + style["pitch"], -50, 50),
-        "volume": _clamp_number(preset["volume"] + style["volume"], -50, 50),
+        "dialectId": preset.get("dialectId", ""),
+        "dialectLabel": DIALECTS.get(preset.get("dialectId", ""), ""),
+        "gender": preset.get("gender", ""),
+        "label": preset.get("label", key),
+        "rate": rate,
+        "pitch": pitch,
+        "volume": volume,
+        "contentType": "audio/mpeg",
         "fallbackReason": "",
     }
 
@@ -680,25 +715,43 @@ def _probe_duration(path):
 
 
 def synthesize_tts(speech_text, voice_id, tts_path, emotion_id=None, tts=None):
-    """Edge TTS 默认声音系统：逻辑 preset + 情绪 prosody + 分类 fallback。
-
-    返回结果包含 requested/actual voice、provider、emotion/style 和 fallbackReason。
-    """
+    """Voice V1 Edge 保持原 fallback；Voice V1.1 原生方言失败时明确失败，不回退普通话。"""
     requested_key, preset = _resolve_voice_preset(voice_id or DEFAULT_VOICE_ID)
     styled = _styled_voice(requested_key, preset, emotion_id)
 
     def _try(candidate):
-        EdgeTTSProvider(
-            voice=candidate["actualVoiceId"],
-            rate=_signed_percent(candidate["rate"]),
-            pitch=_signed_hz(candidate["pitch"]),
-            volume=_signed_percent(candidate["volume"]),
-        ).synthesize(speech_text, tts_path)
+        actual_provider_label = candidate.get("actualProvider") or "edge-tts"
+        provider_name = "edge-tts" if actual_provider_label.startswith("edge-tts") else actual_provider_label
+        if provider_name == "edge-tts":
+            provider = EdgeTTSProvider(
+                voice=candidate["actualVoiceId"],
+                rate=_signed_percent(candidate["rate"]),
+                pitch=_signed_hz(candidate["pitch"]),
+                volume=_signed_percent(candidate["volume"]),
+            )
+        elif provider_name == "qwen3-tts":
+            provider = QwenTTSProvider(
+                voice_id=candidate["actualVoiceId"],
+                emotion_style=candidate.get("emotionStyle", "neutral"),
+            )
+        elif provider_name == "cosyvoice":
+            provider = CosyVoiceProvider(
+                voice_id=candidate["actualVoiceId"],
+                emotion_style=candidate.get("emotionStyle", "neutral"),
+            )
+        else:
+            raise RuntimeError("unknown TTS provider: %s" % provider_name)
+        provider.synthesize(speech_text, tts_path)
+        candidate["actualProvider"] = actual_provider_label
+        candidate["contentType"] = getattr(provider, "last_content_type", "audio/mpeg") or "audio/mpeg"
         return candidate
 
     try:
         return _try(styled)
     except Exception as first_error:
+        if preset.get("provider", "edge-tts") != "edge-tts":
+            raise RuntimeError("native dialect tts failed for %s: %s: %s" % (
+                requested_key, type(first_error).__name__, first_error))
         reason = "%s: %s" % (type(first_error).__name__, first_error)
         category = styled.get("category") or "female"
         for fallback_key in CATEGORY_FALLBACKS.get(category, []):
@@ -717,6 +770,56 @@ def synthesize_tts(speech_text, voice_id, tts_path, emotion_id=None, tts=None):
             except Exception as second_error:
                 reason = "%s; fallback=%s: %s" % (reason, fallback_key, type(second_error).__name__)
         raise RuntimeError("tts failed for category %s: %s" % (category, reason))
+
+
+def rewrite_dialect_text(text, dialect_id):
+    """普通话原意 → 自然方言口语。只返回文本，不在这里直接合成语音。"""
+    if dialect_id not in DIALECTS:
+        raise ValueError("unsupported dialect")
+    text = (text or "").strip()
+    if not text:
+        raise ValueError("text required")
+    api_key = os.environ.get("DASHSCOPE_API_KEY", "").strip()
+    if not api_key:
+        raise RuntimeError("DASHSCOPE_API_KEY not configured")
+    target = DIALECTS[dialect_id]
+    system = (
+        "你是方言日常口语改写器。只输出改写后的句子，不要解释。"
+        "严格保持原意、事实、人物关系和情绪强度；不添加新信息；不使用网络梗、"
+        "不故意夸张土味、不写低俗内容。使用真实日常口语。"
+        "目标方言：%s。若原文已经自然，只做最小必要调整。" % target
+    )
+    payload = json.dumps({
+        "model": "qwen-plus",
+        "temperature": 0.25,
+        "messages": [
+            {"role": "system", "content": system},
+            {"role": "user", "content": "原文：\n" + text + "\n\n请直接输出改写后的方言文本。"},
+        ],
+    }).encode("utf-8")
+    req = urllib.request.Request(
+        DASHSCOPE_CHAT_URL,
+        data=payload,
+        headers={"Authorization": "Bearer " + api_key, "Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            result = json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        body = ""
+        try:
+            body = e.read().decode("utf-8", "replace")[:240]
+        except Exception:
+            pass
+        raise RuntimeError("dialect rewrite http %s: %s" % (e.code, body))
+    except Exception as e:
+        raise RuntimeError("dialect rewrite request failed: %s" % type(e).__name__)
+    try:
+        content = result["choices"][0]["message"]["content"].strip()
+    except Exception:
+        raise RuntimeError("dialect rewrite returned invalid response")
+    return content[:TEXT_MAX]
 
 
 # ===== A路成片 V1 统一模板（纯黑背景 + 暖金底部承托） =====
@@ -1191,7 +1294,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
                 % (tts_info.get("requestedVoiceId") or voice_id or "-", tts_info.get("actualVoiceId") or "-", tts_info.get("actualProvider") or "-", tts_info.get("emotionStyle") or "-", tts_info.get("fallbackReason") or "-", len(text), len(data), token, TTS_CACHE_TTL))
             self.send_response(200)
             self._cors()
-            self.send_header("Content-Type", "audio/mpeg")
+            self.send_header("Content-Type", tts_info.get("contentType") or "audio/mpeg")
             self.send_header("Content-Length", str(len(data)))
             self.send_header("Cache-Control", "no-store")
             self.send_header("X-TTS-Token", token)
@@ -1374,6 +1477,28 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             except (journey_store.JourneyUnavailable, ValueError) as error:
                 return self._send_json(503 if isinstance(error, journey_store.JourneyUnavailable) else 400, {"error": str(error)})
             return self._send_json(201, {"recorded": True}) if ok else self._not_found()
+        if path == "/rewrite-dialect":
+            data = self._read_json_body()
+            if data is None:
+                return self._send_json(400, {"error": "bad request"})
+            text = (data.get("text") or "").strip()
+            dialect_id = data.get("dialectId") or data.get("dialect") or ""
+            if not text:
+                return self._send_json(400, {"error": "请先输入原文"})
+            if len(text) > TEXT_MAX:
+                return self._send_json(400, {"error": "TEXT_TOO_LONG", "message": "这段内容较长，当前最多支持 %d 字，请适当精简后重试。" % TEXT_MAX})
+            if has_unsupported(text):
+                return self._send_json(400, {"error": "暂不支持 emoji / 特殊符号，请使用文字、数字、标点"})
+            if dialect_id not in DIALECTS:
+                return self._send_json(400, {"error": "unsupported dialect"})
+            if not rate_ok(self.client_address[0]):
+                return self._send_json(429, {"error": "too many requests"})
+            try:
+                dialect_text = rewrite_dialect_text(text, dialect_id)
+                return self._send_json(200, {"dialectId": dialect_id, "dialectLabel": DIALECTS[dialect_id], "speechText": dialect_text})
+            except Exception as e:
+                log("REWRITE-ERROR dialect=%s %s: %s" % (dialect_id, type(e).__name__, e))
+                return self._send_json(500, {"error": str(e)})
         if path == "/tts":
             return self._tts()
         if path == "/make-send":
@@ -1453,7 +1578,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             return self._send_json(429, {"error": "server busy"})
 
         emotion_id = (_emotions.get(item) or {}).get("emotionId") or "neutral"
-        tts_cached = take_tts_audio(tts_token, text, voice_id, emotion_id) if tts_token else None
+        tts_cached = take_tts_audio(tts_token, speech_text or text, voice_id, emotion_id) if tts_token else None
         tts_audio_path = tts_cached[0] if tts_cached else None
         tts_audio_info = tts_cached[1] if tts_cached else None
         if tts_token:
