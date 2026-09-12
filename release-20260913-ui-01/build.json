@@ -1,0 +1,12 @@
+{
+  "candidateId": "candidate-ui-polish-20260913-01",
+  "baseProductionRelease": "release-20260912-03",
+  "releaseId": "candidate-20260913-ui-01",
+  "buildId": "candidate-20260913-ui-01",
+  "manifestVersion": "candidate-20260913-ui-01-c1",
+  "manifestSha256": "661e68f933ddea6759cbd3a7efe9048be9e0c6ec25cc308fafd8f38091e9c618",
+  "releasePath": "/release-20260913-ui-01/",
+  "backendBaseUrl": "https://lugu-candidate-20260912-01-production.up.railway.app",
+  "builtAt": "2026-09-13T00:00:00Z",
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/"
+}

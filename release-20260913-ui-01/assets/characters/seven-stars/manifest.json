@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "basePath": "assets/characters/seven-stars",
+  "characters": [
+    {
+      "id": "xingyu-deer",
+      "name": "星语鹿",
+      "main": "xingyu-deer/main.png",
+      "size": [600, 900],
+      "transparent": true
+    },
+    {
+      "id": "xinguang-fox",
+      "name": "心光狐",
+      "main": "xinguang-fox/main.png",
+      "size": [600, 900],
+      "transparent": true
+    },
+    {
+      "id": "menghu-whale",
+      "name": "梦湖鲸",
+      "main": "menghu-whale/main.png",
+      "size": [600, 900],
+      "transparent": true
+    },
+    {
+      "id": "guangwei-cat",
+      "name": "光尾猫",
+      "main": "guangwei-cat/main.png",
+      "size": [600, 900],
+      "transparent": true
+    },
+    {
+      "id": "shouye-bear",
+      "name": "守夜熊",
+      "main": "shouye-bear/main.png",
+      "size": [600, 900],
+      "transparent": true
+    },
+    {
+      "id": "fengxin-rabbit",
+      "name": "风信兔",
+      "main": "fengxin-rabbit/main.png",
+      "size": [600, 900],
+      "transparent": true
+    },
+    {
+      "id": "gongming-gull",
+      "name": "共鸣鸥",
+      "main": "gongming-gull/main.png",
+      "size": [600, 900],
+      "transparent": true
+    }
+  ]
+}
