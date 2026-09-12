@@ -17,15 +17,18 @@ class TTSProvider:
 class EdgeTTSProvider(TTSProvider):
     name = "edge-tts"
 
-    def __init__(self, voice=None):
+    def __init__(self, voice=None, rate="+0%", volume="+0%", pitch="+0Hz"):
         self.voice = voice or os.environ.get("TTS_VOICE", "zh-CN-XiaoxiaoNeural")
+        self.rate = rate or "+0%"
+        self.volume = volume or "+0%"
+        self.pitch = pitch or "+0Hz"
 
     def synthesize(self, text, out_path):
         import asyncio
         import edge_tts
 
         async def _run():
-            com = edge_tts.Communicate(text, self.voice)
+            com = edge_tts.Communicate(text, self.voice, rate=self.rate, volume=self.volume, pitch=self.pitch)
             await com.save(out_path)
 
         asyncio.run(_run())

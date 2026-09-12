@@ -132,27 +132,94 @@ def _contract_error(item, requested_character, build_id, manifest_version):
         }
     return None
 
-# 七星使者 · 测试声音池（ElevenLabs premade，voice_id 为稳定引用）
-VOICE_LIBRARY = {
-    "FGY2WhTYpPnrIDTdsKH5": "Laura",
-    "cgSgspJ2msm6clMCkdW9": "Jessica",
-    "EXAVITQu4vr4xnSDxMaL": "Sarah",
-    "pFZP5JQG7iQjIQuC4Bku": "Lily",
-    "hpp4J3VqNfWAUOO0d1Us": "Bella",
-    "Xb7hH8MSUJpSbSDYk0k2": "Alice",
-    "TX3LPaxmHKxFdv7VOQHJ": "Liam",
-    "bIHbv24MWmeRgasZH58o": "Will",
-    "pNInz6obpgDQGcFmaJgB": "Adam",
-    "JBFqnCBsd6RMkjVDRZzb": "George",
-    "cjVigY5qzO86Huf0OWal": "Eric",
-    "nPczCjzI2devNBz1zQrb": "Brian",
-    "pqHfZKP75CvOlQylNhV4": "Bill",
-    # 风信兔 · 角色化测试候选（characters_animation，测试默认 Lulu，非最终角色声）
-    "ocZQ262SsZb9RIxcQBOj": "Lulu",
-    "lhTvHflPVOqgSWyuWQry": "Hina",
-    "Jr72SE8p9OcJmr8hyX0D": "Chutki",
+# 七星使者 · Candidate 默认声音系统（Edge TTS 稳定优先）
+VOICE_PRESETS = {
+    # 儿童：三种明显不同的节奏、音高和基础音色
+    "child-bright":   {"category": "child",  "label": "儿童·明亮活泼", "provider": "edge-tts", "voiceId": "zh-CN-XiaoyiNeural",     "rate": 8, "pitch": 20, "volume": 0},
+    "child-soft":     {"category": "child",  "label": "儿童·软糯委屈", "provider": "edge-tts", "voiceId": "zh-CN-XiaoxiaoNeural",   "rate": -6, "pitch": 14, "volume": 0},
+    "child-spirited": {"category": "child",  "label": "儿童·有脾气",   "provider": "edge-tts", "voiceId": "zh-CN-YunxiaNeural",     "rate": 5, "pitch": 10, "volume": 0},
+    # 女性：明亮、细腻、成熟力量
+    "female-bright":  {"category": "female", "label": "女性·年轻明亮", "provider": "edge-tts", "voiceId": "zh-CN-XiaoxiaoNeural",   "rate": 8, "pitch": 5, "volume": 0},
+    "female-gentle":  {"category": "female", "label": "女性·温柔细腻", "provider": "edge-tts", "voiceId": "zh-CN-XiaoxiaoNeural",   "rate": -8, "pitch": -8, "volume": 0},
+    "female-powerful":{"category": "female", "label": "女性·成熟有力量", "provider": "edge-tts", "voiceId": "zh-CN-XiaoyiNeural",   "rate": -5, "pitch": -18, "volume": 0},
+    # 男性：青年阳光、克制温柔、成熟力量
+    "male-sunny":     {"category": "male",   "label": "男性·青年阳光", "provider": "edge-tts", "voiceId": "zh-CN-YunxiNeural",      "rate": 8, "pitch": 10, "volume": 0},
+    "male-gentle":    {"category": "male",   "label": "男性·青年温柔", "provider": "edge-tts", "voiceId": "zh-CN-YunyangNeural",    "rate": -8, "pitch": -5, "volume": 0},
+    "male-powerful":  {"category": "male",   "label": "男性·成熟有力量", "provider": "edge-tts", "voiceId": "zh-CN-YunjianNeural",  "rate": -3, "pitch": -10, "volume": 5},
 }
-DEFAULT_VOICE_ID = "Jr72SE8p9OcJmr8hyX0D"  # Chutki（风信兔正式声音身份）
+# 兼容旧 Candidate 页面 send 的三个 ElevenLabs ID，避免旧链接直接报错。
+VOICE_ALIASES = {
+    "ocZQ262SsZb9RIxcQBOj": "female-bright",
+    "lhTvHflPVOqgSWyuWQry": "female-gentle",
+    "Jr72SE8p9OcJmr8hyX0D": "child-spirited",
+}
+# 情绪层只改变 prosody，不改变播放时长和音频结构。
+EMOTION_STYLES = {
+    "happy":      {"style": "happy",     "rate": 6,  "pitch": 8,   "volume": 0},
+    "wronged":    {"style": "wronged",   "rate": -8, "pitch": 5,   "volume": -2},
+    "aggrieved":  {"style": "wronged",   "rate": -8, "pitch": 5,   "volume": -2},
+    "angry":      {"style": "angry",     "rate": 5,  "pitch": -12, "volume": 5},
+    "playful":    {"style": "playful",   "rate": 10, "pitch": 12,  "volume": 0},
+    "jealous":    {"style": "jealous",   "rate": -3, "pitch": 1,   "volume": 0},
+    "stubborn":   {"style": "stubborn",  "rate": 2,  "pitch": -4,  "volume": 0},
+    "surprised":  {"style": "surprised", "rate": 12, "pitch": 10,  "volume": 2},
+    "confused":   {"style": "confused",  "rate": -6, "pitch": 2,   "volume": 0},
+    "disgusted":  {"style": "disgusted", "rate": 2,  "pitch": -8,  "volume": 0},
+    "guilty":     {"style": "guilty",    "rate": -10,"pitch": 4,   "volume": -2},
+    "apologetic": {"style": "comfort",   "rate": -10,"pitch": -4,  "volume": -2},
+    "lowenergy":  {"style": "comfort",   "rate": -14,"pitch": -6,  "volume": -2},
+    "cool":       {"style": "cool",      "rate": -4, "pitch": -8,  "volume": 0},
+    "gloating":   {"style": "gloating",  "rate": 6,  "pitch": 2,   "volume": 0},
+    "comfort":    {"style": "comfort",   "rate": -12,"pitch": -5,  "volume": -2},
+    "neutral":    {"style": "neutral",   "rate": 0,  "pitch": 0,   "volume": 0},
+}
+CATEGORY_FALLBACKS = {
+    "child":  ["child-soft", "child-bright", "child-spirited"],
+    "female": ["female-gentle", "female-bright", "female-powerful"],
+    "male":   ["male-sunny", "male-gentle", "male-powerful"],
+}
+DEFAULT_VOICE_ID = "female-bright"
+
+
+def _clamp_number(value, low, high):
+    return max(low, min(high, int(round(value))))
+
+
+def _signed_percent(value):
+    return "%+d%%" % _clamp_number(value, -50, 50)
+
+
+def _signed_hz(value):
+    return "%+dHz" % _clamp_number(value, -50, 50)
+
+
+def _resolve_voice_preset(requested):
+    key = VOICE_ALIASES.get(requested, requested)
+    preset = VOICE_PRESETS.get(key)
+    if preset:
+        return key, dict(preset)
+    # Direct Edge voice IDs remain usable for diagnostics; classify them as female by default.
+    if isinstance(requested, str) and requested.startswith("zh-"):
+        return requested, {"category": "female", "label": requested, "provider": "edge-tts", "voiceId": requested, "rate": 0, "pitch": 0, "volume": 0}
+    raise ValueError("unknown voice preset: %s" % requested)
+
+
+def _styled_voice(key, preset, emotion_id):
+    style = EMOTION_STYLES.get(emotion_id or "neutral") or EMOTION_STYLES["neutral"]
+    return {
+        "requestedVoiceId": key,
+        "requestedProvider": preset["provider"],
+        "actualVoiceId": preset["voiceId"],
+        "actualProvider": "edge-tts",
+        "emotionId": emotion_id or "neutral",
+        "emotionStyle": style["style"],
+        "category": preset["category"],
+        "rate": _clamp_number(preset["rate"] + style["rate"], -50, 50),
+        "pitch": _clamp_number(preset["pitch"] + style["pitch"], -50, 50),
+        "volume": _clamp_number(preset["volume"] + style["volume"], -50, 50),
+        "fallbackReason": "",
+    }
+
 
 FPS = int(os.environ.get("FPS", "18"))
 SERVICE_ENABLED = os.environ.get("SERVICE_ENABLED", "true").lower() in ("1", "true", "yes", "on")
@@ -437,16 +504,12 @@ def take_app_video(token):
         return record["path"], record["expires"], record["reads"]
 
 
-def _tts_cache_key(text, voice_id):
-    """试听缓存 key：覆盖 text / voiceId / 实际影响 TTS 的 model 与 output format。
-
-    当前 emotion 不影响 TTS，故不纳入 key；若日后 emotion/style 参与 TTS 必须加入。
-    """
-    model_id = os.environ.get("ELEVENLABS_MODEL_ID", ELEVENLABS_MODEL_ID_DEFAULT)
-    return _sha256("\0".join([text, voice_id or "", model_id, ELEVENLABS_OUTPUT_FORMAT]))
+def _tts_cache_key(text, voice_id, emotion_id="neutral"):
+    """试听缓存 key：覆盖文本、逻辑 voice 与情绪 prosody。"""
+    return _sha256("\0".join([text, voice_id or "", emotion_id or "neutral", "edge-tts-v1"]))
 
 
-def store_tts_audio(data, text, voice_id):
+def store_tts_audio(data, text, voice_id, emotion_id="neutral", tts_info=None):
     """把试听生成的 mp3 落入临时缓存，返回 ttsToken。"""
     os.makedirs(TTS_CACHE_DIR, exist_ok=True)
     now = time.time()
@@ -466,13 +529,15 @@ def store_tts_audio(data, text, voice_id):
             "expires": now + TTS_CACHE_TTL,
             "text": text,
             "voice_id": voice_id or "",
-            "key": _tts_cache_key(text, voice_id),
+            "emotion_id": emotion_id or "neutral",
+            "key": _tts_cache_key(text, voice_id, emotion_id),
+            "tts_info": dict(tts_info or {}),
         }
     return token
 
 
-def take_tts_audio(token, text, voice_id):
-    """校验 token 有效且与当前 text/voiceId 对应；命中返回音频文件路径，否则 None。"""
+def take_tts_audio(token, text, voice_id, emotion_id="neutral"):
+    """校验 token 有效且与当前 text/voice/emotion 对应；命中返回 (path, tts_info)。"""
     if not token:
         return None
     now = time.time()
@@ -486,9 +551,9 @@ def take_tts_audio(token, text, voice_id):
                     pass
                 _tts_cache.pop(token, None)
             return None
-        if record["text"] != text or record["voice_id"] != (voice_id or ""):
+        if record["text"] != text or record["voice_id"] != (voice_id or "") or record.get("emotion_id", "neutral") != (emotion_id or "neutral"):
             return None
-        return record["path"]
+        return record["path"], dict(record.get("tts_info") or {})
 
 
 # 异步生成任务：/make-send?async=1 立即返回 202 {job}，后台线程生成并写入
@@ -499,11 +564,12 @@ _jobs = {}
 _jobs_lock = threading.Lock()
 
 
-def _run_job_async(job_id, text, item, voice_id, tts_audio_path=None, requested_character="", build_id="", manifest_version=""):
+def _run_job_async(job_id, text, item, voice_id, tts_audio_path=None, tts_audio_info=None, requested_character="", build_id="", manifest_version=""):
     workdir = None
     try:
         workdir = tempfile.mkdtemp(prefix="make-send-")
         final, meta = generate(item, text, workdir, voice_id=voice_id, speech_text=None, tts_audio_path=tts_audio_path,
+                               tts_audio_info=tts_audio_info,
                                requested_item=item, requested_character=requested_character,
                                build_id=build_id, manifest_version=manifest_version)
         with open(final, "rb") as f:
@@ -512,8 +578,8 @@ def _run_job_async(job_id, text, item, voice_id, tts_audio_path=None, requested_
         with _jobs_lock:
             t0 = _jobs.get(job_id, {}).get("t0", time.time())
             _jobs[job_id] = {"status": "done", "token": token, "text_len": len(text), "meta": meta}
-        log("JOB-DONE job=%s item=%s voice=%s tts_provider=%s text_len=%d lines=%d font=%d tts=%.2fs tts_dur=%.2fs vdur=%.2fs ffmpeg=%.2fs total=%.2fs size=%d"
-            % (job_id, item, meta.get("voice_id") or "-", meta.get("tts_provider") or "-", len(text), meta.get("lines", 0), meta.get("font_size", 0),
+        log("JOB-DONE job=%s item=%s requested_voice=%s actual_voice=%s provider=%s style=%s fallback=%s text_len=%d lines=%d font=%d tts=%.2fs tts_dur=%.2fs vdur=%.2fs ffmpeg=%.2fs total=%.2fs size=%d"
+            % (job_id, item, meta.get("requestedVoiceId") or "-", meta.get("actualVoiceId") or "-", meta.get("actualProvider") or "-", meta.get("emotionStyle") or "-", meta.get("fallbackReason") or "-", len(text), meta.get("lines", 0), meta.get("font_size", 0),
                meta.get("tts", 0), meta.get("tts_duration") or 0.0, meta.get("video_duration") or 0.0,
                meta.get("ffmpeg", 0), time.time() - t0, len(data)))
     except Exception as e:
@@ -588,28 +654,44 @@ def _probe_duration(path):
     return None
 
 
-def synthesize_tts(speech_text, voice_id, tts_path, tts=None):
-    """统一 TTS 合成入口：ElevenLabs 命中优先，失败/未知声音降级 edge-tts。
+def synthesize_tts(speech_text, voice_id, tts_path, emotion_id=None, tts=None):
+    """Edge TTS 默认声音系统：逻辑 preset + 情绪 prosody + 分类 fallback。
 
-    试听接口 /tts 与 /make-send 共用此函数，保证两者声音行为一致。
+    返回结果包含 requested/actual voice、provider、emotion/style 和 fallbackReason。
     """
-    provider_used = "edge-tts"
-    if voice_id and voice_id in VOICE_LIBRARY:
-        try:
-            ElevenLabsProvider(voice_id).synthesize(speech_text, tts_path)
-            provider_used = "elevenlabs"
-        except Exception as e:
-            log("ELEVENLABS-FALLBACK voice=%s err=%s" % (voice_id, "%s: %s" % (type(e).__name__, e)))
-            make_tts_provider("edge-tts").synthesize(speech_text, tts_path)
-            provider_used = "edge-tts-fallback"
-    else:
-        if voice_id:
-            log("UNKNOWN-VOICE voice=%s fallback=edge-tts" % voice_id)
-            provider_used = "edge-tts-fallback"
-        (tts or make_tts_provider("edge-tts")).synthesize(speech_text, tts_path)
-    return provider_used
+    requested_key, preset = _resolve_voice_preset(voice_id or DEFAULT_VOICE_ID)
+    styled = _styled_voice(requested_key, preset, emotion_id)
 
+    def _try(candidate):
+        EdgeTTSProvider(
+            voice=candidate["actualVoiceId"],
+            rate=_signed_percent(candidate["rate"]),
+            pitch=_signed_hz(candidate["pitch"]),
+            volume=_signed_percent(candidate["volume"]),
+        ).synthesize(speech_text, tts_path)
+        return candidate
 
+    try:
+        return _try(styled)
+    except Exception as first_error:
+        reason = "%s: %s" % (type(first_error).__name__, first_error)
+        category = styled.get("category") or "female"
+        for fallback_key in CATEGORY_FALLBACKS.get(category, []):
+            if fallback_key == requested_key:
+                continue
+            fallback_preset = VOICE_PRESETS.get(fallback_key)
+            if not fallback_preset:
+                continue
+            candidate = _styled_voice(fallback_key, fallback_preset, emotion_id)
+            candidate["requestedVoiceId"] = requested_key
+            candidate["requestedProvider"] = preset.get("provider", "edge-tts")
+            candidate["actualProvider"] = "edge-tts-category-fallback"
+            candidate["fallbackReason"] = reason
+            try:
+                return _try(candidate)
+            except Exception as second_error:
+                reason = "%s; fallback=%s: %s" % (reason, fallback_key, type(second_error).__name__)
+        raise RuntimeError("tts failed for category %s: %s" % (category, reason))
 
 
 # ===== A路成片 V1 统一模板（纯黑背景 + 暖金底部承托） =====
@@ -750,7 +832,7 @@ def _v1_compose(item, text, master, tts_path, final, final_duration, speech_star
         raise RuntimeError("v1 ffmpeg rc=%d %s"%(r.returncode, r.stderr[-2500:]))
     return fsize, nlines
 
-def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts_audio_path=None,
+def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts_audio_path=None, tts_audio_info=None,
              requested_item=None, requested_character=None, build_id=None, manifest_version=None):
     actual_item = item
     actual_entry = _emotions.get(actual_item)
@@ -813,12 +895,23 @@ def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts
     if tts_audio_path and os.path.isfile(tts_audio_path):
         # 试听缓存命中：直接复用同一份音频文件，不再次调用 TTS。
         shutil.copyfile(tts_audio_path, tts_path)
-        provider_used = "tts-cache"
+        tts_info = dict(tts_audio_info or {})
+        tts_info.setdefault("requestedVoiceId", voice_id or DEFAULT_VOICE_ID)
+        tts_info.setdefault("actualVoiceId", tts_info.get("actualVoiceId") or voice_id or DEFAULT_VOICE_ID)
+        tts_info.setdefault("actualProvider", "tts-cache")
+        tts_info.setdefault("emotionStyle", (actual_entry.get("emotionId") or "neutral"))
+        tts_info.setdefault("fallbackReason", "")
     else:
-        provider_used = synthesize_tts(speech_text, voice_id, tts_path, tts=tts)
+        tts_info = synthesize_tts(speech_text, voice_id, tts_path, emotion_id=actual_entry.get("emotionId"), tts=tts)
     meta["tts"] = time.time() - t0
-    meta["tts_provider"] = provider_used
-    meta["voice_id"] = voice_id or ""
+    meta["tts_provider"] = tts_info.get("actualProvider") or "edge-tts"
+    meta["voice_id"] = tts_info.get("actualVoiceId") or voice_id or ""
+    meta["requestedVoiceId"] = tts_info.get("requestedVoiceId") or voice_id or DEFAULT_VOICE_ID
+    meta["requestedProvider"] = tts_info.get("requestedProvider") or "edge-tts"
+    meta["actualVoiceId"] = tts_info.get("actualVoiceId") or voice_id or DEFAULT_VOICE_ID
+    meta["actualProvider"] = tts_info.get("actualProvider") or "edge-tts"
+    meta["emotionStyle"] = tts_info.get("emotionStyle") or actual_entry.get("emotionId") or "neutral"
+    meta["fallbackReason"] = tts_info.get("fallbackReason") or ""
 
     t0 = time.time()
     # 动态时长：最终视频时长 = max(保底, TTS 实测时长 + 尾段预留)
@@ -930,7 +1023,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
             "Access-Control-Expose-Headers",
             "X-Video-Path, X-Video-Expires-In, X-Video-Id, X-Journey-Id, "
             "X-Parent-Video-Id, X-Generation, X-Remix-Entry, "
-            "X-TTS-Token, X-TTS-Provider, X-TTS-Voice",
+            "X-TTS-Token, X-TTS-Provider, X-TTS-Voice, X-TTS-Requested-Voice, X-TTS-Emotion-Style, X-TTS-Fallback-Reason",
         )
 
     def _send_json(self, code, obj):
@@ -1025,9 +1118,10 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         return self._tts_serve(
             data.get("text", "") or "",
             data.get("voice") or data.get("voiceId") or DEFAULT_VOICE_ID,
+            data.get("item") or data.get("itemId") or "",
         )
 
-    def _tts_serve(self, text, voice_id):
+    def _tts_serve(self, text, voice_id, item_id=""):
         """试听：只生成 TTS 音频并返回 audio/mpeg + X-TTS-Token，不跑 ffmpeg、不生成视频。"""
         if not read_enabled():
             return self._send_json(503, {"error": "service temporarily unavailable"})
@@ -1046,23 +1140,27 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         try:
             workdir = tempfile.mkdtemp(prefix="tts-")
             tts_path = os.path.join(workdir, "tts.mp3")
-            speech_text = text  # 当前 build_speech_text 原样返回 text，emotion 不影响 TTS
-            provider_used = synthesize_tts(speech_text, voice_id, tts_path)
+            speech_text = text
+            emotion_id = (_emotions.get(item_id) or {}).get("emotionId") or "neutral"
+            tts_info = synthesize_tts(speech_text, voice_id, tts_path, emotion_id=emotion_id)
             with open(tts_path, "rb") as f:
                 data = f.read()
             if not data:
                 raise RuntimeError("tts returned empty audio")
-            token = store_tts_audio(data, speech_text, voice_id)
-            log("TTS-OK voice=%s provider=%s text_len=%d bytes=%d token=%s ttl=%ds"
-                % (voice_id or "-", provider_used, len(text), len(data), token, TTS_CACHE_TTL))
+            token = store_tts_audio(data, speech_text, voice_id, emotion_id=emotion_id, tts_info=tts_info)
+            log("TTS-OK requested_voice=%s actual_voice=%s provider=%s style=%s fallback=%s text_len=%d bytes=%d token=%s ttl=%ds"
+                % (tts_info.get("requestedVoiceId") or voice_id or "-", tts_info.get("actualVoiceId") or "-", tts_info.get("actualProvider") or "-", tts_info.get("emotionStyle") or "-", tts_info.get("fallbackReason") or "-", len(text), len(data), token, TTS_CACHE_TTL))
             self.send_response(200)
             self._cors()
             self.send_header("Content-Type", "audio/mpeg")
             self.send_header("Content-Length", str(len(data)))
             self.send_header("Cache-Control", "no-store")
             self.send_header("X-TTS-Token", token)
-            self.send_header("X-TTS-Provider", provider_used)
-            self.send_header("X-TTS-Voice", voice_id or "")
+            self.send_header("X-TTS-Provider", tts_info.get("actualProvider") or "")
+            self.send_header("X-TTS-Voice", tts_info.get("actualVoiceId") or "")
+            self.send_header("X-TTS-Requested-Voice", tts_info.get("requestedVoiceId") or "")
+            self.send_header("X-TTS-Emotion-Style", tts_info.get("emotionStyle") or "")
+            self.send_header("X-TTS-Fallback-Reason", tts_info.get("fallbackReason") or "")
             self.end_headers()
             self.wfile.write(data)
         except Exception as e:
@@ -1311,9 +1409,12 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         if not SEM.acquire(blocking=False):
             return self._send_json(429, {"error": "server busy"})
 
-        tts_audio_path = take_tts_audio(tts_token, text, voice_id) if tts_token else None
+        emotion_id = (_emotions.get(item) or {}).get("emotionId") or "neutral"
+        tts_cached = take_tts_audio(tts_token, text, voice_id, emotion_id) if tts_token else None
+        tts_audio_path = tts_cached[0] if tts_cached else None
+        tts_audio_info = tts_cached[1] if tts_cached else None
         if tts_token:
-            log("TTS-TOKEN %s text_len=%d voice=%s" % ("hit" if tts_audio_path else "miss", len(text), voice_id or "-"))
+            log("TTS-TOKEN %s text_len=%d voice=%s emotion=%s" % ("hit" if tts_audio_path else "miss", len(text), voice_id or "-", emotion_id))
 
         if async_mode:
             job_id = secrets.token_urlsafe(16)
@@ -1322,13 +1423,13 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
                 for jid in [j for j, r in list(_jobs.items()) if now - r.get("t0", 0) > 900]:
                     _jobs.pop(jid, None)
                 _jobs[job_id] = {"status": "pending", "t0": now, "text_len": len(text)}
-            threading.Thread(target=_run_job_async, args=(job_id, text, item, voice_id, tts_audio_path, requested_character, build_id, manifest_version), daemon=True).start()
+            threading.Thread(target=_run_job_async, args=(job_id, text, item, voice_id, tts_audio_path, tts_audio_info, requested_character, build_id, manifest_version), daemon=True).start()
             return self._send_json(202, {"job": job_id, "status": "pending"})
 
         workdir = None
         try:
             workdir = tempfile.mkdtemp(prefix="make-send-")
-            final, meta = generate(item, text, workdir, voice_id=voice_id, speech_text=speech_text, tts_audio_path=tts_audio_path,
+            final, meta = generate(item, text, workdir, voice_id=voice_id, speech_text=speech_text, tts_audio_path=tts_audio_path, tts_audio_info=tts_audio_info,
                                    requested_item=item, requested_character=requested_character,
                                    build_id=build_id, manifest_version=manifest_version)
             if meta.get("requestedItem") != meta.get("actualItem") or meta.get("requestedCharacter") != meta.get("actualCharacter"):
@@ -1346,8 +1447,8 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
                     return self._send_json(410, {"error": str(error)})
                 except journey_store.JourneyUnavailable as error:
                     return self._send_json(503, {"error": str(error)})
-            log("SUCCESS item=%s voice=%s tts_provider=%s text_len=%d lines=%d font=%d tts=%.2fs tts_dur=%.2fs vdur=%.2fs ffmpeg=%.2fs total=%.2fs size=%d"
-                % (item, meta.get("voice_id") or "-", meta.get("tts_provider") or "-", len(text), meta["lines"], meta["font_size"], meta["tts"],
+            log("SUCCESS item=%s requested_voice=%s actual_voice=%s tts_provider=%s style=%s fallback=%s text_len=%d lines=%d font=%d tts=%.2fs tts_dur=%.2fs vdur=%.2fs ffmpeg=%.2fs total=%.2fs size=%d"
+                % (item, meta.get("requestedVoiceId") or "-", meta.get("actualVoiceId") or "-", meta.get("tts_provider") or "-", meta.get("emotionStyle") or "-", meta.get("fallbackReason") or "-", len(text), meta["lines"], meta["font_size"], meta["tts"],
                    meta.get("tts_duration") or 0.0, meta.get("video_duration") or 0.0, meta["ffmpeg"],
                    time.time() - start, len(data)))
             self.send_response(200)
@@ -1359,8 +1460,11 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             self.send_header("X-Release-Id", RELEASE_ID)
             self.send_header("X-Build-Id", BUILD_ID)
             self.send_header("X-Manifest-Version", MANIFEST_VERSION)
-            self.send_header("X-TTS-Provider", meta.get("tts_provider", ""))
-            self.send_header("X-TTS-Voice", meta.get("voice_id", ""))
+            self.send_header("X-TTS-Provider", meta.get("actualProvider", ""))
+            self.send_header("X-TTS-Voice", meta.get("actualVoiceId", ""))
+            self.send_header("X-TTS-Requested-Voice", meta.get("requestedVoiceId", ""))
+            self.send_header("X-TTS-Emotion-Style", meta.get("emotionStyle", ""))
+            self.send_header("X-TTS-Fallback-Reason", meta.get("fallbackReason", ""))
             self.send_header("X-TTS-Duration-Sec", "%.3f" % (meta.get("tts_duration") or 0.0))
             self.send_header("X-Video-Duration-Sec", "%.3f" % (meta.get("video_duration") or 0.0))
             self.send_header("X-Subtitle-Lines", str(meta.get("lines", 0)))
