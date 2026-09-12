@@ -1,9 +1,9 @@
 {
   "schemaVersion": 2,
-  "releaseId": "release-20260912-02",
-  "buildId": "release-20260912-02",
-  "manifestVersion": "20260912-02-c1",
-  "generatedAt": "2026-09-12T09:45:00Z",
+  "releaseId": "release-20260912-03",
+  "buildId": "release-20260912-03",
+  "manifestVersion": "20260912-03-c1",
+  "generatedAt": "2026-09-12T11:30:00Z",
   "canonicalUrl": "https://lugu.love/",
   "production": {
     "characters": [
