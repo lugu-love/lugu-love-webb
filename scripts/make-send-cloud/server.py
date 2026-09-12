@@ -722,17 +722,17 @@ def _v1_compose(item, text, master, tts_path, final, final_duration, speech_star
         s=V1_TARGET_H/(y1-y0)
         sw=max(2,(int(round(720*s))//2)*2); sh=int(round(1280*s))
         top=int(round(V1_FEET_Y-(y1+1)*s)); left=(720-sw)//2
-    r0=max(0,-top); hc=min(sh-r0,H); pt=max(0,top)
-    l0=max(0,-left); wc=min(sw-l0,W); pl=max(0,left)
     name=emo.get("displayName") or emo.get("label") or item
     code=emo.get("code") or "00"
     bp=os.path.join(workdir,"v1_bottom.png"); sp=os.path.join(workdir,"v1_sub.png")
     _v1_bottom_png("%s · E%s"%(name,code), bp)
     fsize, nlines=_v1_subtitle_png(text, sp)
-    chain=("[0:v]format=yuva420p,scale=%d:%d:flags=lanczos,crop=%d:%d:%d:%d,pad=%d:%d:%d:%d:black[base];"
+    chain=("[0:v]format=yuva420p,scale=%d:%d:flags=lanczos[fg];"
+           "color=c=black:s=%dx%d:r=%d:d=%.3f[bg];"
+           "[bg][fg]overlay=x=%d:y=%d:shortest=1[base];"
            "[2:v]format=rgba[bp];[3:v]format=rgba[sp];"
            "[base][bp]overlay=0:0:shortest=1[b1];[b1][sp]overlay=0:0:shortest=1[ov];"
-           "[ov]fps=%d[vo]" % (sw,sh,wc,hc,l0,r0,W,H,pl,pt,FPS))
+           "[ov]fps=%d[vo]" % (sw,sh,W,H,FPS,master_dur+0.1,left,top,FPS))
     map_v="[vo]"
     if final_duration > master_dur + 0.05:
         chain += ";%s[vo]tpad=stop_mode=clone:stop_duration=%.3f[vout]" % ("", final_duration-master_dur)
@@ -747,7 +747,8 @@ def _v1_compose(item, text, master, tts_path, final, final_duration, speech_star
     else:
         audio="[1:a]apad[aout]"
     chain += ";"+audio
-    cmd=[FFMPEG,"-y","-i",master,"-i",tts_path,"-loop","1","-framerate",str(FPS),"-i",bp,"-loop","1","-framerate",str(FPS),"-i",sp,
+    input_codec = ["-c:v", "libvpx-vp9"] if item.startswith("fox-") else []
+    cmd=[FFMPEG,"-y"] + input_codec + ["-i",master,"-i",tts_path,"-loop","1","-framerate",str(FPS),"-i",bp,"-loop","1","-framerate",str(FPS),"-i",sp,
          "-filter_complex",chain,"-map",map_v,"-map","[aout]",
          "-threads",str(FFMPEG_THREADS),"-c:v","libx264","-preset","medium","-crf","18","-maxrate","%dk"%BITRATE_KBPS,
          "-bufsize","%dk"%(BITRATE_KBPS*2),"-pix_fmt","yuv420p","-r",str(FPS),"-movflags","+faststart",
