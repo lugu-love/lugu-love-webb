@@ -840,7 +840,7 @@ def _v1_compose(item, text, master, tts_path, final, final_duration, speech_star
     else:
         audio="[1:a]apad[aout]"
     chain += ";"+audio
-    input_codec = ["-c:v", "libvpx-vp9"] if item.startswith("fox-") else []
+    input_codec = ["-c:v", "libvpx-vp9"] if master_rel.lower().endswith(".mkv") else []
     cmd=[FFMPEG,"-y"] + input_codec + ["-stream_loop","-1","-i",master,"-i",tts_path,"-loop","1","-framerate",str(FPS),"-i",bp,"-loop","1","-framerate",str(FPS),"-i",sp,
          "-filter_complex",chain,"-map",map_v,"-map","[aout]",
          "-threads",str(FFMPEG_THREADS),"-c:v","libx264","-preset","medium","-crf","18","-maxrate","%dk"%BITRATE_KBPS,
