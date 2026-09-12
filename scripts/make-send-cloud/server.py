@@ -22,6 +22,7 @@ import re
 from text_layout import layout_lines, has_unsupported
 from tts_provider import (
     make_tts_provider,
+    EdgeTTSProvider,
     ElevenLabsProvider,
     ELEVENLABS_MODEL_ID_DEFAULT,
     ELEVENLABS_OUTPUT_FORMAT,
