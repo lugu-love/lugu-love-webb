@@ -22,6 +22,7 @@ import re
 from text_layout import layout_lines, has_unsupported
 from tts_provider import (
     make_tts_provider,
+    EdgeTTSProvider,
     ElevenLabsProvider,
     ELEVENLABS_MODEL_ID_DEFAULT,
     ELEVENLABS_OUTPUT_FORMAT,
@@ -30,72 +31,219 @@ import journey_store
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
-MASTERS_DIR = os.path.join(ROOT, "masters")
-MANIFEST_FILE = os.path.join(ROOT, "emotion-manifest.json")
+GENERATION_MASTERS_DIR = os.environ.get("GENERATION_MASTERS_DIR", os.path.join(ROOT, "generation-masters"))
+ASSET_MANIFEST_FILE = os.environ.get("ASSET_MANIFEST_FILE", os.path.join(ROOT, "asset-manifest.json"))
 POC_SAMPLE_FILE = os.path.join(ROOT, "poc", "sample.mp4")
 FFMPEG = os.environ.get("FFMPEG_BIN", "ffmpeg")
 FONT_FILE = os.environ.get("FONT_FILE", "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc")
 FONT_INDEX = int(os.environ.get("FONT_INDEX", "2"))
 FONT_FC = os.environ.get("FONT_FC", "Noto Sans CJK SC")
 
-# 兜底映射：仅当 emotion-manifest.json 缺失/损坏时使用。
-_FALLBACK_MASTERS = {
-    "rabbit-happy":     ("happy-master-v2.mp4", "开心"),
-    "rabbit-aggrieved": ("wronged-master-v2.mp4", "委屈"),
-    "rabbit-angry":     ("angry-master-v2.mp4", "生气"),
-    "rabbit-playful":   ("playful-master-v2.mp4", "调皮"),
-}
-_FALLBACK_JOURNEY_META = {
-    "rabbit-happy":     ("fengxin-rabbit", "happy"),
-    "rabbit-aggrieved": ("fengxin-rabbit", "wronged"),
-    "rabbit-angry":     ("fengxin-rabbit", "angry"),
-    "rabbit-playful":   ("fengxin-rabbit", "playful"),
-}
+
+def _load_asset_manifest():
+    """Load the one production asset manifest. There is no runtime fallback."""
+    with open(ASSET_MANIFEST_FILE, "r", encoding="utf-8") as f:
+        manifest = json.load(f)
+    if manifest.get("schemaVersion") != 2:
+        raise RuntimeError("unsupported asset manifest schema")
+    release_id = manifest.get("releaseId")
+    build_id = manifest.get("buildId")
+    manifest_version = manifest.get("manifestVersion")
+    items = manifest.get("items") or {}
+    characters = ((manifest.get("production") or {}).get("characters") or [])
+    expected = {"fengxin-rabbit": 11, "xinguang-fox": 8}
+    seen = {}
+    for character in characters:
+        cid = character.get("characterId")
+        order = character.get("itemOrder") or []
+        if cid not in expected or len(order) != expected[cid]:
+            raise RuntimeError("invalid production character order")
+        seen[cid] = set(order)
+    if set(seen) != set(expected) or len(items) != sum(expected.values()):
+        raise RuntimeError("invalid production item count")
+    for item_id, item in items.items():
+        if item.get("itemId") != item_id or item.get("status") != "production":
+            raise RuntimeError("invalid item identity: %s" % item_id)
+        cid = item.get("characterId")
+        if cid not in seen or item_id not in seen[cid]:
+            raise RuntimeError("item is outside production order: %s" % item_id)
+        if not item.get("assetVersion"):
+            raise RuntimeError("missing asset version: %s" % item_id)
+        master = item.get("generationMaster") or {}
+        if not master.get("ref") or not master.get("sha256"):
+            raise RuntimeError("missing generation master: %s" % item_id)
+        for key in ("webVp9", "webHevc", "mobileFallback"):
+            delivery = item.get(key) or {}
+            if not delivery.get("url") or not delivery.get("sha256") or not delivery.get("size"):
+                raise RuntimeError("missing %s delivery: %s" % (key, item_id))
+    return manifest
 
 
-def _load_emotion_manifest():
-    """读取统一映射 emotion-manifest.json；失败返回 {}，交由兜底逻辑处理。"""
-    try:
-        with open(MANIFEST_FILE, "r", encoding="utf-8") as f:
-            return json.load(f).get("emotions") or {}
-    except Exception:
-        return {}
-
-
-_emotions = _load_emotion_manifest()
+ASSET_MANIFEST = _load_asset_manifest()
+RELEASE_ID = ASSET_MANIFEST["releaseId"]
+BUILD_ID = ASSET_MANIFEST["buildId"]
+MANIFEST_VERSION = ASSET_MANIFEST["manifestVersion"]
+_emotions = ASSET_MANIFEST["items"]
 MASTERS = {}
 JOURNEY_META = {}
-for _item_id, _e in _emotions.items():
-    _master = _e.get("renderMaster")
-    if _master:
-        MASTERS[_item_id] = (_master, _e.get("label", _item_id))
-    JOURNEY_META[_item_id] = (_e.get("characterId", "fengxin-rabbit"), _e.get("emotionId", _item_id))
-if not MASTERS:
-    MASTERS = dict(_FALLBACK_MASTERS)
-if not JOURNEY_META:
-    JOURNEY_META = dict(_FALLBACK_JOURNEY_META)
 
-# 七星使者 · 测试声音池（ElevenLabs premade，voice_id 为稳定引用）
-VOICE_LIBRARY = {
-    "FGY2WhTYpPnrIDTdsKH5": "Laura",
-    "cgSgspJ2msm6clMCkdW9": "Jessica",
-    "EXAVITQu4vr4xnSDxMaL": "Sarah",
-    "pFZP5JQG7iQjIQuC4Bku": "Lily",
-    "hpp4J3VqNfWAUOO0d1Us": "Bella",
-    "Xb7hH8MSUJpSbSDYk0k2": "Alice",
-    "TX3LPaxmHKxFdv7VOQHJ": "Liam",
-    "bIHbv24MWmeRgasZH58o": "Will",
-    "pNInz6obpgDQGcFmaJgB": "Adam",
-    "JBFqnCBsd6RMkjVDRZzb": "George",
-    "cjVigY5qzO86Huf0OWal": "Eric",
-    "nPczCjzI2devNBz1zQrb": "Brian",
-    "pqHfZKP75CvOlQylNhV4": "Bill",
-    # 风信兔 · 角色化测试候选（characters_animation，测试默认 Lulu，非最终角色声）
-    "ocZQ262SsZb9RIxcQBOj": "Lulu",
-    "lhTvHflPVOqgSWyuWQry": "Hina",
-    "Jr72SE8p9OcJmr8hyX0D": "Chutki",
+
+def _master_root():
+    return GENERATION_MASTERS_DIR
+
+
+def _sha256_file(path):
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+for _item_id, _e in _emotions.items():
+    _generation = _e.get("generationMaster") or {}
+    _master = _generation.get("ref")
+    if not _master:
+        raise RuntimeError("missing generation master: %s" % _item_id)
+    _path = os.path.join(_master_root(), _master)
+    if not os.path.isfile(_path):
+        raise RuntimeError("generation master file missing: %s" % _item_id)
+    if _sha256_file(_path) != _generation.get("sha256"):
+        raise RuntimeError("generation master SHA mismatch: %s" % _item_id)
+    MASTERS[_item_id] = (_master, _e.get("label", _item_id))
+    JOURNEY_META[_item_id] = (_e.get("characterId", ""), _e.get("emotionId", _item_id))
+
+
+def _contract_error(item, requested_character, build_id, manifest_version, asset_version="", expected_master_sha256=""):
+    if build_id != BUILD_ID or manifest_version != MANIFEST_VERSION:
+        return 409, {
+            "error": "VERSION_MISMATCH",
+            "message": "页面版本与生成服务不一致，请刷新页面后重试。",
+            "buildId": BUILD_ID,
+            "manifestVersion": MANIFEST_VERSION,
+        }
+    if item not in _emotions:
+        return 404, {"error": "item not found", "item": item}
+    actual_character = _emotions[item].get("characterId")
+    if not requested_character or requested_character != actual_character:
+        return 409, {
+            "error": "CHARACTER_MISMATCH",
+            "message": "角色与情绪映射不一致，请刷新页面后重试。",
+            "itemId": item,
+            "characterId": actual_character,
+        }
+    actual_asset_version = _emotions[item].get("assetVersion")
+    if not asset_version or asset_version != actual_asset_version:
+        return 409, {
+            "error": "ASSET_VERSION_MISMATCH",
+            "message": "页面素材版本与生成服务不一致，请刷新页面后重试。",
+            "itemId": item,
+            "assetVersion": actual_asset_version,
+        }
+    expected_master = (_emotions[item].get("generationMaster") or {}).get("sha256")
+    if not expected_master_sha256 or expected_master_sha256 != expected_master:
+        return 409, {
+            "error": "MASTER_HASH_MISMATCH",
+            "message": "生成母版哈希校验失败，已拒绝生成。",
+            "itemId": item,
+            "expectedMasterSHA256": expected_master,
+        }
+    return None
+
+# 七星使者 · Candidate 默认声音系统（Edge TTS 稳定优先）
+VOICE_PRESETS = {
+    # 儿童 5：全部使用不同底层 voiceId
+    "child-bright":   {"category": "child",  "label": "儿童·明亮活泼", "provider": "edge-tts", "voiceId": "zh-CN-YunxiaNeural",                 "rate": 8,   "pitch": 20, "volume": 0},
+    "child-soft":     {"category": "child",  "label": "儿童·软糯委屈", "provider": "edge-tts", "voiceId": "en-US-EmmaMultilingualNeural",       "rate": -8,  "pitch": 32, "volume": 0},
+    "child-spirited": {"category": "child",  "label": "儿童·有脾气",   "provider": "edge-tts", "voiceId": "zh-CN-XiaoyiNeural",                 "rate": 10,  "pitch": 24, "volume": 0},
+    "child-tiny":     {"category": "child",  "label": "儿童·超软幼龄", "provider": "edge-tts", "voiceId": "en-US-AvaMultilingualNeural",        "rate": -12, "pitch": 38, "volume": -3},
+    "child-dramatic": {"category": "child",  "label": "儿童·淘气戏剧", "provider": "edge-tts", "voiceId": "zh-TW-HsiaoChenNeural",              "rate": 12,  "pitch": 28, "volume": 2},
+    # 女性 5：底层 voice 全部为女性且各不相同
+    "female-bright":  {"category": "female", "label": "女性·年轻明亮", "provider": "edge-tts", "voiceId": "zh-CN-XiaoxiaoNeural",               "rate": 8,   "pitch": 6,  "volume": 0},
+    "female-gentle":  {"category": "female", "label": "女性·温柔细腻", "provider": "edge-tts", "voiceId": "zh-CN-shaanxi-XiaoniNeural",         "rate": -8,  "pitch": -8, "volume": 0},
+    "female-sweet":   {"category": "female", "label": "女性·甜美少女", "provider": "edge-tts", "voiceId": "zh-TW-HsiaoYuNeural",                "rate": 6,   "pitch": 8,  "volume": 0},
+    "female-magnetic":{"category": "female", "label": "女性·成熟磁性", "provider": "edge-tts", "voiceId": "fr-FR-VivienneMultilingualNeural",   "rate": -8,  "pitch": 6,  "volume": 0},
+    "female-soft":    {"category": "female", "label": "女性·轻柔安定", "provider": "edge-tts", "voiceId": "de-DE-SeraphinaMultilingualNeural",  "rate": -10, "pitch": 12, "volume": -2},
+    # 男性 5：底层 voice 全部为男性且各不相同
+    "male-sunny":     {"category": "male",   "label": "男性·青年阳光", "provider": "edge-tts", "voiceId": "zh-CN-YunxiNeural",                  "rate": 8,   "pitch": 10, "volume": 0},
+    "male-gentle":    {"category": "male",   "label": "男性·青年温柔", "provider": "edge-tts", "voiceId": "zh-CN-YunyangNeural",                "rate": -8,  "pitch": -2, "volume": 0},
+    "male-powerful":  {"category": "male",   "label": "男性·成熟有力量", "provider": "edge-tts", "voiceId": "zh-CN-YunjianNeural",              "rate": -3,  "pitch": -18,"volume": 5},
+    "male-youth":     {"category": "male",   "label": "男性·少年清亮", "provider": "edge-tts", "voiceId": "zh-TW-YunJheNeural",                 "rate": 10,  "pitch": 18, "volume": 0},
+    "male-deep":      {"category": "male",   "label": "男性·低沉磁性", "provider": "edge-tts", "voiceId": "en-US-AndrewMultilingualNeural",      "rate": -10, "pitch": -20,"volume": 2},
 }
-DEFAULT_VOICE_ID = "Jr72SE8p9OcJmr8hyX0D"  # Chutki（风信兔正式声音身份）
+# 兼容旧 Candidate 页面 send 的三个 ElevenLabs ID，避免旧链接直接报错。
+VOICE_ALIASES = {
+    "ocZQ262SsZb9RIxcQBOj": "female-bright",
+    "lhTvHflPVOqgSWyuWQry": "female-gentle",
+    "Jr72SE8p9OcJmr8hyX0D": "child-spirited",
+}
+# 情绪层只改变 prosody，不改变播放时长和音频结构。
+EMOTION_STYLES = {
+    "happy":      {"style": "happy",     "rate": 6,  "pitch": 8,   "volume": 0},
+    "wronged":    {"style": "wronged",   "rate": -8, "pitch": 5,   "volume": -2},
+    "aggrieved":  {"style": "wronged",   "rate": -8, "pitch": 5,   "volume": -2},
+    "angry":      {"style": "angry",     "rate": 5,  "pitch": -12, "volume": 5},
+    "playful":    {"style": "playful",   "rate": 10, "pitch": 12,  "volume": 0},
+    "jealous":    {"style": "jealous",   "rate": -3, "pitch": 1,   "volume": 0},
+    "stubborn":   {"style": "stubborn",  "rate": 2,  "pitch": -4,  "volume": 0},
+    "surprised":  {"style": "surprised", "rate": 12, "pitch": 10,  "volume": 2},
+    "confused":   {"style": "confused",  "rate": -6, "pitch": 2,   "volume": 0},
+    "disgusted":  {"style": "disgusted", "rate": 2,  "pitch": -8,  "volume": 0},
+    "guilty":     {"style": "guilty",    "rate": -10,"pitch": 4,   "volume": -2},
+    "apologetic": {"style": "comfort",   "rate": -10,"pitch": -4,  "volume": -2},
+    "lowenergy":  {"style": "comfort",   "rate": -14,"pitch": -6,  "volume": -2},
+    "cool":       {"style": "cool",      "rate": -4, "pitch": -8,  "volume": 0},
+    "gloating":   {"style": "gloating",  "rate": 6,  "pitch": 2,   "volume": 0},
+    "comfort":    {"style": "comfort",   "rate": -12,"pitch": -5,  "volume": -2},
+    "neutral":    {"style": "neutral",   "rate": 0,  "pitch": 0,   "volume": 0},
+}
+CATEGORY_FALLBACKS = {
+    "child":  ["child-soft", "child-bright", "child-spirited", "child-tiny", "child-dramatic"],
+    "female": ["female-gentle", "female-bright", "female-sweet", "female-soft", "female-magnetic"],
+    "male":   ["male-sunny", "male-gentle", "male-youth", "male-powerful", "male-deep"],
+}
+DEFAULT_VOICE_ID = "female-bright"
+
+
+def _clamp_number(value, low, high):
+    return max(low, min(high, int(round(value))))
+
+
+def _signed_percent(value):
+    return "%+d%%" % _clamp_number(value, -50, 50)
+
+
+def _signed_hz(value):
+    return "%+dHz" % _clamp_number(value, -50, 50)
+
+
+def _resolve_voice_preset(requested):
+    key = VOICE_ALIASES.get(requested, requested)
+    preset = VOICE_PRESETS.get(key)
+    if preset:
+        return key, dict(preset)
+    # Direct Edge voice IDs remain usable for diagnostics; classify them as female by default.
+    if isinstance(requested, str) and requested.startswith("zh-"):
+        return requested, {"category": "female", "label": requested, "provider": "edge-tts", "voiceId": requested, "rate": 0, "pitch": 0, "volume": 0}
+    raise ValueError("unknown voice preset: %s" % requested)
+
+
+def _styled_voice(key, preset, emotion_id):
+    style = EMOTION_STYLES.get(emotion_id or "neutral") or EMOTION_STYLES["neutral"]
+    return {
+        "requestedVoiceId": key,
+        "requestedProvider": preset["provider"],
+        "actualVoiceId": preset["voiceId"],
+        "actualProvider": "edge-tts",
+        "emotionId": emotion_id or "neutral",
+        "emotionStyle": style["style"],
+        "category": preset["category"],
+        "rate": _clamp_number(preset["rate"] + style["rate"], -50, 50),
+        "pitch": _clamp_number(preset["pitch"] + style["pitch"], -50, 50),
+        "volume": _clamp_number(preset["volume"] + style["volume"], -50, 50),
+        "fallbackReason": "",
+    }
+
 
 FPS = int(os.environ.get("FPS", "18"))
 SERVICE_ENABLED = os.environ.get("SERVICE_ENABLED", "true").lower() in ("1", "true", "yes", "on")
@@ -133,9 +281,9 @@ MAX_HEIGHT = 3 * BASE_FONT_SIZE + 2 * LINE_SPACING   # 最多 3 行 = 190
 MIN_FONT_SIZE = int(os.environ.get("MIN_FONT_SIZE", "36"))   # 可读字号下限
 
 # 动态时长实验（第一版简单规则；具体数值待 12 条实测后确定）：
-# finalDuration = max(BASE_MIN_DURATION, ttsDuration + ENDING_HOLD)
+# finalDuration = max(masterDuration, speechStart + ttsDuration + ENDING_HOLD)
 BASE_MIN_DURATION = float(os.environ.get("BASE_MIN_DURATION", "5.0"))
-ENDING_HOLD = float(os.environ.get("ENDING_HOLD", "2.0"))
+ENDING_HOLD = min(0.5, max(0.3, float(os.environ.get("ENDING_HOLD", "0.4"))))
 MAX_FINAL_DURATION = float(os.environ.get("MAX_FINAL_DURATION", "30.0"))
 
 MAX_CONCURRENT = int(os.environ.get("MAX_CONCURRENT", "2"))
@@ -164,7 +312,7 @@ ANDROID_DEBUG_CERT_SHA256 = os.environ.get(
     "3E:0B:BE:A2:D5:2C:BD:05:7E:84:FB:2D:E6:11:F9:6A:B5:AC:96:57:10:98:2E:A0:50:3F:AA:87:56:F1:2A:F7",
 )
 
-# JOURNEY_META 已由 emotion-manifest.json 统一派生（见上方 _load_emotion_manifest）。
+# JOURNEY_META 由唯一 asset-manifest.json 派生。
 APP_VIDEO_DIR = os.environ.get("APP_VIDEO_DIR", "/tmp/app-video-cache")
 TTS_CACHE_DIR = os.environ.get("TTS_CACHE_DIR", "/tmp/tts-cache")
 TTS_CACHE_TTL = int(os.environ.get("TTS_CACHE_TTL", "600"))
@@ -380,16 +528,12 @@ def take_app_video(token):
         return record["path"], record["expires"], record["reads"]
 
 
-def _tts_cache_key(text, voice_id):
-    """试听缓存 key：覆盖 text / voiceId / 实际影响 TTS 的 model 与 output format。
-
-    当前 emotion 不影响 TTS，故不纳入 key；若日后 emotion/style 参与 TTS 必须加入。
-    """
-    model_id = os.environ.get("ELEVENLABS_MODEL_ID", ELEVENLABS_MODEL_ID_DEFAULT)
-    return _sha256("\0".join([text, voice_id or "", model_id, ELEVENLABS_OUTPUT_FORMAT]))
+def _tts_cache_key(text, voice_id, emotion_id="neutral"):
+    """试听缓存 key：覆盖文本、逻辑 voice 与情绪 prosody。"""
+    return _sha256("\0".join([text, voice_id or "", emotion_id or "neutral", "edge-tts-v1"]))
 
 
-def store_tts_audio(data, text, voice_id):
+def store_tts_audio(data, text, voice_id, emotion_id="neutral", tts_info=None):
     """把试听生成的 mp3 落入临时缓存，返回 ttsToken。"""
     os.makedirs(TTS_CACHE_DIR, exist_ok=True)
     now = time.time()
@@ -409,13 +553,15 @@ def store_tts_audio(data, text, voice_id):
             "expires": now + TTS_CACHE_TTL,
             "text": text,
             "voice_id": voice_id or "",
-            "key": _tts_cache_key(text, voice_id),
+            "emotion_id": emotion_id or "neutral",
+            "key": _tts_cache_key(text, voice_id, emotion_id),
+            "tts_info": dict(tts_info or {}),
         }
     return token
 
 
-def take_tts_audio(token, text, voice_id):
-    """校验 token 有效且与当前 text/voiceId 对应；命中返回音频文件路径，否则 None。"""
+def take_tts_audio(token, text, voice_id, emotion_id="neutral"):
+    """校验 token 有效且与当前 text/voice/emotion 对应；命中返回 (path, tts_info)。"""
     if not token:
         return None
     now = time.time()
@@ -429,9 +575,9 @@ def take_tts_audio(token, text, voice_id):
                     pass
                 _tts_cache.pop(token, None)
             return None
-        if record["text"] != text or record["voice_id"] != (voice_id or ""):
+        if record["text"] != text or record["voice_id"] != (voice_id or "") or record.get("emotion_id", "neutral") != (emotion_id or "neutral"):
             return None
-        return record["path"]
+        return record["path"], dict(record.get("tts_info") or {})
 
 
 # 异步生成任务：/make-send?async=1 立即返回 202 {job}，后台线程生成并写入
@@ -442,19 +588,23 @@ _jobs = {}
 _jobs_lock = threading.Lock()
 
 
-def _run_job_async(job_id, text, item, voice_id, tts_audio_path=None):
+def _run_job_async(job_id, text, item, voice_id, tts_audio_path=None, tts_audio_info=None, requested_character="", build_id="", manifest_version="", requested_asset_version="", expected_master_sha256=""):
     workdir = None
     try:
         workdir = tempfile.mkdtemp(prefix="make-send-")
-        final, meta = generate(item, text, workdir, voice_id=voice_id, speech_text=None, tts_audio_path=tts_audio_path)
+        final, meta = generate(item, text, workdir, voice_id=voice_id, speech_text=None, tts_audio_path=tts_audio_path,
+                               tts_audio_info=tts_audio_info,
+                               requested_item=item, requested_character=requested_character,
+                               build_id=build_id, manifest_version=manifest_version,
+                               requested_asset_version=requested_asset_version, expected_master_sha256=expected_master_sha256)
         with open(final, "rb") as f:
             data = f.read()
         token = store_app_video(data)
         with _jobs_lock:
             t0 = _jobs.get(job_id, {}).get("t0", time.time())
             _jobs[job_id] = {"status": "done", "token": token, "text_len": len(text), "meta": meta}
-        log("JOB-DONE job=%s item=%s voice=%s tts_provider=%s text_len=%d lines=%d font=%d tts=%.2fs tts_dur=%.2fs vdur=%.2fs ffmpeg=%.2fs total=%.2fs size=%d"
-            % (job_id, item, meta.get("voice_id") or "-", meta.get("tts_provider") or "-", len(text), meta.get("lines", 0), meta.get("font_size", 0),
+        log("JOB-DONE job=%s item=%s asset=%s expected_master=%s actual_master=%s requested_voice=%s actual_voice=%s provider=%s style=%s fallback=%s text_len=%d lines=%d font=%d tts=%.2fs tts_dur=%.2fs vdur=%.2fs ffmpeg=%.2fs total=%.2fs size=%d"
+            % (job_id, item, meta.get("actualAssetVersion") or "-", meta.get("expectedMasterSHA256") or "-", meta.get("actualMasterSHA256") or "-", meta.get("requestedVoiceId") or "-", meta.get("actualVoiceId") or "-", meta.get("actualProvider") or "-", meta.get("emotionStyle") or "-", meta.get("fallbackReason") or "-", len(text), meta.get("lines", 0), meta.get("font_size", 0),
                meta.get("tts", 0), meta.get("tts_duration") or 0.0, meta.get("video_duration") or 0.0,
                meta.get("ffmpeg", 0), time.time() - t0, len(data)))
     except Exception as e:
@@ -529,28 +679,44 @@ def _probe_duration(path):
     return None
 
 
-def synthesize_tts(speech_text, voice_id, tts_path, tts=None):
-    """统一 TTS 合成入口：ElevenLabs 命中优先，失败/未知声音降级 edge-tts。
+def synthesize_tts(speech_text, voice_id, tts_path, emotion_id=None, tts=None):
+    """Edge TTS 默认声音系统：逻辑 preset + 情绪 prosody + 分类 fallback。
 
-    试听接口 /tts 与 /make-send 共用此函数，保证两者声音行为一致。
+    返回结果包含 requested/actual voice、provider、emotion/style 和 fallbackReason。
     """
-    provider_used = "edge-tts"
-    if voice_id and voice_id in VOICE_LIBRARY:
-        try:
-            ElevenLabsProvider(voice_id).synthesize(speech_text, tts_path)
-            provider_used = "elevenlabs"
-        except Exception as e:
-            log("ELEVENLABS-FALLBACK voice=%s err=%s" % (voice_id, "%s: %s" % (type(e).__name__, e)))
-            make_tts_provider("edge-tts").synthesize(speech_text, tts_path)
-            provider_used = "edge-tts-fallback"
-    else:
-        if voice_id:
-            log("UNKNOWN-VOICE voice=%s fallback=edge-tts" % voice_id)
-            provider_used = "edge-tts-fallback"
-        (tts or make_tts_provider("edge-tts")).synthesize(speech_text, tts_path)
-    return provider_used
+    requested_key, preset = _resolve_voice_preset(voice_id or DEFAULT_VOICE_ID)
+    styled = _styled_voice(requested_key, preset, emotion_id)
 
+    def _try(candidate):
+        EdgeTTSProvider(
+            voice=candidate["actualVoiceId"],
+            rate=_signed_percent(candidate["rate"]),
+            pitch=_signed_hz(candidate["pitch"]),
+            volume=_signed_percent(candidate["volume"]),
+        ).synthesize(speech_text, tts_path)
+        return candidate
 
+    try:
+        return _try(styled)
+    except Exception as first_error:
+        reason = "%s: %s" % (type(first_error).__name__, first_error)
+        category = styled.get("category") or "female"
+        for fallback_key in CATEGORY_FALLBACKS.get(category, []):
+            if fallback_key == requested_key:
+                continue
+            fallback_preset = VOICE_PRESETS.get(fallback_key)
+            if not fallback_preset:
+                continue
+            candidate = _styled_voice(fallback_key, fallback_preset, emotion_id)
+            candidate["requestedVoiceId"] = requested_key
+            candidate["requestedProvider"] = preset.get("provider", "edge-tts")
+            candidate["actualProvider"] = "edge-tts-category-fallback"
+            candidate["fallbackReason"] = reason
+            try:
+                return _try(candidate)
+            except Exception as second_error:
+                reason = "%s; fallback=%s: %s" % (reason, fallback_key, type(second_error).__name__)
+        raise RuntimeError("tts failed for category %s: %s" % (category, reason))
 
 
 # ===== A路成片 V1 统一模板（纯黑背景 + 暖金底部承托） =====
@@ -644,55 +810,100 @@ def _v1_bottom_png(label, path):
 
 def _v1_compose(item, text, master, tts_path, final, final_duration, speech_start, master_dur, workdir):
     emo=_emotions.get(item) or {}
-    un=emo.get("unionSource") or [0,0,719,1280]
-    x0,y0,x1,y1=un
-    s=V1_TARGET_H/(y1-y0)
-    sw=max(2,(int(round(720*s))//2)*2); sh=int(round(1280*s))
-    top=int(round(V1_FEET_Y-(y1+1)*s)); left=(720-sw)//2
-    r0=max(0,-top); hc=min(sh-r0,H); pt=max(0,top)
+    backend = emo.get("backend") or {}
+    emo = {**emo, **backend}
+    subject_box = emo.get("subjectBox")
+    if subject_box and len(subject_box) == 4:
+        x0, y0, x1, y1 = [int(v) for v in subject_box]
+        source_w = int(emo.get("sourceWidth") or 834)
+        source_h = int(emo.get("sourceHeight") or 1112)
+        s = V1_TARGET_H / max(1, (y1 - y0))
+        sw = max(2, (int(round(source_w * s)) // 2) * 2)
+        sh = int(round(source_h * s))
+        subject_cx = (x0 + x1 + 1) / 2.0
+        left = int(round(W / 2.0 - subject_cx * s))
+        top = int(round(V1_FEET_Y - (y1 + 1) * s))
+    else:
+        un=emo.get("unionSource") or [0,0,719,1280]
+        x0,y0,x1,y1=un
+        s=V1_TARGET_H/(y1-y0)
+        sw=max(2,(int(round(720*s))//2)*2); sh=int(round(1280*s))
+        top=int(round(V1_FEET_Y-(y1+1)*s)); left=(720-sw)//2
     name=emo.get("displayName") or emo.get("label") or item
     code=emo.get("code") or "00"
     bp=os.path.join(workdir,"v1_bottom.png"); sp=os.path.join(workdir,"v1_sub.png")
     _v1_bottom_png("%s · E%s"%(name,code), bp)
     fsize, nlines=_v1_subtitle_png(text, sp)
-    chain=("[0:v]format=yuva420p,scale=%d:%d,crop=%d:%d:0:%d,pad=%d:%d:%d:%d:black[base];"
+    chain=("[0:v]format=yuva420p,scale=%d:%d:flags=lanczos[fg];"
+           "color=c=black:s=%dx%d:r=%d:d=%.3f[bg];"
+           "[bg][fg]overlay=x=%d:y=%d:shortest=1[base];"
            "[2:v]format=rgba[bp];[3:v]format=rgba[sp];"
            "[base][bp]overlay=0:0:shortest=1[b1];[b1][sp]overlay=0:0:shortest=1[ov];"
-           "[ov]fps=%d[vo]" % (sw,sh,sw,hc,r0,W,H,left,pt,FPS))
+           "[ov]fps=%d,trim=duration=%.3f,setpts=PTS-STARTPTS[vo]" % (sw,sh,W,H,FPS,final_duration+0.1,left,top,FPS,final_duration))
     map_v="[vo]"
-    if final_duration > master_dur + 0.05:
-        chain += ";%s[vo]tpad=stop_mode=clone:stop_duration=%.3f[vout]" % ("", final_duration-master_dur)
-        # ffmpeg chain cannot start ';' after fps label; rebuild below
-        chain = chain.replace(";%s[vo]tpad=" % "", ";")
-        chain += ";" if False else ""
-        # simpler: add tpad directly on [vo] without extra ';'
-        chain = chain[:chain.rfind("[vo]")] + "[vo];[vo]tpad=stop_mode=clone:stop_duration=%.3f[vout]" % (final_duration-master_dur)
-        map_v="[vout]"
     if speech_start>0:
         audio="[1:a]adelay=%.0f:all=1,apad[aout]"%(speech_start*1000)
     else:
         audio="[1:a]apad[aout]"
     chain += ";"+audio
-    cmd=[FFMPEG,"-y","-i",master,"-i",tts_path,"-loop","1","-framerate",str(FPS),"-i",bp,"-loop","1","-framerate",str(FPS),"-i",sp,
+    input_codec = ["-c:v", "libvpx-vp9"] if master.lower().endswith(".mkv") else []
+    cmd=[FFMPEG,"-y"] + input_codec + ["-stream_loop","-1","-i",master,"-i",tts_path,"-loop","1","-framerate",str(FPS),"-i",bp,"-loop","1","-framerate",str(FPS),"-i",sp,
          "-filter_complex",chain,"-map",map_v,"-map","[aout]",
-         "-threads",str(FFMPEG_THREADS),"-c:v","libx264","-pix_fmt","yuv420p","-r",str(FPS),
-         "-b:v","%dk"%BITRATE_KBPS,"-c:a","aac","-ar","44100","-b:a","96k","-t","%.3f"%final_duration,final]
+         "-threads",str(FFMPEG_THREADS),"-c:v","libx264","-preset","medium","-crf","18","-maxrate","%dk"%BITRATE_KBPS,
+         "-bufsize","%dk"%(BITRATE_KBPS*2),"-pix_fmt","yuv420p","-r",str(FPS),"-movflags","+faststart",
+         "-c:a","aac","-ar","44100","-b:a","96k","-t","%.3f"%final_duration,final]
     r=subprocess.run(cmd,capture_output=True,text=True,timeout=240)
     if r.returncode!=0:
         raise RuntimeError("v1 ffmpeg rc=%d %s"%(r.returncode, r.stderr[-2500:]))
     return fsize, nlines
 
-def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts_audio_path=None):
-    master_rel, _emotion = MASTERS[item]
-    master = os.path.join(MASTERS_DIR, master_rel)
+def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts_audio_path=None, tts_audio_info=None,
+             requested_item=None, requested_character=None, build_id=None, manifest_version=None,
+             requested_asset_version=None, expected_master_sha256=None):
+    actual_item = item
+    actual_entry = _emotions.get(actual_item)
+    if not actual_entry or actual_item not in MASTERS:
+        raise RuntimeError("item not found")
+    actual_character = actual_entry.get("characterId")
+    if build_id and build_id != BUILD_ID:
+        raise RuntimeError("build id mismatch")
+    if manifest_version and manifest_version != MANIFEST_VERSION:
+        raise RuntimeError("manifest version mismatch")
+    if requested_item and requested_item != actual_item:
+        raise RuntimeError("requested item mismatch")
+    if requested_character and requested_character != actual_character:
+        raise RuntimeError("requested character mismatch")
+    actual_asset_version = actual_entry.get("assetVersion")
+    if requested_asset_version and requested_asset_version != actual_asset_version:
+        raise RuntimeError("requested asset version mismatch")
+    expected_master = (actual_entry.get("generationMaster") or {}).get("sha256")
+    if expected_master_sha256 and expected_master_sha256 != expected_master:
+        raise RuntimeError("expected master SHA mismatch")
+    master_rel, _emotion = MASTERS[actual_item]
+    master = os.path.join(_master_root(), master_rel)
+    actual_master_sha256 = _sha256_file(master)
+    if actual_master_sha256 != expected_master:
+        raise RuntimeError("actual master SHA mismatch")
     final = os.path.join(workdir, "final.mp4")
     tts_path = os.path.join(workdir, "tts.mp3")
-    meta = {}
+    meta = {
+        "requestedItem": requested_item or actual_item,
+        "actualItem": actual_item,
+        "requestedCharacter": requested_character or actual_character,
+        "actualCharacter": actual_character,
+        "releaseId": RELEASE_ID,
+        "buildId": BUILD_ID,
+        "manifestVersion": MANIFEST_VERSION,
+        "requestedAssetVersion": requested_asset_version or actual_asset_version,
+        "actualAssetVersion": actual_asset_version,
+        "expectedMasterSHA256": expected_master,
+        "actualMasterSHA256": actual_master_sha256,
+    }
     # 发声时机：speechStart（秒）= 该条视频里角色完成初步情绪建立、最适合开口的时间。
     # 不同情绪/不同动作可不同；最低门槛 1.2s，负值/非法按 0 处理（不早于视频开头）。
     speech_start = 0.0
     try:
-        speech_start = float((_emotions.get(item) or {}).get("speechStart") or 0.0)
+        speech_start = float((_emotions.get(actual_item) or {}).get("backend", {}).get("speechStart") or 0.0)
     except Exception:
         speech_start = 0.0
     if speech_start < 0:
@@ -723,19 +934,29 @@ def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts
     if tts_audio_path and os.path.isfile(tts_audio_path):
         # 试听缓存命中：直接复用同一份音频文件，不再次调用 TTS。
         shutil.copyfile(tts_audio_path, tts_path)
-        provider_used = "tts-cache"
+        tts_info = dict(tts_audio_info or {})
+        tts_info.setdefault("requestedVoiceId", voice_id or DEFAULT_VOICE_ID)
+        tts_info.setdefault("actualVoiceId", tts_info.get("actualVoiceId") or voice_id or DEFAULT_VOICE_ID)
+        tts_info.setdefault("actualProvider", "tts-cache")
+        tts_info.setdefault("emotionStyle", (actual_entry.get("emotionId") or "neutral"))
+        tts_info.setdefault("fallbackReason", "")
     else:
-        provider_used = synthesize_tts(speech_text, voice_id, tts_path, tts=tts)
+        tts_info = synthesize_tts(speech_text, voice_id, tts_path, emotion_id=actual_entry.get("emotionId"), tts=tts)
     meta["tts"] = time.time() - t0
-    meta["tts_provider"] = provider_used
-    meta["voice_id"] = voice_id or ""
+    meta["tts_provider"] = tts_info.get("actualProvider") or "edge-tts"
+    meta["voice_id"] = tts_info.get("actualVoiceId") or voice_id or ""
+    meta["requestedVoiceId"] = tts_info.get("requestedVoiceId") or voice_id or DEFAULT_VOICE_ID
+    meta["requestedProvider"] = tts_info.get("requestedProvider") or "edge-tts"
+    meta["actualVoiceId"] = tts_info.get("actualVoiceId") or voice_id or DEFAULT_VOICE_ID
+    meta["actualProvider"] = tts_info.get("actualProvider") or "edge-tts"
+    meta["emotionStyle"] = tts_info.get("emotionStyle") or actual_entry.get("emotionId") or "neutral"
+    meta["fallbackReason"] = tts_info.get("fallbackReason") or ""
 
     t0 = time.time()
     # 动态时长：最终视频时长 = max(保底, TTS 实测时长 + 尾段预留)
     tts_dur = _probe_duration(tts_path) or 0.0
-    final_duration = max(BASE_MIN_DURATION, speech_start + tts_dur + ENDING_HOLD)
-    final_duration = min(final_duration, MAX_FINAL_DURATION)
     master_dur = _probe_duration(master) or float(DURATION)
+    final_duration = max(master_dur, speech_start + tts_dur + ENDING_HOLD)
     # V1 统一成片模板（union 自动布局 + 字幕自适应 + 纯黑/暖金底部承托）
     v1_text = text if speech_text is None else text
     fsize, nlines = _v1_compose(item, text, master, tts_path, final, final_duration, speech_start, master_dur, workdir)
@@ -841,7 +1062,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
             "Access-Control-Expose-Headers",
             "X-Video-Path, X-Video-Expires-In, X-Video-Id, X-Journey-Id, "
             "X-Parent-Video-Id, X-Generation, X-Remix-Entry, "
-            "X-TTS-Token, X-TTS-Provider, X-TTS-Voice",
+            "X-TTS-Token, X-TTS-Provider, X-TTS-Voice, X-TTS-Requested-Voice, X-TTS-Emotion-Style, X-TTS-Fallback-Reason, X-Asset-Version, X-Master-SHA256",
         )
 
     def _send_json(self, code, obj):
@@ -936,9 +1157,10 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         return self._tts_serve(
             data.get("text", "") or "",
             data.get("voice") or data.get("voiceId") or DEFAULT_VOICE_ID,
+            data.get("item") or data.get("itemId") or "",
         )
 
-    def _tts_serve(self, text, voice_id):
+    def _tts_serve(self, text, voice_id, item_id=""):
         """试听：只生成 TTS 音频并返回 audio/mpeg + X-TTS-Token，不跑 ffmpeg、不生成视频。"""
         if not read_enabled():
             return self._send_json(503, {"error": "service temporarily unavailable"})
@@ -957,23 +1179,27 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         try:
             workdir = tempfile.mkdtemp(prefix="tts-")
             tts_path = os.path.join(workdir, "tts.mp3")
-            speech_text = text  # 当前 build_speech_text 原样返回 text，emotion 不影响 TTS
-            provider_used = synthesize_tts(speech_text, voice_id, tts_path)
+            speech_text = text
+            emotion_id = (_emotions.get(item_id) or {}).get("emotionId") or "neutral"
+            tts_info = synthesize_tts(speech_text, voice_id, tts_path, emotion_id=emotion_id)
             with open(tts_path, "rb") as f:
                 data = f.read()
             if not data:
                 raise RuntimeError("tts returned empty audio")
-            token = store_tts_audio(data, speech_text, voice_id)
-            log("TTS-OK voice=%s provider=%s text_len=%d bytes=%d token=%s ttl=%ds"
-                % (voice_id or "-", provider_used, len(text), len(data), token, TTS_CACHE_TTL))
+            token = store_tts_audio(data, speech_text, voice_id, emotion_id=emotion_id, tts_info=tts_info)
+            log("TTS-OK requested_voice=%s actual_voice=%s provider=%s style=%s fallback=%s text_len=%d bytes=%d token=%s ttl=%ds"
+                % (tts_info.get("requestedVoiceId") or voice_id or "-", tts_info.get("actualVoiceId") or "-", tts_info.get("actualProvider") or "-", tts_info.get("emotionStyle") or "-", tts_info.get("fallbackReason") or "-", len(text), len(data), token, TTS_CACHE_TTL))
             self.send_response(200)
             self._cors()
             self.send_header("Content-Type", "audio/mpeg")
             self.send_header("Content-Length", str(len(data)))
             self.send_header("Cache-Control", "no-store")
             self.send_header("X-TTS-Token", token)
-            self.send_header("X-TTS-Provider", provider_used)
-            self.send_header("X-TTS-Voice", voice_id or "")
+            self.send_header("X-TTS-Provider", tts_info.get("actualProvider") or "")
+            self.send_header("X-TTS-Voice", tts_info.get("actualVoiceId") or "")
+            self.send_header("X-TTS-Requested-Voice", tts_info.get("requestedVoiceId") or "")
+            self.send_header("X-TTS-Emotion-Style", tts_info.get("emotionStyle") or "")
+            self.send_header("X-TTS-Fallback-Reason", tts_info.get("fallbackReason") or "")
             self.end_headers()
             self.wfile.write(data)
         except Exception as e:
@@ -1032,7 +1258,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
         if path == "/status":
-            return self._send_json(200, {"enabled": read_enabled(), "fox_masters": sum(1 for k in MASTERS if k.startswith("fox-")), "fps": FPS, "bitrate_kbps": BITRATE_KBPS})
+            return self._send_json(200, {"enabled": read_enabled(), "releaseId": RELEASE_ID, "buildId": BUILD_ID, "manifestVersion": MANIFEST_VERSION, "rabbitMasters": sum(1 for k in MASTERS if k.startswith("rabbit-")), "foxMasters": sum(1 for k in MASTERS if k.startswith("fox-")), "productionItems": len(MASTERS), "fps": FPS, "bitrate_kbps": BITRATE_KBPS})
         if path == "/welcome":
             return self._welcome_public()
         if path == "/.well-known/assetlinks.json":
@@ -1097,9 +1323,21 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             speech_text = (qs.get("speechText") or qs.get("speech_text") or [""])[0] or None
             tts_token = (qs.get("ttsToken") or [""])[0] or None
             return self._serve(
-                qs.get("text", [""])[0], qs.get("item", ["rabbit-happy"])[0], app_bridge,
-                journey_v1, qs.get("remix_token", [""])[0], qs.get("source_channel", ["h5"])[0],
-                voice_id, speech_text, async_mode, tts_token,
+                text=qs.get("text", [""])[0],
+                item=(qs.get("item") or [""])[0],
+                app_bridge=app_bridge,
+                journey_v1=journey_v1,
+                remix_token=(qs.get("remix_token") or [""])[0],
+                source_channel=(qs.get("source_channel") or ["h5"])[0],
+                voice_id=voice_id,
+                speech_text=speech_text,
+                async_mode=async_mode,
+                tts_token=tts_token,
+                requested_character=(qs.get("characterId") or [""])[0],
+                build_id=(qs.get("buildId") or [""])[0],
+                manifest_version=(qs.get("manifestVersion") or [""])[0],
+                asset_version=(qs.get("assetVersion") or [""])[0],
+                expected_master_sha256=(qs.get("expectedMasterSHA256") or [""])[0],
             )
         return self._not_found()
 
@@ -1146,10 +1384,21 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             speech_text = data.get("speechText") or data.get("speech_text") or None
             tts_token = data.get("ttsToken") or None
             return self._serve(
-                data.get("text", "") or "", data.get("item", "rabbit-happy") or "rabbit-happy",
-                bool(data.get("app_bridge")), bool(data.get("journey_v1")),
-                data.get("remix_token", "") or "", data.get("source_channel", "h5") or "h5",
-                voice_id, speech_text, bool(data.get("async")), tts_token,
+                text=data.get("text", "") or "",
+                item=data.get("item", "") or "",
+                app_bridge=bool(data.get("app_bridge")),
+                journey_v1=bool(data.get("journey_v1")),
+                remix_token=data.get("remix_token", "") or "",
+                source_channel=data.get("source_channel", "h5") or "h5",
+                voice_id=voice_id,
+                speech_text=speech_text,
+                async_mode=bool(data.get("async")),
+                tts_token=tts_token,
+                requested_character=data.get("characterId", "") or "",
+                build_id=data.get("buildId", "") or "",
+                manifest_version=data.get("manifestVersion", "") or "",
+                asset_version=data.get("assetVersion", "") or "",
+                expected_master_sha256=data.get("expectedMasterSHA256", "") or "",
             )
         return self._not_found()
 
@@ -1186,18 +1435,14 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         log("ADMIN-TOGGLE enabled=%s" % enabled)
         return self._send_json(200, {"enabled": enabled})
 
-    def _serve(self, text, item, app_bridge=False, journey_v1=False, remix_token="", source_channel="h5", voice_id=None, speech_text=None, async_mode=False, tts_token=None):
-        # 旧 Rabbit master 已退出生产链；新版 Release 验收前禁止正式生成。
-        return self._send_json(503, {
-            "error": "PRODUCTION_ASSET_CHAIN_LOCKED",
-            "message": "正式生成已暂停，等待新版资产版本验收。",
-        })
+    def _serve(self, text, item, app_bridge=False, journey_v1=False, remix_token="", source_channel="h5", voice_id=None, speech_text=None, async_mode=False, tts_token=None, requested_character="", build_id="", manifest_version="", asset_version="", expected_master_sha256=""):
+        contract_error = _contract_error(item, requested_character, build_id, manifest_version, asset_version, expected_master_sha256)
+        if contract_error:
+            return self._send_json(contract_error[0], contract_error[1])
         if not read_enabled():
             return self._send_json(503, {"error": "service temporarily unavailable"})
         start = time.time()
         text = (text or DEFAULT_TEXT).strip()
-        if item not in MASTERS:
-            return self._send_json(404, {"error": "item not found", "item": item})
         if len(text) > TEXT_MAX:
             return self._send_json(400, {"error": "TEXT_TOO_LONG", "message": "这段内容较长，当前最多支持 %d 字，请适当精简后重试。" % TEXT_MAX})
         if has_unsupported(text):
@@ -1207,9 +1452,12 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         if not SEM.acquire(blocking=False):
             return self._send_json(429, {"error": "server busy"})
 
-        tts_audio_path = take_tts_audio(tts_token, text, voice_id) if tts_token else None
+        emotion_id = (_emotions.get(item) or {}).get("emotionId") or "neutral"
+        tts_cached = take_tts_audio(tts_token, text, voice_id, emotion_id) if tts_token else None
+        tts_audio_path = tts_cached[0] if tts_cached else None
+        tts_audio_info = tts_cached[1] if tts_cached else None
         if tts_token:
-            log("TTS-TOKEN %s text_len=%d voice=%s" % ("hit" if tts_audio_path else "miss", len(text), voice_id or "-"))
+            log("TTS-TOKEN %s text_len=%d voice=%s emotion=%s" % ("hit" if tts_audio_path else "miss", len(text), voice_id or "-", emotion_id))
 
         if async_mode:
             job_id = secrets.token_urlsafe(16)
@@ -1218,13 +1466,18 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
                 for jid in [j for j, r in list(_jobs.items()) if now - r.get("t0", 0) > 900]:
                     _jobs.pop(jid, None)
                 _jobs[job_id] = {"status": "pending", "t0": now, "text_len": len(text)}
-            threading.Thread(target=_run_job_async, args=(job_id, text, item, voice_id, tts_audio_path), daemon=True).start()
+            threading.Thread(target=_run_job_async, args=(job_id, text, item, voice_id, tts_audio_path, tts_audio_info, requested_character, build_id, manifest_version, asset_version, expected_master_sha256), daemon=True).start()
             return self._send_json(202, {"job": job_id, "status": "pending"})
 
         workdir = None
         try:
             workdir = tempfile.mkdtemp(prefix="make-send-")
-            final, meta = generate(item, text, workdir, voice_id=voice_id, speech_text=speech_text, tts_audio_path=tts_audio_path)
+            final, meta = generate(item, text, workdir, voice_id=voice_id, speech_text=speech_text, tts_audio_path=tts_audio_path, tts_audio_info=tts_audio_info,
+                                   requested_item=item, requested_character=requested_character,
+                                   build_id=build_id, manifest_version=manifest_version,
+                                   requested_asset_version=asset_version, expected_master_sha256=expected_master_sha256)
+            if meta.get("requestedItem") != meta.get("actualItem") or meta.get("requestedCharacter") != meta.get("actualCharacter"):
+                raise RuntimeError("requested/actual identity mismatch")
             with open(final, "rb") as f:
                 data = f.read()
             journey_record = None
@@ -1238,8 +1491,8 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
                     return self._send_json(410, {"error": str(error)})
                 except journey_store.JourneyUnavailable as error:
                     return self._send_json(503, {"error": str(error)})
-            log("SUCCESS item=%s voice=%s tts_provider=%s text_len=%d lines=%d font=%d tts=%.2fs tts_dur=%.2fs vdur=%.2fs ffmpeg=%.2fs total=%.2fs size=%d"
-                % (item, meta.get("voice_id") or "-", meta.get("tts_provider") or "-", len(text), meta["lines"], meta["font_size"], meta["tts"],
+            log("SUCCESS item=%s requested_voice=%s actual_voice=%s tts_provider=%s style=%s fallback=%s text_len=%d lines=%d font=%d tts=%.2fs tts_dur=%.2fs vdur=%.2fs ffmpeg=%.2fs total=%.2fs size=%d"
+                % (item, meta.get("requestedVoiceId") or "-", meta.get("actualVoiceId") or "-", meta.get("tts_provider") or "-", meta.get("emotionStyle") or "-", meta.get("fallbackReason") or "-", len(text), meta["lines"], meta["font_size"], meta["tts"],
                    meta.get("tts_duration") or 0.0, meta.get("video_duration") or 0.0, meta["ffmpeg"],
                    time.time() - start, len(data)))
             self.send_response(200)
@@ -1248,8 +1501,16 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             self.send_header("Content-Length", str(len(data)))
             self.send_header("Content-Disposition", 'attachment; filename="%s.mp4"' % item)
             self.send_header("Cache-Control", "no-store")
-            self.send_header("X-TTS-Provider", meta.get("tts_provider", ""))
-            self.send_header("X-TTS-Voice", meta.get("voice_id", ""))
+            self.send_header("X-Release-Id", RELEASE_ID)
+            self.send_header("X-Build-Id", BUILD_ID)
+            self.send_header("X-Manifest-Version", MANIFEST_VERSION)
+            self.send_header("X-TTS-Provider", meta.get("actualProvider", ""))
+            self.send_header("X-TTS-Voice", meta.get("actualVoiceId", ""))
+            self.send_header("X-TTS-Requested-Voice", meta.get("requestedVoiceId", ""))
+            self.send_header("X-TTS-Emotion-Style", meta.get("emotionStyle", ""))
+            self.send_header("X-TTS-Fallback-Reason", meta.get("fallbackReason", ""))
+            self.send_header("X-Asset-Version", meta.get("actualAssetVersion", ""))
+            self.send_header("X-Master-SHA256", meta.get("actualMasterSHA256", ""))
             self.send_header("X-TTS-Duration-Sec", "%.3f" % (meta.get("tts_duration") or 0.0))
             self.send_header("X-Video-Duration-Sec", "%.3f" % (meta.get("video_duration") or 0.0))
             self.send_header("X-Subtitle-Lines", str(meta.get("lines", 0)))
@@ -1280,7 +1541,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
 def main():
     port = int(os.environ.get("PORT", "8000"))
     log("start port=%d concurrent=%d masters=%s font=%s ffmpeg=%s state=%s"
-        % (port, MAX_CONCURRENT, MASTERS_DIR, FONT_FILE, FFMPEG, SITE_STATE_FILE))
+        % (port, MAX_CONCURRENT, GENERATION_MASTERS_DIR, FONT_FILE, FFMPEG, SITE_STATE_FILE))
     httpd = http.server.ThreadingHTTPServer(("0.0.0.0", port), Handler)
     httpd.serve_forever()
 
