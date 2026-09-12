@@ -912,7 +912,7 @@ def _v1_bottom_png(label, path):
 
 
 
-def _v1_compose(item, text, master, tts_path, final, final_duration, speech_start, master_dur, workdir):
+def _v1_compose(item, text, master, tts_path, final, final_duration, speech_start, master_dur, workdir, no_text=False):
     emo=_emotions.get(item) or {}
     backend = emo.get("backend") or {}
     emo = {**emo, **backend}
@@ -935,8 +935,32 @@ def _v1_compose(item, text, master, tts_path, final, final_duration, speech_star
         top=int(round(V1_FEET_Y-(y1+1)*s)); left=(720-sw)//2
     name=emo.get("displayName") or emo.get("label") or item
     code=emo.get("code") or "00"
-    bp=os.path.join(workdir,"v1_bottom.png"); sp=os.path.join(workdir,"v1_sub.png")
+    bp=os.path.join(workdir,"v1_bottom.png")
     _v1_bottom_png("%s · E%s"%(name,code), bp)
+    input_codec = ["-c:v", "libvpx-vp9"] if master.lower().endswith(".mkv") else []
+
+    if no_text:
+        chain=("[0:v]format=yuva420p,scale=%d:%d:flags=lanczos[fg];"
+               "color=c=black:s=%dx%d:r=%d:d=%.3f[bg];"
+               "[bg][fg]overlay=x=%d:y=%d:shortest=1[base];"
+               "[1:v]format=rgba[bp];"
+               "[base][bp]overlay=0:0:shortest=1[ov];"
+               "[ov]fps=%d,trim=duration=%.3f,setpts=PTS-STARTPTS[vo]" % (
+                   sw,sh,W,H,FPS,final_duration+0.1,left,top,FPS,final_duration))
+        cmd=[FFMPEG,"-y"] + input_codec + [
+            "-stream_loop","-1","-i",master,
+            "-loop","1","-framerate",str(FPS),"-i",bp,
+            "-filter_complex",chain,"-map","[vo]",
+            "-threads",str(FFMPEG_THREADS),"-c:v","libx264","-preset","medium","-crf","18",
+            "-maxrate","%dk"%BITRATE_KBPS,"-bufsize","%dk"%(BITRATE_KBPS*2),
+            "-pix_fmt","yuv420p","-r",str(FPS),"-movflags","+faststart","-an",
+            "-t","%.3f"%final_duration,final]
+        r=subprocess.run(cmd,capture_output=True,text=True,timeout=240)
+        if r.returncode!=0:
+            raise RuntimeError("v1 no-text ffmpeg rc=%d %s"%(r.returncode, r.stderr[-2500:]))
+        return 0, 0
+
+    sp=os.path.join(workdir,"v1_sub.png")
     fsize, nlines=_v1_subtitle_png(text, sp)
     chain=("[0:v]format=yuva420p,scale=%d:%d:flags=lanczos[fg];"
            "color=c=black:s=%dx%d:r=%d:d=%.3f[bg];"
@@ -950,7 +974,6 @@ def _v1_compose(item, text, master, tts_path, final, final_duration, speech_star
     else:
         audio="[1:a]apad[aout]"
     chain += ";"+audio
-    input_codec = ["-c:v", "libvpx-vp9"] if master.lower().endswith(".mkv") else []
     cmd=[FFMPEG,"-y"] + input_codec + ["-stream_loop","-1","-i",master,"-i",tts_path,"-loop","1","-framerate",str(FPS),"-i",bp,"-loop","1","-framerate",str(FPS),"-i",sp,
          "-filter_complex",chain,"-map",map_v,"-map","[aout]",
          "-threads",str(FFMPEG_THREADS),"-c:v","libx264","-preset","medium","-crf","18","-maxrate","%dk"%BITRATE_KBPS,
@@ -960,6 +983,7 @@ def _v1_compose(item, text, master, tts_path, final, final_duration, speech_star
     if r.returncode!=0:
         raise RuntimeError("v1 ffmpeg rc=%d %s"%(r.returncode, r.stderr[-2500:]))
     return fsize, nlines
+
 
 def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts_audio_path=None, tts_audio_info=None,
              requested_item=None, requested_character=None, build_id=None, manifest_version=None,
@@ -989,7 +1013,6 @@ def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts
     if actual_master_sha256 != expected_master:
         raise RuntimeError("actual master SHA mismatch")
     final = os.path.join(workdir, "final.mp4")
-    tts_path = os.path.join(workdir, "tts.mp3")
     meta = {
         "requestedItem": requested_item or actual_item,
         "actualItem": actual_item,
@@ -1003,8 +1026,37 @@ def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts
         "expectedMasterSHA256": expected_master,
         "actualMasterSHA256": actual_master_sha256,
     }
+    master_dur = _probe_duration(master) or float(DURATION)
+    text = (text or "").strip()
+    no_text = not text
+    meta["textMode"] = "no-text" if no_text else "text"
+    if no_text:
+        meta["layout"] = 0.0
+        meta["lines"] = 0
+        meta["font_size"] = 0
+        meta["tts"] = 0.0
+        meta["tts_provider"] = "none"
+        meta["voice_id"] = ""
+        meta["requestedVoiceId"] = ""
+        meta["requestedProvider"] = ""
+        meta["actualVoiceId"] = ""
+        meta["providerVoiceId"] = ""
+        meta["actualProvider"] = "none"
+        meta["emotionStyle"] = actual_entry.get("emotionId") or "neutral"
+        meta["fallbackReason"] = ""
+        meta["speech_start"] = 0.0
+        meta["tts_duration"] = 0.0
+        final_duration = master_dur
+        t0 = time.time()
+        fsize, nlines = _v1_compose(item, "", master, None, final, final_duration, 0.0, master_dur, workdir, no_text=True)
+        meta["ffmpeg"] = time.time() - t0
+        meta["size"] = os.path.getsize(final)
+        meta["final_duration"] = final_duration
+        meta["video_duration"] = _probe_duration(final) or final_duration
+        meta["speech_text"] = ""
+        return final, meta
+
     # 发声时机：speechStart（秒）= 该条视频里角色完成初步情绪建立、最适合开口的时间。
-    # 不同情绪/不同动作可不同；最低门槛 1.2s，负值/非法按 0 处理（不早于视频开头）。
     speech_start = 0.0
     try:
         speech_start = float((_emotions.get(actual_item) or {}).get("backend", {}).get("speechStart") or 0.0)
@@ -1032,11 +1084,11 @@ def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts
     meta["lines"] = len(lines)
     meta["font_size"] = font_size
 
+    tts_path = os.path.join(workdir, "tts.mp3")
     t0 = time.time()
     if speech_text is None:
         speech_text = build_speech_text(text, _emotion)
     if tts_audio_path and os.path.isfile(tts_audio_path):
-        # 试听缓存命中：直接复用同一份音频文件，不再次调用 TTS。
         shutil.copyfile(tts_audio_path, tts_path)
         tts_info = dict(tts_audio_info or {})
         tts_info.setdefault("requestedVoiceId", voice_id or DEFAULT_VOICE_ID)
@@ -1058,13 +1110,9 @@ def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts
     meta["fallbackReason"] = tts_info.get("fallbackReason") or ""
 
     t0 = time.time()
-    # 动态时长：最终视频时长 = max(保底, TTS 实测时长 + 尾段预留)
     tts_dur = _probe_duration(tts_path) or 0.0
-    master_dur = _probe_duration(master) or float(DURATION)
     final_duration = max(master_dur, speech_start + tts_dur + ENDING_HOLD)
-    # V1 统一成片模板（union 自动布局 + 字幕自适应 + 纯黑/暖金底部承托）
-    v1_text = text if speech_text is None else text
-    fsize, nlines = _v1_compose(item, text, master, tts_path, final, final_duration, speech_start, master_dur, workdir)
+    fsize, nlines = _v1_compose(item, text, master, tts_path, final, final_duration, speech_start, master_dur, workdir, no_text=False)
     meta["lines"] = nlines
     meta["font_size"] = fsize
     meta["ffmpeg"] = time.time() - t0
@@ -1570,7 +1618,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         if not read_enabled():
             return self._send_json(503, {"error": "service temporarily unavailable"})
         start = time.time()
-        text = (text or DEFAULT_TEXT).strip()
+        text = (text or "").strip()
         if len(text) > TEXT_MAX:
             return self._send_json(400, {"error": "TEXT_TOO_LONG", "message": "这段内容较长，当前最多支持 %d 字，请适当精简后重试。" % TEXT_MAX})
         if has_unsupported(text):
@@ -1581,11 +1629,19 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             return self._send_json(429, {"error": "server busy"})
 
         emotion_id = (_emotions.get(item) or {}).get("emotionId") or "neutral"
-        tts_cached = take_tts_audio(tts_token, speech_text or text, voice_id, emotion_id) if tts_token else None
-        tts_audio_path = tts_cached[0] if tts_cached else None
-        tts_audio_info = tts_cached[1] if tts_cached else None
-        if tts_token:
-            log("TTS-TOKEN %s text_len=%d voice=%s emotion=%s" % ("hit" if tts_audio_path else "miss", len(text), voice_id or "-", emotion_id))
+        if not text:
+            # 无文字模式：明确忽略上一轮 text/speech/tts token，禁止复用旧音频或字幕。
+            speech_text = None
+            tts_token = None
+            tts_audio_path = None
+            tts_audio_info = None
+            log("NO-TEXT item=%s voice_ignored=%s emotion=%s" % (item, voice_id or "-", emotion_id))
+        else:
+            tts_cached = take_tts_audio(tts_token, speech_text or text, voice_id, emotion_id) if tts_token else None
+            tts_audio_path = tts_cached[0] if tts_cached else None
+            tts_audio_info = tts_cached[1] if tts_cached else None
+            if tts_token:
+                log("TTS-TOKEN %s text_len=%d voice=%s emotion=%s" % ("hit" if tts_audio_path else "miss", len(text), voice_id or "-", emotion_id))
 
         if async_mode:
             job_id = secrets.token_urlsafe(16)
@@ -1619,8 +1675,8 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
                     return self._send_json(410, {"error": str(error)})
                 except journey_store.JourneyUnavailable as error:
                     return self._send_json(503, {"error": str(error)})
-            log("SUCCESS item=%s requested_voice=%s actual_voice=%s tts_provider=%s style=%s fallback=%s text_len=%d lines=%d font=%d tts=%.2fs tts_dur=%.2fs vdur=%.2fs ffmpeg=%.2fs total=%.2fs size=%d"
-                % (item, meta.get("requestedVoiceId") or "-", meta.get("actualVoiceId") or "-", meta.get("tts_provider") or "-", meta.get("emotionStyle") or "-", meta.get("fallbackReason") or "-", len(text), meta["lines"], meta["font_size"], meta["tts"],
+            log("SUCCESS item=%s text_mode=%s requested_voice=%s actual_voice=%s tts_provider=%s style=%s fallback=%s text_len=%d lines=%d font=%d tts=%.2fs tts_dur=%.2fs vdur=%.2fs ffmpeg=%.2fs total=%.2fs size=%d"
+                % (item, meta.get("textMode") or "-", meta.get("requestedVoiceId") or "-", meta.get("actualVoiceId") or "-", meta.get("tts_provider") or "-", meta.get("emotionStyle") or "-", meta.get("fallbackReason") or "-", len(text), meta["lines"], meta["font_size"], meta["tts"],
                    meta.get("tts_duration") or 0.0, meta.get("video_duration") or 0.0, meta["ffmpeg"],
                    time.time() - start, len(data)))
             self.send_response(200)
