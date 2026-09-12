@@ -1,11 +1,12 @@
 {
   "releaseId": "release-20260912-01",
   "buildId": "release-20260912-01",
-  "manifestVersion": "20260912-01",
-  "manifestSha256": "7289c06ad26ae8d5dad33f68209dd090330a7009b9f693ac847a62983a998411",
-  "canonicalUrl": "https://lugu.love/",
+  "manifestVersion": "20260912-01-c4",
+  "manifestSha256": "c84c7ef6fec29235513475bb5f919a40fdf932aab6384bff1eb2f88e8af19f6b",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
   "releasePath": "/release-20260912-01/",
   "backendBaseUrl": "https://api.lugu.love",
   "builtAt": "2026-09-11T19:05:08Z",
-  "pwaEnabled": false
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/"
 }

@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="assets/icons/favicon-v2-64.png" type="image/png">
 <meta name="theme-color" content="#0b0c18">
 <title>七星使者 · 心情表达</title>
 <style>  :root { --bg:#0b0c18; --card:#17192e; --ink:#eef0ff; --muted:#9aa0c3; --accent:#7d8bff; }
@@ -51,7 +52,7 @@
   .sub-actions .suggest { margin:0; flex:0 1 auto; min-width:0; height:34px; display:inline-flex; align-items:center; gap:6px; padding:0 10px; border:1px solid rgba(255,255,255,.14); border-radius:999px; background:rgba(255,255,255,.05); color:#b8c0ff; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; }
   .voice-mini { display:inline-flex; align-items:center; gap:6px; flex:0 1 auto; min-width:0; height:34px; padding:0 10px; border:1px solid rgba(255,255,255,.12); border-radius:999px; background:rgba(255,255,255,.05); }
   .voice-mini .voice-icon { font-size:12px; line-height:1; color:var(--muted); flex:0 0 auto; }
-  .voice-select { height:30px; max-width:100px; min-width:0; padding:0 2px; border:none; background:transparent; color:#b8c0ff; font-size:12px; font-weight:600; outline:none; }
+  .voice-select { height:30px; max-width:165px; min-width:0; padding:0 2px; border:none; background:transparent; color:#b8c0ff; font-size:12px; font-weight:600; outline:none; }
   .voice-preview { flex:0 1 auto; min-width:0; height:34px; display:inline-flex; align-items:center; gap:6px; padding:0 10px; border:1px solid rgba(255,255,255,.14); border-radius:999px; background:rgba(255,255,255,.05); color:#b8c0ff; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; }
   .voice-preview:disabled { opacity:.55; cursor:default; }
   .suggest-box { display:flex; flex-direction:column; flex-shrink:0; margin-top:6px; padding:0 16px; max-height:132px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
@@ -249,11 +250,9 @@ window.__MAIN__ = function () {
       totalFrames: e.previewFrames || webVp9.frames || webHevc.frames || 0,
       sheetCount: e.previewSheets || 0,
       previewProxy: e.previewProxy || null,
-      delivery: {
-        vp9: webVp9.url || "",
-        hevc: webHevc.url || "",
-        mobileFallback: mobileFallback.url || ""
-      }
+      assetVersion: e.assetVersion || "",
+      generationMasterSha256: (e.generationMaster || {}).sha256 || "",
+      delivery: { vp9: webVp9.url || "", hevc: webHevc.url || "", mobileFallback: mobileFallback.url || "" }
     };
   }
 
@@ -261,45 +260,39 @@ window.__MAIN__ = function () {
     return fetch("build.json?v=" + encodeURIComponent(location.search || "0"), { cache:"no-store" })
       .then(function(r){ if(!r.ok) throw new Error("build " + r.status); return r.json(); })
       .then(function(build){
-        if(!build || build.releaseId !== "release-20260912-01" || build.buildId !== "release-20260912-01" || build.manifestVersion !== "20260912-01"){
-          throw new Error("build contract mismatch");
-        }
+        if(!build || build.releaseId !== "release-20260912-01" || build.buildId !== "release-20260912-01" || build.manifestVersion !== "20260912-01-c4") throw new Error("build contract mismatch");
         BUILD_CONTRACT = build;
         return fetch("asset-manifest.json?v=" + encodeURIComponent(build.manifestVersion), { cache:"no-store" });
       })
       .then(function(r){ if(!r.ok) throw new Error("manifest " + r.status); return r.json(); })
       .then(function(manifest){
-        if(!manifest || manifest.releaseId !== BUILD_CONTRACT.releaseId || manifest.buildId !== BUILD_CONTRACT.buildId || manifest.manifestVersion !== BUILD_CONTRACT.manifestVersion){
-          throw new Error("manifest contract mismatch");
-        }
-        var allowed = { "rabbit-aggrieved":1, "rabbit-sajiao":1, "rabbit-guilty":1, "rabbit-lowenergy":1 };
-        ["fox-confused","fox-disgusted","fox-schadenfreude","fox-cool","fox-jealous","fox-guilty","fox-pleading"].forEach(function(id){ allowed[id]=1; });
+        if(!manifest || manifest.releaseId !== BUILD_CONTRACT.releaseId || manifest.buildId !== BUILD_CONTRACT.buildId || manifest.manifestVersion !== BUILD_CONTRACT.manifestVersion) throw new Error("manifest contract mismatch");
+        var denied = {"rabbit-aggrieved":1,"rabbit-sajiao":1,"rabbit-guilty":1,"rabbit-lowenergy":1};
+        ["fox-confused","fox-disgusted","fox-schadenfreude","fox-cool","fox-jealous","fox-guilty","fox-pleading"].forEach(function(id){ denied[id]=1; });
         var chars = manifest.production && manifest.production.characters;
         if(!Array.isArray(chars) || chars.length !== 2) throw new Error("characters contract mismatch");
-        var result = { "fengxin-rabbit": [], "xinguang-fox": [] };
+        var result = {"fengxin-rabbit":[],"xinguang-fox":[]};
         chars.forEach(function(c){
-          var cid = c.characterId;
+          var cid=c.characterId;
           if(!result[cid] || !Array.isArray(c.itemOrder)) throw new Error("character order mismatch");
           c.itemOrder.forEach(function(itemId){
-            if(allowed[itemId]) throw new Error("isolated item in production: " + itemId);
-            var e = manifest.items && manifest.items[itemId];
+            if(denied[itemId]) throw new Error("isolated item in production: " + itemId);
+            var e=manifest.items && manifest.items[itemId];
             if(!e || e.characterId !== cid) throw new Error("item character mismatch: " + itemId);
-            if(!e.generationMaster || !e.generationMaster.ref || !e.webVp9 || !e.webVp9.url || !e.webHevc || !e.webHevc.url || !e.mobileFallback || !e.mobileFallback.url){
-              throw new Error("incomplete item contract: " + itemId);
-            }
-            result[cid].push(mapManifestEntry(e, itemId));
+            if(!e.generationMaster || !e.generationMaster.ref || !e.webVp9 || !e.webVp9.url || !e.webHevc || !e.webHevc.url || !e.mobileFallback || !e.mobileFallback.url) throw new Error("incomplete item contract: " + itemId);
+            result[cid].push(mapManifestEntry(e,itemId));
           });
         });
         if(result["fengxin-rabbit"].length !== 11 || result["xinguang-fox"].length !== 8) throw new Error("production item count mismatch");
-        CHARACTERS["fengxin-rabbit"].emotions = result["fengxin-rabbit"];
-        CHARACTERS["xinguang-fox"].emotions = result["xinguang-fox"];
-        EMOTIONS = CHARACTERS[currentCharacterId].emotions;
+        CHARACTERS["fengxin-rabbit"].emotions=result["fengxin-rabbit"];
+        CHARACTERS["xinguang-fox"].emotions=result["xinguang-fox"];
+        EMOTIONS=CHARACTERS[currentCharacterId].emotions;
         return true;
       })
       .catch(function(err){
-        console.error("[production-contract]", err);
+        console.error("[production-contract]",err);
         document.documentElement.classList.add("state-contract-error");
-        if(typeof setStatus === "function") setStatus("生产素材契约加载失败，已停止生成。", "err");
+        if(typeof setStatus === "function") setStatus("生产素材契约加载失败，已停止生成。","err");
         return false;
       });
   }
@@ -578,30 +571,231 @@ window.__MAIN__ = function () {
   window.addEventListener("load", function(){ setTimeout(detectBridgeNow, 150); });
 
   var current=null;
+  // A路转发接收：?e=1..15 预选情绪；from=home 时“←首页”优先浏览器返回。
   var fwdE = 0;
   try { var _fe = parseInt(new URLSearchParams(location.search).get("e") || "", 10); if (_fe >= 1 && _fe <= 15) fwdE = _fe; } catch (err) {}
   var fwdFromHome = false;
   try { fwdFromHome = new URLSearchParams(location.search).get("from") === "home"; } catch (err) {}
+  function applyForwardText(){
+    var stored = null;
+    try { stored = window.sessionStorage.getItem("lugu_forward_text"); } catch (e) {}
+    try { window.sessionStorage.removeItem("lugu_forward_text"); } catch (e) {}
+    try { window.sessionStorage.removeItem("lugu_forward_emotion"); } catch (e) {}
+    if(!stored || !textInput) return;
+    textInput.value = stored;
+    textInput.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+
+  var cache={}, preloadOrder=["2","3"], preloadStarted=false, activeUserLoad=false;
+  var sheets=[], loaded=0, frameIndex=0, lastFrameAt=0, animId=null;
+  var lastBlob=null, lastFile=null, lastUrl=null;
+
+  var VOICES = [
+    {name:"儿童·明亮活泼", label:"明亮", id:"child-bright"},
+    {name:"儿童·软糯委屈", label:"软糯", id:"child-soft"},
+    {name:"儿童·有脾气", label:"个性", id:"child-spirited"},
+    {name:"儿童·超软幼龄", label:"幼龄", id:"child-tiny"},
+    {name:"儿童·淘气戏剧", label:"戏剧", id:"child-dramatic"},
+    {name:"女性·年轻明亮", label:"明亮", id:"female-bright"},
+    {name:"女性·温柔细腻", label:"温柔", id:"female-gentle"},
+    {name:"女性·甜美少女", label:"甜美", id:"female-sweet"},
+    {name:"女性·成熟磁性", label:"磁性", id:"female-magnetic"},
+    {name:"女性·轻柔安定", label:"轻柔", id:"female-soft"},
+    {name:"男性·青年阳光", label:"阳光", id:"male-sunny"},
+    {name:"男性·青年温柔", label:"温柔", id:"male-gentle"},
+    {name:"男性·成熟有力量", label:"力量", id:"male-powerful"},
+    {name:"男性·少年清亮", label:"少年", id:"male-youth"},
+    {name:"男性·低沉磁性", label:"低沉", id:"male-deep"}
+  ];
+  var voiceSelect=document.getElementById("voiceSelect");
+  VOICES.forEach(function(v){
+    var o=document.createElement("option"); o.value=v.id; o.textContent=v.name+"｜"+v.label; voiceSelect.appendChild(o);
+  });
+  voiceSelect.value="female-bright";
+  var btnPreviewVoice=document.getElementById("btnPreviewVoice");
+  var ttsToken=null;
+  var previewAudio=null;
+  var previewAudioUrl=null;
+  var previewAudioCtx=null;
+  var previewSource=null;
+  var previewHtmlAudio=null;
+  var SILENT_WAV="data:audio/wav;base64,UklGRkQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==";
+  var previewState="idle";
+  var previewReqId=0;
+  voiceSelect.addEventListener("change", invalidatePreviewToken);
+
+  function scrollEmotionTo(id){
+    Array.prototype.forEach.call(emotionsEl.children, function(b){
+      if(b.dataset && b.dataset.em === id){
+        try{ b.scrollIntoView({ behavior:"smooth", inline:"center", block:"nearest" }); }catch(e){}
+      }
+    });
+  }
+  function renderCharacterSelect(){
+    if(!characterSelect) return;
+    characterSelect.innerHTML = "";
+    Object.keys(CHARACTERS).forEach(function(id){
+      var c = CHARACTERS[id];
+      if(!c.emotions || c.emotions.length === 0) return;
+      var o = document.createElement("option"); o.value = id; o.textContent = c.name; characterSelect.appendChild(o);
+    });
+    characterSelect.value = currentCharacterId;
+  }
+
+  var alphaVideoToken = 0;
+  function releaseAlphaVideo(){
+    alphaVideoToken++;
+    if(!alphaVideo) return;
+    alphaVideo.onerror = null;
+    alphaVideo.pause();
+    alphaVideo.removeAttribute("src");
+    try { alphaVideo.load(); } catch(e) {}
+    alphaVideo.hidden = true;
+  }
+
+  function playAlphaVideo(delivery){
+    if(!alphaVideo || !delivery) return false;
+    var first = VIDEO_PREFER_HEVC ? delivery.hevc : delivery.vp9;
+    var alternate = VIDEO_PREFER_HEVC ? delivery.vp9 : delivery.hevc;
+    if(!first) first = alternate;
+    if(!first){
+      setStatus("当前情绪暂无浏览器可用透明视频，已切换备用动画", "err");
+      return false;
+    }
+    var token = ++alphaVideoToken;
+    var triedAlternate = false;
+    function fallbackCanvas(){
+      if(token !== alphaVideoToken) return;
+      alphaVideo.hidden = true;
+      canvas.hidden = false;
+      if(current && current.sheetCount > 0){
+        setStatus("当前浏览器透明视频不可用，已切换备用动画", "err");
+        loadSheets();
+      } else {
+        setStatus("当前浏览器暂时无法播放该透明视频", "err");
+      }
+    }
+    if (VIDEO_IS_MOBILE && delivery.mobileFallback) {
+      canvas.hidden = true;
+      alphaVideo.hidden = false;
+      alphaVideo.onerror = null;
+      alphaVideo.src = delivery.mobileFallback;
+      try { alphaVideo.load(); } catch(e) {}
+      var mobilePlay = alphaVideo.play();
+      if(mobilePlay && mobilePlay.catch) mobilePlay.catch(function(){});
+      alphaVideo.onerror = function(){
+        if(token !== alphaVideoToken) return;
+        fallbackCanvas();
+      };
+      return true;
+    }
+    function trySource(url){
+      if(token !== alphaVideoToken) return;
+      if(!url){ fallbackCanvas(); return; }
+      canvas.hidden = true;
+      alphaVideo.hidden = false;
+      alphaVideo.onerror = null;
+      alphaVideo.src = url;
+      try { alphaVideo.load(); } catch(e) {}
+      var checkAlpha = function(){
+        alphaVideo.removeEventListener("loadeddata", checkAlpha);
+        if(token !== alphaVideoToken) return;
+        if(!VIDEO_IS_MOBILE) return;
+        try {
+          var c=document.createElement("canvas"); c.width=8; c.height=8;
+          var cx=c.getContext("2d"); cx.drawImage(alphaVideo,0,0,8,8);
+          var d=cx.getImageData(0,0,8,8).data;
+          var transparent=0, opaqueGreen=0;
+          for(var i=0;i<d.length;i+=4){
+            if(d[i+3] < 20) transparent++;
+            else if(d[i+1] > d[i]+30 && d[i+1] > d[i+2]+30) opaqueGreen++;
+          }
+          if(transparent < 8 && opaqueGreen > 24) fallbackCanvas();
+        } catch(e) { fallbackCanvas(); }
+      };
+      alphaVideo.addEventListener("loadeddata", checkAlpha, {once:true});
+      var pr = alphaVideo.play();
+      if(pr && pr.catch) pr.catch(function(){});
+      alphaVideo.onerror = function(){
+        if(token !== alphaVideoToken) return;
+        if(!triedAlternate && alternate && alternate !== url){
+          triedAlternate = true;
+          trySource(alternate);
+        } else {
+          fallbackCanvas();
+        }
+      };
+    }
+    trySource(first);
+    return true;
+  }
+
+  function loadEmotionVisual(){
+    cancelAnimationFrame(animId);
+    if(!current) return;
+    if(current && current.delivery && (current.delivery.vp9 || current.delivery.hevc)){
+      playAlphaVideo(current.delivery);
+      return;
+    }
+    releaseAlphaVideo();
+    canvas.hidden = false;
+    loadSheets();
+  }
+
+  function switchCharacter(id){
+    if(!CHARACTERS[id] || !CHARACTERS[id].emotions || CHARACTERS[id].emotions.length === 0) return;
+    userCancelInFlight();
+    releaseAlphaVideo();
+    cancelAnimationFrame(animId);
+    currentCharacterId = id;
+    EMOTIONS = CHARACTERS[id].emotions;
+    current = EMOTIONS[0];
+    renderCharacterSelect();
+    renderEmotionButtons();
+    clearGenerated();
+    loadEmotionVisual();
+    renderDiag();
+    renderPreloadDiag();
+  }
+
+  function renderEmotionButtons(){
+    emotionsEl.innerHTML = "";
+    EMOTIONS.forEach(function(e){
+      var b=document.createElement("button"); b.type="button"; b.className="emotion";
+      b.dataset.em=e.id; b.textContent=e.name;
+      b.addEventListener("click", function(){ selectEmotion(e.id); });
+      emotionsEl.appendChild(b);
+    });
+    refreshUI(); renderGuide(); renderSuggest();
+    if(current) scrollEmotionTo(current.id);
+  }
   if(characterSelect){
     characterSelect.addEventListener("change", function(){ switchCharacter(this.value); });
   }
-  function initializeProductionManifest(){
-    loadProductionManifest().then(function(ok){
-      if(!ok){ syncGenerateEnabled(); return; }
+  renderCharacterSelect();
+  if (fwdE) {
+    var _fwdEmo = EMOTIONS.find(function (x) { return x.id === String(fwdE); });
+    if (_fwdEmo) current = _fwdEmo;
+  }
+  renderEmotionButtons();
+
+  loadProductionManifest().then(function(ok){
+    if (ok) {
       if(requestedCharacterId !== currentCharacterId && CHARACTERS[requestedCharacterId].emotions.length > 0){
         currentCharacterId = requestedCharacterId;
         EMOTIONS = CHARACTERS[currentCharacterId].emotions;
       }
-      var keepId = fwdE ? String(fwdE) : (EMOTIONS[0] && EMOTIONS[0].id);
+      var keepId = fwdE ? String(fwdE) : (current && current.id);
       current = EMOTIONS.find(function(e){ return e.id === keepId; }) || EMOTIONS[0];
       renderCharacterSelect();
-      if(fwdE || current){ renderEmotionButtons(); }
-      if(current){ loadEmotionVisual(); }
+      renderEmotionButtons();
+      loadEmotionVisual();
       renderDiag(); renderPreloadDiag();
-      syncGenerateEnabled();
-      applyForwardText();
-    });
-  }
+    }
+    if(typeof syncGenerateEnabled === "function") syncGenerateEnabled();
+    applyForwardText();
+  });
+
   function refreshUI(){ if(!current) return; Array.prototype.forEach.call(emotionsEl.children, function(b){ if(!b.dataset || !b.dataset.em) return; b.classList.toggle("active", b.dataset.em===current.id); }); }
   function selectEmotion(id){
     if(!current) return;
@@ -1003,7 +1197,7 @@ window.__MAIN__ = function () {
     fetch(MAKE_SEND_API + "/tts", {
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ text:text, voiceId:voiceSelect.value }),
+      body: JSON.stringify({ text:text, voiceId:voiceSelect.value, itemId:current ? current.item : "" }),
       cache:"no-store",
       mode:"cors"
     }).then(function(resp){
@@ -1116,7 +1310,7 @@ window.__MAIN__ = function () {
       var tFetchStart = performance.now();
       lastTiming.clickToFetchMs=Math.round(tFetchStart-tClick);
       if(!BUILD_CONTRACT || !current){ throw new Error("production contract not ready"); }
-      var url=MAKE_SEND_API + "/make-send?text=" + encodeURIComponent(text) + "&item=" + encodeURIComponent(current.item) + "&characterId=" + encodeURIComponent(current.characterId) + "&buildId=" + encodeURIComponent(BUILD_CONTRACT.buildId) + "&manifestVersion=" + encodeURIComponent(BUILD_CONTRACT.manifestVersion) + "&voiceId=" + encodeURIComponent(voiceSelect.value) + (ttsToken ? "&ttsToken=" + encodeURIComponent(ttsToken) : "") + (isAppBridge ? "&app_bridge=1" : "") + "&async=1";
+      var url=MAKE_SEND_API + "/make-send?text=" + encodeURIComponent(text) + "&item=" + encodeURIComponent(current.item) + "&characterId=" + encodeURIComponent(current.characterId) + "&buildId=" + encodeURIComponent(BUILD_CONTRACT.buildId) + "&manifestVersion=" + encodeURIComponent(BUILD_CONTRACT.manifestVersion) + "&assetVersion=" + encodeURIComponent(current.assetVersion || "") + "&expectedMasterSHA256=" + encodeURIComponent(current.generationMasterSha256 || "") + "&voiceId=" + encodeURIComponent(voiceSelect.value) + (ttsToken ? "&ttsToken=" + encodeURIComponent(ttsToken) : "") + (isAppBridge ? "&app_bridge=1" : "") + "&async=1";
       activeController = typeof AbortController === "function" ? new AbortController() : null;
       generatePhase="request-sent";
       renderDiag();
@@ -1372,9 +1566,14 @@ window.__MAIN__ = function () {
   }
 
 
+  refreshUI();
+  loadEmotionVisual();
+  renderDiag();
+  renderBridgeDiag();
+  renderPreloadDiag();
+  renderGuide();
   updateCharCount();
   syncGenerateEnabled();
-  initializeProductionManifest();
 };
 
 if (window.__MAIN_PENDING__) {

@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "releaseId": "release-20260912-01",
   "buildId": "release-20260912-01",
-  "manifestVersion": "20260912-01",
+  "manifestVersion": "20260912-01-c4",
   "generatedAt": "2026-09-11T19:05:08Z",
   "canonicalUrl": "https://lugu.love/",
   "production": {
@@ -52,10 +52,16 @@
       "previewSheets": 15,
       "status": "production",
       "generationMaster": {
-        "kind": "backend-local",
-        "ref": "happy-master-v2.mp4",
-        "sha256": "9e406da21a7c2099fe97e4f674a9a2d3ea850652d8a9d6bfd4b00fb2737298e3",
-        "container": "mp4"
+        "kind": "approved-content-version",
+        "ref": "rabbit_01_happy_generation_alpha_v1.mkv",
+        "sha256": "4a6ad6d4d186a77b1d2e3d059d5deb5c127c3c245435e92b851b7ffef4cc4832",
+        "container": "mkv",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "rabbit_01_happy_birefnet_alpha_v1.mov",
+          "sha256": "3c83bf4ff59972c1714f5cfa1d9313b2fb13b96c84728745d2b13fd0b2eb1e32",
+          "assetVersion": "rabbit-happy-v1"
+        }
       },
       "webVp9": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/01-rabbit-happy/delivery/rabbit_01_happy_alpha_vp9.webm",
@@ -67,7 +73,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "rabbit-happy-v1"
       },
       "webHevc": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/01-rabbit-happy/delivery/rabbit_01_happy_alpha_hevc.mov",
@@ -79,7 +86,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "rabbit-happy-v1"
       },
       "mobileFallback": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/01-rabbit-happy/mobile-v2/rabbit_01_happy_mobile_black_v2.mp4",
@@ -90,7 +98,8 @@
         "height": 1112,
         "fps": 24,
         "frames": 121,
-        "duration": 5.041667
+        "duration": 5.041667,
+        "assetVersion": "rabbit-happy-v1"
       },
       "backend": {
         "displayName": "开心",
@@ -101,8 +110,17 @@
           0,
           719,
           1280
-        ]
-      }
+        ],
+        "subjectBox": [
+          219,
+          229,
+          693,
+          885
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "rabbit-happy-v1"
     },
     "rabbit-angry": {
       "itemId": "rabbit-angry",
@@ -115,10 +133,16 @@
       "previewSheets": 15,
       "status": "production",
       "generationMaster": {
-        "kind": "backend-local",
-        "ref": "angry-master-v2.mp4",
-        "sha256": "ae83d652f1e70aefb774119b89e39a9da16b8ebb2a641f661f588fa81e1c314b",
-        "container": "mp4"
+        "kind": "approved-content-version",
+        "ref": "rabbit_03_angry_generation_alpha_v1.mkv",
+        "sha256": "94f977b2520008d3881d83ec37d61916cd6e3de09a27eb4faf00849b480b0545",
+        "container": "mkv",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "rabbit_03_angry_birefnet_alpha_v2.mov",
+          "sha256": "69d5927d9131671c78134a3a8efd99b89de59cfa635313e6f0e3fe1fbc4b8435",
+          "assetVersion": "rabbit-angry-v2"
+        }
       },
       "webVp9": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/03-rabbit-angry/delivery/rabbit_03_angry_alpha_vp9.webm",
@@ -130,7 +154,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "rabbit-angry-v2"
       },
       "webHevc": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/03-rabbit-angry/delivery/rabbit_03_angry_alpha_hevc.mov",
@@ -142,7 +167,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "rabbit-angry-v2"
       },
       "mobileFallback": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/03-rabbit-angry/mobile-v2/rabbit_03_angry_mobile_black_v2.mp4",
@@ -153,7 +179,8 @@
         "height": 1112,
         "fps": 24,
         "frames": 121,
-        "duration": 5.041667
+        "duration": 5.041667,
+        "assetVersion": "rabbit-angry-v2"
       },
       "backend": {
         "displayName": "生气",
@@ -164,8 +191,17 @@
           0,
           719,
           1280
-        ]
-      }
+        ],
+        "subjectBox": [
+          260,
+          288,
+          595,
+          808
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "rabbit-angry-v2"
     },
     "rabbit-playful": {
       "itemId": "rabbit-playful",
@@ -178,10 +214,16 @@
       "previewSheets": 15,
       "status": "production",
       "generationMaster": {
-        "kind": "backend-local",
-        "ref": "rabbit-playful.mp4",
-        "sha256": "707a3d3ad6669f81bf3fd8e3b2a3acaa2161b83643eaa24bbfccba2f37b31d11",
-        "container": "mp4"
+        "kind": "approved-content-version",
+        "ref": "rabbit_05_playful_generation_alpha_v1.mkv",
+        "sha256": "9c13e7436c402106e9de1c2b53d04ab46704d117a98a82aca4fc3fc817efddb8",
+        "container": "mkv",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "rabbit_05_playful_birefnet_alpha_v1.mov",
+          "sha256": "54a4d4efd7d21fb97021f5ddb53a45a21aab6f6ebf3ba7e46b8c8092ea4970a0",
+          "assetVersion": "rabbit-playful-v1"
+        }
       },
       "webVp9": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/05-rabbit-playful/delivery/rabbit_05_playful_alpha_vp9.webm",
@@ -193,7 +235,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "rabbit-playful-v1"
       },
       "webHevc": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/05-rabbit-playful/delivery/rabbit_05_playful_alpha_hevc.mov",
@@ -205,7 +248,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "rabbit-playful-v1"
       },
       "mobileFallback": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/05-rabbit-playful/mobile-v2/rabbit_05_playful_mobile_black_v2.mp4",
@@ -216,7 +260,8 @@
         "height": 1112,
         "fps": 24,
         "frames": 121,
-        "duration": 5.041667
+        "duration": 5.041667,
+        "assetVersion": "rabbit-playful-v1"
       },
       "backend": {
         "displayName": "调皮",
@@ -227,8 +272,17 @@
           0,
           719,
           1280
-        ]
-      }
+        ],
+        "subjectBox": [
+          212,
+          215,
+          717,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "rabbit-playful-v1"
     },
     "rabbit-jealous": {
       "itemId": "rabbit-jealous",
@@ -241,10 +295,16 @@
       "previewSheets": 15,
       "status": "production",
       "generationMaster": {
-        "kind": "backend-local",
-        "ref": "rabbit-jealous.mp4",
-        "sha256": "8f1a90b9992056f33c2c506899f8a5a809b94e20c58442da8121c3bdd07fc1c1",
-        "container": "mp4"
+        "kind": "approved-content-version",
+        "ref": "rabbit_06_jealous_generation_alpha_v1.mkv",
+        "sha256": "31b9a7e82542b9588bfdb4a39b771cf5640e1499c545483531f01de92c452d21",
+        "container": "mkv",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "rabbit_06_jealous_birefnet_alpha_v3.mov",
+          "sha256": "b07600ea4c34a0ffbab4960701fd980e22e6dae89de0f8cf76751b224c5729a0",
+          "assetVersion": "rabbit-jealous-v3"
+        }
       },
       "webVp9": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/06-rabbit-jealous/delivery/rabbit_06_jealous_alpha_web_v1.webm",
@@ -256,7 +316,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "rabbit-jealous-v3"
       },
       "webHevc": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/06-rabbit-jealous/delivery/rabbit_06_jealous_alpha_hevc.mov",
@@ -268,7 +329,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "rabbit-jealous-v3"
       },
       "mobileFallback": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/06-rabbit-jealous/mobile-v2/rabbit_06_jealous_mobile_black_v2.mp4",
@@ -279,7 +341,8 @@
         "height": 1112,
         "fps": 24,
         "frames": 121,
-        "duration": 5.041667
+        "duration": 5.041667,
+        "assetVersion": "rabbit-jealous-v3"
       },
       "backend": {
         "displayName": "吃醋",
@@ -290,8 +353,17 @@
           0,
           719,
           1280
-        ]
-      }
+        ],
+        "subjectBox": [
+          232,
+          227,
+          650,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "rabbit-jealous-v3"
     },
     "rabbit-stubborn": {
       "itemId": "rabbit-stubborn",
@@ -304,10 +376,16 @@
       "previewSheets": 15,
       "status": "production",
       "generationMaster": {
-        "kind": "backend-local",
-        "ref": "rabbit-stubborn.mp4",
-        "sha256": "129594c5ddb98458ad62f8773a6fa25cfd6612b7821af47df437773d8a420404",
-        "container": "mp4"
+        "kind": "approved-content-version",
+        "ref": "rabbit_07_stubborn_generation_alpha_v1.mkv",
+        "sha256": "abbb199e44825e7ebae38f5750760c397bf2d028e113c082157ba194e3fbf046",
+        "container": "mkv",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "rabbit_07_stubborn_birefnet_alpha_v2.mov",
+          "sha256": "cc1db43feb70293bbf1dce3ee167b966210c73b389a1d38f3f6b3a5d8964e303",
+          "assetVersion": "rabbit-stubborn-v2"
+        }
       },
       "webVp9": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/07-rabbit-stubborn/delivery/rabbit_07_stubborn_alpha_vp9.webm",
@@ -319,7 +397,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "rabbit-stubborn-v2"
       },
       "webHevc": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/07-rabbit-stubborn/delivery/rabbit_07_stubborn_alpha_hevc.mov",
@@ -331,7 +410,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "rabbit-stubborn-v2"
       },
       "mobileFallback": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/07-rabbit-stubborn/mobile-v2/rabbit_07_stubborn_mobile_black_v2.mp4",
@@ -342,7 +422,8 @@
         "height": 1112,
         "fps": 24,
         "frames": 121,
-        "duration": 5.041667
+        "duration": 5.041667,
+        "assetVersion": "rabbit-stubborn-v2"
       },
       "backend": {
         "displayName": "嘴硬不服",
@@ -353,8 +434,17 @@
           0,
           719,
           1280
-        ]
-      }
+        ],
+        "subjectBox": [
+          221,
+          213,
+          681,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "rabbit-stubborn-v2"
     },
     "rabbit-surprise": {
       "itemId": "rabbit-surprise",
@@ -367,10 +457,16 @@
       "previewSheets": 15,
       "status": "production",
       "generationMaster": {
-        "kind": "backend-local",
-        "ref": "rabbit-surprise.mp4",
-        "sha256": "66cd603c1b31183c33041231f4b529e1a6023657739d16e6d4afe5e897e711ac",
-        "container": "mp4"
+        "kind": "approved-content-version",
+        "ref": "rabbit_08_surprise_generation_alpha_v1.mkv",
+        "sha256": "e70336b10b6b72c7bd3299bafce8c8779d9b4842719d800f487d4073c29667e9",
+        "container": "mkv",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "rabbit_08_surprise_birefnet_alpha_v1.mov",
+          "sha256": "f215fd042f2e4c07949581f3702436fd4b939aa1ea64f8d804b5082c9ca13ab5",
+          "assetVersion": "rabbit-surprise-v1"
+        }
       },
       "webVp9": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/08-rabbit-surprise/delivery/rabbit_08_surprise_alpha_vp9.webm",
@@ -382,7 +478,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "rabbit-surprise-v1"
       },
       "webHevc": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/08-rabbit-surprise/delivery/rabbit_08_surprise_alpha_hevc.mov",
@@ -394,7 +491,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "rabbit-surprise-v1"
       },
       "mobileFallback": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/08-rabbit-surprise/mobile-v2/rabbit_08_surprise_mobile_black_v2.mp4",
@@ -405,7 +503,8 @@
         "height": 1112,
         "fps": 24,
         "frames": 121,
-        "duration": 5.041667
+        "duration": 5.041667,
+        "assetVersion": "rabbit-surprise-v1"
       },
       "backend": {
         "displayName": "意外惊喜",
@@ -416,8 +515,17 @@
           0,
           719,
           1280
-        ]
-      }
+        ],
+        "subjectBox": [
+          223,
+          230,
+          644,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "rabbit-surprise-v1"
     },
     "rabbit-confused": {
       "itemId": "rabbit-confused",
@@ -430,10 +538,16 @@
       "previewSheets": 15,
       "status": "production",
       "generationMaster": {
-        "kind": "backend-local",
-        "ref": "rabbit-confused.mp4",
-        "sha256": "5dfd6a420e1b9b1e9894724a817c9804c43c420c6a097201916c6d5de5a858d4",
-        "container": "mp4"
+        "kind": "approved-content-version",
+        "ref": "rabbit_09_confused_generation_alpha_v1.mkv",
+        "sha256": "40ec63d9a484930c2bf8a76d4bd282a32f7c4cb3413e86ddbb7fab898f46b449",
+        "container": "mkv",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "rabbit_09_confused_birefnet_alpha_v3.mov",
+          "sha256": "1ff67997a264a10f93ef4d5d39da617a09fc06812c495bc1fbb9054678356378",
+          "assetVersion": "rabbit-confused-v3"
+        }
       },
       "webVp9": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/09-rabbit-confused/delivery/rabbit_09_confused_alpha_web_v1.webm",
@@ -445,7 +559,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "rabbit-confused-v3"
       },
       "webHevc": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/09-rabbit-confused/delivery/rabbit_09_confused_alpha_hevc.mov",
@@ -457,7 +572,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "rabbit-confused-v3"
       },
       "mobileFallback": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/09-rabbit-confused/mobile-v2/rabbit_09_confused_mobile_black_v2.mp4",
@@ -468,7 +584,8 @@
         "height": 1112,
         "fps": 24,
         "frames": 121,
-        "duration": 5.041667
+        "duration": 5.041667,
+        "assetVersion": "rabbit-confused-v3"
       },
       "backend": {
         "displayName": "疑惑",
@@ -479,8 +596,17 @@
           0,
           719,
           1280
-        ]
-      }
+        ],
+        "subjectBox": [
+          206,
+          230,
+          676,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "rabbit-confused-v3"
     },
     "rabbit-disgust": {
       "itemId": "rabbit-disgust",
@@ -493,10 +619,16 @@
       "previewSheets": 15,
       "status": "production",
       "generationMaster": {
-        "kind": "backend-local",
-        "ref": "rabbit-disgust.mp4",
-        "sha256": "105211bd8913d0b481d044901ec889b3b725cd3cc272e9690236f687d3cc7481",
-        "container": "mp4"
+        "kind": "approved-content-version",
+        "ref": "rabbit_10_disgust_generation_alpha_v1.mkv",
+        "sha256": "6ef3893a0ceef486dae6fb16296cff03aed833a52e02419d30a2dda2bf43d7b8",
+        "container": "mkv",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "rabbit_10_disgust_birefnet_alpha_v1.mov",
+          "sha256": "2b1146babbef5bc021f529fc0b85905e88296a72d6cd03728d0a093f6a101c30",
+          "assetVersion": "rabbit-disgust-v1"
+        }
       },
       "webVp9": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/10-rabbit-disgust/delivery/rabbit_10_disgust_alpha_vp9.webm",
@@ -508,7 +640,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "rabbit-disgust-v1"
       },
       "webHevc": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/10-rabbit-disgust/delivery/rabbit_10_disgust_alpha_hevc.mov",
@@ -520,7 +653,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "rabbit-disgust-v1"
       },
       "mobileFallback": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/10-rabbit-disgust/mobile-v2/rabbit_10_disgust_mobile_black_v2.mp4",
@@ -531,7 +665,8 @@
         "height": 1112,
         "fps": 24,
         "frames": 121,
-        "duration": 5.041667
+        "duration": 5.041667,
+        "assetVersion": "rabbit-disgust-v1"
       },
       "backend": {
         "displayName": "嫌弃",
@@ -542,8 +677,17 @@
           0,
           719,
           1280
-        ]
-      }
+        ],
+        "subjectBox": [
+          231,
+          223,
+          628,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "rabbit-disgust-v1"
     },
     "rabbit-apology": {
       "itemId": "rabbit-apology",
@@ -556,10 +700,16 @@
       "previewSheets": 15,
       "status": "production",
       "generationMaster": {
-        "kind": "backend-local",
-        "ref": "rabbit-apology.mp4",
-        "sha256": "280ab687d824d6d59b4e786e4db0693ae647d181e5aa680b0fdcfe43928a46f2",
-        "container": "mp4"
+        "kind": "approved-content-version",
+        "ref": "rabbit_12_apology_generation_alpha_v1.mkv",
+        "sha256": "1b839f51fdc174fcccaf218323f7889019aea0a93866d32cca9c03656d7ebd89",
+        "container": "mkv",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "rabbit_12_apology_birefnet_v4_alpha_v1.mov",
+          "sha256": "fee7a4a16f6d041f999c0c4f896bbb0027954da1076a87bc42f099836a5ad8be",
+          "assetVersion": "rabbit-apology-v4"
+        }
       },
       "webVp9": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/12-rabbit-apology/delivery/rabbit_12_apology_alpha_vp9.webm",
@@ -571,7 +721,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "rabbit-apology-v4"
       },
       "webHevc": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/12-rabbit-apology/delivery/rabbit_12_apology_alpha_hevc.mov",
@@ -583,7 +734,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "rabbit-apology-v4"
       },
       "mobileFallback": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/12-rabbit-apology/mobile-v2/rabbit_12_apology_mobile_black_v2.mp4",
@@ -594,7 +746,8 @@
         "height": 1112,
         "fps": 24,
         "frames": 121,
-        "duration": 5.041667
+        "duration": 5.041667,
+        "assetVersion": "rabbit-apology-v4"
       },
       "backend": {
         "displayName": "求原谅",
@@ -605,8 +758,17 @@
           0,
           719,
           1280
-        ]
-      }
+        ],
+        "subjectBox": [
+          213,
+          218,
+          621,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "rabbit-apology-v4"
     },
     "rabbit-cool": {
       "itemId": "rabbit-cool",
@@ -619,10 +781,16 @@
       "previewSheets": 15,
       "status": "production",
       "generationMaster": {
-        "kind": "backend-local",
-        "ref": "rabbit-cool.mp4",
-        "sha256": "e7ae32b62a868e8f57bf759c3f60a3de4cc7033df6af0fd9a9a261700a6614a7",
-        "container": "mp4"
+        "kind": "approved-content-version",
+        "ref": "rabbit_14_cool_generation_alpha_v1.mkv",
+        "sha256": "a822cf3b067dfd80070717d1da42e2c413674a7c74eaad6e776b72193863a1f3",
+        "container": "mkv",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "rabbit_14_cool_birefnet_alpha_v1.mov",
+          "sha256": "709b79f7ac591ba98990606cebdb9e2120c05eeea09428c675dcb385c4f92413",
+          "assetVersion": "rabbit-cool-v1"
+        }
       },
       "webVp9": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/14-rabbit-cool/delivery/rabbit_14_cool_alpha_vp9.webm",
@@ -634,7 +802,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "rabbit-cool-v1"
       },
       "webHevc": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/14-rabbit-cool/delivery/rabbit_14_cool_alpha_hevc.mov",
@@ -646,7 +815,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "rabbit-cool-v1"
       },
       "mobileFallback": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/14-rabbit-cool/mobile-v2/rabbit_14_cool_mobile_black_v2.mp4",
@@ -657,7 +827,8 @@
         "height": 1112,
         "fps": 24,
         "frames": 121,
-        "duration": 5.041667
+        "duration": 5.041667,
+        "assetVersion": "rabbit-cool-v1"
       },
       "backend": {
         "displayName": "装酷",
@@ -668,8 +839,17 @@
           0,
           719,
           1280
-        ]
-      }
+        ],
+        "subjectBox": [
+          228,
+          230,
+          732,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "rabbit-cool-v1"
     },
     "rabbit-gloat": {
       "itemId": "rabbit-gloat",
@@ -682,10 +862,16 @@
       "previewSheets": 15,
       "status": "production",
       "generationMaster": {
-        "kind": "backend-local",
-        "ref": "rabbit-gloat.mp4",
-        "sha256": "e7bdef4a270aae18ed8fe41af2d66872c8d7fd2f87a41fc8acf0294534f35e23",
-        "container": "mp4"
+        "kind": "approved-content-version",
+        "ref": "rabbit_15_gloat_generation_alpha_v1.mkv",
+        "sha256": "f8fdcc13fe1c10f13a1edec32d000fb17f6060e6494341df7e41f09e4771cefc",
+        "container": "mkv",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "rabbit_15_gloat_birefnet_alpha_v3.mov",
+          "sha256": "c6d6805763c583de903105d996ad8c7ab4ede64813c21672a50d407796988432",
+          "assetVersion": "rabbit-gloat-v3"
+        }
       },
       "webVp9": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/15-rabbit-gloat/delivery/rabbit_15_gloat_alpha_web_v1.webm",
@@ -697,7 +883,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "rabbit-gloat-v3"
       },
       "webHevc": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/15-rabbit-gloat/delivery/rabbit_15_gloat_alpha_hevc.mov",
@@ -709,7 +896,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "rabbit-gloat-v3"
       },
       "mobileFallback": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/15-rabbit-gloat/mobile-v2/rabbit_15_gloat_mobile_black_v2.mp4",
@@ -720,7 +908,8 @@
         "height": 1112,
         "fps": 24,
         "frames": 121,
-        "duration": 5.041667
+        "duration": 5.041667,
+        "assetVersion": "rabbit-gloat-v3"
       },
       "backend": {
         "displayName": "幸灾乐祸",
@@ -731,8 +920,17 @@
           0,
           719,
           1280
-        ]
-      }
+        ],
+        "subjectBox": [
+          216,
+          224,
+          642,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "rabbit-gloat-v3"
     },
     "fox-white-hurt": {
       "itemId": "fox-white-hurt",
@@ -747,7 +945,7 @@
       "generationMaster": {
         "kind": "backend-local",
         "ref": "fox_white_hurt_sad_generation_alpha_v1.mkv",
-        "sha256": "05c61e6f96b953d44c563216f4d2733a8e193ec06d556d36d57ce7b0a7bd329e",
+        "sha256": "eb6c8ccc65df4efd9282974e77f7e44b1e08a6c6e81fe629ce5ac7b547b64af0",
         "container": "mkv"
       },
       "webVp9": {
@@ -760,7 +958,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "fox-white-hurt-v1"
       },
       "webHevc": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/01-fox-white-hurt/delivery/fox_white_hurt_sad_alpha_hevc.mov",
@@ -772,7 +971,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "fox-white-hurt-v1"
       },
       "mobileFallback": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/01-fox-white-hurt/mobile/fox_white_hurt_sad_mobile_black_v1.mp4",
@@ -783,7 +983,8 @@
         "height": 1112,
         "fps": 24,
         "frames": 121,
-        "duration": 5.041667
+        "duration": 5.041667,
+        "assetVersion": "fox-white-hurt-v1"
       },
       "backend": {
         "displayName": "委屈难过",
@@ -794,8 +995,17 @@
           0,
           719,
           1280
-        ]
-      }
+        ],
+        "subjectBox": [
+          175,
+          229,
+          768,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "fox-white-hurt-v1"
     },
     "fox-navy-angry": {
       "itemId": "fox-navy-angry",
@@ -810,7 +1020,7 @@
       "generationMaster": {
         "kind": "backend-local",
         "ref": "fox_navy_angry_generation_alpha_v1.mkv",
-        "sha256": "ee54376c9f39524c1230b4b4113b8e0800a5d8d21d8ad66b1b3ba4987f32d95a",
+        "sha256": "28ffb4f4b4aee5062cd57cd40cfdbce6dece74baf516ea6351d45e6deabf67a7",
         "container": "mkv"
       },
       "webVp9": {
@@ -823,7 +1033,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "fox-navy-angry-v1"
       },
       "webHevc": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/02-fox-navy-angry/delivery/fox_navy_angry_alpha_hevc.mov",
@@ -835,7 +1046,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "fox-navy-angry-v1"
       },
       "mobileFallback": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/02-fox-navy-angry/mobile/fox_navy_angry_mobile_black_v1.mp4",
@@ -846,7 +1058,8 @@
         "height": 1112,
         "fps": 24,
         "frames": 121,
-        "duration": 5.041667
+        "duration": 5.041667,
+        "assetVersion": "fox-navy-angry-v1"
       },
       "backend": {
         "displayName": "生气愤怒",
@@ -857,8 +1070,17 @@
           0,
           719,
           1280
-        ]
-      }
+        ],
+        "subjectBox": [
+          191,
+          225,
+          702,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "fox-navy-angry-v1"
     },
     "fox-pink-coquettish": {
       "itemId": "fox-pink-coquettish",
@@ -873,7 +1095,7 @@
       "generationMaster": {
         "kind": "backend-local",
         "ref": "fox_pink_coquettish_generation_alpha_v1.mkv",
-        "sha256": "b51e078cd85b831741a0ceaa1081bd07733d576c3c25031ce20fdb6f553ffa94",
+        "sha256": "c868f86ff00c8cf88aab47a7dec7c00fb19e8d733e7d15841e0c454b5a513d52",
         "container": "mkv"
       },
       "webVp9": {
@@ -886,7 +1108,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "fox-pink-coquettish-v1"
       },
       "webHevc": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/03-fox-pink-coquettish/delivery/fox_pink_coquettish_alpha_hevc.mov",
@@ -898,7 +1121,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "fox-pink-coquettish-v1"
       },
       "mobileFallback": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/03-fox-pink-coquettish/mobile/fox_pink_coquettish_mobile_black_v1.mp4",
@@ -909,7 +1133,8 @@
         "height": 1112,
         "fps": 24,
         "frames": 121,
-        "duration": 5.041667
+        "duration": 5.041667,
+        "assetVersion": "fox-pink-coquettish-v1"
       },
       "backend": {
         "displayName": "撒娇",
@@ -920,8 +1145,17 @@
           0,
           719,
           1280
-        ]
-      }
+        ],
+        "subjectBox": [
+          153,
+          229,
+          762,
+          886
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "fox-pink-coquettish-v1"
     },
     "fox-black-playful": {
       "itemId": "fox-black-playful",
@@ -936,7 +1170,7 @@
       "generationMaster": {
         "kind": "backend-local",
         "ref": "fox_black_playful_generation_alpha_v1.mkv",
-        "sha256": "4ff4e67e47c4c78bf71c02a876e9ba6ebd0dde7b7a675a1d79cfa3580bca9808",
+        "sha256": "0d4ce24c7f39b8d36441dcc9e5c984f8404b74560fee8ac639fcc0ef65474e00",
         "container": "mkv"
       },
       "webVp9": {
@@ -949,7 +1183,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "fox-black-playful-v1"
       },
       "webHevc": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/04-fox-black-playful/delivery/fox_black_playful_alpha_hevc.mov",
@@ -961,7 +1196,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "fox-black-playful-v1"
       },
       "mobileFallback": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/04-fox-black-playful/mobile/fox_black_playful_mobile_black_v1.mp4",
@@ -972,7 +1208,8 @@
         "height": 1112,
         "fps": 24,
         "frames": 121,
-        "duration": 5.041667
+        "duration": 5.041667,
+        "assetVersion": "fox-black-playful-v1"
       },
       "backend": {
         "displayName": "调皮幽默",
@@ -983,8 +1220,17 @@
           0,
           719,
           1280
-        ]
-      }
+        ],
+        "subjectBox": [
+          177,
+          225,
+          683,
+          883
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "fox-black-playful-v1"
     },
     "fox-red-happy": {
       "itemId": "fox-red-happy",
@@ -999,7 +1245,7 @@
       "generationMaster": {
         "kind": "backend-local",
         "ref": "fox_red_happy_generation_alpha_v1.mkv",
-        "sha256": "200a245526ed17cd1a7b7703b7e2d4fe42a6adca3fba7ad37f655bebd2710b8f",
+        "sha256": "df789ae8f8a0d989489974edba8e6ddf3a7be55265596f582d333f7977f817da",
         "container": "mkv"
       },
       "webVp9": {
@@ -1012,7 +1258,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "fox-red-happy-v1"
       },
       "webHevc": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/05-fox-red-happy/delivery/fox_red_happy_alpha_hevc.mov",
@@ -1024,7 +1271,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "fox-red-happy-v1"
       },
       "mobileFallback": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/05-fox-red-happy/mobile/fox_red_happy_mobile_black_v1.mp4",
@@ -1035,7 +1283,8 @@
         "height": 1112,
         "fps": 24,
         "frames": 121,
-        "duration": 5.041667
+        "duration": 5.041667,
+        "assetVersion": "fox-red-happy-v1"
       },
       "backend": {
         "displayName": "开心快乐",
@@ -1046,8 +1295,17 @@
           0,
           719,
           1280
-        ]
-      }
+        ],
+        "subjectBox": [
+          119,
+          229,
+          725,
+          883
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "fox-red-happy-v1"
     },
     "fox-teal-surprised": {
       "itemId": "fox-teal-surprised",
@@ -1062,7 +1320,7 @@
       "generationMaster": {
         "kind": "backend-local",
         "ref": "fox_teal_surprised_generation_alpha_v1.mkv",
-        "sha256": "e85261ec816dcfe707792f780971440e2deb53caa408b6523e950812e998fbcc",
+        "sha256": "d104bb4302647d4431a0b12ad7a75c323134711f63099d0f1e8c87725f8e4147",
         "container": "mkv"
       },
       "webVp9": {
@@ -1075,7 +1333,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "fox-teal-surprised-v1"
       },
       "webHevc": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/06-fox-teal-surprised/delivery/fox_teal_surprised_alpha_hevc.mov",
@@ -1087,7 +1346,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "fox-teal-surprised-v1"
       },
       "mobileFallback": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/06-fox-teal-surprised/mobile/fox_teal_surprised_mobile_black_v1.mp4",
@@ -1098,7 +1358,8 @@
         "height": 1112,
         "fps": 24,
         "frames": 121,
-        "duration": 5.041667
+        "duration": 5.041667,
+        "assetVersion": "fox-teal-surprised-v1"
       },
       "backend": {
         "displayName": "意外惊喜",
@@ -1109,8 +1370,17 @@
           0,
           719,
           1280
-        ]
-      }
+        ],
+        "subjectBox": [
+          191,
+          229,
+          720,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "fox-teal-surprised-v1"
     },
     "fox-defiant": {
       "itemId": "fox-defiant",
@@ -1125,7 +1395,7 @@
       "generationMaster": {
         "kind": "backend-local",
         "ref": "fox_defiant_generation_alpha_v1.mkv",
-        "sha256": "3c206c5f3bbae5aae6c837534faacce23090e7f4ae59e4be2d83ca6c117cc4c2",
+        "sha256": "0df046e27cff4c11048a6b7695e3278077854e2cc9d84ab326cc5d8f9c5c9c26",
         "container": "mkv"
       },
       "webVp9": {
@@ -1138,7 +1408,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "fox-defiant-v1"
       },
       "webHevc": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/07-fox-defiant/delivery/fox_defiant_alpha_hevc.mov",
@@ -1150,7 +1421,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "fox-defiant-v1"
       },
       "mobileFallback": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/07-fox-defiant/mobile/fox_defiant_mobile_black_v1.mp4",
@@ -1161,7 +1433,8 @@
         "height": 1112,
         "fps": 24,
         "frames": 121,
-        "duration": 5.041667
+        "duration": 5.041667,
+        "assetVersion": "fox-defiant-v1"
       },
       "backend": {
         "displayName": "嘴硬不服",
@@ -1172,8 +1445,17 @@
           0,
           719,
           1280
-        ]
-      }
+        ],
+        "subjectBox": [
+          205,
+          229,
+          720,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "fox-defiant-v1"
     },
     "fox-giveup": {
       "itemId": "fox-giveup",
@@ -1188,7 +1470,7 @@
       "generationMaster": {
         "kind": "backend-local",
         "ref": "fox_giveup_generation_alpha_v1.mkv",
-        "sha256": "201cd4123778fd50255be8cc93e82738615d66c6c218c3e5aaa1fbd67b659822",
+        "sha256": "32be2c68c2bd0685825b767517c9670eb9a6589ea0324c4a6a94360e9d4ba416",
         "container": "mkv"
       },
       "webVp9": {
@@ -1201,7 +1483,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "fox-giveup-v1"
       },
       "webHevc": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/08-fox-giveup/delivery/fox_giveup_alpha_hevc.mov",
@@ -1213,7 +1496,8 @@
         "fps": 24,
         "frames": 121,
         "duration": 5.041667,
-        "alpha": true
+        "alpha": true,
+        "assetVersion": "fox-giveup-v1"
       },
       "mobileFallback": {
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/08-fox-giveup/mobile/fox_giveup_mobile_black_v1.mp4",
@@ -1224,7 +1508,8 @@
         "height": 1112,
         "fps": 24,
         "frames": 121,
-        "duration": 5.041667
+        "duration": 5.041667,
+        "assetVersion": "fox-giveup-v1"
       },
       "backend": {
         "displayName": "躺平摆烂",
@@ -1235,8 +1520,18 @@
           0,
           719,
           1280
-        ]
-      }
+        ],
+        "subjectBox": [
+          171,
+          229,
+          780,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "fox-giveup-v1"
     }
-  }
+  },
+  "candidateRevision": 4
 }
