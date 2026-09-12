@@ -136,9 +136,9 @@ def _contract_error(item, requested_character, build_id, manifest_version):
 # 七星使者 · Candidate 默认声音系统（Edge TTS 稳定优先）
 VOICE_PRESETS = {
     # 儿童：三种明显不同的节奏、音高和基础音色
-    "child-bright":   {"category": "child",  "label": "儿童·明亮活泼", "provider": "edge-tts", "voiceId": "zh-CN-XiaoyiNeural",     "rate": 10, "pitch": 40, "volume": 0},
-    "child-soft":     {"category": "child",  "label": "儿童·软糯委屈", "provider": "edge-tts", "voiceId": "zh-CN-XiaoxiaoNeural",   "rate": -4, "pitch": 30, "volume": 0},
-    "child-spirited": {"category": "child",  "label": "儿童·有脾气",   "provider": "edge-tts", "voiceId": "zh-CN-YunxiaNeural",     "rate": 6, "pitch": 24, "volume": 0},
+    "child-bright":   {"category": "child",  "label": "儿童·明亮活泼", "provider": "edge-tts", "voiceId": "zh-CN-YunxiaNeural",     "rate": 12, "pitch": 28, "volume": 0},
+    "child-soft":     {"category": "child",  "label": "儿童·软糯委屈", "provider": "edge-tts", "voiceId": "zh-CN-YunxiaNeural",     "rate": -8, "pitch": 18, "volume": 0},
+    "child-spirited": {"category": "child",  "label": "儿童·有脾气",   "provider": "edge-tts", "voiceId": "zh-CN-YunxiaNeural",     "rate": 5, "pitch": 8, "volume": 0},
     # 女性：明亮、细腻、成熟力量
     "female-bright":  {"category": "female", "label": "女性·年轻明亮", "provider": "edge-tts", "voiceId": "zh-CN-XiaoxiaoNeural",   "rate": 8, "pitch": 5, "volume": 0},
     "female-gentle":  {"category": "female", "label": "女性·温柔细腻", "provider": "edge-tts", "voiceId": "zh-CN-XiaoxiaoNeural",   "rate": -8, "pitch": -18, "volume": 0},
