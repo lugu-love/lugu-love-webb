@@ -23,7 +23,7 @@ COPY poc/ poc/
 
 # 唯一生产资产契约由前端不可变 Release 固定 SHA 拉取。
 ARG RELEASE_MANIFEST_URL=https://pub-baeb836de8654e238577516dce76dea3.r2.dev/site-candidates/20260912-01/release-20260912-01/asset-manifest.json
-ARG RELEASE_MANIFEST_SHA256=9a4cc405d12c84ad42a60ebdaafc107e60c3198dcc6ca7cfbf505a825b4b52aa
+ARG RELEASE_MANIFEST_SHA256=c84c7ef6fec29235513475bb5f919a40fdf932aab6384bff1eb2f88e8af19f6b
 RUN curl -fsSL "$RELEASE_MANIFEST_URL" -o asset-manifest.json && \
     echo "$RELEASE_MANIFEST_SHA256  asset-manifest.json" | sha256sum -c -
 
