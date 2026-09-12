@@ -162,14 +162,14 @@ VOICE_PRESETS = {
     "female-bright":  {"category": "female", "label": "女性·年轻明亮", "provider": "edge-tts", "voiceId": "zh-CN-XiaoxiaoNeural",               "rate": 8,   "pitch": 6,  "volume": 0},
     "female-gentle":  {"category": "female", "label": "女性·温柔细腻", "provider": "edge-tts", "voiceId": "zh-CN-shaanxi-XiaoniNeural",         "rate": -8,  "pitch": -8, "volume": 0},
     "female-sweet":   {"category": "female", "label": "女性·甜美少女", "provider": "edge-tts", "voiceId": "zh-TW-HsiaoYuNeural",                "rate": 6,   "pitch": 8,  "volume": 0},
-    "female-magnetic":{"category": "female", "label": "女性·成熟磁性", "provider": "edge-tts", "voiceId": "fr-FR-VivienneMultilingualNeural",   "rate": -8,  "pitch": -16,"volume": 0},
-    "female-soft":    {"category": "female", "label": "女性·轻柔安定", "provider": "edge-tts", "voiceId": "de-DE-SeraphinaMultilingualNeural",  "rate": -10, "pitch": -4, "volume": -2},
+    "female-magnetic":{"category": "female", "label": "女性·成熟磁性", "provider": "edge-tts", "voiceId": "fr-FR-VivienneMultilingualNeural",   "rate": -8,  "pitch": -6, "volume": 0},
+    "female-soft":    {"category": "female", "label": "女性·轻柔安定", "provider": "edge-tts", "voiceId": "de-DE-SeraphinaMultilingualNeural",  "rate": -10, "pitch": 2,  "volume": -2},
     # 男性 5：底层 voice 全部为男性且各不相同
     "male-sunny":     {"category": "male",   "label": "男性·青年阳光", "provider": "edge-tts", "voiceId": "zh-CN-YunxiNeural",                  "rate": 8,   "pitch": 10, "volume": 0},
     "male-gentle":    {"category": "male",   "label": "男性·青年温柔", "provider": "edge-tts", "voiceId": "zh-CN-YunyangNeural",                "rate": -8,  "pitch": -2, "volume": 0},
-    "male-powerful":  {"category": "male",   "label": "男性·成熟有力量", "provider": "edge-tts", "voiceId": "zh-CN-YunjianNeural",              "rate": -3,  "pitch": -12,"volume": 5},
-    "male-youth":     {"category": "male",   "label": "男性·少年清亮", "provider": "edge-tts", "voiceId": "zh-TW-YunJheNeural",                 "rate": 10,  "pitch": 8,  "volume": 0},
-    "male-deep":      {"category": "male",   "label": "男性·低沉磁性", "provider": "edge-tts", "voiceId": "en-US-AndrewMultilingualNeural",      "rate": -10, "pitch": -12,"volume": 2},
+    "male-powerful":  {"category": "male",   "label": "男性·成熟有力量", "provider": "edge-tts", "voiceId": "zh-CN-YunjianNeural",              "rate": -3,  "pitch": -18,"volume": 5},
+    "male-youth":     {"category": "male",   "label": "男性·少年清亮", "provider": "edge-tts", "voiceId": "zh-TW-YunJheNeural",                 "rate": 10,  "pitch": 18, "volume": 0},
+    "male-deep":      {"category": "male",   "label": "男性·低沉磁性", "provider": "edge-tts", "voiceId": "en-US-AndrewMultilingualNeural",      "rate": -10, "pitch": -20,"volume": 2},
 }
 # 兼容旧 Candidate 页面 send 的三个 ElevenLabs ID，避免旧链接直接报错。
 VOICE_ALIASES = {
