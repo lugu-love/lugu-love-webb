@@ -623,11 +623,11 @@ _jobs = {}
 _jobs_lock = threading.Lock()
 
 
-def _run_job_async(job_id, text, item, voice_id, tts_audio_path=None, tts_audio_info=None, requested_character="", build_id="", manifest_version="", requested_asset_version="", expected_master_sha256=""):
+def _run_job_async(job_id, text, item, voice_id, speech_text=None, tts_audio_path=None, tts_audio_info=None, requested_character="", build_id="", manifest_version="", requested_asset_version="", expected_master_sha256=""):
     workdir = None
     try:
         workdir = tempfile.mkdtemp(prefix="make-send-")
-        final, meta = generate(item, text, workdir, voice_id=voice_id, speech_text=None, tts_audio_path=tts_audio_path,
+        final, meta = generate(item, text, workdir, voice_id=voice_id, speech_text=speech_text, tts_audio_path=tts_audio_path,
                                tts_audio_info=tts_audio_info,
                                requested_item=item, requested_character=requested_character,
                                build_id=build_id, manifest_version=manifest_version,
@@ -1591,7 +1591,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
                 for jid in [j for j, r in list(_jobs.items()) if now - r.get("t0", 0) > 900]:
                     _jobs.pop(jid, None)
                 _jobs[job_id] = {"status": "pending", "t0": now, "text_len": len(text)}
-            threading.Thread(target=_run_job_async, args=(job_id, text, item, voice_id, tts_audio_path, tts_audio_info, requested_character, build_id, manifest_version, asset_version, expected_master_sha256), daemon=True).start()
+            threading.Thread(target=_run_job_async, args=(job_id, text, item, voice_id, speech_text, tts_audio_path, tts_audio_info, requested_character, build_id, manifest_version, asset_version, expected_master_sha256), daemon=True).start()
             return self._send_json(202, {"job": job_id, "status": "pending"})
 
         workdir = None
