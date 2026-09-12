@@ -136,17 +136,17 @@ def _contract_error(item, requested_character, build_id, manifest_version):
 # 七星使者 · Candidate 默认声音系统（Edge TTS 稳定优先）
 VOICE_PRESETS = {
     # 儿童：三种明显不同的节奏、音高和基础音色
-    "child-bright":   {"category": "child",  "label": "儿童·明亮活泼", "provider": "edge-tts", "voiceId": "zh-CN-XiaoyiNeural",     "rate": 8, "pitch": 20, "volume": 0},
-    "child-soft":     {"category": "child",  "label": "儿童·软糯委屈", "provider": "edge-tts", "voiceId": "zh-CN-XiaoxiaoNeural",   "rate": -6, "pitch": 14, "volume": 0},
-    "child-spirited": {"category": "child",  "label": "儿童·有脾气",   "provider": "edge-tts", "voiceId": "zh-CN-YunxiaNeural",     "rate": 5, "pitch": 10, "volume": 0},
+    "child-bright":   {"category": "child",  "label": "儿童·明亮活泼", "provider": "edge-tts", "voiceId": "zh-CN-XiaoyiNeural",     "rate": 10, "pitch": 40, "volume": 0},
+    "child-soft":     {"category": "child",  "label": "儿童·软糯委屈", "provider": "edge-tts", "voiceId": "zh-CN-XiaoxiaoNeural",   "rate": -4, "pitch": 30, "volume": 0},
+    "child-spirited": {"category": "child",  "label": "儿童·有脾气",   "provider": "edge-tts", "voiceId": "zh-CN-YunxiaNeural",     "rate": 6, "pitch": 24, "volume": 0},
     # 女性：明亮、细腻、成熟力量
     "female-bright":  {"category": "female", "label": "女性·年轻明亮", "provider": "edge-tts", "voiceId": "zh-CN-XiaoxiaoNeural",   "rate": 8, "pitch": 5, "volume": 0},
-    "female-gentle":  {"category": "female", "label": "女性·温柔细腻", "provider": "edge-tts", "voiceId": "zh-CN-XiaoxiaoNeural",   "rate": -8, "pitch": -8, "volume": 0},
-    "female-powerful":{"category": "female", "label": "女性·成熟有力量", "provider": "edge-tts", "voiceId": "zh-CN-XiaoyiNeural",   "rate": -5, "pitch": -18, "volume": 0},
+    "female-gentle":  {"category": "female", "label": "女性·温柔细腻", "provider": "edge-tts", "voiceId": "zh-CN-XiaoxiaoNeural",   "rate": -8, "pitch": -18, "volume": 0},
+    "female-powerful":{"category": "female", "label": "女性·成熟有力量", "provider": "edge-tts", "voiceId": "zh-CN-XiaoyiNeural",   "rate": -6, "pitch": -28, "volume": 0},
     # 男性：青年阳光、克制温柔、成熟力量
-    "male-sunny":     {"category": "male",   "label": "男性·青年阳光", "provider": "edge-tts", "voiceId": "zh-CN-YunxiNeural",      "rate": 8, "pitch": 10, "volume": 0},
-    "male-gentle":    {"category": "male",   "label": "男性·青年温柔", "provider": "edge-tts", "voiceId": "zh-CN-YunyangNeural",    "rate": -8, "pitch": -5, "volume": 0},
-    "male-powerful":  {"category": "male",   "label": "男性·成熟有力量", "provider": "edge-tts", "voiceId": "zh-CN-YunjianNeural",  "rate": -3, "pitch": -10, "volume": 5},
+    "male-sunny":     {"category": "male",   "label": "男性·青年阳光", "provider": "edge-tts", "voiceId": "zh-CN-YunxiNeural",      "rate": 8, "pitch": 12, "volume": 0},
+    "male-gentle":    {"category": "male",   "label": "男性·青年温柔", "provider": "edge-tts", "voiceId": "zh-CN-YunyangNeural",    "rate": -8, "pitch": -2, "volume": 0},
+    "male-powerful":  {"category": "male",   "label": "男性·成熟有力量", "provider": "edge-tts", "voiceId": "zh-CN-YunjianNeural",  "rate": -3, "pitch": -12, "volume": 5},
 }
 # 兼容旧 Candidate 页面 send 的三个 ElevenLabs ID，避免旧链接直接报错。
 VOICE_ALIASES = {
