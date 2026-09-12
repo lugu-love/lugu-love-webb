@@ -195,7 +195,7 @@
     </details>
   </div>
   <div class="toast" id="toast"></div>
-<script src="runtime-config.js"></script>
+<script src="runtime-config.js?v=20260912-02"></script>
 <script>
 (function () {
   var app = document.querySelector('.app');
@@ -761,6 +761,16 @@ window.__MAIN__ = function () {
     });
   });
   voiceSelect.addEventListener("change", invalidatePreviewToken);
+  var btnPreviewVoice=document.getElementById("btnPreviewVoice");
+  var ttsToken=null;
+  var previewAudio=null;
+  var previewAudioUrl=null;
+  var previewAudioCtx=null;
+  var previewSource=null;
+  var previewHtmlAudio=null;
+  var SILENT_WAV="data:audio/wav;base64,UklGRkQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==";
+  var previewState="idle";
+  var previewReqId=0;
 
   function scrollEmotionTo(id){
     Array.prototype.forEach.call(emotionsEl.children, function(b){
