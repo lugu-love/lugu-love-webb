@@ -1187,6 +1187,11 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         return self._send_json(200, {"enabled": enabled})
 
     def _serve(self, text, item, app_bridge=False, journey_v1=False, remix_token="", source_channel="h5", voice_id=None, speech_text=None, async_mode=False, tts_token=None):
+        # 旧 Rabbit master 已退出生产链；新版 Release 验收前禁止正式生成。
+        return self._send_json(503, {
+            "error": "PRODUCTION_ASSET_CHAIN_LOCKED",
+            "message": "正式生成已暂停，等待新版资产版本验收。",
+        })
         if not read_enabled():
             return self._send_json(503, {"error": "service temporarily unavailable"})
         start = time.time()
