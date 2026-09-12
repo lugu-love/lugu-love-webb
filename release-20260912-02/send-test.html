@@ -53,8 +53,18 @@
   .voice-mini { display:inline-flex; align-items:center; gap:6px; flex:0 1 auto; min-width:0; height:34px; padding:0 10px; border:1px solid rgba(255,255,255,.12); border-radius:999px; background:rgba(255,255,255,.05); }
   .voice-mini .voice-icon { font-size:12px; line-height:1; color:var(--muted); flex:0 0 auto; }
   .voice-select { height:30px; max-width:165px; min-width:0; padding:0 2px; border:none; background:transparent; color:#b8c0ff; font-size:12px; font-weight:600; outline:none; }
+  .voice-scope { max-width:72px; color:#e6e8ff; }
+  .voice-dialect { max-width:86px; }
   .voice-preview { flex:0 1 auto; min-width:0; height:34px; display:inline-flex; align-items:center; gap:6px; padding:0 10px; border:1px solid rgba(255,255,255,.14); border-radius:999px; background:rgba(255,255,255,.05); color:#b8c0ff; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; }
   .voice-preview:disabled { opacity:.55; cursor:default; }
+  .dialect-box { margin:8px 16px 0; padding:10px; border:1px solid rgba(125,139,255,.24); border-radius:14px; background:rgba(125,139,255,.06); }
+  .dialect-box[hidden] { display:none !important; }
+  .dialect-head { display:flex; align-items:center; gap:8px; }
+  .dialect-head select { flex:1 1 auto; min-width:0; height:32px; border:1px solid rgba(255,255,255,.12); border-radius:9px; background:#12142a; color:#dfe3ff; font-size:12px; padding:0 8px; outline:none; }
+  .dialect-head button { flex:0 0 auto; height:32px; padding:0 10px; border:1px solid rgba(125,139,255,.34); border-radius:9px; background:rgba(125,139,255,.12); color:#c7cdff; font-size:12px; font-weight:700; }
+  .dialect-box textarea { width:100%; min-height:58px; margin-top:8px; resize:vertical; border:1px solid rgba(255,255,255,.10); border-radius:10px; background:#101225; color:#f2f4ff; padding:9px 10px; font-size:13px; line-height:1.45; outline:none; }
+  .dialect-box textarea[readonly] { color:#aeb5d4; }
+  .dialect-tip { margin-top:6px; color:rgba(180,188,225,.72); font-size:11px; line-height:1.45; }
   .suggest-box { display:flex; flex-direction:column; flex-shrink:0; margin-top:6px; padding:0 16px; max-height:132px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
   .suggest-chip { display:flex; align-items:flex-start; gap:9px; text-align:left; padding:11px 0; border:none; background:transparent; border-bottom:1px solid rgba(255,255,255,.06); color:rgba(224,218,240,.82); font-size:13px; line-height:1.4; cursor:pointer; }
   .suggest-chip:last-child { border-bottom:none; }
@@ -141,8 +151,16 @@
     <div class="sub-actions">
       <button class="suggest" id="btnSuggest" type="button">✨ 帮我选一句</button>
       <label class="character-mini"><span>使者</span><select id="characterSelect" class="character-select" aria-label="选择使者"></select></label>
-      <label class="voice-mini"><span class="voice-icon">🔊</span><select id="voiceSelect" class="voice-select"></select></label>
+      <label class="voice-mini"><span class="voice-icon">🔊</span><select id="voiceScopeSelect" class="voice-select voice-scope" aria-label="选择普通话或方言"><option value="standard">普通话</option><option value="dialect">方言</option></select><select id="dialectSelect" class="voice-select voice-dialect" aria-label="选择方言" hidden></select><select id="voiceSelect" class="voice-select" aria-label="选择声音"></select></label>
       <button class="voice-preview" id="btnPreviewVoice" type="button">🔊 试听</button>
+    </div>
+    <div class="dialect-box" id="dialectBox" hidden>
+      <div class="dialect-head">
+        <select id="rewriteMode" aria-label="方言文本处理方式"><option value="none">不转换，直接朗读原文</option><option value="dialect">转换为方言口语</option></select>
+        <button id="btnRewriteDialect" type="button">转换方言文本</button>
+      </div>
+      <textarea id="dialectTextInput" placeholder="不转换时同步原文；转换后可手动修改朗读文本"></textarea>
+      <div class="dialect-tip" id="dialectTip">默认不强制改写；用户最后确认的文本才是实际朗读文本。</div>
     </div>
     <div class="suggest-box" id="suggestBox" hidden></div>
     <div class="preview-text" id="previewText"></div>
@@ -260,7 +278,7 @@ window.__MAIN__ = function () {
     return fetch("build.json?v=" + encodeURIComponent(location.search || "0"), { cache:"no-store" })
       .then(function(r){ if(!r.ok) throw new Error("build " + r.status); return r.json(); })
       .then(function(build){
-        if(!build || build.releaseId !== "release-20260912-01" || build.buildId !== "release-20260912-01" || build.manifestVersion !== "20260912-01-c4") throw new Error("build contract mismatch");
+        if(!build || build.releaseId !== "release-20260912-02" || build.buildId !== "release-20260912-02" || build.manifestVersion !== "20260912-02-c1") throw new Error("build contract mismatch");
         BUILD_CONTRACT = build;
         return fetch("asset-manifest.json?v=" + encodeURIComponent(build.manifestVersion), { cache:"no-store" });
       })
@@ -607,21 +625,141 @@ window.__MAIN__ = function () {
     {name:"男性·少年清亮", label:"少年", id:"male-youth"},
     {name:"男性·低沉磁性", label:"低沉", id:"male-deep"}
   ];
+  var DIALECTS = [
+    {id:"sichuan", name:"四川", label:"四川话 / 川渝", voices:[
+      {name:"晴儿", label:"女声", id:"dialect-sichuan-female", gender:"female"},
+      {name:"程川", label:"男声", id:"dialect-sichuan-male", gender:"male"}
+    ]},
+    {id:"cantonese", name:"粤语", label:"广东话 / 粤语", voices:[
+      {name:"阿清", label:"女声", id:"dialect-cantonese-female", gender:"female"},
+      {name:"阿强", label:"男声", id:"dialect-cantonese-male", gender:"male"}
+    ]},
+    {id:"northeast", name:"东北", label:"东北话", voices:[
+      {name:"龙老铁", label:"男声", id:"dialect-northeast-male", gender:"male"}
+    ]},
+    {id:"shanghai", name:"上海", label:"上海话", voices:[
+      {name:"阿珍", label:"女声", id:"dialect-shanghai-female", gender:"female"}
+    ]},
+    {id:"hokkien", name:"闽南", label:"闽南语", voices:[
+      {name:"龙安闽", label:"女声", id:"dialect-hokkien-female", gender:"female"}
+    ]},
+    {id:"shaanxi", name:"陕西", label:"陕西话", voices:[
+      {name:"秦川", label:"男声", id:"dialect-shaanxi-male", gender:"male"}
+    ]}
+  ];
+  var voiceScopeSelect=document.getElementById("voiceScopeSelect");
+  var dialectSelect=document.getElementById("dialectSelect");
+  var dialectBox=document.getElementById("dialectBox");
+  var rewriteModeSelect=document.getElementById("rewriteMode");
+  var btnRewriteDialect=document.getElementById("btnRewriteDialect");
+  var dialectTextInput=document.getElementById("dialectTextInput");
+  var dialectTip=document.getElementById("dialectTip");
   var voiceSelect=document.getElementById("voiceSelect");
-  VOICES.forEach(function(v){
-    var o=document.createElement("option"); o.value=v.id; o.textContent=v.name+"｜"+v.label; voiceSelect.appendChild(o);
+  function currentDialect(){
+    var id=dialectSelect.value || "sichuan";
+    for(var i=0;i<DIALECTS.length;i++){ if(DIALECTS[i].id===id) return DIALECTS[i]; }
+    return DIALECTS[0];
+  }
+  function renderStandardVoices(){
+    voiceSelect.innerHTML="";
+    VOICES.forEach(function(v){
+      var o=document.createElement("option"); o.value=v.id; o.textContent=v.name+"｜"+v.label; voiceSelect.appendChild(o);
+    });
+    voiceSelect.value="female-bright";
+  }
+  function renderDialectVoices(){
+    var dialect=currentDialect();
+    voiceSelect.innerHTML="";
+    dialect.voices.forEach(function(v){
+      var o=document.createElement("option"); o.value=v.id; o.textContent=v.name+"·"+v.label; voiceSelect.appendChild(o);
+    });
+    voiceSelect.value=dialect.voices[0].id;
+  }
+  function renderDialectSelect(){
+    dialectSelect.innerHTML="";
+    DIALECTS.forEach(function(d){
+      var o=document.createElement("option"); o.value=d.id; o.textContent=d.name; dialectSelect.appendChild(o);
+    });
+    dialectSelect.value="sichuan";
+  }
+  function isDialectMode(){ return voiceScopeSelect.value==="dialect"; }
+  function syncDialectBox(){
+    var on=isDialectMode();
+    dialectSelect.hidden=!on;
+    dialectBox.hidden=!on;
+    if(!on){ return; }
+    var none=rewriteModeSelect.value==="none";
+    if(none){
+      dialectTextInput.value=textInput.value;
+      dialectTextInput.readOnly=true;
+      btnRewriteDialect.textContent="同步原文";
+      dialectTip.textContent="不转换：将直接朗读原文，不会被强制改写。";
+    } else {
+      dialectTextInput.readOnly=false;
+      btnRewriteDialect.textContent="转换方言文本";
+      dialectTip.textContent="转换只改变朗读文本，不改变页面上的原意；生成前可以继续手动修改。";
+    }
+  }
+  function effectiveSpeechText(){
+    var original=(textInput.value||"").trim();
+    if(!isDialectMode()) return original;
+    return ((dialectTextInput.value||"").trim() || original);
+  }
+  function invalidateDialectPreview(){
+    if(typeof invalidatePreviewToken==="function") invalidatePreviewToken();
+  }
+  renderStandardVoices();
+  renderDialectSelect();
+  syncDialectBox();
+  voiceScopeSelect.addEventListener("change", function(){
+    if(isDialectMode()){ renderDialectVoices(); }
+    else { renderStandardVoices(); }
+    syncDialectBox();
+    invalidateDialectPreview();
   });
-  voiceSelect.value="female-bright";
-  var btnPreviewVoice=document.getElementById("btnPreviewVoice");
-  var ttsToken=null;
-  var previewAudio=null;
-  var previewAudioUrl=null;
-  var previewAudioCtx=null;
-  var previewSource=null;
-  var previewHtmlAudio=null;
-  var SILENT_WAV="data:audio/wav;base64,UklGRkQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==";
-  var previewState="idle";
-  var previewReqId=0;
+  dialectSelect.addEventListener("change", function(){
+    rewriteModeSelect.value="none";
+    renderDialectVoices();
+    syncDialectBox();
+    invalidateDialectPreview();
+  });
+  rewriteModeSelect.addEventListener("change", function(){ syncDialectBox(); invalidateDialectPreview(); });
+  dialectTextInput.addEventListener("input", invalidateDialectPreview);
+  btnRewriteDialect.addEventListener("click", function(){
+    var text=(textInput.value||"").trim();
+    if(!text){ showToast("请先写一句话"); return; }
+    if(!isDialectMode()) return;
+    if(rewriteModeSelect.value==="none"){
+      dialectTextInput.value=text;
+      syncDialectBox();
+      invalidateDialectPreview();
+      return;
+    }
+    var dialect=currentDialect();
+    btnRewriteDialect.disabled=true;
+    btnRewriteDialect.textContent="转换中…";
+    fetch(MAKE_SEND_API + "/rewrite-dialect", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({text:text,dialectId:dialect.id}),
+      cache:"no-store",
+      mode:"cors"
+    }).then(function(resp){
+      return resp.json().catch(function(){ return {}; }).then(function(data){
+        if(!resp.ok) throw new Error((data&&data.message)||(data&&data.error)||("HTTP "+resp.status));
+        return data;
+      });
+    }).then(function(data){
+      dialectTextInput.value=(data&&data.speechText)||text;
+      syncDialectBox();
+      invalidateDialectPreview();
+    }).catch(function(err){
+      showToast((err&&err.message)||"方言文本转换失败");
+    }).finally(function(){
+      btnRewriteDialect.disabled=false;
+      btnRewriteDialect.textContent="转换方言文本";
+    });
+  });
   voiceSelect.addEventListener("change", invalidatePreviewToken);
 
   function scrollEmotionTo(id){
@@ -949,6 +1087,7 @@ window.__MAIN__ = function () {
     userCancelInFlight();
     invalidatePreviewToken();
     previewTextEl.textContent=textInput.value;
+    if(isDialectMode() && rewriteModeSelect.value==="none"){ dialectTextInput.value=textInput.value; }
     var n=updateCharCount();
     if(n>30 && !longTextHintShown){ showToast("文字较长，生成视频会相应更长。"); }
     longTextHintShown=n>30;
@@ -1173,7 +1312,7 @@ window.__MAIN__ = function () {
   function previewVoice(){
     if(previewState==="playing"){ stopPreviewAudio(); previewState="idle"; resetPreviewButton(); return; }
     if(previewState==="loading") return;
-    var text=(textInput.value||"").trim();
+    var text=effectiveSpeechText();
     if(!text){ showToast("请先写一句话"); return; }
     var myReq=++previewReqId;
     previewState="loading";
@@ -1310,7 +1449,8 @@ window.__MAIN__ = function () {
       var tFetchStart = performance.now();
       lastTiming.clickToFetchMs=Math.round(tFetchStart-tClick);
       if(!BUILD_CONTRACT || !current){ throw new Error("production contract not ready"); }
-      var url=MAKE_SEND_API + "/make-send?text=" + encodeURIComponent(text) + "&item=" + encodeURIComponent(current.item) + "&characterId=" + encodeURIComponent(current.characterId) + "&buildId=" + encodeURIComponent(BUILD_CONTRACT.buildId) + "&manifestVersion=" + encodeURIComponent(BUILD_CONTRACT.manifestVersion) + "&assetVersion=" + encodeURIComponent(current.assetVersion || "") + "&expectedMasterSHA256=" + encodeURIComponent(current.generationMasterSha256 || "") + "&voiceId=" + encodeURIComponent(voiceSelect.value) + (ttsToken ? "&ttsToken=" + encodeURIComponent(ttsToken) : "") + (isAppBridge ? "&app_bridge=1" : "") + "&async=1";
+      var speechText=effectiveSpeechText();
+      var url=MAKE_SEND_API + "/make-send?text=" + encodeURIComponent(text) + "&item=" + encodeURIComponent(current.item) + "&characterId=" + encodeURIComponent(current.characterId) + "&buildId=" + encodeURIComponent(BUILD_CONTRACT.buildId) + "&manifestVersion=" + encodeURIComponent(BUILD_CONTRACT.manifestVersion) + "&assetVersion=" + encodeURIComponent(current.assetVersion || "") + "&expectedMasterSHA256=" + encodeURIComponent(current.generationMasterSha256 || "") + "&voiceId=" + encodeURIComponent(voiceSelect.value) + (speechText && speechText!==text ? "&speechText=" + encodeURIComponent(speechText) : "") + (ttsToken ? "&ttsToken=" + encodeURIComponent(ttsToken) : "") + (isAppBridge ? "&app_bridge=1" : "") + "&async=1";
       activeController = typeof AbortController === "function" ? new AbortController() : null;
       generatePhase="request-sent";
       renderDiag();
