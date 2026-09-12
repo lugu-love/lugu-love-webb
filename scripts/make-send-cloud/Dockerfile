@@ -22,8 +22,8 @@ COPY generation-masters/ generation-masters/
 COPY poc/ poc/
 
 # 唯一生产资产契约由前端不可变 Release 固定 SHA 拉取。
-ARG RELEASE_MANIFEST_URL=https://raw.githubusercontent.com/lugu-love/lugu-love-webb/5f93adf5193dcd5bd415069da91c844063e80052/release-20260912-03/asset-manifest.json
-ARG RELEASE_MANIFEST_SHA256=cec42de7ca6f29fee2d1de70349f2d347f3301509aa825ceec313df05bab8316
+ARG RELEASE_MANIFEST_URL=https://raw.githubusercontent.com/lugu-love/lugu-love-webb/ad8c1b284819f4439324f3cfb624ebc2c0ae0b1c/release-20260913-ui-01/asset-manifest.json
+ARG RELEASE_MANIFEST_SHA256=661e68f933ddea6759cbd3a7efe9048be9e0c6ec25cc308fafd8f38091e9c618
 RUN curl -fsSL "$RELEASE_MANIFEST_URL" -o asset-manifest.json && \
     echo "$RELEASE_MANIFEST_SHA256  asset-manifest.json" | sha256sum -c -
 
