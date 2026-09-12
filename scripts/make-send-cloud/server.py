@@ -84,10 +84,30 @@ MANIFEST_VERSION = ASSET_MANIFEST["manifestVersion"]
 _emotions = ASSET_MANIFEST["items"]
 MASTERS = {}
 JOURNEY_META = {}
+
+
+def _master_root(item_id):
+    return GENERATION_MASTERS_DIR if item_id.startswith("fox-") else MASTERS_DIR
+
+
+def _sha256_file(path):
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
 for _item_id, _e in _emotions.items():
-    _master = (_e.get("generationMaster") or {}).get("ref")
+    _generation = _e.get("generationMaster") or {}
+    _master = _generation.get("ref")
     if not _master:
         raise RuntimeError("missing generation master: %s" % _item_id)
+    _path = os.path.join(_master_root(_item_id), _master)
+    if not os.path.isfile(_path):
+        raise RuntimeError("generation master file missing: %s" % _item_id)
+    if _sha256_file(_path) != _generation.get("sha256"):
+        raise RuntimeError("generation master SHA mismatch: %s" % _item_id)
     MASTERS[_item_id] = (_master, _e.get("label", _item_id))
     JOURNEY_META[_item_id] = (_e.get("characterId", ""), _e.get("emotionId", _item_id))
 
@@ -685,21 +705,34 @@ def _v1_compose(item, text, master, tts_path, final, final_duration, speech_star
     emo=_emotions.get(item) or {}
     backend = emo.get("backend") or {}
     emo = {**emo, **backend}
-    un=emo.get("unionSource") or [0,0,719,1280]
-    x0,y0,x1,y1=un
-    s=V1_TARGET_H/(y1-y0)
-    sw=max(2,(int(round(720*s))//2)*2); sh=int(round(1280*s))
-    top=int(round(V1_FEET_Y-(y1+1)*s)); left=(720-sw)//2
+    subject_box = emo.get("subjectBox")
+    if subject_box and len(subject_box) == 4:
+        x0, y0, x1, y1 = [int(v) for v in subject_box]
+        source_w = int(emo.get("sourceWidth") or 834)
+        source_h = int(emo.get("sourceHeight") or 1112)
+        s = V1_TARGET_H / max(1, (y1 - y0))
+        sw = max(2, (int(round(source_w * s)) // 2) * 2)
+        sh = int(round(source_h * s))
+        subject_cx = (x0 + x1 + 1) / 2.0
+        left = int(round(W / 2.0 - subject_cx * s))
+        top = int(round(V1_FEET_Y - (y1 + 1) * s))
+    else:
+        un=emo.get("unionSource") or [0,0,719,1280]
+        x0,y0,x1,y1=un
+        s=V1_TARGET_H/(y1-y0)
+        sw=max(2,(int(round(720*s))//2)*2); sh=int(round(1280*s))
+        top=int(round(V1_FEET_Y-(y1+1)*s)); left=(720-sw)//2
     r0=max(0,-top); hc=min(sh-r0,H); pt=max(0,top)
+    l0=max(0,-left); wc=min(sw-l0,W); pl=max(0,left)
     name=emo.get("displayName") or emo.get("label") or item
     code=emo.get("code") or "00"
     bp=os.path.join(workdir,"v1_bottom.png"); sp=os.path.join(workdir,"v1_sub.png")
     _v1_bottom_png("%s · E%s"%(name,code), bp)
     fsize, nlines=_v1_subtitle_png(text, sp)
-    chain=("[0:v]format=yuva420p,scale=%d:%d,crop=%d:%d:0:%d,pad=%d:%d:%d:%d:black[base];"
+    chain=("[0:v]format=yuva420p,scale=%d:%d:flags=lanczos,crop=%d:%d:%d:%d,pad=%d:%d:%d:%d:black[base];"
            "[2:v]format=rgba[bp];[3:v]format=rgba[sp];"
            "[base][bp]overlay=0:0:shortest=1[b1];[b1][sp]overlay=0:0:shortest=1[ov];"
-           "[ov]fps=%d[vo]" % (sw,sh,sw,hc,r0,W,H,left,pt,FPS))
+           "[ov]fps=%d[vo]" % (sw,sh,wc,hc,l0,r0,W,H,pl,pt,FPS))
     map_v="[vo]"
     if final_duration > master_dur + 0.05:
         chain += ";%s[vo]tpad=stop_mode=clone:stop_duration=%.3f[vout]" % ("", final_duration-master_dur)
@@ -716,8 +749,9 @@ def _v1_compose(item, text, master, tts_path, final, final_duration, speech_star
     chain += ";"+audio
     cmd=[FFMPEG,"-y","-i",master,"-i",tts_path,"-loop","1","-framerate",str(FPS),"-i",bp,"-loop","1","-framerate",str(FPS),"-i",sp,
          "-filter_complex",chain,"-map",map_v,"-map","[aout]",
-         "-threads",str(FFMPEG_THREADS),"-c:v","libx264","-pix_fmt","yuv420p","-r",str(FPS),
-         "-b:v","%dk"%BITRATE_KBPS,"-c:a","aac","-ar","44100","-b:a","96k","-t","%.3f"%final_duration,final]
+         "-threads",str(FFMPEG_THREADS),"-c:v","libx264","-preset","medium","-crf","18","-maxrate","%dk"%BITRATE_KBPS,
+         "-bufsize","%dk"%(BITRATE_KBPS*2),"-pix_fmt","yuv420p","-r",str(FPS),"-movflags","+faststart",
+         "-c:a","aac","-ar","44100","-b:a","96k","-t","%.3f"%final_duration,final]
     r=subprocess.run(cmd,capture_output=True,text=True,timeout=240)
     if r.returncode!=0:
         raise RuntimeError("v1 ffmpeg rc=%d %s"%(r.returncode, r.stderr[-2500:]))
@@ -739,8 +773,7 @@ def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts
     if requested_character and requested_character != actual_character:
         raise RuntimeError("requested character mismatch")
     master_rel, _emotion = MASTERS[actual_item]
-    master_root = GENERATION_MASTERS_DIR if actual_item.startswith("fox-") else MASTERS_DIR
-    master = os.path.join(master_root, master_rel)
+    master = os.path.join(_master_root(actual_item), master_rel)
     final = os.path.join(workdir, "final.mp4")
     tts_path = os.path.join(workdir, "tts.mp3")
     meta = {
