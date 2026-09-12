@@ -263,7 +263,8 @@ def _styled_voice(key, preset, emotion_id):
     return {
         "requestedVoiceId": key,
         "requestedProvider": provider,
-        "actualVoiceId": preset["voiceId"],
+        "actualVoiceId": key,
+        "providerVoiceId": preset["voiceId"],
         "actualProvider": provider,
         "emotionId": emotion_id or "neutral",
         "emotionStyle": style["style"],
@@ -638,8 +639,8 @@ def _run_job_async(job_id, text, item, voice_id, speech_text=None, tts_audio_pat
         with _jobs_lock:
             t0 = _jobs.get(job_id, {}).get("t0", time.time())
             _jobs[job_id] = {"status": "done", "token": token, "text_len": len(text), "meta": meta}
-        log("JOB-DONE job=%s item=%s asset=%s expected_master=%s actual_master=%s requested_voice=%s actual_voice=%s provider=%s style=%s fallback=%s text_len=%d lines=%d font=%d tts=%.2fs tts_dur=%.2fs vdur=%.2fs ffmpeg=%.2fs total=%.2fs size=%d"
-            % (job_id, item, meta.get("actualAssetVersion") or "-", meta.get("expectedMasterSHA256") or "-", meta.get("actualMasterSHA256") or "-", meta.get("requestedVoiceId") or "-", meta.get("actualVoiceId") or "-", meta.get("actualProvider") or "-", meta.get("emotionStyle") or "-", meta.get("fallbackReason") or "-", len(text), meta.get("lines", 0), meta.get("font_size", 0),
+        log("JOB-DONE job=%s item=%s asset=%s expected_master=%s actual_master=%s requested_voice=%s actual_voice=%s provider_voice=%s provider=%s style=%s fallback=%s text_len=%d lines=%d font=%d tts=%.2fs tts_dur=%.2fs vdur=%.2fs ffmpeg=%.2fs total=%.2fs size=%d"
+            % (job_id, item, meta.get("actualAssetVersion") or "-", meta.get("expectedMasterSHA256") or "-", meta.get("actualMasterSHA256") or "-", meta.get("requestedVoiceId") or "-", meta.get("actualVoiceId") or "-", meta.get("providerVoiceId") or "-", meta.get("actualProvider") or "-", meta.get("emotionStyle") or "-", meta.get("fallbackReason") or "-", len(text), meta.get("lines", 0), meta.get("font_size", 0),
                meta.get("tts", 0), meta.get("tts_duration") or 0.0, meta.get("video_duration") or 0.0,
                meta.get("ffmpeg", 0), time.time() - t0, len(data)))
     except Exception as e:
@@ -724,19 +725,19 @@ def synthesize_tts(speech_text, voice_id, tts_path, emotion_id=None, tts=None):
         provider_name = "edge-tts" if actual_provider_label.startswith("edge-tts") else actual_provider_label
         if provider_name == "edge-tts":
             provider = EdgeTTSProvider(
-                voice=candidate["actualVoiceId"],
+                voice=candidate["providerVoiceId"],
                 rate=_signed_percent(candidate["rate"]),
                 pitch=_signed_hz(candidate["pitch"]),
                 volume=_signed_percent(candidate["volume"]),
             )
         elif provider_name == "qwen3-tts":
             provider = QwenTTSProvider(
-                voice_id=candidate["actualVoiceId"],
+                voice_id=candidate["providerVoiceId"],
                 emotion_style=candidate.get("emotionStyle", "neutral"),
             )
         elif provider_name == "cosyvoice":
             provider = CosyVoiceProvider(
-                voice_id=candidate["actualVoiceId"],
+                voice_id=candidate["providerVoiceId"],
                 emotion_style=candidate.get("emotionStyle", "neutral"),
             )
         else:
@@ -1051,6 +1052,7 @@ def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts
     meta["requestedVoiceId"] = tts_info.get("requestedVoiceId") or voice_id or DEFAULT_VOICE_ID
     meta["requestedProvider"] = tts_info.get("requestedProvider") or "edge-tts"
     meta["actualVoiceId"] = tts_info.get("actualVoiceId") or voice_id or DEFAULT_VOICE_ID
+    meta["providerVoiceId"] = tts_info.get("providerVoiceId") or ""
     meta["actualProvider"] = tts_info.get("actualProvider") or "edge-tts"
     meta["emotionStyle"] = tts_info.get("emotionStyle") or actual_entry.get("emotionId") or "neutral"
     meta["fallbackReason"] = tts_info.get("fallbackReason") or ""
@@ -1165,7 +1167,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
             "Access-Control-Expose-Headers",
             "X-Video-Path, X-Video-Expires-In, X-Video-Id, X-Journey-Id, "
             "X-Parent-Video-Id, X-Generation, X-Remix-Entry, "
-            "X-TTS-Token, X-TTS-Provider, X-TTS-Voice, X-TTS-Requested-Voice, X-TTS-Emotion-Style, X-TTS-Fallback-Reason, X-Asset-Version, X-Master-SHA256",
+            "X-TTS-Token, X-TTS-Provider, X-TTS-Voice, X-TTS-Provider-Voice, X-TTS-Requested-Voice, X-TTS-Emotion-Style, X-TTS-Fallback-Reason, X-Asset-Version, X-Master-SHA256",
         )
 
     def _send_json(self, code, obj):
@@ -1290,8 +1292,8 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             if not data:
                 raise RuntimeError("tts returned empty audio")
             token = store_tts_audio(data, speech_text, voice_id, emotion_id=emotion_id, tts_info=tts_info)
-            log("TTS-OK requested_voice=%s actual_voice=%s provider=%s style=%s fallback=%s text_len=%d bytes=%d token=%s ttl=%ds"
-                % (tts_info.get("requestedVoiceId") or voice_id or "-", tts_info.get("actualVoiceId") or "-", tts_info.get("actualProvider") or "-", tts_info.get("emotionStyle") or "-", tts_info.get("fallbackReason") or "-", len(text), len(data), token, TTS_CACHE_TTL))
+            log("TTS-OK requested_voice=%s actual_voice=%s provider_voice=%s provider=%s style=%s fallback=%s text_len=%d bytes=%d token=%s ttl=%ds"
+                % (tts_info.get("requestedVoiceId") or voice_id or "-", tts_info.get("actualVoiceId") or "-", tts_info.get("providerVoiceId") or "-", tts_info.get("actualProvider") or "-", tts_info.get("emotionStyle") or "-", tts_info.get("fallbackReason") or "-", len(text), len(data), token, TTS_CACHE_TTL))
             self.send_response(200)
             self._cors()
             self.send_header("Content-Type", tts_info.get("contentType") or "audio/mpeg")
@@ -1300,6 +1302,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             self.send_header("X-TTS-Token", token)
             self.send_header("X-TTS-Provider", tts_info.get("actualProvider") or "")
             self.send_header("X-TTS-Voice", tts_info.get("actualVoiceId") or "")
+            self.send_header("X-TTS-Provider-Voice", tts_info.get("providerVoiceId") or "")
             self.send_header("X-TTS-Requested-Voice", tts_info.get("requestedVoiceId") or "")
             self.send_header("X-TTS-Emotion-Style", tts_info.get("emotionStyle") or "")
             self.send_header("X-TTS-Fallback-Reason", tts_info.get("fallbackReason") or "")
@@ -1631,6 +1634,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             self.send_header("X-Manifest-Version", MANIFEST_VERSION)
             self.send_header("X-TTS-Provider", meta.get("actualProvider", ""))
             self.send_header("X-TTS-Voice", meta.get("actualVoiceId", ""))
+            self.send_header("X-TTS-Provider-Voice", meta.get("providerVoiceId", ""))
             self.send_header("X-TTS-Requested-Voice", meta.get("requestedVoiceId", ""))
             self.send_header("X-TTS-Emotion-Style", meta.get("emotionStyle", ""))
             self.send_header("X-TTS-Fallback-Reason", meta.get("fallbackReason", ""))
