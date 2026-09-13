@@ -41,12 +41,23 @@
   #stage { width:min(68vw,300px); height:auto; border-radius:18px; pointer-events:none; mix-blend-mode:lighten; }   /* 去黑底：黑色精灵背景与深色页面混合消失，只留兔子 */
   #alphaVideo { display:block; width:min(68vw,300px); height:min(68vw,300px); object-fit:contain; pointer-events:none; border-radius:18px; background:transparent; }
   #alphaVideo[hidden], #stage[hidden] { display:none !important; }
-  .character-picker { display:inline-flex; align-items:center; gap:6px; height:38px; padding:0 8px; border:1px solid rgba(255,255,255,.12); border-radius:999px; background:rgba(255,255,255,.05); }
-  .character-picker .picker-label { color:var(--muted); font-size:12px; font-weight:600; }
-  .character-avatar { flex:0 0 30px; min-width:0; width:30px; height:30px; padding:2px; border-radius:50%; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06); display:inline-grid; place-items:center; cursor:pointer; line-height:0; transition:border-color .16s ease, box-shadow .16s ease, transform .16s ease; }
-  .character-avatar img { width:26px; height:26px; max-width:26px; max-height:26px; border-radius:50%; object-fit:cover; display:block; }
-  .character-avatar.active { border-color:#96a4ff; box-shadow:0 0 0 2px rgba(125,139,255,.18), 0 0 14px rgba(125,139,255,.28); transform:translateY(-1px); }
-  .character-avatar[hidden] { display:none !important; }
+  .character-picker { position:relative; display:inline-flex; align-items:center; min-width:0; }
+  .character-trigger { flex:0 0 auto; min-width:0; height:34px; padding:0 11px; border:1px solid rgba(255,255,255,.14); border-radius:999px; background:rgba(255,255,255,.05); color:#b8c0ff; font-size:12px; font-weight:650; display:inline-flex; align-items:center; gap:5px; line-height:1; cursor:pointer; }
+  .character-trigger .picker-label { color:var(--muted); }
+  .character-trigger .character-current { color:#e8ebff; }
+  .character-trigger .chevron { color:rgba(184,192,255,.65); font-size:11px; transition:transform .16s ease; }
+  .character-trigger[aria-expanded="true"] .chevron { transform:rotate(180deg); }
+  .character-menu { position:absolute; left:0; bottom:calc(100% + 9px); z-index:80; width:min(82vw,318px); padding:10px; border:1px solid rgba(125,139,255,.28); border-radius:16px; background:rgba(17,20,40,.98); box-shadow:0 16px 36px rgba(0,0,0,.42); }
+  .character-menu[hidden] { display:none !important; }
+  .character-menu-title { margin:0 0 8px 2px; color:rgba(226,230,255,.78); font-size:11px; font-weight:700; letter-spacing:.08em; }
+  .character-menu-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; }
+  .character-option { flex:none; min-width:0; height:auto; min-height:68px; padding:6px 3px 5px; border:1px solid rgba(255,255,255,.10); border-radius:12px; background:rgba(255,255,255,.04); color:#dce1ff; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:4px; line-height:1; cursor:pointer; }
+  .character-option img { width:40px; height:40px; max-width:40px; max-height:40px; border-radius:50%; object-fit:contain; background:rgba(255,255,255,.04); display:block; }
+  .character-option .character-name { font-size:11px; font-weight:650; white-space:nowrap; }
+  .character-option .character-state { font-size:9px; color:#7f89ad; white-space:nowrap; }
+  .character-option.active { border-color:#96a4ff; background:rgba(125,139,255,.16); box-shadow:0 0 0 2px rgba(125,139,255,.12); }
+  .character-option:disabled { opacity:.38; cursor:not-allowed; filter:grayscale(.75); }
+  .character-option:disabled .character-state { color:#8a91ad; }
   .emotions { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:8px 10px; margin:14px 0 8px; position:relative; z-index:30; max-width:min(94vw,520px); }
   .emotion { flex:0 0 auto; min-width:0; min-height:34px; height:auto; line-height:1.2; padding:5px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:var(--muted); font-size:12px; font-weight:600; cursor:pointer; text-align:center; white-space:nowrap; }
   .emotion.active { color:#fff; border-color:var(--accent); background:rgba(125,139,255,.22); box-shadow:0 0 16px rgba(125,139,255,.28); }
@@ -166,7 +177,7 @@
     <div class="guide" id="guide"></div>
     <div class="sub-actions">
       <button class="suggest" id="btnSuggest" type="button">✨ 帮我选一句</button>
-      <div class="character-picker" id="characterPicker" role="radiogroup" aria-label="选择使者"><span class="picker-label">使者</span><button class="character-avatar active" type="button" data-character-id="fengxin-rabbit" aria-label="风信兔" aria-pressed="true"><img src="assets/characters/seven-stars/fengxin-rabbit/main.png" alt="风信兔"></button><button class="character-avatar" type="button" data-character-id="xinguang-fox" aria-label="狐使者" aria-pressed="false"><img src="assets/characters/seven-stars/xinguang-fox/main.png" alt="狐使者"></button></div>
+      <div class="character-picker" id="characterPicker"><button class="character-trigger" id="characterTrigger" type="button" aria-expanded="false" aria-controls="characterMenu"><span class="picker-label">使者</span><span class="character-current" id="characterCurrent">风信兔</span><span class="chevron">⌄</span></button><div class="character-menu" id="characterMenu" hidden role="listbox" aria-label="七星使者头像"><div class="character-menu-title">七星使者</div><div class="character-menu-grid" id="characterMenuGrid"></div></div></div>
       <select id="characterSelect" class="character-select" aria-label="选择使者" hidden></select>
       <label class="voice-mini"><span class="voice-icon">🔊</span><select id="voiceScopeSelect" class="voice-select voice-scope" aria-label="选择普通话或方言"><option value="standard">普通话</option><option value="dialect">方言</option></select><select id="dialectSelect" class="voice-select voice-dialect" aria-label="选择方言" hidden></select><select id="voiceSelect" class="voice-select" aria-label="选择声音"></select></label>
       <button class="voice-preview" id="btnPreviewVoice" type="button">🔊 试听</button>
@@ -787,18 +798,45 @@ window.__MAIN__ = function () {
       }
     });
   }
-  var characterAvatarButtons = Array.prototype.slice.call(document.querySelectorAll(".character-avatar"));
-  function syncCharacterAvatars(){
-    characterAvatarButtons.forEach(function(btn){
-      var id = btn.getAttribute("data-character-id");
-      var option = characterSelect ? characterSelect.querySelector('option[value="' + id + '"]') : null;
-      var available = !!(option && !option.disabled);
-      btn.hidden = !available;
-      btn.disabled = !available;
-      var active = available && characterSelect.value === id;
-      btn.classList.toggle("active", active);
-      btn.setAttribute("aria-pressed", active ? "true" : "false");
+  var SEVEN_STARS = [
+    {id:"fengxin-rabbit", short:"兔", official:"风信兔"},
+    {id:"xingyu-deer", short:"鹿", official:"星语鹿"},
+    {id:"xinguang-fox", short:"狐", official:"心光狐"},
+    {id:"shouye-bear", short:"熊", official:"守夜熊"},
+    {id:"menghu-whale", short:"鲸", official:"梦湖鲸"},
+    {id:"guangwei-cat", short:"猫", official:"光尾猫"},
+    {id:"gongming-gull", short:"鸥", official:"共鸣鸥"}
+  ];
+  var characterTrigger=document.getElementById("characterTrigger");
+  var characterMenu=document.getElementById("characterMenu");
+  var characterMenuGrid=document.getElementById("characterMenuGrid");
+  var characterCurrent=document.getElementById("characterCurrent");
+  function currentCharacterName(){
+    var c=CHARACTERS[currentCharacterId];
+    return (c && c.name) || "使者";
+  }
+  function closeCharacterMenu(){
+    if(!characterMenu) return;
+    characterMenu.hidden=true;
+    characterTrigger.setAttribute("aria-expanded","false");
+  }
+  function syncCharacterMenu(){
+    if(!characterMenuGrid || !characterSelect) return;
+    characterMenuGrid.innerHTML="";
+    SEVEN_STARS.forEach(function(role){
+      var option=characterSelect.querySelector('option[value="'+role.id+'"]');
+      var available=!!option;
+      var b=document.createElement("button");
+      b.type="button"; b.className="character-option"+(role.id===currentCharacterId?" active":"");
+      b.dataset.characterId=role.id; b.disabled=!available;
+      b.setAttribute("role","option"); b.setAttribute("aria-selected",role.id===currentCharacterId?"true":"false");
+      var img=document.createElement("img"); img.src="assets/characters/seven-stars/"+role.id+"/portrait.png"; img.alt=role.official; img.loading="lazy"; b.appendChild(img);
+      var name=document.createElement("span"); name.className="character-name"; name.textContent=role.short; b.appendChild(name);
+      var state=document.createElement("span"); state.className="character-state"; state.textContent=available?"":"暂未开放"; b.appendChild(state);
+      if(available){ b.addEventListener("click", function(){ if(characterSelect.value!==role.id){ characterSelect.value=role.id; characterSelect.dispatchEvent(new Event("change",{bubbles:true})); } closeCharacterMenu(); }); }
+      characterMenuGrid.appendChild(b);
     });
+    if(characterCurrent) characterCurrent.textContent=currentCharacterName();
   }
   function renderCharacterSelect(){
     if(!characterSelect) return;
@@ -809,17 +847,14 @@ window.__MAIN__ = function () {
       var o = document.createElement("option"); o.value = id; o.textContent = c.name; characterSelect.appendChild(o);
     });
     characterSelect.value = currentCharacterId;
-    syncCharacterAvatars();
+    syncCharacterMenu();
   }
-  characterAvatarButtons.forEach(function(btn){
-    btn.addEventListener("click", function(){
-      var id = btn.getAttribute("data-character-id");
-      if(!characterSelect || !id || characterSelect.value === id) return;
-      characterSelect.value = id;
-      characterSelect.dispatchEvent(new Event("change", {bubbles:true}));
-    });
-  });
-
+  if(characterTrigger && characterMenu){
+    characterTrigger.addEventListener("click", function(e){ e.stopPropagation(); characterMenu.hidden=!characterMenu.hidden; characterTrigger.setAttribute("aria-expanded",characterMenu.hidden?"false":"true"); });
+    characterMenu.addEventListener("click", function(e){ e.stopPropagation(); });
+    document.addEventListener("click", closeCharacterMenu);
+    document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeCharacterMenu(); });
+  }
   var alphaVideoToken = 0;
   function releaseAlphaVideo(){
     alphaVideoToken++;
