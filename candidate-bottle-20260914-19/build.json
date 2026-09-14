@@ -1,0 +1,15 @@
+{
+  "releaseId": "candidate-bottle-20260914-19",
+  "buildId": "candidate-bottle-20260914-19",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "cec42de7ca6f29fee2d1de70349f2d347f3301509aa825ceec313df05bab8316",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/candidate-bottle-20260914-19/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-14T00:00:00Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "candidate": true,
+  "candidateOf": "release-20260913-ui-01",
+  "candidateNote": "候选 19：把 rabbit-happy 上已验收的模式推广到全部 19 条素材（11 兔 + 8 狐）——不跳跃（pre-shake 0、无 wake 抖动）、小瓶阶段持续循环（忽略音乐协调脚本的全局暂停）、ended 后 150ms 返程（去掉 480ms）、回到小瓶后继续循环、使者层统一下移 13px。漂流瓶动画、地球与离场逻辑未动；正式站未动。"
+}
