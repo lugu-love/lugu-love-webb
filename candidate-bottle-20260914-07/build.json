@@ -1,0 +1,15 @@
+{
+  "releaseId": "candidate-bottle-20260914-07",
+  "buildId": "candidate-bottle-20260914-07",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "cec42de7ca6f29fee2d1de70349f2d347f3301509aa825ceec313df05bab8316",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/candidate-bottle-20260914-07/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-14T00:00:00Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "candidate": true,
+  "candidateOf": "release-20260913-ui-01",
+  "candidateNote": "漂流瓶候选版 07：轨迹/缩放/停留位置/播放流程仍与候选 01 一致；入场垂直偏移 42px → 20px → 10px（再降 50%，累计 -76%），使者层保持 10px。真机可用 ?rise=6/8/10 与 ?feet=6/8/14 对比，?rise=0 可完全取消上浮。"
+}
