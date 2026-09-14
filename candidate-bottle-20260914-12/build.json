@@ -1,0 +1,15 @@
+{
+  "releaseId": "candidate-bottle-20260914-12",
+  "buildId": "candidate-bottle-20260914-12",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "cec42de7ca6f29fee2d1de70349f2d347f3301509aa825ceec313df05bab8316",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/candidate-bottle-20260914-12/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-14T00:00:00Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "candidate": true,
+  "candidateOf": "release-20260913-ui-01",
+  "candidateNote": "漂流瓶候选版 12（第一阶段）：fox-giveup 只做“起跳点=落地点”的纯水平/垂直平移锁点（P0 = 第 52 帧起跳前稳定着地的脚底中心；起跳→落地用 smoothstep 把接触点拉回 P0，落地后保持；无缩放、无整体移位、不对齐瓶心），页面临时显示固定红点 P0 供目测。漂流瓶动画、位置、缩放、播放流程未动。"
+}
