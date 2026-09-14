@@ -1,0 +1,15 @@
+{
+  "releaseId": "candidate-bottle-20260914-02",
+  "buildId": "candidate-bottle-20260914-02",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "cec42de7ca6f29fee2d1de70349f2d347f3301509aa825ceec313df05bab8316",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/candidate-bottle-20260914-02/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-14T00:00:00Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "candidate": true,
+  "candidateOf": "release-20260913-ui-01",
+  "candidateNote": "漂流瓶候选版 02：在 01 的正式视频接入基础上，只修漂流瓶垂直位移动画与状态复位（入场起点固定、落位改为真实 class 状态、放大态强制复位），正式入口仍指向 release-20260913-ui-01。"
+}
