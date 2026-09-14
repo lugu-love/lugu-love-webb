@@ -1,0 +1,976 @@
+{
+  "schemaVersion": 1,
+  "catalogVersion": "20260914-01",
+  "updatedAt": "2026-09-14T12:34:59Z",
+  "assetBaseUrl": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/music/",
+  "tracks": [
+    {
+      "id": "music.core.001",
+      "title": "星河钢琴",
+      "file": "audio/v1/music.core.001/79f87035f48e6e6f22d420a1441b623bb3271c08c9a122758cb87e1d0e47f409.m4a",
+      "url": null,
+      "duration": 76.693333,
+      "mood": [
+        "calm",
+        "warm",
+        "piano",
+        "night"
+      ],
+      "source": {
+        "type": "local-archive",
+        "provider": "51miz",
+        "providerTrackId": "P-aaa0536-54F92252",
+        "sourceUrl": null,
+        "acquiredAt": null,
+        "notes": "Provider inferred from the local archive name; authorization evidence has not been found."
+      },
+      "license": {
+        "status": "unverified",
+        "type": "unknown",
+        "licenseProof": null,
+        "commercialUse": null,
+        "attributionRequired": null,
+        "attributionText": null,
+        "expiresAt": null,
+        "territory": null
+      },
+      "status": "blocked",
+      "classification": "legacy",
+      "statusReason": "license_unverified",
+      "contexts": {
+        "earthRandom": true,
+        "bottleRandom": true,
+        "activeSend": false,
+        "opening": false
+      },
+      "provider": {
+        "type": "internal",
+        "id": "lugu-love"
+      },
+      "visibility": "public",
+      "mimeType": "audio/mp4",
+      "bytes": 910457,
+      "sha256": "79f87035f48e6e6f22d420a1441b623bb3271c08c9a122758cb87e1d0e47f409",
+      "version": 1,
+      "artwork": null,
+      "preview": null
+    },
+    {
+      "id": "music.core.002",
+      "title": "温柔长笛",
+      "file": "audio/v1/music.core.002/f0808ea5435d3094b92c27e44da672c8c4a24ddaddf2ab1571790affd46216ac.m4a",
+      "url": null,
+      "duration": 150.070567,
+      "mood": [
+        "gentle",
+        "meditative",
+        "flute",
+        "organic"
+      ],
+      "source": {
+        "type": "local-archive",
+        "provider": null,
+        "providerTrackId": null,
+        "sourceUrl": null,
+        "acquiredAt": null,
+        "notes": "Local archive is named Native American Flute; creator and license evidence are unknown."
+      },
+      "license": {
+        "status": "unverified",
+        "type": "unknown",
+        "licenseProof": null,
+        "commercialUse": null,
+        "attributionRequired": null,
+        "attributionText": null,
+        "expiresAt": null,
+        "territory": null
+      },
+      "status": "blocked",
+      "classification": "legacy",
+      "statusReason": "license_unverified",
+      "contexts": {
+        "earthRandom": true,
+        "bottleRandom": true,
+        "activeSend": false,
+        "opening": false
+      },
+      "provider": {
+        "type": "internal",
+        "id": "lugu-love"
+      },
+      "visibility": "public",
+      "mimeType": "audio/mp4",
+      "bytes": 1859981,
+      "sha256": "f0808ea5435d3094b92c27e44da672c8c4a24ddaddf2ab1571790affd46216ac",
+      "version": 1,
+      "artwork": null,
+      "preview": null
+    },
+    {
+      "id": "music.core.003",
+      "title": "夜空冥想",
+      "file": "audio/v1/music.core.003/efd2bc72f7e3105d81afd4aedec4c8ebf05bd56da4961bf80835ebc506ec338a.m4a",
+      "url": null,
+      "duration": 120.064,
+      "mood": [
+        "night",
+        "meditative",
+        "calm",
+        "ambient"
+      ],
+      "source": {
+        "type": "local-archive",
+        "provider": "51miz",
+        "providerTrackId": "P-mzpy00978-CCBF4FD7",
+        "sourceUrl": null,
+        "acquiredAt": null,
+        "notes": "Provider inferred from the local archive name; authorization evidence has not been found."
+      },
+      "license": {
+        "status": "unverified",
+        "type": "unknown",
+        "licenseProof": null,
+        "commercialUse": null,
+        "attributionRequired": null,
+        "attributionText": null,
+        "expiresAt": null,
+        "territory": null
+      },
+      "status": "blocked",
+      "classification": "legacy",
+      "statusReason": "license_unverified",
+      "contexts": {
+        "earthRandom": true,
+        "bottleRandom": true,
+        "activeSend": false,
+        "opening": false
+      },
+      "provider": {
+        "type": "internal",
+        "id": "lugu-love"
+      },
+      "visibility": "public",
+      "mimeType": "audio/mp4",
+      "bytes": 1450079,
+      "sha256": "efd2bc72f7e3105d81afd4aedec4c8ebf05bd56da4961bf80835ebc506ec338a",
+      "version": 1,
+      "artwork": null,
+      "preview": null
+    },
+    {
+      "id": "music.core.004",
+      "title": "地球开场",
+      "file": "audio/v1/music.core.004/a526eabf1b2a7e4abd6d96c134dae88d582a5662a66e14ddc0d5085d7c69de44.mp3",
+      "url": null,
+      "duration": 6.0,
+      "mood": [
+        "opening",
+        "warm",
+        "piano",
+        "loop"
+      ],
+      "source": {
+        "type": "local-archive",
+        "provider": null,
+        "providerTrackId": null,
+        "sourceUrl": null,
+        "acquiredAt": null,
+        "notes": "Local production asset; creator and license evidence are unknown."
+      },
+      "license": {
+        "status": "unverified",
+        "type": "unknown",
+        "licenseProof": null,
+        "commercialUse": null,
+        "attributionRequired": null,
+        "attributionText": null,
+        "expiresAt": null,
+        "territory": null
+      },
+      "status": "blocked",
+      "classification": "legacy",
+      "statusReason": "license_unverified",
+      "contexts": {
+        "earthRandom": false,
+        "bottleRandom": false,
+        "activeSend": false,
+        "opening": true
+      },
+      "provider": {
+        "type": "internal",
+        "id": "lugu-love"
+      },
+      "visibility": "public",
+      "mimeType": "audio/mpeg",
+      "bytes": 145492,
+      "sha256": "a526eabf1b2a7e4abd6d96c134dae88d582a5662a66e14ddc0d5085d7c69de44",
+      "version": 1,
+      "artwork": null,
+      "preview": null
+    },
+    {
+      "id": "music.core.005",
+      "title": "Piano Reflections",
+      "file": "audio/v1/music.core.005/7d58c4255d91f58e29e61520b6011cabd5a54b3e89b54646cebac9d37295bbec.mp3",
+      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/music/audio/v1/music.core.005/7d58c4255d91f58e29e61520b6011cabd5a54b3e89b54646cebac9d37295bbec.mp3",
+      "duration": 198.857143,
+      "mood": [
+        "warm",
+        "healing",
+        "piano",
+        "gentle"
+      ],
+      "source": {
+        "type": "external-provider",
+        "provider": "mixkit",
+        "providerTrackId": "22",
+        "sourceUrl": "https://mixkit.co/free-stock-music/download/22/",
+        "acquiredAt": "2026-09-14T12:34:59Z",
+        "notes": "Metadata page: https://mixkit.co/free-stock-music/mood/calm/; license snapshot: music/license-evidence/v1/mixkit/stock-music-free-license-20260914.html; source record: music/license-evidence/v1/mixkit/source-records.json"
+      },
+      "license": {
+        "status": "verified",
+        "type": "Mixkit Stock Music Free License",
+        "licenseProof": "https://mixkit.co/license/modal/musicFree/",
+        "commercialUse": true,
+        "attributionRequired": false,
+        "attributionText": null,
+        "expiresAt": null,
+        "territory": null
+      },
+      "status": "active",
+      "classification": "candidate",
+      "statusReason": null,
+      "contexts": {
+        "earthRandom": true,
+        "bottleRandom": true,
+        "activeSend": true,
+        "opening": false
+      },
+      "provider": {
+        "type": "external",
+        "id": "mixkit"
+      },
+      "visibility": "public",
+      "mimeType": "audio/mpeg",
+      "bytes": 6365591,
+      "sha256": "7d58c4255d91f58e29e61520b6011cabd5a54b3e89b54646cebac9d37295bbec",
+      "version": 1,
+      "artwork": null,
+      "preview": null
+    },
+    {
+      "id": "music.core.006",
+      "title": "Hope and Kindness",
+      "file": "audio/v1/music.core.006/c8ca872f595c60c7734cfb13055d80d7a7b33466e5ae8e27b7518e5c30084b87.mp3",
+      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/music/audio/v1/music.core.006/c8ca872f595c60c7734cfb13055d80d7a7b33466e5ae8e27b7518e5c30084b87.mp3",
+      "duration": 120.0,
+      "mood": [
+        "hope",
+        "warm",
+        "folk",
+        "kindness"
+      ],
+      "source": {
+        "type": "external-provider",
+        "provider": "mixkit",
+        "providerTrackId": "534",
+        "sourceUrl": "https://mixkit.co/free-stock-music/download/534/",
+        "acquiredAt": "2026-09-14T12:34:59Z",
+        "notes": "Metadata page: https://mixkit.co/free-stock-music/mood/affectionate/; license snapshot: music/license-evidence/v1/mixkit/stock-music-free-license-20260914.html; source record: music/license-evidence/v1/mixkit/source-records.json"
+      },
+      "license": {
+        "status": "verified",
+        "type": "Mixkit Stock Music Free License",
+        "licenseProof": "https://mixkit.co/license/modal/musicFree/",
+        "commercialUse": true,
+        "attributionRequired": false,
+        "attributionText": null,
+        "expiresAt": null,
+        "territory": null
+      },
+      "status": "active",
+      "classification": "candidate",
+      "statusReason": null,
+      "contexts": {
+        "earthRandom": true,
+        "bottleRandom": true,
+        "activeSend": true,
+        "opening": false
+      },
+      "provider": {
+        "type": "external",
+        "id": "mixkit"
+      },
+      "visibility": "public",
+      "mimeType": "audio/mpeg",
+      "bytes": 3841924,
+      "sha256": "c8ca872f595c60c7734cfb13055d80d7a7b33466e5ae8e27b7518e5c30084b87",
+      "version": 1,
+      "artwork": null,
+      "preview": null
+    },
+    {
+      "id": "music.core.007",
+      "title": "Feeling Happy",
+      "file": "audio/v1/music.core.007/73f8fa95c7fa9f835fcc37afed86b5527341400574ddf721de362395ae280fcc.mp3",
+      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/music/audio/v1/music.core.007/73f8fa95c7fa9f835fcc37afed86b5527341400574ddf721de362395ae280fcc.mp3",
+      "duration": 147.937506,
+      "mood": [
+        "happy",
+        "light",
+        "playful",
+        "uplifting"
+      ],
+      "source": {
+        "type": "external-provider",
+        "provider": "mixkit",
+        "providerTrackId": "5",
+        "sourceUrl": "https://mixkit.co/free-stock-music/download/5/",
+        "acquiredAt": "2026-09-14T12:34:59Z",
+        "notes": "Metadata page: https://mixkit.co/free-stock-music/mood/cheerful/; license snapshot: music/license-evidence/v1/mixkit/stock-music-free-license-20260914.html; source record: music/license-evidence/v1/mixkit/source-records.json"
+      },
+      "license": {
+        "status": "verified",
+        "type": "Mixkit Stock Music Free License",
+        "licenseProof": "https://mixkit.co/license/modal/musicFree/",
+        "commercialUse": true,
+        "attributionRequired": false,
+        "attributionText": null,
+        "expiresAt": null,
+        "territory": null
+      },
+      "status": "active",
+      "classification": "candidate",
+      "statusReason": null,
+      "contexts": {
+        "earthRandom": true,
+        "bottleRandom": true,
+        "activeSend": true,
+        "opening": false
+      },
+      "provider": {
+        "type": "external",
+        "id": "mixkit"
+      },
+      "visibility": "public",
+      "mimeType": "audio/mpeg",
+      "bytes": 4736484,
+      "sha256": "73f8fa95c7fa9f835fcc37afed86b5527341400574ddf721de362395ae280fcc",
+      "version": 1,
+      "artwork": null,
+      "preview": null
+    },
+    {
+      "id": "music.core.008",
+      "title": "Smile",
+      "file": "audio/v1/music.core.008/0f582b05625f07762b551757097d0d15412bc2e9154781508b59060dea5a58a5.mp3",
+      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/music/audio/v1/music.core.008/0f582b05625f07762b551757097d0d15412bc2e9154781508b59060dea5a58a5.mp3",
+      "duration": 96.591995,
+      "mood": [
+        "happy",
+        "gentle",
+        "guitar",
+        "light"
+      ],
+      "source": {
+        "type": "external-provider",
+        "provider": "mixkit",
+        "providerTrackId": "1076",
+        "sourceUrl": "https://mixkit.co/free-stock-music/download/1076/",
+        "acquiredAt": "2026-09-14T12:34:59Z",
+        "notes": "Metadata page: https://mixkit.co/free-stock-music/mood/cheerful/; license snapshot: music/license-evidence/v1/mixkit/stock-music-free-license-20260914.html; source record: music/license-evidence/v1/mixkit/source-records.json"
+      },
+      "license": {
+        "status": "verified",
+        "type": "Mixkit Stock Music Free License",
+        "licenseProof": "https://mixkit.co/license/modal/musicFree/",
+        "commercialUse": true,
+        "attributionRequired": false,
+        "attributionText": null,
+        "expiresAt": null,
+        "territory": null
+      },
+      "status": "active",
+      "classification": "candidate",
+      "statusReason": null,
+      "contexts": {
+        "earthRandom": true,
+        "bottleRandom": true,
+        "activeSend": true,
+        "opening": false
+      },
+      "provider": {
+        "type": "external",
+        "id": "mixkit"
+      },
+      "visibility": "public",
+      "mimeType": "audio/mpeg",
+      "bytes": 3092942,
+      "sha256": "0f582b05625f07762b551757097d0d15412bc2e9154781508b59060dea5a58a5",
+      "version": 1,
+      "artwork": null,
+      "preview": null
+    },
+    {
+      "id": "music.core.009",
+      "title": "Romantic",
+      "file": "audio/v1/music.core.009/88a47f6415f95e3c758116584d88bf53935a03b593949a4ea4c4516c1182779f.mp3",
+      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/music/audio/v1/music.core.009/88a47f6415f95e3c758116584d88bf53935a03b593949a4ea4c4516c1182779f.mp3",
+      "duration": 158.589375,
+      "mood": [
+        "romantic",
+        "tender",
+        "orchestral"
+      ],
+      "source": {
+        "type": "external-provider",
+        "provider": "mixkit",
+        "providerTrackId": "659",
+        "sourceUrl": "https://mixkit.co/free-stock-music/download/659/",
+        "acquiredAt": "2026-09-14T12:34:59Z",
+        "notes": "Metadata page: https://mixkit.co/free-stock-music/mood/affectionate/; license snapshot: music/license-evidence/v1/mixkit/stock-music-free-license-20260914.html; source record: music/license-evidence/v1/mixkit/source-records.json"
+      },
+      "license": {
+        "status": "verified",
+        "type": "Mixkit Stock Music Free License",
+        "licenseProof": "https://mixkit.co/license/modal/musicFree/",
+        "commercialUse": true,
+        "attributionRequired": false,
+        "attributionText": null,
+        "expiresAt": null,
+        "territory": null
+      },
+      "status": "active",
+      "classification": "candidate",
+      "statusReason": null,
+      "contexts": {
+        "earthRandom": true,
+        "bottleRandom": true,
+        "activeSend": true,
+        "opening": false
+      },
+      "provider": {
+        "type": "external",
+        "id": "mixkit"
+      },
+      "visibility": "public",
+      "mimeType": "audio/mpeg",
+      "bytes": 5074978,
+      "sha256": "88a47f6415f95e3c758116584d88bf53935a03b593949a4ea4c4516c1182779f",
+      "version": 1,
+      "artwork": null,
+      "preview": null
+    },
+    {
+      "id": "music.core.010",
+      "title": "Forever Love",
+      "file": "audio/v1/music.core.010/b909edf239071746969b4bfbc888d1b42d109cae4269285b63cbf2ba42f8daaf.mp3",
+      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/music/audio/v1/music.core.010/b909edf239071746969b4bfbc888d1b42d109cae4269285b63cbf2ba42f8daaf.mp3",
+      "duration": 110.6,
+      "mood": [
+        "romantic",
+        "love",
+        "warm",
+        "hopeful"
+      ],
+      "source": {
+        "type": "external-provider",
+        "provider": "mixkit",
+        "providerTrackId": "38",
+        "sourceUrl": "https://mixkit.co/free-stock-music/download/38/",
+        "acquiredAt": "2026-09-14T12:34:59Z",
+        "notes": "Metadata page: https://mixkit.co/free-stock-music/mood/hopeful/; license snapshot: music/license-evidence/v1/mixkit/stock-music-free-license-20260914.html; source record: music/license-evidence/v1/mixkit/source-records.json"
+      },
+      "license": {
+        "status": "verified",
+        "type": "Mixkit Stock Music Free License",
+        "licenseProof": "https://mixkit.co/license/modal/musicFree/",
+        "commercialUse": true,
+        "attributionRequired": false,
+        "attributionText": null,
+        "expiresAt": null,
+        "territory": null
+      },
+      "status": "active",
+      "classification": "candidate",
+      "statusReason": null,
+      "contexts": {
+        "earthRandom": true,
+        "bottleRandom": true,
+        "activeSend": true,
+        "opening": false
+      },
+      "provider": {
+        "type": "external",
+        "id": "mixkit"
+      },
+      "visibility": "public",
+      "mimeType": "audio/mpeg",
+      "bytes": 3541121,
+      "sha256": "b909edf239071746969b4bfbc888d1b42d109cae4269285b63cbf2ba42f8daaf",
+      "version": 1,
+      "artwork": null,
+      "preview": null
+    },
+    {
+      "id": "music.core.011",
+      "title": "Relaxation 05",
+      "file": "audio/v1/music.core.011/46330d05ad0c21d78c5767957fdd8212cee52ec549c3285a370de99311f8b4c6.mp3",
+      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/music/audio/v1/music.core.011/46330d05ad0c21d78c5767957fdd8212cee52ec549c3285a370de99311f8b4c6.mp3",
+      "duration": 117.73385,
+      "mood": [
+        "calm",
+        "meditation",
+        "ambient",
+        "quiet"
+      ],
+      "source": {
+        "type": "external-provider",
+        "provider": "mixkit",
+        "providerTrackId": "749",
+        "sourceUrl": "https://mixkit.co/free-stock-music/download/749/",
+        "acquiredAt": "2026-09-14T12:34:59Z",
+        "notes": "Metadata page: https://mixkit.co/free-stock-music/mood/calm/; license snapshot: music/license-evidence/v1/mixkit/stock-music-free-license-20260914.html; source record: music/license-evidence/v1/mixkit/source-records.json"
+      },
+      "license": {
+        "status": "verified",
+        "type": "Mixkit Stock Music Free License",
+        "licenseProof": "https://mixkit.co/license/modal/musicFree/",
+        "commercialUse": true,
+        "attributionRequired": false,
+        "attributionText": null,
+        "expiresAt": null,
+        "territory": null
+      },
+      "status": "active",
+      "classification": "candidate",
+      "statusReason": null,
+      "contexts": {
+        "earthRandom": true,
+        "bottleRandom": true,
+        "activeSend": true,
+        "opening": false
+      },
+      "provider": {
+        "type": "external",
+        "id": "mixkit"
+      },
+      "visibility": "public",
+      "mimeType": "audio/mpeg",
+      "bytes": 4709354,
+      "sha256": "46330d05ad0c21d78c5767957fdd8212cee52ec549c3285a370de99311f8b4c6",
+      "version": 1,
+      "artwork": null,
+      "preview": null
+    },
+    {
+      "id": "music.core.012",
+      "title": "We'll Be Okay",
+      "file": "audio/v1/music.core.012/a07e945508eb65714fc0673a18af43f09b602fa726493dfafc6a726e63d6055d.mp3",
+      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/music/audio/v1/music.core.012/a07e945508eb65714fc0673a18af43f09b602fa726493dfafc6a726e63d6055d.mp3",
+      "duration": 104.022381,
+      "mood": [
+        "comfort",
+        "hope",
+        "gentle",
+        "warm"
+      ],
+      "source": {
+        "type": "external-provider",
+        "provider": "mixkit",
+        "providerTrackId": "1081",
+        "sourceUrl": "https://mixkit.co/free-stock-music/download/1081/",
+        "acquiredAt": "2026-09-14T12:34:59Z",
+        "notes": "Metadata page: https://mixkit.co/free-stock-music/mood/affectionate/; license snapshot: music/license-evidence/v1/mixkit/stock-music-free-license-20260914.html; source record: music/license-evidence/v1/mixkit/source-records.json"
+      },
+      "license": {
+        "status": "verified",
+        "type": "Mixkit Stock Music Free License",
+        "licenseProof": "https://mixkit.co/license/modal/musicFree/",
+        "commercialUse": true,
+        "attributionRequired": false,
+        "attributionText": null,
+        "expiresAt": null,
+        "territory": null
+      },
+      "status": "active",
+      "classification": "candidate",
+      "statusReason": null,
+      "contexts": {
+        "earthRandom": true,
+        "bottleRandom": true,
+        "activeSend": true,
+        "opening": false
+      },
+      "provider": {
+        "type": "external",
+        "id": "mixkit"
+      },
+      "visibility": "public",
+      "mimeType": "audio/mpeg",
+      "bytes": 3331178,
+      "sha256": "a07e945508eb65714fc0673a18af43f09b602fa726493dfafc6a726e63d6055d",
+      "version": 1,
+      "artwork": null,
+      "preview": null
+    },
+    {
+      "id": "music.core.013",
+      "title": "Dreaming Big",
+      "file": "audio/v1/music.core.013/8c89819547b42a80750fb25f37a960a1f45f6fd66bc8d784ac817b98b002897c.mp3",
+      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/music/audio/v1/music.core.013/8c89819547b42a80750fb25f37a960a1f45f6fd66bc8d784ac817b98b002897c.mp3",
+      "duration": 110.383855,
+      "mood": [
+        "hope",
+        "uplifting",
+        "inspiring",
+        "dreamy"
+      ],
+      "source": {
+        "type": "external-provider",
+        "provider": "mixkit",
+        "providerTrackId": "31",
+        "sourceUrl": "https://mixkit.co/free-stock-music/download/31/",
+        "acquiredAt": "2026-09-14T12:34:59Z",
+        "notes": "Metadata page: https://mixkit.co/free-stock-music/mood/hopeful/; license snapshot: music/license-evidence/v1/mixkit/stock-music-free-license-20260914.html; source record: music/license-evidence/v1/mixkit/source-records.json"
+      },
+      "license": {
+        "status": "verified",
+        "type": "Mixkit Stock Music Free License",
+        "licenseProof": "https://mixkit.co/license/modal/musicFree/",
+        "commercialUse": true,
+        "attributionRequired": false,
+        "attributionText": null,
+        "expiresAt": null,
+        "territory": null
+      },
+      "status": "active",
+      "classification": "candidate",
+      "statusReason": null,
+      "contexts": {
+        "earthRandom": true,
+        "bottleRandom": true,
+        "activeSend": true,
+        "opening": false
+      },
+      "provider": {
+        "type": "external",
+        "id": "mixkit"
+      },
+      "visibility": "public",
+      "mimeType": "audio/mpeg",
+      "bytes": 3534262,
+      "sha256": "8c89819547b42a80750fb25f37a960a1f45f6fd66bc8d784ac817b98b002897c",
+      "version": 1,
+      "artwork": null,
+      "preview": null
+    },
+    {
+      "id": "music.core.014",
+      "title": "Possible Dreams",
+      "file": "audio/v1/music.core.014/ee6d055c20cccda716b6b63a154ef0dc825195b7061dc439abb8a623973f4798.mp3",
+      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/music/audio/v1/music.core.014/ee6d055c20cccda716b6b63a154ef0dc825195b7061dc439abb8a623973f4798.mp3",
+      "duration": 159.313447,
+      "mood": [
+        "hope",
+        "dreamy",
+        "classical",
+        "piano"
+      ],
+      "source": {
+        "type": "external-provider",
+        "provider": "mixkit",
+        "providerTrackId": "599",
+        "sourceUrl": "https://mixkit.co/free-stock-music/download/599/",
+        "acquiredAt": "2026-09-14T12:34:59Z",
+        "notes": "Metadata page: https://mixkit.co/free-stock-music/mood/affectionate/; license snapshot: music/license-evidence/v1/mixkit/stock-music-free-license-20260914.html; source record: music/license-evidence/v1/mixkit/source-records.json"
+      },
+      "license": {
+        "status": "verified",
+        "type": "Mixkit Stock Music Free License",
+        "licenseProof": "https://mixkit.co/license/modal/musicFree/",
+        "commercialUse": true,
+        "attributionRequired": false,
+        "attributionText": null,
+        "expiresAt": null,
+        "territory": null
+      },
+      "status": "active",
+      "classification": "candidate",
+      "statusReason": null,
+      "contexts": {
+        "earthRandom": true,
+        "bottleRandom": true,
+        "activeSend": true,
+        "opening": false
+      },
+      "provider": {
+        "type": "external",
+        "id": "mixkit"
+      },
+      "visibility": "public",
+      "mimeType": "audio/mpeg",
+      "bytes": 5100237,
+      "sha256": "ee6d055c20cccda716b6b63a154ef0dc825195b7061dc439abb8a623973f4798",
+      "version": 1,
+      "artwork": null,
+      "preview": null
+    },
+    {
+      "id": "music.core.015",
+      "title": "Forest Treasure",
+      "file": "audio/v1/music.core.015/b96c15fa68fdc26197aa2d6f64850e922fc86005295bd75b4cf625866deeeade.mp3",
+      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/music/audio/v1/music.core.015/b96c15fa68fdc26197aa2d6f64850e922fc86005295bd75b4cf625866deeeade.mp3",
+      "duration": 104.045688,
+      "mood": [
+        "nature",
+        "forest",
+        "peaceful",
+        "ambient"
+      ],
+      "source": {
+        "type": "external-provider",
+        "provider": "mixkit",
+        "providerTrackId": "138",
+        "sourceUrl": "https://mixkit.co/free-stock-music/download/138/",
+        "acquiredAt": "2026-09-14T12:34:59Z",
+        "notes": "Metadata page: https://mixkit.co/free-stock-music/mood/calm/; license snapshot: music/license-evidence/v1/mixkit/stock-music-free-license-20260914.html; source record: music/license-evidence/v1/mixkit/source-records.json"
+      },
+      "license": {
+        "status": "verified",
+        "type": "Mixkit Stock Music Free License",
+        "licenseProof": "https://mixkit.co/license/modal/musicFree/",
+        "commercialUse": true,
+        "attributionRequired": false,
+        "attributionText": null,
+        "expiresAt": null,
+        "territory": null
+      },
+      "status": "active",
+      "classification": "candidate",
+      "statusReason": null,
+      "contexts": {
+        "earthRandom": true,
+        "bottleRandom": true,
+        "activeSend": true,
+        "opening": false
+      },
+      "provider": {
+        "type": "external",
+        "id": "mixkit"
+      },
+      "visibility": "public",
+      "mimeType": "audio/mpeg",
+      "bytes": 3329580,
+      "sha256": "b96c15fa68fdc26197aa2d6f64850e922fc86005295bd75b4cf625866deeeade",
+      "version": 1,
+      "artwork": null,
+      "preview": null
+    },
+    {
+      "id": "music.core.016",
+      "title": "Forest Mist Whispers",
+      "file": "audio/v1/music.core.016/30232da0b9521ed35e009162bfe7c63d06c9c8e4ca81ea5137ab63a9dc66cd98.mp3",
+      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/music/audio/v1/music.core.016/30232da0b9521ed35e009162bfe7c63d06c9c8e4ca81ea5137ab63a9dc66cd98.mp3",
+      "duration": 150.936,
+      "mood": [
+        "nature",
+        "mist",
+        "peaceful",
+        "ambient"
+      ],
+      "source": {
+        "type": "external-provider",
+        "provider": "mixkit",
+        "providerTrackId": "148",
+        "sourceUrl": "https://mixkit.co/free-stock-music/download/148/",
+        "acquiredAt": "2026-09-14T12:34:59Z",
+        "notes": "Metadata page: https://mixkit.co/free-stock-music/mood/hopeful/; license snapshot: music/license-evidence/v1/mixkit/stock-music-free-license-20260914.html; source record: music/license-evidence/v1/mixkit/source-records.json"
+      },
+      "license": {
+        "status": "verified",
+        "type": "Mixkit Stock Music Free License",
+        "licenseProof": "https://mixkit.co/license/modal/musicFree/",
+        "commercialUse": true,
+        "attributionRequired": false,
+        "attributionText": null,
+        "expiresAt": null,
+        "territory": null
+      },
+      "status": "active",
+      "classification": "candidate",
+      "statusReason": null,
+      "contexts": {
+        "earthRandom": true,
+        "bottleRandom": true,
+        "activeSend": true,
+        "opening": false
+      },
+      "provider": {
+        "type": "external",
+        "id": "mixkit"
+      },
+      "visibility": "public",
+      "mimeType": "audio/mpeg",
+      "bytes": 4830022,
+      "sha256": "30232da0b9521ed35e009162bfe7c63d06c9c8e4ca81ea5137ab63a9dc66cd98",
+      "version": 1,
+      "artwork": null,
+      "preview": null
+    },
+    {
+      "id": "music.core.017",
+      "title": "Spirit in the Woods",
+      "file": "audio/v1/music.core.017/6dd23952c6c989929ddc5e96edd2e67b20e91bfe4e382b17ce1b9c2807a97a94.mp3",
+      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/music/audio/v1/music.core.017/6dd23952c6c989929ddc5e96edd2e67b20e91bfe4e382b17ce1b9c2807a97a94.mp3",
+      "duration": 113.214688,
+      "mood": [
+        "nature",
+        "woods",
+        "meditation",
+        "ambient"
+      ],
+      "source": {
+        "type": "external-provider",
+        "provider": "mixkit",
+        "providerTrackId": "139",
+        "sourceUrl": "https://mixkit.co/free-stock-music/download/139/",
+        "acquiredAt": "2026-09-14T12:34:59Z",
+        "notes": "Metadata page: https://mixkit.co/free-stock-music/mood/calm/; license snapshot: music/license-evidence/v1/mixkit/stock-music-free-license-20260914.html; source record: music/license-evidence/v1/mixkit/source-records.json"
+      },
+      "license": {
+        "status": "verified",
+        "type": "Mixkit Stock Music Free License",
+        "licenseProof": "https://mixkit.co/license/modal/musicFree/",
+        "commercialUse": true,
+        "attributionRequired": false,
+        "attributionText": null,
+        "expiresAt": null,
+        "territory": null
+      },
+      "status": "active",
+      "classification": "candidate",
+      "statusReason": null,
+      "contexts": {
+        "earthRandom": true,
+        "bottleRandom": true,
+        "activeSend": true,
+        "opening": false
+      },
+      "provider": {
+        "type": "external",
+        "id": "mixkit"
+      },
+      "visibility": "public",
+      "mimeType": "audio/mpeg",
+      "bytes": 3622988,
+      "sha256": "6dd23952c6c989929ddc5e96edd2e67b20e91bfe4e382b17ce1b9c2807a97a94",
+      "version": 1,
+      "artwork": null,
+      "preview": null
+    },
+    {
+      "id": "music.core.018",
+      "title": "Serene View",
+      "file": "audio/v1/music.core.018/556ae7a19c783bd666593e60fbba776bac7f9ff6c2173bebded0bc200cc82ec3.mp3",
+      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/music/audio/v1/music.core.018/556ae7a19c783bd666593e60fbba776bac7f9ff6c2173bebded0bc200cc82ec3.mp3",
+      "duration": 113.930091,
+      "mood": [
+        "night",
+        "stars",
+        "soft-electronic",
+        "serene"
+      ],
+      "source": {
+        "type": "external-provider",
+        "provider": "mixkit",
+        "providerTrackId": "443",
+        "sourceUrl": "https://mixkit.co/free-stock-music/download/443/",
+        "acquiredAt": "2026-09-14T12:34:59Z",
+        "notes": "Metadata page: https://mixkit.co/free-stock-music/mood/calm/; license snapshot: music/license-evidence/v1/mixkit/stock-music-free-license-20260914.html; source record: music/license-evidence/v1/mixkit/source-records.json"
+      },
+      "license": {
+        "status": "verified",
+        "type": "Mixkit Stock Music Free License",
+        "licenseProof": "https://mixkit.co/license/modal/musicFree/",
+        "commercialUse": true,
+        "attributionRequired": false,
+        "attributionText": null,
+        "expiresAt": null,
+        "territory": null
+      },
+      "status": "active",
+      "classification": "candidate",
+      "statusReason": null,
+      "contexts": {
+        "earthRandom": true,
+        "bottleRandom": true,
+        "activeSend": true,
+        "opening": false
+      },
+      "provider": {
+        "type": "external",
+        "id": "mixkit"
+      },
+      "visibility": "public",
+      "mimeType": "audio/mpeg",
+      "bytes": 3647991,
+      "sha256": "556ae7a19c783bd666593e60fbba776bac7f9ff6c2173bebded0bc200cc82ec3",
+      "version": 1,
+      "artwork": null,
+      "preview": null
+    },
+    {
+      "id": "music.core.019",
+      "title": "Tears of Joy",
+      "file": "audio/v1/music.core.019/30717c4e8d2a954a6163477b831e5b8981b406d2c34d72820fce4d40a8686ddc.mp3",
+      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/music/audio/v1/music.core.019/30717c4e8d2a954a6163477b831e5b8981b406d2c34d72820fce4d40a8686ddc.mp3",
+      "duration": 140.173063,
+      "mood": [
+        "guitar",
+        "warm",
+        "gratitude",
+        "gentle"
+      ],
+      "source": {
+        "type": "external-provider",
+        "provider": "mixkit",
+        "providerTrackId": "839",
+        "sourceUrl": "https://mixkit.co/free-stock-music/download/839/",
+        "acquiredAt": "2026-09-14T12:34:59Z",
+        "notes": "Metadata page: https://mixkit.co/free-stock-music/instrument/acoustic-guitar/; license snapshot: music/license-evidence/v1/mixkit/stock-music-free-license-20260914.html; source record: music/license-evidence/v1/mixkit/source-records.json"
+      },
+      "license": {
+        "status": "verified",
+        "type": "Mixkit Stock Music Free License",
+        "licenseProof": "https://mixkit.co/license/modal/musicFree/",
+        "commercialUse": true,
+        "attributionRequired": false,
+        "attributionText": null,
+        "expiresAt": null,
+        "territory": null
+      },
+      "status": "active",
+      "classification": "candidate",
+      "statusReason": null,
+      "contexts": {
+        "earthRandom": true,
+        "bottleRandom": true,
+        "activeSend": true,
+        "opening": false
+      },
+      "provider": {
+        "type": "external",
+        "id": "mixkit"
+      },
+      "visibility": "public",
+      "mimeType": "audio/mpeg",
+      "bytes": 4485656,
+      "sha256": "30717c4e8d2a954a6163477b831e5b8981b406d2c34d72820fce4d40a8686ddc",
+      "version": 1,
+      "artwork": null,
+      "preview": null
+    }
+  ]
+}

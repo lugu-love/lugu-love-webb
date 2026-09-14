@@ -1,0 +1,433 @@
+{
+  "provider": "mixkit",
+  "retrievedAt": "2026-09-14T12:34:59Z",
+  "license": {
+    "type": "Mixkit Stock Music Free License",
+    "proofUrl": "https://mixkit.co/license/modal/musicFree/",
+    "licensePageUrl": "https://mixkit.co/license/",
+    "commercialUse": true,
+    "attributionRequired": false
+  },
+  "tracks": {
+    "22": {
+      "musicId": "music.core.005",
+      "category": "calm",
+      "categoryUrl": "https://mixkit.co/free-stock-music/mood/calm/",
+      "downloadUrl": "https://mixkit.co/free-stock-music/download/22/",
+      "record": {
+        "@id": "Piano Reflections",
+        "@type": "MusicRecording",
+        "name": "Piano Reflections",
+        "genre": "Corporate Music",
+        "byArtist": "Ahjay Stelino",
+        "duration": "PT3M19S",
+        "url": "https://assets.mixkit.co/music/22/22.mp3",
+        "waveformUrl": "https://assets.mixkit.co/music/22/22-waveform.json",
+        "copyrightNotice": "Mixkit Stock Music Free License",
+        "encodingFormat": "audio/mpeg",
+        "isAccessibleForFree": true,
+        "license": "https://mixkit.co/license/#musicFree",
+        "publisher": {
+          "@id": "https://mixkit.co/#organization"
+        },
+        "datePublished": "2020-01-28"
+      },
+      "acquiredAt": "2026-09-14T12:34:59Z",
+      "audioSha256": "7d58c4255d91f58e29e61520b6011cabd5a54b3e89b54646cebac9d37295bbec",
+      "audioBytes": 6365591,
+      "audioDurationSeconds": 198.857143
+    },
+    "534": {
+      "musicId": "music.core.006",
+      "category": "affectionate",
+      "categoryUrl": "https://mixkit.co/free-stock-music/mood/affectionate/",
+      "downloadUrl": "https://mixkit.co/free-stock-music/download/534/",
+      "record": {
+        "@id": "Hope and Kindness",
+        "@type": "MusicRecording",
+        "name": "Hope and Kindness",
+        "genre": "Folk",
+        "byArtist": "Diego Nava",
+        "duration": "PT2M0S",
+        "url": "https://assets.mixkit.co/music/534/534.mp3",
+        "waveformUrl": "https://assets.mixkit.co/music/534/534-waveform.json",
+        "copyrightNotice": "Mixkit Stock Music Free License",
+        "encodingFormat": "audio/mpeg",
+        "isAccessibleForFree": true,
+        "license": "https://mixkit.co/license/#musicFree",
+        "publisher": {
+          "@id": "https://mixkit.co/#organization"
+        },
+        "datePublished": "2020-01-28"
+      },
+      "acquiredAt": "2026-09-14T12:34:59Z",
+      "audioSha256": "c8ca872f595c60c7734cfb13055d80d7a7b33466e5ae8e27b7518e5c30084b87",
+      "audioBytes": 3841924,
+      "audioDurationSeconds": 120.0
+    },
+    "5": {
+      "musicId": "music.core.007",
+      "category": "cheerful",
+      "categoryUrl": "https://mixkit.co/free-stock-music/mood/cheerful/",
+      "downloadUrl": "https://mixkit.co/free-stock-music/download/5/",
+      "record": {
+        "@id": "Feeling Happy",
+        "@type": "MusicRecording",
+        "name": "Feeling Happy",
+        "genre": "Children",
+        "byArtist": "Ahjay Stelino",
+        "duration": "PT2M28S",
+        "url": "https://assets.mixkit.co/music/5/5.mp3",
+        "waveformUrl": "https://assets.mixkit.co/music/5/5-waveform.json",
+        "copyrightNotice": "Mixkit Stock Music Free License",
+        "encodingFormat": "audio/mpeg",
+        "isAccessibleForFree": true,
+        "license": "https://mixkit.co/license/#musicFree",
+        "publisher": {
+          "@id": "https://mixkit.co/#organization"
+        },
+        "datePublished": "2020-01-28"
+      },
+      "acquiredAt": "2026-09-14T12:34:59Z",
+      "audioSha256": "73f8fa95c7fa9f835fcc37afed86b5527341400574ddf721de362395ae280fcc",
+      "audioBytes": 4736484,
+      "audioDurationSeconds": 147.937506
+    },
+    "1076": {
+      "musicId": "music.core.008",
+      "category": "cheerful",
+      "categoryUrl": "https://mixkit.co/free-stock-music/mood/cheerful/",
+      "downloadUrl": "https://mixkit.co/free-stock-music/download/1076/",
+      "record": {
+        "@id": "Smile",
+        "@type": "MusicRecording",
+        "name": "Smile",
+        "genre": "Children",
+        "byArtist": "Michael Ramir C.",
+        "duration": "PT1M37S",
+        "url": "https://assets.mixkit.co/music/1076/1076.mp3",
+        "waveformUrl": "https://assets.mixkit.co/music/1076/1076-waveform.json",
+        "copyrightNotice": "Mixkit Stock Music Free License",
+        "encodingFormat": "audio/mpeg",
+        "isAccessibleForFree": true,
+        "license": "https://mixkit.co/license/#musicFree",
+        "publisher": {
+          "@id": "https://mixkit.co/#organization"
+        },
+        "datePublished": "2020-01-28"
+      },
+      "acquiredAt": "2026-09-14T12:34:59Z",
+      "audioSha256": "0f582b05625f07762b551757097d0d15412bc2e9154781508b59060dea5a58a5",
+      "audioBytes": 3092942,
+      "audioDurationSeconds": 96.591995
+    },
+    "659": {
+      "musicId": "music.core.009",
+      "category": "affectionate",
+      "categoryUrl": "https://mixkit.co/free-stock-music/mood/affectionate/",
+      "downloadUrl": "https://mixkit.co/free-stock-music/download/659/",
+      "record": {
+        "@id": "Romantic",
+        "@type": "MusicRecording",
+        "name": "Romantic",
+        "genre": "Film Score",
+        "byArtist": "Francisco Alvear",
+        "duration": "PT2M39S",
+        "url": "https://assets.mixkit.co/music/659/659.mp3",
+        "waveformUrl": "https://assets.mixkit.co/music/659/659-waveform.json",
+        "copyrightNotice": "Mixkit Stock Music Free License",
+        "encodingFormat": "audio/mpeg",
+        "isAccessibleForFree": true,
+        "license": "https://mixkit.co/license/#musicFree",
+        "publisher": {
+          "@id": "https://mixkit.co/#organization"
+        },
+        "datePublished": "2020-01-28"
+      },
+      "acquiredAt": "2026-09-14T12:34:59Z",
+      "audioSha256": "88a47f6415f95e3c758116584d88bf53935a03b593949a4ea4c4516c1182779f",
+      "audioBytes": 5074978,
+      "audioDurationSeconds": 158.589375
+    },
+    "38": {
+      "musicId": "music.core.010",
+      "category": "hopeful",
+      "categoryUrl": "https://mixkit.co/free-stock-music/mood/hopeful/",
+      "downloadUrl": "https://mixkit.co/free-stock-music/download/38/",
+      "record": {
+        "@id": "Forever Love",
+        "@type": "MusicRecording",
+        "name": "Forever Love",
+        "genre": "Film Score",
+        "byArtist": "Ahjay Stelino",
+        "duration": "PT1M51S",
+        "url": "https://assets.mixkit.co/music/38/38.mp3",
+        "waveformUrl": "https://assets.mixkit.co/music/38/38-waveform.json",
+        "copyrightNotice": "Mixkit Stock Music Free License",
+        "encodingFormat": "audio/mpeg",
+        "isAccessibleForFree": true,
+        "license": "https://mixkit.co/license/#musicFree",
+        "publisher": {
+          "@id": "https://mixkit.co/#organization"
+        },
+        "datePublished": "2020-01-28"
+      },
+      "acquiredAt": "2026-09-14T12:34:59Z",
+      "audioSha256": "b909edf239071746969b4bfbc888d1b42d109cae4269285b63cbf2ba42f8daaf",
+      "audioBytes": 3541121,
+      "audioDurationSeconds": 110.6
+    },
+    "749": {
+      "musicId": "music.core.011",
+      "category": "calm",
+      "categoryUrl": "https://mixkit.co/free-stock-music/mood/calm/",
+      "downloadUrl": "https://mixkit.co/free-stock-music/download/749/",
+      "record": {
+        "@id": "Relaxation 05",
+        "@type": "MusicRecording",
+        "name": "Relaxation 05",
+        "genre": "Ambient",
+        "byArtist": "Lily J",
+        "duration": "PT1M58S",
+        "url": "https://assets.mixkit.co/music/749/749.mp3",
+        "waveformUrl": "https://assets.mixkit.co/music/749/749-waveform.json",
+        "copyrightNotice": "Mixkit Stock Music Free License",
+        "encodingFormat": "audio/mpeg",
+        "isAccessibleForFree": true,
+        "license": "https://mixkit.co/license/#musicFree",
+        "publisher": {
+          "@id": "https://mixkit.co/#organization"
+        },
+        "datePublished": "2020-01-28"
+      },
+      "acquiredAt": "2026-09-14T12:34:59Z",
+      "audioSha256": "46330d05ad0c21d78c5767957fdd8212cee52ec549c3285a370de99311f8b4c6",
+      "audioBytes": 4709354,
+      "audioDurationSeconds": 117.73385
+    },
+    "1081": {
+      "musicId": "music.core.012",
+      "category": "affectionate",
+      "categoryUrl": "https://mixkit.co/free-stock-music/mood/affectionate/",
+      "downloadUrl": "https://mixkit.co/free-stock-music/download/1081/",
+      "record": {
+        "@id": "We'll Be Okay",
+        "@type": "MusicRecording",
+        "name": "We'll Be Okay",
+        "genre": "Film Score",
+        "byArtist": "Michael Ramir C.",
+        "duration": "PT1M44S",
+        "url": "https://assets.mixkit.co/music/1081/1081.mp3",
+        "waveformUrl": "https://assets.mixkit.co/music/1081/1081-waveform.json",
+        "copyrightNotice": "Mixkit Stock Music Free License",
+        "encodingFormat": "audio/mpeg",
+        "isAccessibleForFree": true,
+        "license": "https://mixkit.co/license/#musicFree",
+        "publisher": {
+          "@id": "https://mixkit.co/#organization"
+        },
+        "datePublished": "2020-01-28"
+      },
+      "acquiredAt": "2026-09-14T12:34:59Z",
+      "audioSha256": "a07e945508eb65714fc0673a18af43f09b602fa726493dfafc6a726e63d6055d",
+      "audioBytes": 3331178,
+      "audioDurationSeconds": 104.022381
+    },
+    "31": {
+      "musicId": "music.core.013",
+      "category": "hopeful",
+      "categoryUrl": "https://mixkit.co/free-stock-music/mood/hopeful/",
+      "downloadUrl": "https://mixkit.co/free-stock-music/download/31/",
+      "record": {
+        "@id": "Dreaming Big",
+        "@type": "MusicRecording",
+        "name": "Dreaming Big",
+        "genre": "Film Score",
+        "byArtist": "Ahjay Stelino",
+        "duration": "PT1M50S",
+        "url": "https://assets.mixkit.co/music/31/31.mp3",
+        "waveformUrl": "https://assets.mixkit.co/music/31/31-waveform.json",
+        "copyrightNotice": "Mixkit Stock Music Free License",
+        "encodingFormat": "audio/mpeg",
+        "isAccessibleForFree": true,
+        "license": "https://mixkit.co/license/#musicFree",
+        "publisher": {
+          "@id": "https://mixkit.co/#organization"
+        },
+        "datePublished": "2020-01-28"
+      },
+      "acquiredAt": "2026-09-14T12:34:59Z",
+      "audioSha256": "8c89819547b42a80750fb25f37a960a1f45f6fd66bc8d784ac817b98b002897c",
+      "audioBytes": 3534262,
+      "audioDurationSeconds": 110.383855
+    },
+    "599": {
+      "musicId": "music.core.014",
+      "category": "affectionate",
+      "categoryUrl": "https://mixkit.co/free-stock-music/mood/affectionate/",
+      "downloadUrl": "https://mixkit.co/free-stock-music/download/599/",
+      "record": {
+        "@id": "Possible Dreams",
+        "@type": "MusicRecording",
+        "name": "Possible Dreams",
+        "genre": "Classical",
+        "byArtist": "Eugenio Mininni",
+        "duration": "PT2M39S",
+        "url": "https://assets.mixkit.co/music/599/599.mp3",
+        "waveformUrl": "https://assets.mixkit.co/music/599/599-waveform.json",
+        "copyrightNotice": "Mixkit Stock Music Free License",
+        "encodingFormat": "audio/mpeg",
+        "isAccessibleForFree": true,
+        "license": "https://mixkit.co/license/#musicFree",
+        "publisher": {
+          "@id": "https://mixkit.co/#organization"
+        },
+        "datePublished": "2020-01-28"
+      },
+      "acquiredAt": "2026-09-14T12:34:59Z",
+      "audioSha256": "ee6d055c20cccda716b6b63a154ef0dc825195b7061dc439abb8a623973f4798",
+      "audioBytes": 5100237,
+      "audioDurationSeconds": 159.313447
+    },
+    "138": {
+      "musicId": "music.core.015",
+      "category": "calm",
+      "categoryUrl": "https://mixkit.co/free-stock-music/mood/calm/",
+      "downloadUrl": "https://mixkit.co/free-stock-music/download/138/",
+      "record": {
+        "@id": "Forest Treasure",
+        "@type": "MusicRecording",
+        "name": "Forest Treasure",
+        "genre": "Ambient",
+        "byArtist": "Alejandro Magaña (A. M.)",
+        "duration": "PT1M44S",
+        "url": "https://assets.mixkit.co/music/138/138.mp3",
+        "waveformUrl": "https://assets.mixkit.co/music/138/138-waveform.json",
+        "copyrightNotice": "Mixkit Stock Music Free License",
+        "encodingFormat": "audio/mpeg",
+        "isAccessibleForFree": true,
+        "license": "https://mixkit.co/license/#musicFree",
+        "publisher": {
+          "@id": "https://mixkit.co/#organization"
+        },
+        "datePublished": "2020-01-28"
+      },
+      "acquiredAt": "2026-09-14T12:34:59Z",
+      "audioSha256": "b96c15fa68fdc26197aa2d6f64850e922fc86005295bd75b4cf625866deeeade",
+      "audioBytes": 3329580,
+      "audioDurationSeconds": 104.045688
+    },
+    "148": {
+      "musicId": "music.core.016",
+      "category": "hopeful",
+      "categoryUrl": "https://mixkit.co/free-stock-music/mood/hopeful/",
+      "downloadUrl": "https://mixkit.co/free-stock-music/download/148/",
+      "record": {
+        "@id": "Forest Mist Whispers",
+        "@type": "MusicRecording",
+        "name": "Forest Mist Whispers",
+        "genre": "Ambient",
+        "byArtist": "Alejandro Magaña (A. M.)",
+        "duration": "PT2M31S",
+        "url": "https://assets.mixkit.co/music/148/148.mp3",
+        "waveformUrl": "https://assets.mixkit.co/music/148/148-waveform.json",
+        "copyrightNotice": "Mixkit Stock Music Free License",
+        "encodingFormat": "audio/mpeg",
+        "isAccessibleForFree": true,
+        "license": "https://mixkit.co/license/#musicFree",
+        "publisher": {
+          "@id": "https://mixkit.co/#organization"
+        },
+        "datePublished": "2020-01-28"
+      },
+      "acquiredAt": "2026-09-14T12:34:59Z",
+      "audioSha256": "30232da0b9521ed35e009162bfe7c63d06c9c8e4ca81ea5137ab63a9dc66cd98",
+      "audioBytes": 4830022,
+      "audioDurationSeconds": 150.936
+    },
+    "139": {
+      "musicId": "music.core.017",
+      "category": "calm",
+      "categoryUrl": "https://mixkit.co/free-stock-music/mood/calm/",
+      "downloadUrl": "https://mixkit.co/free-stock-music/download/139/",
+      "record": {
+        "@id": "Spirit in the Woods",
+        "@type": "MusicRecording",
+        "name": "Spirit in the Woods",
+        "genre": "Ambient",
+        "byArtist": "Alejandro Magaña (A. M.)",
+        "duration": "PT1M53S",
+        "url": "https://assets.mixkit.co/music/139/139.mp3",
+        "waveformUrl": "https://assets.mixkit.co/music/139/139-waveform.json",
+        "copyrightNotice": "Mixkit Stock Music Free License",
+        "encodingFormat": "audio/mpeg",
+        "isAccessibleForFree": true,
+        "license": "https://mixkit.co/license/#musicFree",
+        "publisher": {
+          "@id": "https://mixkit.co/#organization"
+        },
+        "datePublished": "2020-01-28"
+      },
+      "acquiredAt": "2026-09-14T12:34:59Z",
+      "audioSha256": "6dd23952c6c989929ddc5e96edd2e67b20e91bfe4e382b17ce1b9c2807a97a94",
+      "audioBytes": 3622988,
+      "audioDurationSeconds": 113.214688
+    },
+    "443": {
+      "musicId": "music.core.018",
+      "category": "calm",
+      "categoryUrl": "https://mixkit.co/free-stock-music/mood/calm/",
+      "downloadUrl": "https://mixkit.co/free-stock-music/download/443/",
+      "record": {
+        "@id": "Serene View",
+        "@type": "MusicRecording",
+        "name": "Serene View",
+        "genre": "Chillout",
+        "byArtist": "Arulo",
+        "duration": "PT1M54S",
+        "url": "https://assets.mixkit.co/music/443/443.mp3",
+        "waveformUrl": "https://assets.mixkit.co/music/443/443-waveform.json",
+        "copyrightNotice": "Mixkit Stock Music Free License",
+        "encodingFormat": "audio/mpeg",
+        "isAccessibleForFree": true,
+        "license": "https://mixkit.co/license/#musicFree",
+        "publisher": {
+          "@id": "https://mixkit.co/#organization"
+        },
+        "datePublished": "2020-01-28"
+      },
+      "acquiredAt": "2026-09-14T12:34:59Z",
+      "audioSha256": "556ae7a19c783bd666593e60fbba776bac7f9ff6c2173bebded0bc200cc82ec3",
+      "audioBytes": 3647991,
+      "audioDurationSeconds": 113.930091
+    },
+    "839": {
+      "musicId": "music.core.019",
+      "category": "acoustic-guitar",
+      "categoryUrl": "https://mixkit.co/free-stock-music/instrument/acoustic-guitar/",
+      "downloadUrl": "https://mixkit.co/free-stock-music/download/839/",
+      "record": {
+        "@id": "Tears of Joy",
+        "@type": "MusicRecording",
+        "name": "Tears of Joy",
+        "genre": "Folk Pop",
+        "byArtist": "Michael Ramir C.",
+        "duration": "PT2M20S",
+        "url": "https://assets.mixkit.co/music/839/839.mp3",
+        "waveformUrl": "https://assets.mixkit.co/music/839/839-waveform.json",
+        "copyrightNotice": "Mixkit Stock Music Free License",
+        "encodingFormat": "audio/mpeg",
+        "isAccessibleForFree": true,
+        "license": "https://mixkit.co/license/#musicFree",
+        "publisher": {
+          "@id": "https://mixkit.co/#organization"
+        },
+        "datePublished": "2020-01-28"
+      },
+      "acquiredAt": "2026-09-14T12:34:59Z",
+      "audioSha256": "30717c4e8d2a954a6163477b831e5b8981b406d2c34d72820fce4d40a8686ddc",
+      "audioBytes": 4485656,
+      "audioDurationSeconds": 140.173063
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "sources": {
+    "music.core.001": "release-20260914-bottle-baseline-r2/assets/music/p-aaa0536-54f92252.m4a",
+    "music.core.002": "release-20260914-bottle-baseline-r2/assets/music/native-american-flute.m4a",
+    "music.core.003": "release-20260914-bottle-baseline-r2/assets/music/p-mzpy00978-ccbf4fd7.m4a",
+    "music.core.004": "release-20260914-bottle-baseline-r2/assets/music/piano-earth-loop-6s.mp3",
+    "music.core.005": "music/audio/v1/music.core.005/7d58c4255d91f58e29e61520b6011cabd5a54b3e89b54646cebac9d37295bbec.mp3",
+    "music.core.006": "music/audio/v1/music.core.006/c8ca872f595c60c7734cfb13055d80d7a7b33466e5ae8e27b7518e5c30084b87.mp3",
+    "music.core.007": "music/audio/v1/music.core.007/73f8fa95c7fa9f835fcc37afed86b5527341400574ddf721de362395ae280fcc.mp3",
+    "music.core.008": "music/audio/v1/music.core.008/0f582b05625f07762b551757097d0d15412bc2e9154781508b59060dea5a58a5.mp3",
+    "music.core.009": "music/audio/v1/music.core.009/88a47f6415f95e3c758116584d88bf53935a03b593949a4ea4c4516c1182779f.mp3",
+    "music.core.010": "music/audio/v1/music.core.010/b909edf239071746969b4bfbc888d1b42d109cae4269285b63cbf2ba42f8daaf.mp3",
+    "music.core.011": "music/audio/v1/music.core.011/46330d05ad0c21d78c5767957fdd8212cee52ec549c3285a370de99311f8b4c6.mp3",
+    "music.core.012": "music/audio/v1/music.core.012/a07e945508eb65714fc0673a18af43f09b602fa726493dfafc6a726e63d6055d.mp3",
+    "music.core.013": "music/audio/v1/music.core.013/8c89819547b42a80750fb25f37a960a1f45f6fd66bc8d784ac817b98b002897c.mp3",
+    "music.core.014": "music/audio/v1/music.core.014/ee6d055c20cccda716b6b63a154ef0dc825195b7061dc439abb8a623973f4798.mp3",
+    "music.core.015": "music/audio/v1/music.core.015/b96c15fa68fdc26197aa2d6f64850e922fc86005295bd75b4cf625866deeeade.mp3",
+    "music.core.016": "music/audio/v1/music.core.016/30232da0b9521ed35e009162bfe7c63d06c9c8e4ca81ea5137ab63a9dc66cd98.mp3",
+    "music.core.017": "music/audio/v1/music.core.017/6dd23952c6c989929ddc5e96edd2e67b20e91bfe4e382b17ce1b9c2807a97a94.mp3",
+    "music.core.018": "music/audio/v1/music.core.018/556ae7a19c783bd666593e60fbba776bac7f9ff6c2173bebded0bc200cc82ec3.mp3",
+    "music.core.019": "music/audio/v1/music.core.019/30717c4e8d2a954a6163477b831e5b8981b406d2c34d72820fce4d40a8686ddc.mp3"
+  }
+}
