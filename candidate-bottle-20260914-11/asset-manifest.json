@@ -1,0 +1,1537 @@
+{
+  "schemaVersion": 2,
+  "releaseId": "release-20260912-03",
+  "buildId": "release-20260912-03",
+  "manifestVersion": "20260912-03-c1",
+  "generatedAt": "2026-09-12T11:30:00Z",
+  "canonicalUrl": "https://lugu.love/",
+  "production": {
+    "characters": [
+      {
+        "characterId": "fengxin-rabbit",
+        "displayName": "风信兔",
+        "itemOrder": [
+          "rabbit-happy",
+          "rabbit-angry",
+          "rabbit-playful",
+          "rabbit-jealous",
+          "rabbit-stubborn",
+          "rabbit-surprise",
+          "rabbit-confused",
+          "rabbit-disgust",
+          "rabbit-apology",
+          "rabbit-cool",
+          "rabbit-gloat"
+        ]
+      },
+      {
+        "characterId": "xinguang-fox",
+        "displayName": "狐使者",
+        "itemOrder": [
+          "fox-white-hurt",
+          "fox-navy-angry",
+          "fox-pink-coquettish",
+          "fox-black-playful",
+          "fox-red-happy",
+          "fox-teal-surprised",
+          "fox-defiant",
+          "fox-giveup"
+        ]
+      }
+    ]
+  },
+  "items": {
+    "rabbit-happy": {
+      "itemId": "rabbit-happy",
+      "characterId": "fengxin-rabbit",
+      "emotionId": "happy",
+      "label": "开心",
+      "sequenceId": "1",
+      "previewProxy": "mobile/1",
+      "previewFrames": 180,
+      "previewSheets": 15,
+      "status": "production",
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "rabbit_01_happy_generation_alpha_v1.mkv",
+        "sha256": "4a6ad6d4d186a77b1d2e3d059d5deb5c127c3c245435e92b851b7ffef4cc4832",
+        "container": "mkv",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "rabbit_01_happy_birefnet_alpha_v1.mov",
+          "sha256": "3c83bf4ff59972c1714f5cfa1d9313b2fb13b96c84728745d2b13fd0b2eb1e32",
+          "assetVersion": "rabbit-happy-v1"
+        }
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/01-rabbit-happy/delivery/rabbit_01_happy_alpha_vp9.webm",
+        "sha256": "1d77065800331d8ab641287f4f85b92cf151bbd15016573616a8ee7e7ef523cd",
+        "size": 1445463,
+        "contentType": "video/webm",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "rabbit-happy-v1"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/01-rabbit-happy/delivery/rabbit_01_happy_alpha_hevc.mov",
+        "sha256": "9a08cffa52bde9a2614b19a32e8a6bca558975338c15ec468d4fe4de38e1ace7",
+        "size": 2476316,
+        "contentType": "video/quicktime",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "rabbit-happy-v1"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/01-rabbit-happy/mobile-v2/rabbit_01_happy_mobile_black_v2.mp4",
+        "sha256": "29bf0883fc2e24ff035716b898f3f146709b2772d3d99016b3bc848c30bbc99b",
+        "size": 858999,
+        "contentType": "video/mp4",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "rabbit-happy-v1"
+      },
+      "backend": {
+        "displayName": "开心",
+        "code": "01",
+        "speechStart": 1.4,
+        "unionSource": [
+          0,
+          0,
+          719,
+          1280
+        ],
+        "subjectBox": [
+          219,
+          229,
+          693,
+          885
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "rabbit-happy-v1"
+    },
+    "rabbit-angry": {
+      "itemId": "rabbit-angry",
+      "characterId": "fengxin-rabbit",
+      "emotionId": "angry",
+      "label": "生气",
+      "sequenceId": "3",
+      "previewProxy": "mobile/3",
+      "previewFrames": 180,
+      "previewSheets": 15,
+      "status": "production",
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "rabbit_03_angry_generation_alpha_v1.mkv",
+        "sha256": "94f977b2520008d3881d83ec37d61916cd6e3de09a27eb4faf00849b480b0545",
+        "container": "mkv",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "rabbit_03_angry_birefnet_alpha_v2.mov",
+          "sha256": "69d5927d9131671c78134a3a8efd99b89de59cfa635313e6f0e3fe1fbc4b8435",
+          "assetVersion": "rabbit-angry-v2"
+        }
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/03-rabbit-angry/delivery/rabbit_03_angry_alpha_vp9.webm",
+        "sha256": "6f2f8528fcd0318f80efcc0eb4986b5ee8c70052d32617187f3b516d82f3f789",
+        "size": 854469,
+        "contentType": "video/webm",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "rabbit-angry-v2"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/03-rabbit-angry/delivery/rabbit_03_angry_alpha_hevc.mov",
+        "sha256": "352b42139e70999c11a0438c1125271fc413e062aac336cea1bd52deb4fde66a",
+        "size": 2213160,
+        "contentType": "video/quicktime",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "rabbit-angry-v2"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/03-rabbit-angry/mobile-v2/rabbit_03_angry_mobile_black_v2.mp4",
+        "sha256": "8a7091b51ff656561f71d14337d8f2d46542a1276082fc15f793c21546630a9c",
+        "size": 473056,
+        "contentType": "video/mp4",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "rabbit-angry-v2"
+      },
+      "backend": {
+        "displayName": "生气",
+        "code": "03",
+        "speechStart": 2.0,
+        "unionSource": [
+          0,
+          0,
+          719,
+          1280
+        ],
+        "subjectBox": [
+          260,
+          288,
+          595,
+          808
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "rabbit-angry-v2"
+    },
+    "rabbit-playful": {
+      "itemId": "rabbit-playful",
+      "characterId": "fengxin-rabbit",
+      "emotionId": "playful",
+      "label": "调皮",
+      "sequenceId": "5",
+      "previewProxy": "mobile/5",
+      "previewFrames": 180,
+      "previewSheets": 15,
+      "status": "production",
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "rabbit_05_playful_generation_alpha_v1.mkv",
+        "sha256": "9c13e7436c402106e9de1c2b53d04ab46704d117a98a82aca4fc3fc817efddb8",
+        "container": "mkv",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "rabbit_05_playful_birefnet_alpha_v1.mov",
+          "sha256": "54a4d4efd7d21fb97021f5ddb53a45a21aab6f6ebf3ba7e46b8c8092ea4970a0",
+          "assetVersion": "rabbit-playful-v1"
+        }
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/05-rabbit-playful/delivery/rabbit_05_playful_alpha_vp9.webm",
+        "sha256": "9938b6b901808dd8f847f173034968704d46d03f838ef5ab213c91d3275ee932",
+        "size": 913484,
+        "contentType": "video/webm",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "rabbit-playful-v1"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/05-rabbit-playful/delivery/rabbit_05_playful_alpha_hevc.mov",
+        "sha256": "eb26a93117843ba698c0b3303dd2a29202d6ad6c255a671b816ec97d503d2a32",
+        "size": 2358791,
+        "contentType": "video/quicktime",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "rabbit-playful-v1"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/05-rabbit-playful/mobile-v2/rabbit_05_playful_mobile_black_v2.mp4",
+        "sha256": "91de64bdab4ec26eaa4259c56de8265d6c4267c6bcb4d4ef695de5e80ab937bc",
+        "size": 569146,
+        "contentType": "video/mp4",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "rabbit-playful-v1"
+      },
+      "backend": {
+        "displayName": "调皮",
+        "code": "05",
+        "speechStart": 1.5,
+        "unionSource": [
+          0,
+          0,
+          719,
+          1280
+        ],
+        "subjectBox": [
+          212,
+          215,
+          717,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "rabbit-playful-v1"
+    },
+    "rabbit-jealous": {
+      "itemId": "rabbit-jealous",
+      "characterId": "fengxin-rabbit",
+      "emotionId": "jealous",
+      "label": "吃醋",
+      "sequenceId": "6",
+      "previewProxy": "mobile/6",
+      "previewFrames": 180,
+      "previewSheets": 15,
+      "status": "production",
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "rabbit_06_jealous_generation_alpha_v1.mkv",
+        "sha256": "31b9a7e82542b9588bfdb4a39b771cf5640e1499c545483531f01de92c452d21",
+        "container": "mkv",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "rabbit_06_jealous_birefnet_alpha_v3.mov",
+          "sha256": "b07600ea4c34a0ffbab4960701fd980e22e6dae89de0f8cf76751b224c5729a0",
+          "assetVersion": "rabbit-jealous-v3"
+        }
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/06-rabbit-jealous/delivery/rabbit_06_jealous_alpha_web_v1.webm",
+        "sha256": "25c36f4f8f69172d68a0024cad7d6d7b02f3334a1a8130eba3b256e94d14f79d",
+        "size": 946436,
+        "contentType": "video/webm",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "rabbit-jealous-v3"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/06-rabbit-jealous/delivery/rabbit_06_jealous_alpha_hevc.mov",
+        "sha256": "3d8daf139232b2d438a6840f7b5897a5cd719c189b3ffef78a4ce16ccf74e39a",
+        "size": 2356964,
+        "contentType": "video/quicktime",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "rabbit-jealous-v3"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/06-rabbit-jealous/mobile-v2/rabbit_06_jealous_mobile_black_v2.mp4",
+        "sha256": "f2a9a1dbee5ad0f9bb8d21bd0a47508140e88df2395711d6ebb9c9f0e1f8e8cb",
+        "size": 576326,
+        "contentType": "video/mp4",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "rabbit-jealous-v3"
+      },
+      "backend": {
+        "displayName": "吃醋",
+        "code": "06",
+        "speechStart": 2.0,
+        "unionSource": [
+          0,
+          0,
+          719,
+          1280
+        ],
+        "subjectBox": [
+          232,
+          227,
+          650,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "rabbit-jealous-v3"
+    },
+    "rabbit-stubborn": {
+      "itemId": "rabbit-stubborn",
+      "characterId": "fengxin-rabbit",
+      "emotionId": "stubborn",
+      "label": "嘴硬不服",
+      "sequenceId": "7",
+      "previewProxy": "mobile/7",
+      "previewFrames": 180,
+      "previewSheets": 15,
+      "status": "production",
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "rabbit_07_stubborn_generation_alpha_v1.mkv",
+        "sha256": "abbb199e44825e7ebae38f5750760c397bf2d028e113c082157ba194e3fbf046",
+        "container": "mkv",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "rabbit_07_stubborn_birefnet_alpha_v2.mov",
+          "sha256": "cc1db43feb70293bbf1dce3ee167b966210c73b389a1d38f3f6b3a5d8964e303",
+          "assetVersion": "rabbit-stubborn-v2"
+        }
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/07-rabbit-stubborn/delivery/rabbit_07_stubborn_alpha_vp9.webm",
+        "sha256": "7ddf1bdec3b7a0ac5cd59a3712a51278aec34ff8a9e063942371d65c7d8085d8",
+        "size": 905167,
+        "contentType": "video/webm",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "rabbit-stubborn-v2"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/07-rabbit-stubborn/delivery/rabbit_07_stubborn_alpha_hevc.mov",
+        "sha256": "7880dc97e833ef3dd1b9191f0aac4b42f14df7eeb678f009851699a64e03b45e",
+        "size": 2304880,
+        "contentType": "video/quicktime",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "rabbit-stubborn-v2"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/07-rabbit-stubborn/mobile-v2/rabbit_07_stubborn_mobile_black_v2.mp4",
+        "sha256": "32756831af3daee543d5015d03e0e494546ac0564c8d85073db491d3c571a79d",
+        "size": 557922,
+        "contentType": "video/mp4",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "rabbit-stubborn-v2"
+      },
+      "backend": {
+        "displayName": "嘴硬不服",
+        "code": "07",
+        "speechStart": 2.0,
+        "unionSource": [
+          0,
+          0,
+          719,
+          1280
+        ],
+        "subjectBox": [
+          221,
+          213,
+          681,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "rabbit-stubborn-v2"
+    },
+    "rabbit-surprise": {
+      "itemId": "rabbit-surprise",
+      "characterId": "fengxin-rabbit",
+      "emotionId": "surprised",
+      "label": "意外惊喜",
+      "sequenceId": "8",
+      "previewProxy": "mobile/8",
+      "previewFrames": 180,
+      "previewSheets": 15,
+      "status": "production",
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "rabbit_08_surprise_generation_alpha_v1.mkv",
+        "sha256": "e70336b10b6b72c7bd3299bafce8c8779d9b4842719d800f487d4073c29667e9",
+        "container": "mkv",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "rabbit_08_surprise_birefnet_alpha_v1.mov",
+          "sha256": "f215fd042f2e4c07949581f3702436fd4b939aa1ea64f8d804b5082c9ca13ab5",
+          "assetVersion": "rabbit-surprise-v1"
+        }
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/08-rabbit-surprise/delivery/rabbit_08_surprise_alpha_vp9.webm",
+        "sha256": "2e5375cfb32492a9be410a16336ab1f9c261811fed6faa9f75613c70e0db10e2",
+        "size": 953043,
+        "contentType": "video/webm",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "rabbit-surprise-v1"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/08-rabbit-surprise/delivery/rabbit_08_surprise_alpha_hevc.mov",
+        "sha256": "beee57f68f6c2f23deebff9e335805340600df28f76dd1da3ccaa7bca65d7a86",
+        "size": 2343553,
+        "contentType": "video/quicktime",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "rabbit-surprise-v1"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/08-rabbit-surprise/mobile-v2/rabbit_08_surprise_mobile_black_v2.mp4",
+        "sha256": "0e3151de97e417c380692a204ea6d3abe2ae248c02862fc608f7ca05622624d3",
+        "size": 599722,
+        "contentType": "video/mp4",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "rabbit-surprise-v1"
+      },
+      "backend": {
+        "displayName": "意外惊喜",
+        "code": "08",
+        "speechStart": 1.2,
+        "unionSource": [
+          0,
+          0,
+          719,
+          1280
+        ],
+        "subjectBox": [
+          223,
+          230,
+          644,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "rabbit-surprise-v1"
+    },
+    "rabbit-confused": {
+      "itemId": "rabbit-confused",
+      "characterId": "fengxin-rabbit",
+      "emotionId": "confused",
+      "label": "疑惑",
+      "sequenceId": "9",
+      "previewProxy": "mobile/9",
+      "previewFrames": 180,
+      "previewSheets": 15,
+      "status": "production",
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "rabbit_09_confused_generation_alpha_v1.mkv",
+        "sha256": "40ec63d9a484930c2bf8a76d4bd282a32f7c4cb3413e86ddbb7fab898f46b449",
+        "container": "mkv",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "rabbit_09_confused_birefnet_alpha_v3.mov",
+          "sha256": "1ff67997a264a10f93ef4d5d39da617a09fc06812c495bc1fbb9054678356378",
+          "assetVersion": "rabbit-confused-v3"
+        }
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/09-rabbit-confused/delivery/rabbit_09_confused_alpha_web_v1.webm",
+        "sha256": "7663631d3952c8bb8905431e8c92a5bae0794a9fb6b9813efaf90660341dc54f",
+        "size": 1065385,
+        "contentType": "video/webm",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "rabbit-confused-v3"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/09-rabbit-confused/delivery/rabbit_09_confused_alpha_hevc.mov",
+        "sha256": "b15e997aa3f4ae46a8b9632934f593113f38d8ea6fe9049177ac024a5ad53b63",
+        "size": 2409496,
+        "contentType": "video/quicktime",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "rabbit-confused-v3"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/09-rabbit-confused/mobile-v2/rabbit_09_confused_mobile_black_v2.mp4",
+        "sha256": "f7454481b066671ab4546cf77c923ed27ceac261bcb6031818f3a913f1b37524",
+        "size": 595291,
+        "contentType": "video/mp4",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "rabbit-confused-v3"
+      },
+      "backend": {
+        "displayName": "疑惑",
+        "code": "09",
+        "speechStart": 1.8,
+        "unionSource": [
+          0,
+          0,
+          719,
+          1280
+        ],
+        "subjectBox": [
+          206,
+          230,
+          676,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "rabbit-confused-v3"
+    },
+    "rabbit-disgust": {
+      "itemId": "rabbit-disgust",
+      "characterId": "fengxin-rabbit",
+      "emotionId": "disgusted",
+      "label": "嫌弃",
+      "sequenceId": "10",
+      "previewProxy": "mobile/10",
+      "previewFrames": 180,
+      "previewSheets": 15,
+      "status": "production",
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "rabbit_10_disgust_generation_alpha_v1.mkv",
+        "sha256": "6ef3893a0ceef486dae6fb16296cff03aed833a52e02419d30a2dda2bf43d7b8",
+        "container": "mkv",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "rabbit_10_disgust_birefnet_alpha_v1.mov",
+          "sha256": "2b1146babbef5bc021f529fc0b85905e88296a72d6cd03728d0a093f6a101c30",
+          "assetVersion": "rabbit-disgust-v1"
+        }
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/10-rabbit-disgust/delivery/rabbit_10_disgust_alpha_vp9.webm",
+        "sha256": "26f0126909cd957aa154b7a9d251cf4ad6e14d60b10d18a294815c7c308003ca",
+        "size": 689239,
+        "contentType": "video/webm",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "rabbit-disgust-v1"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/10-rabbit-disgust/delivery/rabbit_10_disgust_alpha_hevc.mov",
+        "sha256": "6dd2b4c22c5081ebf93a86695dddabd7ed49c9430d49f7fc8bd679d69eda4309",
+        "size": 2252114,
+        "contentType": "video/quicktime",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "rabbit-disgust-v1"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/10-rabbit-disgust/mobile-v2/rabbit_10_disgust_mobile_black_v2.mp4",
+        "sha256": "89ddfe52cc79a6f1388a9221568bd494d2ebe8353a924ece9f8343d09cecc8ec",
+        "size": 481533,
+        "contentType": "video/mp4",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "rabbit-disgust-v1"
+      },
+      "backend": {
+        "displayName": "嫌弃",
+        "code": "10",
+        "speechStart": 1.6,
+        "unionSource": [
+          0,
+          0,
+          719,
+          1280
+        ],
+        "subjectBox": [
+          231,
+          223,
+          628,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "rabbit-disgust-v1"
+    },
+    "rabbit-apology": {
+      "itemId": "rabbit-apology",
+      "characterId": "fengxin-rabbit",
+      "emotionId": "apologetic",
+      "label": "求原谅",
+      "sequenceId": "12",
+      "previewProxy": "mobile/12",
+      "previewFrames": 180,
+      "previewSheets": 15,
+      "status": "production",
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "rabbit_12_apology_generation_alpha_v1.mkv",
+        "sha256": "1b839f51fdc174fcccaf218323f7889019aea0a93866d32cca9c03656d7ebd89",
+        "container": "mkv",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "rabbit_12_apology_birefnet_v4_alpha_v1.mov",
+          "sha256": "fee7a4a16f6d041f999c0c4f896bbb0027954da1076a87bc42f099836a5ad8be",
+          "assetVersion": "rabbit-apology-v4"
+        }
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/12-rabbit-apology/delivery/rabbit_12_apology_alpha_vp9.webm",
+        "sha256": "9f58d18459b90c4455418872bd334b9430cece2cf92c55b826284252d1af607f",
+        "size": 1118009,
+        "contentType": "video/webm",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "rabbit-apology-v4"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/12-rabbit-apology/delivery/rabbit_12_apology_alpha_hevc.mov",
+        "sha256": "1e8272f15f545483163a7621fbd99f4051bdccb0175557cdc79d360351f1468b",
+        "size": 2411536,
+        "contentType": "video/quicktime",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "rabbit-apology-v4"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/12-rabbit-apology/mobile-v2/rabbit_12_apology_mobile_black_v2.mp4",
+        "sha256": "ae0ae598f21e6edf7d9deba01edffd986c5df70f91adc410879a657d0c542794",
+        "size": 634953,
+        "contentType": "video/mp4",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "rabbit-apology-v4"
+      },
+      "backend": {
+        "displayName": "求原谅",
+        "code": "12",
+        "speechStart": 2.0,
+        "unionSource": [
+          0,
+          0,
+          719,
+          1280
+        ],
+        "subjectBox": [
+          213,
+          218,
+          621,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "rabbit-apology-v4"
+    },
+    "rabbit-cool": {
+      "itemId": "rabbit-cool",
+      "characterId": "fengxin-rabbit",
+      "emotionId": "cool",
+      "label": "装酷",
+      "sequenceId": "14",
+      "previewProxy": "mobile/14",
+      "previewFrames": 180,
+      "previewSheets": 15,
+      "status": "production",
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "rabbit_14_cool_generation_alpha_v1.mkv",
+        "sha256": "a822cf3b067dfd80070717d1da42e2c413674a7c74eaad6e776b72193863a1f3",
+        "container": "mkv",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "rabbit_14_cool_birefnet_alpha_v1.mov",
+          "sha256": "709b79f7ac591ba98990606cebdb9e2120c05eeea09428c675dcb385c4f92413",
+          "assetVersion": "rabbit-cool-v1"
+        }
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/14-rabbit-cool/delivery/rabbit_14_cool_alpha_vp9.webm",
+        "sha256": "54347d2187b55e3f6a4137772d21fe65181c6efb6021b11b43422cca76c34d35",
+        "size": 976663,
+        "contentType": "video/webm",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "rabbit-cool-v1"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/14-rabbit-cool/delivery/rabbit_14_cool_alpha_hevc.mov",
+        "sha256": "b614714d703a7c098d02fe0ff33981d6fdbb30cb1a214367baba84cb7a282f04",
+        "size": 2409465,
+        "contentType": "video/quicktime",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "rabbit-cool-v1"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/14-rabbit-cool/mobile-v2/rabbit_14_cool_mobile_black_v2.mp4",
+        "sha256": "c270aa7937c375a5d443036e7632b5e49cd295d5c017da29854c287efa1e7fa9",
+        "size": 577685,
+        "contentType": "video/mp4",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "rabbit-cool-v1"
+      },
+      "backend": {
+        "displayName": "装酷",
+        "code": "14",
+        "speechStart": 2.0,
+        "unionSource": [
+          0,
+          0,
+          719,
+          1280
+        ],
+        "subjectBox": [
+          228,
+          230,
+          732,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "rabbit-cool-v1"
+    },
+    "rabbit-gloat": {
+      "itemId": "rabbit-gloat",
+      "characterId": "fengxin-rabbit",
+      "emotionId": "gloating",
+      "label": "幸灾乐祸",
+      "sequenceId": "15",
+      "previewProxy": "mobile/15",
+      "previewFrames": 180,
+      "previewSheets": 15,
+      "status": "production",
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "rabbit_15_gloat_generation_alpha_v1.mkv",
+        "sha256": "f8fdcc13fe1c10f13a1edec32d000fb17f6060e6494341df7e41f09e4771cefc",
+        "container": "mkv",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "rabbit_15_gloat_birefnet_alpha_v3.mov",
+          "sha256": "c6d6805763c583de903105d996ad8c7ab4ede64813c21672a50d407796988432",
+          "assetVersion": "rabbit-gloat-v3"
+        }
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/15-rabbit-gloat/delivery/rabbit_15_gloat_alpha_web_v1.webm",
+        "sha256": "e46f215d9e4a1bf47681ed225ab5768ca5c1f5c1a5539c0142bb3ba415e930f3",
+        "size": 1344512,
+        "contentType": "video/webm",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "rabbit-gloat-v3"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/15-rabbit-gloat/delivery/rabbit_15_gloat_alpha_hevc.mov",
+        "sha256": "5c379a4483962d72c9ec49a127d8df700439a29171a8e7cb9ca93ea166d48bd0",
+        "size": 2479626,
+        "contentType": "video/quicktime",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "rabbit-gloat-v3"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/15-rabbit-gloat/mobile-v2/rabbit_15_gloat_mobile_black_v2.mp4",
+        "sha256": "dde71a2b093e861b99cf3b1b1a96a0b1d663e09f3402c8cbaab851544d2a51a1",
+        "size": 716852,
+        "contentType": "video/mp4",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "rabbit-gloat-v3"
+      },
+      "backend": {
+        "displayName": "幸灾乐祸",
+        "code": "15",
+        "speechStart": 1.6,
+        "unionSource": [
+          0,
+          0,
+          719,
+          1280
+        ],
+        "subjectBox": [
+          216,
+          224,
+          642,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "rabbit-gloat-v3"
+    },
+    "fox-white-hurt": {
+      "itemId": "fox-white-hurt",
+      "characterId": "xinguang-fox",
+      "emotionId": "wronged",
+      "label": "委屈难过",
+      "sequenceId": "1",
+      "previewProxy": "fox_white_hurt_sad_birefnet_gray_preview_v1.mp4",
+      "previewFrames": 180,
+      "previewSheets": 15,
+      "status": "production",
+      "generationMaster": {
+        "kind": "backend-local",
+        "ref": "fox_white_hurt_sad_generation_alpha_v1.mkv",
+        "sha256": "eb6c8ccc65df4efd9282974e77f7e44b1e08a6c6e81fe629ce5ac7b547b64af0",
+        "container": "mkv"
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/01-fox-white-hurt/delivery/fox_white_hurt_sad_alpha_vp9.webm",
+        "sha256": "9bf72a951df2dd0892f14362f3a73a64eccd84eef78c2671716c1506436cdbf1",
+        "size": 876119,
+        "contentType": "video/webm",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "fox-white-hurt-v1"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/01-fox-white-hurt/delivery/fox_white_hurt_sad_alpha_hevc.mov",
+        "sha256": "7a5f2c7e176e2b5ea73366c303da9f913ff8751e9d39906b420a433ad09464f5",
+        "size": 2376192,
+        "contentType": "video/quicktime",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "fox-white-hurt-v1"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/01-fox-white-hurt/mobile/fox_white_hurt_sad_mobile_black_v1.mp4",
+        "sha256": "c2e59ce1267c5ee2350cbece9b36eb2ea91d1e1ab604a325319e8065fb310a5f",
+        "size": 628423,
+        "contentType": "video/mp4",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "fox-white-hurt-v1"
+      },
+      "backend": {
+        "displayName": "委屈难过",
+        "code": "01",
+        "speechStart": 0,
+        "unionSource": [
+          0,
+          0,
+          719,
+          1280
+        ],
+        "subjectBox": [
+          175,
+          229,
+          768,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "fox-white-hurt-v1"
+    },
+    "fox-navy-angry": {
+      "itemId": "fox-navy-angry",
+      "characterId": "xinguang-fox",
+      "emotionId": "angry",
+      "label": "生气愤怒",
+      "sequenceId": "2",
+      "previewProxy": "fox_navy_angry_birefnet_gray_preview_v1.mp4",
+      "previewFrames": 180,
+      "previewSheets": 15,
+      "status": "production",
+      "generationMaster": {
+        "kind": "backend-local",
+        "ref": "fox_navy_angry_generation_alpha_v1.mkv",
+        "sha256": "28ffb4f4b4aee5062cd57cd40cfdbce6dece74baf516ea6351d45e6deabf67a7",
+        "container": "mkv"
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/02-fox-navy-angry/delivery/fox_navy_angry_alpha_vp9.webm",
+        "sha256": "ece51656606218a8a5e53e3ffbe9685dfa6f256b4d8481dae67d38708c75abc4",
+        "size": 1139621,
+        "contentType": "video/webm",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "fox-navy-angry-v1"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/02-fox-navy-angry/delivery/fox_navy_angry_alpha_hevc.mov",
+        "sha256": "343be36c23b55aad72de9978d3680fd705ff703f957a3604237446fbfd97d56d",
+        "size": 2445400,
+        "contentType": "video/quicktime",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "fox-navy-angry-v1"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/02-fox-navy-angry/mobile/fox_navy_angry_mobile_black_v1.mp4",
+        "sha256": "0006a96c4e5e72ddbbe77b95670a5d89d2aa542d16fb50c6d7267105cedefa21",
+        "size": 702093,
+        "contentType": "video/mp4",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "fox-navy-angry-v1"
+      },
+      "backend": {
+        "displayName": "生气愤怒",
+        "code": "02",
+        "speechStart": 0,
+        "unionSource": [
+          0,
+          0,
+          719,
+          1280
+        ],
+        "subjectBox": [
+          191,
+          225,
+          702,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "fox-navy-angry-v1"
+    },
+    "fox-pink-coquettish": {
+      "itemId": "fox-pink-coquettish",
+      "characterId": "xinguang-fox",
+      "emotionId": "sajiao",
+      "label": "撒娇",
+      "sequenceId": "3",
+      "previewProxy": "fox_pink_coquettish_birefnet_gray_preview_v1.mp4",
+      "previewFrames": 180,
+      "previewSheets": 15,
+      "status": "production",
+      "generationMaster": {
+        "kind": "backend-local",
+        "ref": "fox_pink_coquettish_generation_alpha_v1.mkv",
+        "sha256": "c868f86ff00c8cf88aab47a7dec7c00fb19e8d733e7d15841e0c454b5a513d52",
+        "container": "mkv"
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/03-fox-pink-coquettish/delivery/fox_pink_coquettish_alpha_vp9.webm",
+        "sha256": "ef5677d95c9bcb5bc8e461bd0e2fb0e56f6ad8a627ce12119c0f5b056dfb2f4e",
+        "size": 1167935,
+        "contentType": "video/webm",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "fox-pink-coquettish-v1"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/03-fox-pink-coquettish/delivery/fox_pink_coquettish_alpha_hevc.mov",
+        "sha256": "e822370e6295aec9be70ddcd31ba78e7aa8e627213bd5bcd3d1e7790c7a05652",
+        "size": 2469016,
+        "contentType": "video/quicktime",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "fox-pink-coquettish-v1"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/03-fox-pink-coquettish/mobile/fox_pink_coquettish_mobile_black_v1.mp4",
+        "sha256": "cf04350f4b5d43b1758bec274437ec3ca10ba97818bcb708ff7310b86da9ee89",
+        "size": 727643,
+        "contentType": "video/mp4",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "fox-pink-coquettish-v1"
+      },
+      "backend": {
+        "displayName": "撒娇",
+        "code": "03",
+        "speechStart": 0,
+        "unionSource": [
+          0,
+          0,
+          719,
+          1280
+        ],
+        "subjectBox": [
+          153,
+          229,
+          762,
+          886
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "fox-pink-coquettish-v1"
+    },
+    "fox-black-playful": {
+      "itemId": "fox-black-playful",
+      "characterId": "xinguang-fox",
+      "emotionId": "playful",
+      "label": "调皮幽默",
+      "sequenceId": "4",
+      "previewProxy": "fox_black_playful_birefnet_gray_preview_v1.mp4",
+      "previewFrames": 180,
+      "previewSheets": 15,
+      "status": "production",
+      "generationMaster": {
+        "kind": "backend-local",
+        "ref": "fox_black_playful_generation_alpha_v1.mkv",
+        "sha256": "0d4ce24c7f39b8d36441dcc9e5c984f8404b74560fee8ac639fcc0ef65474e00",
+        "container": "mkv"
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/04-fox-black-playful/delivery/fox_black_playful_alpha_vp9.webm",
+        "sha256": "d724278b8c2742ff6db0e3013453d27d7ecaa33f55ca46bbc930f9e8d1ac20c5",
+        "size": 920502,
+        "contentType": "video/webm",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "fox-black-playful-v1"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/04-fox-black-playful/delivery/fox_black_playful_alpha_hevc.mov",
+        "sha256": "6a1a7bc395b22596c8c3a43b8455f5c66db8f524c3f24a9e268bb49c55aabff6",
+        "size": 2353822,
+        "contentType": "video/quicktime",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "fox-black-playful-v1"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/04-fox-black-playful/mobile/fox_black_playful_mobile_black_v1.mp4",
+        "sha256": "770d69cd5ee30c3f6bc0c924145acae32571e83e308f86cd4ce3269f390cab75",
+        "size": 615932,
+        "contentType": "video/mp4",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "fox-black-playful-v1"
+      },
+      "backend": {
+        "displayName": "调皮幽默",
+        "code": "04",
+        "speechStart": 0,
+        "unionSource": [
+          0,
+          0,
+          719,
+          1280
+        ],
+        "subjectBox": [
+          177,
+          225,
+          683,
+          883
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "fox-black-playful-v1"
+    },
+    "fox-red-happy": {
+      "itemId": "fox-red-happy",
+      "characterId": "xinguang-fox",
+      "emotionId": "happy",
+      "label": "开心快乐",
+      "sequenceId": "5",
+      "previewProxy": "fox_red_happy_birefnet_gray_preview_v1.mp4",
+      "previewFrames": 180,
+      "previewSheets": 15,
+      "status": "production",
+      "generationMaster": {
+        "kind": "backend-local",
+        "ref": "fox_red_happy_generation_alpha_v1.mkv",
+        "sha256": "df789ae8f8a0d989489974edba8e6ddf3a7be55265596f582d333f7977f817da",
+        "container": "mkv"
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/05-fox-red-happy/delivery/fox_red_happy_alpha_vp9.webm",
+        "sha256": "43e81e9f07ee5c004f110ee09ecf835408b1eb7186e8c1898347f3fd017ec8f7",
+        "size": 1223878,
+        "contentType": "video/webm",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "fox-red-happy-v1"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/05-fox-red-happy/delivery/fox_red_happy_alpha_hevc.mov",
+        "sha256": "5f6f8536cf37f58375ea1107f2aa9821a18ec037f08125d7f416b0feb9c9dd7c",
+        "size": 2489164,
+        "contentType": "video/quicktime",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "fox-red-happy-v1"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/05-fox-red-happy/mobile/fox_red_happy_mobile_black_v1.mp4",
+        "sha256": "a1064c3bcd64bea8c617d4fb0f3a79e650b07a47b8933ce80d44a29299a1a998",
+        "size": 872819,
+        "contentType": "video/mp4",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "fox-red-happy-v1"
+      },
+      "backend": {
+        "displayName": "开心快乐",
+        "code": "05",
+        "speechStart": 0,
+        "unionSource": [
+          0,
+          0,
+          719,
+          1280
+        ],
+        "subjectBox": [
+          119,
+          229,
+          725,
+          883
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "fox-red-happy-v1"
+    },
+    "fox-teal-surprised": {
+      "itemId": "fox-teal-surprised",
+      "characterId": "xinguang-fox",
+      "emotionId": "surprised",
+      "label": "意外惊喜",
+      "sequenceId": "6",
+      "previewProxy": "fox_teal_surprised_birefnet_gray_preview_v1.mp4",
+      "previewFrames": 180,
+      "previewSheets": 15,
+      "status": "production",
+      "generationMaster": {
+        "kind": "backend-local",
+        "ref": "fox_teal_surprised_generation_alpha_v1.mkv",
+        "sha256": "d104bb4302647d4431a0b12ad7a75c323134711f63099d0f1e8c87725f8e4147",
+        "container": "mkv"
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/06-fox-teal-surprised/delivery/fox_teal_surprised_alpha_vp9.webm",
+        "sha256": "54cad45544ec7d2674d289b52832968671304383f1d72a043c33d003ae8cf52c",
+        "size": 1176623,
+        "contentType": "video/webm",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "fox-teal-surprised-v1"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/06-fox-teal-surprised/delivery/fox_teal_surprised_alpha_hevc.mov",
+        "sha256": "339ffd8380663ac8c5498115d0f9102498bea54bf08202c1c08128f00062ccd5",
+        "size": 2465700,
+        "contentType": "video/quicktime",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "fox-teal-surprised-v1"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/06-fox-teal-surprised/mobile/fox_teal_surprised_mobile_black_v1.mp4",
+        "sha256": "9799813b7817f10d62b52ec27503b019e738189a0cb1d047d4d475b1e946c6d0",
+        "size": 749172,
+        "contentType": "video/mp4",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "fox-teal-surprised-v1"
+      },
+      "backend": {
+        "displayName": "意外惊喜",
+        "code": "06",
+        "speechStart": 0,
+        "unionSource": [
+          0,
+          0,
+          719,
+          1280
+        ],
+        "subjectBox": [
+          191,
+          229,
+          720,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "fox-teal-surprised-v1"
+    },
+    "fox-defiant": {
+      "itemId": "fox-defiant",
+      "characterId": "xinguang-fox",
+      "emotionId": "defiant",
+      "label": "嘴硬不服",
+      "sequenceId": "7",
+      "previewProxy": "fox_defiant_birefnet_gray_preview_v1.mp4",
+      "previewFrames": 180,
+      "previewSheets": 15,
+      "status": "production",
+      "generationMaster": {
+        "kind": "backend-local",
+        "ref": "fox_defiant_generation_alpha_v1.mkv",
+        "sha256": "0df046e27cff4c11048a6b7695e3278077854e2cc9d84ab326cc5d8f9c5c9c26",
+        "container": "mkv"
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/07-fox-defiant/delivery/fox_defiant_alpha_vp9.webm",
+        "sha256": "b964a54a0628d00ba5290eaaef9191fb9bcb84b83b354683922a3dc56c1321ff",
+        "size": 779374,
+        "contentType": "video/webm",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "fox-defiant-v1"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/07-fox-defiant/delivery/fox_defiant_alpha_hevc.mov",
+        "sha256": "b8837d1b9fc60379b7f1b350372b1ef21f6cafa04312359dec2415f524c71906",
+        "size": 2326318,
+        "contentType": "video/quicktime",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "fox-defiant-v1"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/07-fox-defiant/mobile/fox_defiant_mobile_black_v1.mp4",
+        "sha256": "81414e70040dae3fce98e09cf00c7e209fc847d384925bb2409b6199a2ee7455",
+        "size": 483133,
+        "contentType": "video/mp4",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "fox-defiant-v1"
+      },
+      "backend": {
+        "displayName": "嘴硬不服",
+        "code": "07",
+        "speechStart": 0,
+        "unionSource": [
+          0,
+          0,
+          719,
+          1280
+        ],
+        "subjectBox": [
+          205,
+          229,
+          720,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "fox-defiant-v1"
+    },
+    "fox-giveup": {
+      "itemId": "fox-giveup",
+      "characterId": "xinguang-fox",
+      "emotionId": "lowenergy",
+      "label": "躺平摆烂",
+      "sequenceId": "8",
+      "previewProxy": "fox_giveup_birefnet_gray_preview_v1.mp4",
+      "previewFrames": 180,
+      "previewSheets": 15,
+      "status": "production",
+      "generationMaster": {
+        "kind": "backend-local",
+        "ref": "fox_giveup_generation_alpha_v1.mkv",
+        "sha256": "32be2c68c2bd0685825b767517c9670eb9a6589ea0324c4a6a94360e9d4ba416",
+        "container": "mkv"
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/08-fox-giveup/delivery/fox_giveup_alpha_vp9.webm",
+        "sha256": "ffb1228fa2697e8d1e59fa7cbd6af70d51c86bfec899b391fe68951cb7f5b3d2",
+        "size": 872442,
+        "contentType": "video/webm",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "fox-giveup-v1"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/08-fox-giveup/delivery/fox_giveup_alpha_hevc.mov",
+        "sha256": "ad59451f7c8cabc2f2c2f80ceb444230de58fdfe832cd9afb7ff69423dd84759",
+        "size": 2274023,
+        "contentType": "video/quicktime",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "fox-giveup-v1"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/08-fox-giveup/mobile/fox_giveup_mobile_black_v1.mp4",
+        "sha256": "17305658bb2da7cb8f05e4563a2f9b9ef73369d9fc9a316bf149cffe4d2676fe",
+        "size": 558036,
+        "contentType": "video/mp4",
+        "width": 834,
+        "height": 1112,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "fox-giveup-v1"
+      },
+      "backend": {
+        "displayName": "躺平摆烂",
+        "code": "08",
+        "speechStart": 0,
+        "unionSource": [
+          0,
+          0,
+          719,
+          1280
+        ],
+        "subjectBox": [
+          171,
+          229,
+          780,
+          882
+        ],
+        "sourceWidth": 834,
+        "sourceHeight": 1112
+      },
+      "assetVersion": "fox-giveup-v1"
+    }
+  },
+  "candidateRevision": 4
+}

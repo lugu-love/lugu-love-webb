@@ -1,0 +1,15 @@
+{
+  "releaseId": "candidate-bottle-20260914-11",
+  "buildId": "candidate-bottle-20260914-11",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "cec42de7ca6f29fee2d1de70349f2d347f3301509aa825ceec313df05bab8316",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/candidate-bottle-20260914-11/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-14T00:00:00Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "candidate": true,
+  "candidateOf": "release-20260913-ui-01",
+  "candidateNote": "漂流瓶候选版 11：fox-giveup 改为二维修正素材（素材层人工关键帧：起跳前 0-40 / 过渡 40-96 / 落地站稳 96-120；接触点 X 锁到瓶底中心线、Y 锁到起跳接触线、比例回到站立比例 1.178x），并加入瓶底中心十字 + 起跳/落地脚底中心标记。漂流瓶动画、位置、缩放、播放流程未动。"
+}
