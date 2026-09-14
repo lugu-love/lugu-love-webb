@@ -1,0 +1,15 @@
+{
+  "releaseId": "candidate-bottle-20260914-28",
+  "buildId": "candidate-bottle-20260914-28",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "cec42de7ca6f29fee2d1de70349f2d347f3301509aa825ceec313df05bab8316",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/candidate-bottle-20260914-28/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-14T00:00:00Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "candidate": true,
+  "candidateOf": "release-20260913-ui-01",
+  "candidateNote": "候选 28（头像修复）：给 19 条素材各生成一张取自本条目视频首帧的头像，卡片里 ta的世界 按钮前的头像现在随使者与情绪变化（缺失时回退角色 portrait）。冻结的漂流瓶参数未改。"
+}
