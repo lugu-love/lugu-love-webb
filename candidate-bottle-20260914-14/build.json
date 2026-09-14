@@ -1,0 +1,15 @@
+{
+  "releaseId": "candidate-bottle-20260914-14",
+  "buildId": "candidate-bottle-20260914-14",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "cec42de7ca6f29fee2d1de70349f2d347f3301509aa825ceec313df05bab8316",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/candidate-bottle-20260914-14/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-14T00:00:00Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "candidate": true,
+  "candidateOf": "release-20260913-ui-01",
+  "candidateNote": "rabbit-happy 脚底固定·原地唤醒候选（14）：pre-shake 上抬 0px；唤醒动画只做 rotate ±2° 与 scale 98%~102%，1.1s ease-in-out，transform-origin 设在真实双脚中心 P0(54.53%,76.85%)，全程无 translateX/translateY，结束回到 rotate 0 / scale 1；视频未裁切（实测开头无静止空白）。只对这一条兔子生效，其它素材与漂流瓶动画未动。"
+}
