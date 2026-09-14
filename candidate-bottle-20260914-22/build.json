@@ -1,0 +1,15 @@
+{
+  "releaseId": "candidate-bottle-20260914-22",
+  "buildId": "candidate-bottle-20260914-22",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "cec42de7ca6f29fee2d1de70349f2d347f3301509aa825ceec313df05bab8316",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/candidate-bottle-20260914-22/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-14T00:00:00Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "candidate": true,
+  "candidateOf": "release-20260913-ui-01",
+  "candidateNote": "候选 22：小瓶停稳时的原地小跳再放慢一倍（1.24s → 2.48s）。关键帧、跳跃高度（约 -11px）、落回原位与所有定位参数不变；其余沿用候选 20/19 模式。"
+}
