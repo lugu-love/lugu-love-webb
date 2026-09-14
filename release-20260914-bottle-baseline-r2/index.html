@@ -3571,6 +3571,7 @@ color: rgba(212, 226, 250, .62);
 </div>
 </main>
 <script src="assets/js/lugu-music-coordinator.js?v=20260713-2"></script>
+<script src="assets/js/lugu-music-library.js?v=20260914-1"></script>
 <script>
 (() => {
 if (!window.LuguMusic) {
@@ -5267,11 +5268,8 @@ if (prog) { prog.hidden = true; }
 }
 window.playFengxinRabbitAngryDemo = playFengxinRabbitAngryDemo;
 const backgroundMusicSrc = "assets/music/piano-earth-loop-6s.mp3";
-const voiceMusicList = [
-"assets/music/native-american-flute.m4a",
-"assets/music/p-aaa0536-54f92252.m4a",
-"assets/music/p-mzpy00978-ccbf4fd7.m4a"
-];
+const voiceMusicContext = "earthRandom";
+const voiceMusicRecentIds = [];
 const stars = new Set();
 let nextSpawn = 0;
 let voiceStarStartAt = 0;
@@ -5290,7 +5288,6 @@ try { window.earthMusicEnabled = localStorage.getItem("lugu_earth_music_enabled"
 let earthSoundUnlocked = false;
 let openingLaughAudio = null;
 const earthEffectAudios = new Set();
-let voiceMusicIndex = 0;
 let voiceMusicFadeFrame = 0;
 let voiceMusicStartTimer = 0;
 let voiceAudio = null;
@@ -6333,8 +6330,10 @@ voiceMusicFadeFrame = requestAnimationFrame(fadeIn);
 }
 
 function startVoiceMusic(options = {}) {
-if (voiceMusicList.length === 0) return;
 if (!window.earthMusicEnabled) return;
+if (!window.LuguMusicLibrary) return;
+const musicTrack = window.LuguMusicLibrary.pick(voiceMusicContext, voiceMusicRecentIds);
+if (!musicTrack || !musicTrack.url) return;
 stopMusic({ immediate: true });
 window.LuguMusic.claim("earth-music");
 
@@ -6345,8 +6344,9 @@ destroyAudioNow(fadingVoiceAudio);
 voiceAudio = null;
 fadingVoiceAudio = null;
 
-const src = voiceMusicList[voiceMusicIndex % voiceMusicList.length];
-voiceMusicIndex += 1;
+const src = musicTrack.url;
+voiceMusicRecentIds.push(musicTrack.id);
+if (voiceMusicRecentIds.length > 5) voiceMusicRecentIds.shift();
 const audio = new Audio(src);
 voiceAudio = audio;
 window.audio = audio;
