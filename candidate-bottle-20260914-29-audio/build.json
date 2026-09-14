@@ -1,0 +1,15 @@
+{
+  "releaseId": "candidate-bottle-20260914-29-audio",
+  "buildId": "candidate-bottle-20260914-29-audio",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "cec42de7ca6f29fee2d1de70349f2d347f3301509aa825ceec313df05bab8316",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/candidate-bottle-20260914-29-audio/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-14T00:00:00Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "candidate": true,
+  "candidateOf": "release-20260913-ui-01",
+  "candidateNote": "候选 29（地球首页音频修复·第一步）：背景音乐不再因超出用户手势窗口被 NotAllowedError 拦截——首次手势内以音量 0 启动 BGM，笑声/钟声结束后淡入；play 失败自动重试一次，仍失败则记下并在下一次手势重试。漂流瓶与冻结参数未改。"
+}
