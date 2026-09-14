@@ -1,0 +1,15 @@
+{
+  "releaseId": "candidate-bottle-20260914-20",
+  "buildId": "candidate-bottle-20260914-20",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "cec42de7ca6f29fee2d1de70349f2d347f3301509aa825ceec313df05bab8316",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/candidate-bottle-20260914-20/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-14T00:00:00Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "candidate": true,
+  "candidateOf": "release-20260913-ui-01",
+  "candidateNote": "候选 20：在小瓶刚停稳（arrival + 0.32s 的 is-awakening 时机）让使者在原地轻轻跳一下（0.62s，起跳 -11px 并回到原位，带轻微 squash/stretch），全部 19 条素材通用。定位不变（结束回到 translate 0 / scale 1）；其余保持候选 19 模式：持续循环、不跳跃以外的改动不变、ended 后 150ms 返程、使者层 13px。"
+}
