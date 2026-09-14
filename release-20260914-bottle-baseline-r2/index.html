@@ -3571,7 +3571,6 @@ color: rgba(212, 226, 250, .62);
 </div>
 </main>
 <script src="assets/js/lugu-music-coordinator.js?v=20260713-2"></script>
-<script src="assets/js/lugu-music-library.js?v=20260914-1"></script>
 <script>
 (() => {
 if (!window.LuguMusic) {
@@ -5268,8 +5267,11 @@ if (prog) { prog.hidden = true; }
 }
 window.playFengxinRabbitAngryDemo = playFengxinRabbitAngryDemo;
 const backgroundMusicSrc = "assets/music/piano-earth-loop-6s.mp3";
-const voiceMusicContext = "earthRandom";
-const voiceMusicRecentIds = [];
+const voiceMusicList = [
+"assets/music/native-american-flute.m4a",
+"assets/music/p-aaa0536-54f92252.m4a",
+"assets/music/p-mzpy00978-ccbf4fd7.m4a"
+];
 const stars = new Set();
 let nextSpawn = 0;
 let voiceStarStartAt = 0;
@@ -5282,12 +5284,17 @@ let musicSession = 0;
 let backgroundMusicPlayCount = 0;
 let openingAfterLaughScheduled = false;
 let musicForceAudible = false;
+// 首次手势内以静音启动 BGM（拿播放许可），等笑声/钟声结束后再淡入
+let musicSilentStart = false;
+// 自动播放被拒后标记：下一次用户手势里重试
+let musicNeedsGesture = false;
 let musicVolume = .6;
 window.earthMusicEnabled = true;
 try { window.earthMusicEnabled = localStorage.getItem("lugu_earth_music_enabled") !== "0"; } catch (error) {}
 let earthSoundUnlocked = false;
 let openingLaughAudio = null;
 const earthEffectAudios = new Set();
+let voiceMusicIndex = 0;
 let voiceMusicFadeFrame = 0;
 let voiceMusicStartTimer = 0;
 let voiceAudio = null;
@@ -6129,7 +6136,15 @@ spawnVoiceStar();
 function scheduleOpeningBackgroundMusic(delay = 1000) {
 clearTimeout(backgroundMusicTimer);
 backgroundMusicTimer = setTimeout(() => {
-if (canPlayEarthSound()) startMusic();
+if (!canPlayEarthSound()) return;
+// 第一次手势里已经以静音启动过 BGM：这里只把它淡入，不重新起播（避免被浏览器拦截、也不重叠）
+if (musicSilentStart && window.audio && !window.audio.paused) {
+musicSilentStart = false;
+animateAudioVolume(window.audio, 0, musicVolume, musicStartFadeDuration);
+if (window.syncAudioUI) window.syncAudioUI();
+return;
+}
+startMusic();
 }, delay);
 }
 
@@ -6160,6 +6175,17 @@ earthEffectAudios.delete(audio);
 function unlockEarthSounds() {
 earthSoundUnlocked = true;
 playOpeningLaughSound();
+// 第一次手势内就把 BGM 播放器以音量 0 启动：浏览器会记录这次“用户手势播放”，
+// 之后（笑声/钟声结束）再淡入就不会被 NotAllowedError 拦截。
+if (window.earthMusicEnabled && !musicSilentStart && !(window.audio && !window.audio.paused)) {
+musicSilentStart = true;
+try { startMusic({ silentStart: true }); } catch (error) { musicSilentStart = false; }
+}
+// 之前因自动播放被拒时的补救：在手势里重试一次
+if (musicNeedsGesture) {
+musicNeedsGesture = false;
+try { startMusic(); } catch (error) {}
+}
 }
 
 function armBackgroundLoop(audio, session, forceAudible = false) {
@@ -6205,12 +6231,37 @@ if (window.syncAudioUI) window.syncAudioUI();
 
 audio.play().then(() => {
 syncMusicMotion();
+// 手势内静音起播：先维持 0 音量，等笑声/钟声结束后由 scheduleOpeningBackgroundMusic 淡入
+if (musicSilentStart) {
+audio.volume = 0;
+// 手势启动的这一个元素就是“持续存在的音乐播放器”：循环播放它本身，
+// 不再在运行中新建/销毁元素（新建元素会因超出用户手势窗口被浏览器再次拦截）。
+audio.loop = true;
+} else {
 animateAudioVolume(audio, 0, musicVolume, fadeDuration);
-armBackgroundLoop(audio, session, forceAudible);
+}
+if (!audio.loop) armBackgroundLoop(audio, session, forceAudible);
 if (window.syncAudioUI) window.syncAudioUI();
 }).catch(() => {
+// 失败自动重试一次；仍失败则记住“需要一次用户手势”，由下一次手势重试
+setTimeout(() => {
+if (session !== musicSession) return;
+audio.play().then(() => {
+syncMusicMotion();
+if (musicSilentStart) {
+audio.volume = 0;
+audio.loop = true;
+} else {
+animateAudioVolume(audio, 0, musicVolume, fadeDuration);
+}
+if (!audio.loop) armBackgroundLoop(audio, session, forceAudible);
+if (window.syncAudioUI) window.syncAudioUI();
+}).catch(() => {
+musicNeedsGesture = true;
 destroyAudioNow(audio);
 syncMusicMotion();
+});
+}, 400);
 });
 }
 
@@ -6254,6 +6305,7 @@ syncMusicMotion();
 
 function startMusic(options = {}) {
 const forceAudible = Boolean(options.forceAudible);
+musicSilentStart = Boolean(options.silentStart);
 if (!window.earthMusicEnabled && !forceAudible) return;
 stopVoiceMusic({ immediate: true });
 window.LuguMusic.claim("earth-music");
@@ -6330,10 +6382,8 @@ voiceMusicFadeFrame = requestAnimationFrame(fadeIn);
 }
 
 function startVoiceMusic(options = {}) {
+if (voiceMusicList.length === 0) return;
 if (!window.earthMusicEnabled) return;
-if (!window.LuguMusicLibrary) return;
-const musicTrack = window.LuguMusicLibrary.pick(voiceMusicContext, voiceMusicRecentIds);
-if (!musicTrack || !musicTrack.url) return;
 stopMusic({ immediate: true });
 window.LuguMusic.claim("earth-music");
 
@@ -6344,9 +6394,8 @@ destroyAudioNow(fadingVoiceAudio);
 voiceAudio = null;
 fadingVoiceAudio = null;
 
-const src = musicTrack.url;
-voiceMusicRecentIds.push(musicTrack.id);
-if (voiceMusicRecentIds.length > 5) voiceMusicRecentIds.shift();
+const src = voiceMusicList[voiceMusicIndex % voiceMusicList.length];
+voiceMusicIndex += 1;
 const audio = new Audio(src);
 voiceAudio = audio;
 window.audio = audio;
