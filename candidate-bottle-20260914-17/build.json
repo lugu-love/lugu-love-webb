@@ -1,0 +1,15 @@
+{
+  "releaseId": "candidate-bottle-20260914-16",
+  "buildId": "candidate-bottle-20260914-16",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "cec42de7ca6f29fee2d1de70349f2d347f3301509aa825ceec313df05bab8316",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/candidate-bottle-20260914-16/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-14T00:00:00Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "candidate": true,
+  "candidateOf": "release-20260913-ui-01",
+  "candidateNote": "对比候选（16）：rabbit-happy 不跳跃 + 兔子回到小瓶后继续在瓶内循环播放（不做自动离场，便于观察逐轮循环观感）。ended 后仍为 150ms、返程前等待 0。只对这一条素材生效；漂流瓶进入动画、其他兔子与狐狸、正式站未改动。"
+}
