@@ -84,8 +84,13 @@ window.__LUGU_BOOT__ = (function () {
   .character-option .character-name { font-size:11px; font-weight:650; white-space:nowrap; }
   .character-option .character-state { font-size:9px; color:#7f89ad; white-space:nowrap; }
   .character-option.active { border-color:#96a4ff; background:rgba(125,139,255,.16); box-shadow:0 0 0 2px rgba(125,139,255,.12); }
-  .character-option:disabled { opacity:.38; cursor:not-allowed; filter:grayscale(.75); }
-  .character-option:disabled .character-state { color:#8a91ad; }
+  /* 未开放使者：弱化但仍可点（点击只给“即将开放”反馈，不切换） */
+  .character-option[data-available="0"] { opacity:.42; filter:grayscale(.75); }
+  .character-option[data-available="0"] .character-state { color:#8a91ad; }
+  .character-avatar-placeholder { width:40px; height:40px; max-width:40px; max-height:40px; border-radius:50%;
+    border:1px dashed rgba(255,255,255,.30); background:rgba(255,255,255,.05);
+    color:rgba(226,230,255,.72); font-size:15px; font-weight:650; line-height:1;
+    display:flex; align-items:center; justify-content:center; }
   .emotions { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:8px 10px; margin:14px 0 8px; position:relative; z-index:30; max-width:min(94vw,520px); }
   .emotion { flex:0 0 auto; min-width:0; min-height:34px; height:auto; line-height:1.2; padding:5px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:var(--muted); font-size:12px; font-weight:600; cursor:pointer; text-align:center; white-space:nowrap; }
   .emotion.active { color:#fff; border-color:var(--accent); background:rgba(125,139,255,.22); box-shadow:0 0 16px rgba(125,139,255,.28); }
@@ -208,6 +213,7 @@ window.__LUGU_BOOT__ = (function () {
       min-height:64px; padding:6px 2px 5px; border-radius:12px; scroll-snap-align:center;
     }
     .character-option img { width:34px; height:34px; max-width:34px; max-height:34px; }
+    .character-option .character-avatar-placeholder { width:34px; height:34px; max-width:34px; max-height:34px; font-size:13px; }
     .character-option .character-name { font-size:12px; }
   }
 </style>
@@ -360,7 +366,8 @@ window.__MAIN__ = function () {
       previewProxy: e.previewProxy || null,
       assetVersion: e.assetVersion || "",
       generationMasterSha256: (e.generationMaster || {}).sha256 || "",
-      delivery: { vp9: webVp9.url || "", hevc: webHevc.url || "", mobileFallback: mobileFallback.url || "" }
+      // 只登记已验收的正式交付；webHevc 是绿幕源，不进入调用清单。
+      delivery: { vp9: webVp9.url || "", mobileFallback: mobileFallback.url || "" }
     };
   }
 
@@ -868,15 +875,21 @@ window.__MAIN__ = function () {
       }
     });
   }
+  // 横滑顺序固定：兔｜狐｜鹿｜熊｜鹤｜猫｜鸥（与 assets/qixing-v1/manifest.json 的
+  // 角色表一致）。第 5 位是「鹤」，不是「鲸」——不得用鲸代替鹤。
+  // avatar 为 null 表示正式头像尚未验收：用中性占位，不新增、不伪造素材、不请求任何图。
   var SEVEN_STARS = [
-    {id:"fengxin-rabbit", short:"兔", official:"风信兔"},
-    {id:"xinguang-fox", short:"狐", official:"心光狐"},
-    {id:"xingyu-deer", short:"鹿", official:"星语鹿"},
-    {id:"shouye-bear", short:"熊", official:"守夜熊"},
-    {id:"menghu-whale", short:"鲸", official:"梦湖鲸"},
-    {id:"guangwei-cat", short:"猫", official:"光尾猫"},
-    {id:"gongming-gull", short:"鸥", official:"共鸣鸥"}
+    {id:"fengxin-rabbit", short:"兔", official:"风信兔", avatar:"assets/characters/seven-stars/fengxin-rabbit/portrait.png"},
+    {id:"xinguang-fox", short:"狐", official:"心光狐", avatar:"assets/characters/seven-stars/xinguang-fox/portrait.png"},
+    {id:"xingyu-deer", short:"鹿", official:"星语鹿", avatar:"assets/characters/seven-stars/xingyu-deer/portrait.png"},
+    {id:"shouye-bear", short:"熊", official:"守夜熊", avatar:"assets/characters/seven-stars/shouye-bear/portrait.png"},
+    {id:"crane", short:"鹤", official:"霁心鹤", avatar:null},
+    {id:"guangwei-cat", short:"猫", official:"光尾猫", avatar:"assets/characters/seven-stars/guangwei-cat/portrait.png"},
+    {id:"gongming-gull", short:"鸥", official:"共鸣鸥", avatar:"assets/characters/seven-stars/gongming-gull/portrait.png"}
   ];
+  // 正式可用角色白名单：素材验收通过前，其余使者一律不能进入主舞台。
+  var UNLOCKED_CHARACTERS = { "fengxin-rabbit":1, "xinguang-fox":1 };
+  function isCharacterUnlocked(id){ return !!UNLOCKED_CHARACTERS[id]; }
   var characterTrigger=document.getElementById("characterTrigger");
   var characterMenu=document.getElementById("characterMenu");
   var characterMenuGrid=document.getElementById("characterMenuGrid");
@@ -892,12 +905,12 @@ window.__MAIN__ = function () {
   // 页面一渲染就有角色可见；R2 正式视频首帧解码完成后浏览器自动用视频帧替换它。
   var PORTRAIT_BY_CHARACTER=(function(){
     var map={};
-    SEVEN_STARS.forEach(function(role){ map[role.id]="assets/characters/seven-stars/"+role.id+"/portrait.png"; });
+    SEVEN_STARS.forEach(function(role){ if(role.avatar) map[role.id]=role.avatar; });
     return map;
   })();
   function setStagePoster(characterId){
     if(!alphaVideo) return;
-    var url=PORTRAIT_BY_CHARACTER[characterId];
+    var url=isCharacterUnlocked(characterId) ? PORTRAIT_BY_CHARACTER[characterId] : null;
     if(!url || alphaVideo.getAttribute("poster") === url) return;
     alphaVideo.setAttribute("poster", url);
   }
@@ -950,16 +963,29 @@ window.__MAIN__ = function () {
     if(!characterMenuGrid || !characterSelect) return;
     characterMenuGrid.innerHTML="";
     SEVEN_STARS.forEach(function(role){
+      // 只有白名单里的角色才算“已开放”；其余即便 manifest 里有素材也不得进入主舞台。
       var option=characterSelect.querySelector('option[value="'+role.id+'"]');
-      var available=!!option;
+      var available=isCharacterUnlocked(role.id) && !!option;
       var b=document.createElement("button");
       b.type="button"; b.className="character-option"+(role.id===currentCharacterId?" active":"");
-      b.dataset.characterId=role.id; b.disabled=!available;
+      b.dataset.characterId=role.id; b.dataset.available=available?"1":"0";
       b.setAttribute("role","option"); b.setAttribute("aria-selected",role.id===currentCharacterId?"true":"false");
-      var img=document.createElement("img"); img.dataset.src="assets/characters/seven-stars/"+role.id+"/portrait.png"; img.alt=role.official; img.loading="lazy"; b.appendChild(img);
+      if(role.avatar){
+        var img=document.createElement("img"); img.dataset.src=role.avatar; img.alt=role.official; img.loading="lazy"; b.appendChild(img);
+      } else {
+        // 正式头像未验收：中性占位，不发任何图片请求，也不用错角色头像顶上。
+        var ph=document.createElement("span"); ph.className="character-avatar-placeholder"; ph.textContent=role.short;
+        ph.setAttribute("aria-hidden","true"); b.appendChild(ph);
+      }
       var name=document.createElement("span"); name.className="character-name"; name.textContent=role.short; b.appendChild(name);
-      var state=document.createElement("span"); state.className="character-state"; state.textContent=available?"":"暂未开放"; b.appendChild(state);
-      if(available){ b.addEventListener("click", function(){ if(characterSelect.value!==role.id){ characterSelect.value=role.id; characterSelect.dispatchEvent(new Event("change",{bubbles:true})); } closeCharacterMenu(); }); }
+      var state=document.createElement("span"); state.className="character-state"; state.textContent=available?"":"即将开放"; b.appendChild(state);
+      if(available){
+        b.addEventListener("click", function(){ if(characterSelect.value!==role.id){ characterSelect.value=role.id; characterSelect.dispatchEvent(new Event("change",{bubbles:true})); } closeCharacterMenu(); });
+      } else {
+        // 未开放：只给轻量反馈，不切换、不加载任何素材。
+        b.setAttribute("aria-disabled","true");
+        b.addEventListener("click", function(e){ e.preventDefault(); e.stopPropagation(); showToast(role.official + " 即将开放"); });
+      }
       characterMenuGrid.appendChild(b);
     });
     if(pickerAvatarsRequested) applyPickerAvatarSrc();
@@ -1007,15 +1033,22 @@ window.__MAIN__ = function () {
 
   function playAlphaVideo(delivery){
     if(!alphaVideo || !delivery) return false;
-    var first = VIDEO_PREFER_HEVC ? delivery.hevc : delivery.vp9;
-    var alternate = VIDEO_PREFER_HEVC ? delivery.vp9 : delivery.hevc;
-    if(!first) first = alternate;
-    if(!first){
+    // ---- 素材准入（2026-09-15 审计结论）------------------------------------
+    // R2 上 19 条素材的 webHevc(.mov) 全部是**未抠像的绿幕源**：ffprobe 显示单轨
+    // yuv420p、无 alpha 通道，逐帧采样绿色占比 82%–92%（manifest 里标注的
+    // "alpha": true 与实物不符）。因此正式调用一律不再使用 delivery.hevc。
+    // 已验收的正式交付只有两种：webVp9（透明）与 mobileFallback（黑底 MP4）。
+    // 桌面端按 VP9 → 黑底 MP4；手机端按 黑底 MP4 → VP9；全部失败才走备用动画。
+    var sources = VIDEO_IS_MOBILE
+      ? [delivery.mobileFallback, delivery.vp9]
+      : [delivery.vp9, delivery.mobileFallback];
+    sources = sources.filter(function(u){ return !!u; });
+    if(!sources.length){
       setStatus("当前情绪暂无浏览器可用透明视频，已切换备用动画", "err");
       return false;
     }
     var token = ++alphaVideoToken;
-    var triedAlternate = false;
+    var sourceIndex = 0;
     function fallbackCanvas(){
       if(token !== alphaVideoToken) return;
       alphaVideo.hidden = true;
@@ -1027,32 +1060,19 @@ window.__MAIN__ = function () {
         setStatus("当前浏览器暂时无法播放该透明视频", "err");
       }
     }
-    if (VIDEO_IS_MOBILE && delivery.mobileFallback) {
-      canvas.hidden = true;
-      alphaVideo.hidden = false;
-      alphaVideo.onerror = null;
-      alphaVideo.src = delivery.mobileFallback;
-      try { alphaVideo.load(); } catch(e) {}
-      var mobilePlay = alphaVideo.play();
-      if(mobilePlay && mobilePlay.catch) mobilePlay.catch(function(){});
-      alphaVideo.onerror = function(){
-        if(token !== alphaVideoToken) return;
-        fallbackCanvas();
-      };
-      return true;
-    }
-    function trySource(url){
+    function tryNextSource(){
       if(token !== alphaVideoToken) return;
-      if(!url){ fallbackCanvas(); return; }
+      if(sourceIndex >= sources.length){ fallbackCanvas(); return; }
+      var url = sources[sourceIndex++];
       canvas.hidden = true;
       alphaVideo.hidden = false;
       alphaVideo.onerror = null;
       alphaVideo.src = url;
       try { alphaVideo.load(); } catch(e) {}
+      // 绿幕/透明度体检：手机与桌面都做，任何绿幕源都不允许上台。
       var checkAlpha = function(){
         alphaVideo.removeEventListener("loadeddata", checkAlpha);
         if(token !== alphaVideoToken) return;
-        if(!VIDEO_IS_MOBILE) return;
         try {
           var c=document.createElement("canvas"); c.width=8; c.height=8;
           var cx=c.getContext("2d"); cx.drawImage(alphaVideo,0,0,8,8);
@@ -1062,30 +1082,25 @@ window.__MAIN__ = function () {
             if(d[i+3] < 20) transparent++;
             else if(d[i+1] > d[i]+30 && d[i+1] > d[i+2]+30) opaqueGreen++;
           }
-          if(transparent < 8 && opaqueGreen > 24) fallbackCanvas();
-        } catch(e) { fallbackCanvas(); }
+          if(transparent < 8 && opaqueGreen > 24){ tryNextSource(); }
+        } catch(e) { /* 采样失败（跨域/解码差异）不阻断正常播放 */ }
       };
       alphaVideo.addEventListener("loadeddata", checkAlpha, {once:true});
       var pr = alphaVideo.play();
       if(pr && pr.catch) pr.catch(function(){});
       alphaVideo.onerror = function(){
         if(token !== alphaVideoToken) return;
-        if(!triedAlternate && alternate && alternate !== url){
-          triedAlternate = true;
-          trySource(alternate);
-        } else {
-          fallbackCanvas();
-        }
+        tryNextSource();
       };
     }
-    trySource(first);
+    tryNextSource();
     return true;
   }
 
   function loadEmotionVisual(){
     cancelAnimationFrame(animId);
     if(!current) return;
-    if(current && current.delivery && (current.delivery.vp9 || current.delivery.hevc)){
+    if(current && current.delivery && (current.delivery.vp9 || current.delivery.mobileFallback)){
       playAlphaVideo(current.delivery);
       return;
     }
@@ -1095,6 +1110,8 @@ window.__MAIN__ = function () {
   }
 
   function switchCharacter(id){
+    // 双重闸门：既要在正式白名单里，也要 manifest 真的交付了该角色的素材。
+    if(!isCharacterUnlocked(id)) return;
     if(!CHARACTERS[id] || !CHARACTERS[id].emotions || CHARACTERS[id].emotions.length === 0) return;
     userCancelInFlight();
     releaseAlphaVideo();
