@@ -1,0 +1,15 @@
+{
+  "releaseId": "candidate-bottle-20260914-13",
+  "buildId": "candidate-bottle-20260914-13",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "cec42de7ca6f29fee2d1de70349f2d347f3301509aa825ceec313df05bab8316",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/candidate-bottle-20260914-13/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-14T00:00:00Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "candidate": true,
+  "candidateOf": "release-20260913-ui-01",
+  "candidateNote": "兔子不跳跃版试验候选（13）：只关闭使者层自身的两处垂直位移（13px pre-shake 上抬 + wake 抖动 ±4~6px）；漂流瓶从远处飘来动画、瓶子、地球、播放与离场流程全部未动。可用 ?item=rabbit-happy 固定看这条兔子，再用 ?nojump=1 可额外关闭“跳出瓶子到屏幕中央”的前场表演。"
+}
