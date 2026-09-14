@@ -1,0 +1,15 @@
+{
+  "releaseId": "candidate-bottle-20260914-24",
+  "buildId": "candidate-bottle-20260914-24",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "cec42de7ca6f29fee2d1de70349f2d347f3301509aa825ceec313df05bab8316",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/candidate-bottle-20260914-24/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-14T00:00:00Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "candidate": true,
+  "candidateOf": "release-20260913-ui-01",
+  "candidateNote": "候选 24（音乐修复）：瓶内静音角色视频起播时不再停掉背景音乐——把 earth-music 的停止回调包一层，忽略由瓶内视频起播触发的停止请求；冻结的漂流瓶定位/小跳/循环/时间链参数一律未改。"
+}
