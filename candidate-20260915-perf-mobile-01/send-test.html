@@ -222,7 +222,7 @@ window.__LUGU_BOOT__ = (function () {
     <div class="edit-top">
       <div class="brand" id="brand"><a class="back-home" href="index.html" aria-label="返回首页">← 首页</a><span class="brand-title"><span class="brand-main">七星使者</span><span class="brand-sub">· 心意表达</span></span><nav class="intent-nav" aria-label="心意表达入口"><span class="active">情绪</span><span class="sep">｜</span><span>祝福</span><span class="sep">｜</span><span>问候</span></nav></div>
 
-      <div class="stage-wrap"><canvas id="stage" width="540" height="540"></canvas><video id="alphaVideo" autoplay muted loop playsinline webkit-playsinline preload="metadata" crossorigin="anonymous" hidden></video></div>
+      <div class="stage-wrap"><canvas id="stage" width="540" height="540" hidden></canvas><video id="alphaVideo" autoplay muted loop playsinline webkit-playsinline preload="metadata" crossorigin="anonymous" poster="assets/characters/seven-stars/fengxin-rabbit/portrait.png"></video></div>
 
 
       <div class="emotions" id="emotions"></div>
@@ -888,6 +888,19 @@ window.__MAIN__ = function () {
   var compactPickerQuery=null;
   try { compactPickerQuery=window.matchMedia("(max-width: 560px)"); } catch(e) { compactPickerQuery=null; }
   function isCompactPicker(){ return compactPickerQuery ? compactPickerQuery.matches : (window.innerWidth||0) <= 560; }
+  // 首屏优先：当前使者用一张 28–35KB 的头像做“首帧占位”（poster），
+  // 页面一渲染就有角色可见；R2 正式视频首帧解码完成后浏览器自动用视频帧替换它。
+  var PORTRAIT_BY_CHARACTER=(function(){
+    var map={};
+    SEVEN_STARS.forEach(function(role){ map[role.id]="assets/characters/seven-stars/"+role.id+"/portrait.png"; });
+    return map;
+  })();
+  function setStagePoster(characterId){
+    if(!alphaVideo) return;
+    var url=PORTRAIT_BY_CHARACTER[characterId];
+    if(!url || alphaVideo.getAttribute("poster") === url) return;
+    alphaVideo.setAttribute("poster", url);
+  }
   function placeCharacterMenu(){
     if(!characterMenu || !characterPickerEl || !subActionsEl) return;
     var compact=isCompactPicker();
@@ -1087,6 +1100,7 @@ window.__MAIN__ = function () {
     releaseAlphaVideo();
     cancelAnimationFrame(animId);
     currentCharacterId = id;
+    setStagePoster(id);
     EMOTIONS = CHARACTERS[id].emotions;
     current = EMOTIONS[0];
     renderCharacterSelect();
@@ -1111,6 +1125,7 @@ window.__MAIN__ = function () {
   if(characterSelect){
     characterSelect.addEventListener("change", function(){ switchCharacter(this.value); });
   }
+  setStagePoster(currentCharacterId);
   renderCharacterSelect();
   if (fwdE) {
     var _fwdEmo = EMOTIONS.find(function (x) { return x.id === String(fwdE); });
@@ -1124,6 +1139,7 @@ window.__MAIN__ = function () {
         currentCharacterId = requestedCharacterId;
         EMOTIONS = CHARACTERS[currentCharacterId].emotions;
       }
+      setStagePoster(currentCharacterId);
       var keepId = fwdE ? String(fwdE) : (current && current.id);
       current = EMOTIONS.find(function(e){ return e.id === keepId; }) || EMOTIONS[0];
       renderCharacterSelect();
