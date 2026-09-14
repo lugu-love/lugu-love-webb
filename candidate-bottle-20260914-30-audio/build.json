@@ -1,0 +1,15 @@
+{
+  "releaseId": "candidate-bottle-20260914-30-audio",
+  "buildId": "candidate-bottle-20260914-30-audio",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "cec42de7ca6f29fee2d1de70349f2d347f3301509aa825ceec313df05bab8316",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/candidate-bottle-20260914-30-audio/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-14T00:00:00Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "candidate": true,
+  "candidateOf": "release-20260913-ui-01",
+  "candidateNote": "候选 30（地球首页音频修复·第二步）：手势内启动的这一个音乐元素作为持续存在的播放器（loop），不再运行中新建/销毁元素，避免后续交叉淡入被 NotAllowedError 拦截；笑声→钟声→音乐淡入的顺序与声音开关不变。漂流瓶与冻结参数未改。"
+}
