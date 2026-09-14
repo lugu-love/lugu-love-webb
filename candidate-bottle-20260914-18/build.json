@@ -1,0 +1,15 @@
+{
+  "releaseId": "candidate-bottle-20260914-18",
+  "buildId": "candidate-bottle-20260914-18",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "cec42de7ca6f29fee2d1de70349f2d347f3301509aa825ceec313df05bab8316",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/candidate-bottle-20260914-18/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-14T00:00:00Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "candidate": true,
+  "candidateOf": "release-20260913-ui-01",
+  "candidateNote": "候选 18：在 17 的基础上，rabbit-happy 的使者层再下移 3px（10px→13px）。其余不变：小瓶阶段持续循环（忽略音乐协调脚本的全局暂停）、不跳跃、视频结束 150ms 后返程、回到小瓶后继续循环。只对该条目生效，其他素材与漂流瓶动画未动。"
+}
