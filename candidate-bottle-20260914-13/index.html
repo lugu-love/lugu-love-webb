@@ -1633,11 +1633,11 @@ animation: fengxin-rabbit-wake 1.55s ease-in-out forwards;
      2) 1.55s 的 wake 抖动里 ±4~6px 的上下位移与 ±5° 倾斜。
    漂流瓶从远处飘来的动画、瓶子位置/缩放/轨迹、地球、播放与离场流程都不动。
    兔子素材本身就是原地表演（脚底 X/Y 跨度 ≤0.47px），所以脚底改用固定位置即可。 */
-.voice-bottle .fengxin-rabbit-demo.is-near.is-pre-shake {
+.voice-bottle.is-nojump-test .fengxin-rabbit-demo.is-near.is-pre-shake {
 transform: translateX(-50%);
 }
 
-.voice-bottle .fengxin-rabbit-demo.is-awakening {
+.voice-bottle.is-nojump-test .fengxin-rabbit-demo.is-awakening {
 animation: none;
 }
 
@@ -6724,6 +6724,9 @@ const safeTime = formatLetterTime().replace(/[&<>"']/g, (char) => ({
 }[char]));
 
 bottle.className = "voice-bottle";
+// 本候选（兔子不跳跃试验）：只对这一条兔子关闭使者层自身的垂直位移，
+// 其他兔子与狐狸一律保持原样。
+if (rabbitSequence && rabbitSequence.id === "rabbit-happy") bottle.classList.add("is-nojump-test");
 const bottleStartX = star.currentX || star.startX;
 const bottleStartY = star.currentY || star.startY;
 bottle.style.setProperty("--bottle-x", `${bottleStartX}px`);
