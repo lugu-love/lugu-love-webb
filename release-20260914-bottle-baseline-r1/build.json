@@ -1,0 +1,15 @@
+{
+  "releaseId": "release-20260914-bottle-baseline-r1",
+  "buildId": "release-20260914-bottle-baseline-r1",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "cec42de7ca6f29fee2d1de70349f2d347f3301509aa825ceec313df05bab8316",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/release-20260914-bottle-baseline-r1/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-14T07:32:25.626Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "baseline": "bottle-baseline-20260914-r1",
+  "baselineSource": "candidate-bottle-20260914-23（19 条统一模式 + 停稳小跳 2.48s / 最高 -6.6px）",
+  "frozenIndexSha256": "6cf9c0b7414db2085777bbaf4cd9483b4ac100f0472c024d1cc974ac5eb7e350"
+}
