@@ -1,0 +1,15 @@
+{
+  "releaseId": "candidate-bottle-20260914-04",
+  "buildId": "candidate-bottle-20260914-04",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "cec42de7ca6f29fee2d1de70349f2d347f3301509aa825ceec313df05bab8316",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/candidate-bottle-20260914-04/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-14T00:00:00Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "candidate": true,
+  "candidateOf": "release-20260913-ui-01",
+  "candidateNote": "漂流瓶候选版 04：漂流瓶进入动画/轨迹/缩放/定位全部恢复为候选 01（7c3a895，即原版“从远处飘来”）参数，唯一改动是使者内部显示层整体下移 18px；正式入口仍指向 release-20260913-ui-01。"
+}
