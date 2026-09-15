@@ -63,6 +63,7 @@ window.__LUGU_BOOT__ = (function () {
   .brand-c { font-family:"Avenir Next","PingFang SC","Hiragino Sans GB",sans-serif; font-weight:450; letter-spacing:.015em; }
   .intent-nav { margin-left:auto; display:inline-flex; align-items:center; gap:4px; color:rgba(238,240,255,.42); font-size:13px; letter-spacing:0; white-space:nowrap; }
   .intent-nav .active { color:rgba(238,240,255,.92); font-weight:650; }
+  .intent-nav a { color:inherit; text-decoration:none; }
   .intent-nav .sep { color:rgba(238,240,255,.22); }
   .stage-wrap { display:flex; align-items:center; justify-content:center; min-height:0; pointer-events:none; margin-top:8px; }
   #stage { width:min(68vw,300px); height:auto; border-radius:18px; pointer-events:none; mix-blend-mode:lighten; }   /* 去黑底：黑色精灵背景与深色页面混合消失，只留兔子 */
@@ -281,7 +282,7 @@ window.__LUGU_BOOT__ = (function () {
 
   <div class="app">
     <div class="edit-top">
-      <div class="brand" id="brand"><a class="back-home" href="index.html" aria-label="返回首页">← 首页</a><span class="brand-title"><span class="brand-main">七星使者</span><span class="brand-sub">· 心意表达</span></span><nav class="intent-nav" aria-label="心意表达入口"><span class="active">情绪</span><span class="sep">｜</span><span>祝福</span><span class="sep">｜</span><span>问候</span></nav></div>
+      <div class="brand" id="brand"><a class="back-home" href="index.html" aria-label="返回首页">← 首页</a><span class="brand-title"><span class="brand-main">七星使者</span><span class="brand-sub">· 心意表达</span></span><nav class="intent-nav" aria-label="心意表达入口"><span class="active">情绪</span><span class="sep">｜</span><a href="blessing.html">祝福</a><span class="sep">｜</span><span>问候</span></nav></div>
 
       <div class="stage-wrap"><canvas id="stage" width="540" height="540" hidden></canvas><video id="alphaVideo" autoplay muted loop playsinline webkit-playsinline preload="metadata" crossorigin="anonymous"></video></div>
 
