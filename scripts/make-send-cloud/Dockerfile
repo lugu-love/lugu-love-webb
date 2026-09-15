@@ -14,7 +14,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY server.py tts_provider.py text_layout.py journey_store.py ./
+COPY server.py tts_provider.py text_layout.py journey_store.py blessing-manifest.json ./
 COPY template/ template/
 
 # generationMaster 只能来自 manifest 声明的目录，不再下载或猜测历史 masters。

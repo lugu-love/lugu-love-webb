@@ -1,0 +1,276 @@
+{
+  "schemaVersion": 1,
+  "releaseId": "release-20260915-fox-blessing-v1",
+  "buildId": "release-20260915-fox-blessing-v1",
+  "manifestVersion": "20260915-fox-blessing-v1",
+  "updatedAt": "2026-09-15",
+  "description": "狐狸祝福动作独立合同；不影响既有19条情绪生产项。",
+  "items": {
+    "fox-blessing-flowers": {
+      "itemId": "fox-blessing-flowers",
+      "status": "production",
+      "contentType": "blessing",
+      "action": "flowers",
+      "code": "01",
+      "label": "送花",
+      "displayName": "狐使者·送花",
+      "characterId": "xinguang-fox",
+      "emotionId": "blessing",
+      "assetVersion": "fox-blessing-flowers-v1",
+      "quickScenes": {
+        "general": "把这束花送给你，愿你今天也被温柔以待。",
+        "festival": "愿每一个值得庆祝的日子，都有花香和笑意。",
+        "thanks": "谢谢你一直在，这份心意送给你。"
+      },
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "fox_blessing_flowers_generation_alpha_v1.mkv",
+        "sha256": "3eba301336cd82b65d674b3b42c4663e5df28c6541b92b0c70af41308ea2c59e",
+        "container": "mkv",
+        "source": {
+          "fileName": "01送花_birefnet_alpha_v1.mov",
+          "sha256": "c1dc377ed821bebc5bbc232c988dd5168469d4c528be2223e13d23907c2994aa"
+        }
+      },
+      "backend": {
+        "speechStart": 1.5,
+        "subjectBox": [
+          0,
+          25,
+          719,
+          928
+        ],
+        "sourceWidth": 720,
+        "sourceHeight": 960
+      }
+    },
+    "fox-blessing-cake": {
+      "itemId": "fox-blessing-cake",
+      "status": "production",
+      "contentType": "blessing",
+      "action": "cake",
+      "code": "02",
+      "label": "蛋糕",
+      "displayName": "狐使者·蛋糕",
+      "characterId": "xinguang-fox",
+      "emotionId": "blessing",
+      "assetVersion": "fox-blessing-cake-v1",
+      "quickScenes": {
+        "general": "愿甜甜的心意，陪你度过今天。",
+        "festival": "愿这份甜蜜，点亮你的每一个好日子。",
+        "thanks": "谢谢你带来的甜，也想把这份甜送给你。"
+      },
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "fox_blessing_cake_generation_alpha_v1.mkv",
+        "sha256": "a6078163dbb38eb5c73b46f5673d103b9657844c90419b5ff53fab8ee4e8769c",
+        "container": "mkv",
+        "source": {
+          "fileName": "02蛋糕_birefnet_alpha_v1.mov",
+          "sha256": "5f786fc3954cfbb7b7813cae0b5300c6f58cd5df19c75af717796e2df05e2b36"
+        }
+      },
+      "backend": {
+        "speechStart": 1.5,
+        "subjectBox": [
+          48,
+          42,
+          719,
+          940
+        ],
+        "sourceWidth": 720,
+        "sourceHeight": 960
+      }
+    },
+    "fox-blessing-hug": {
+      "itemId": "fox-blessing-hug",
+      "status": "production",
+      "contentType": "blessing",
+      "action": "hug",
+      "code": "04",
+      "label": "拥抱",
+      "displayName": "狐使者·拥抱",
+      "characterId": "xinguang-fox",
+      "emotionId": "blessing",
+      "assetVersion": "fox-blessing-hug-v1",
+      "quickScenes": {
+        "general": "想给你一个拥抱，愿你被温柔包围。",
+        "festival": "愿这一刻的拥抱，把快乐和安心都送给你。",
+        "thanks": "谢谢你一直在，想给你一个温暖的拥抱。"
+      },
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "fox_blessing_hug_generation_alpha_v1.mkv",
+        "sha256": "cb024993ffcf204cb4e8c004b6a1a4e70c247a03c40be93fb66dc824b06acc48",
+        "container": "mkv",
+        "source": {
+          "fileName": "04拥抱_birefnet_alpha_v1.mov",
+          "sha256": "ddaa8426266c9bb921c6a042144d7a12a96151da3588120850f7c5cf51c934d7"
+        }
+      },
+      "backend": {
+        "speechStart": 1.5,
+        "subjectBox": [
+          50,
+          49,
+          719,
+          936
+        ],
+        "sourceWidth": 720,
+        "sourceHeight": 960
+      }
+    },
+    "fox-blessing-heart": {
+      "itemId": "fox-blessing-heart",
+      "status": "production",
+      "contentType": "blessing",
+      "action": "heart",
+      "code": "06",
+      "label": "爱心",
+      "displayName": "狐使者·爱心",
+      "characterId": "xinguang-fox",
+      "emotionId": "blessing",
+      "assetVersion": "fox-blessing-heart-v1",
+      "quickScenes": {
+        "general": "把一份真心送给你，愿你被好好珍惜。",
+        "festival": "愿每一份真心，都在今天被温柔回应。",
+        "thanks": "谢谢你出现在我的生活里，这份真心送给你。"
+      },
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "fox_blessing_heart_generation_alpha_v1.mkv",
+        "sha256": "8678aee6ad8754d9e9b6dc0b407462537b049673f88823a8c3cfe0894c1c7af4",
+        "container": "mkv",
+        "source": {
+          "fileName": "06爱心_birefnet_alpha_v1.mov",
+          "sha256": "b5d624c2a7376cab82c9fd1c41b558a840a039ab4a43c3f8c062da0d0e882786"
+        }
+      },
+      "backend": {
+        "speechStart": 1.5,
+        "subjectBox": [
+          74,
+          40,
+          719,
+          912
+        ],
+        "sourceWidth": 720,
+        "sourceHeight": 960
+      }
+    },
+    "fox-blessing-kiss": {
+      "itemId": "fox-blessing-kiss",
+      "status": "production",
+      "contentType": "blessing",
+      "action": "kiss",
+      "code": "07",
+      "label": "飞吻",
+      "displayName": "狐使者·飞吻",
+      "characterId": "xinguang-fox",
+      "emotionId": "blessing",
+      "assetVersion": "fox-blessing-kiss-v1",
+      "quickScenes": {
+        "general": "送你一个飞吻，愿你今天甜甜的。",
+        "festival": "愿这个飞吻，把快乐和好运一起带给你。",
+        "thanks": "谢谢你一直在，送你一个轻轻的飞吻。"
+      },
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "fox_blessing_kiss_generation_alpha_v1.mkv",
+        "sha256": "4a0d3e971c1f18ca1a287bef514ee9a6f86fd8dfcda8edf65691f4cb58d68c6a",
+        "container": "mkv",
+        "source": {
+          "fileName": "07飞吻_birefnet_alpha_v1.mov",
+          "sha256": "137e5ebc77f1fb28b3b475254ac738527e6742b8125f5714027bd00b398f3b8c"
+        }
+      },
+      "backend": {
+        "speechStart": 1.5,
+        "subjectBox": [
+          58,
+          33,
+          719,
+          919
+        ],
+        "sourceWidth": 720,
+        "sourceHeight": 960
+      }
+    },
+    "fox-blessing-applause": {
+      "itemId": "fox-blessing-applause",
+      "status": "production",
+      "contentType": "blessing",
+      "action": "applause",
+      "code": "08",
+      "label": "鼓掌",
+      "displayName": "狐使者·鼓掌",
+      "characterId": "xinguang-fox",
+      "emotionId": "blessing",
+      "assetVersion": "fox-blessing-applause-v1",
+      "quickScenes": {
+        "general": "为你鼓掌，愿你每一步都闪闪发光。",
+        "festival": "愿所有值得庆祝的时刻，都有热烈掌声。",
+        "thanks": "谢谢你做到了，也谢谢一直努力的你。"
+      },
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "fox_blessing_applause_generation_alpha_v1.mkv",
+        "sha256": "bb21757cd46d6e7633e0f5e260eba9fec87f057dfc8234c52cff59880f422c33",
+        "container": "mkv",
+        "source": {
+          "fileName": "08鼓掌_birefnet_alpha_v1.mov",
+          "sha256": "1b4271eecfef839b653cbd0a328bc75ba991d845a3e155e3775fded6e0801aec"
+        }
+      },
+      "backend": {
+        "speechStart": 1.5,
+        "subjectBox": [
+          45,
+          26,
+          713,
+          941
+        ],
+        "sourceWidth": 720,
+        "sourceHeight": 960
+      }
+    },
+    "fox-blessing-prayer": {
+      "itemId": "fox-blessing-prayer",
+      "status": "production",
+      "contentType": "blessing",
+      "action": "prayer",
+      "code": "09",
+      "label": "祈福",
+      "displayName": "狐使者·祈福",
+      "characterId": "xinguang-fox",
+      "emotionId": "blessing",
+      "assetVersion": "fox-blessing-prayer-v1",
+      "quickScenes": {
+        "general": "愿你所盼皆如愿，所行皆坦途。",
+        "festival": "愿所有美好都如约而至，平安喜乐常相伴。",
+        "thanks": "谢谢你一直都在，愿平安和好运常伴你左右。"
+      },
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "fox_blessing_prayer_generation_alpha_v1.mkv",
+        "sha256": "e08ed0ce8cde05b8e7faf58a5eb9a9a561ea3f15a69e15a0a4825af3dd935bd0",
+        "container": "mkv",
+        "source": {
+          "fileName": "09祈福_birefnet_alpha_v1.mov",
+          "sha256": "5d03ce04f507a285e0f010fc3830913a9a4c0caf29c4922bac716bf85fbed973"
+        }
+      },
+      "backend": {
+        "speechStart": 1.5,
+        "subjectBox": [
+          77,
+          37,
+          719,
+          938
+        ],
+        "sourceWidth": 720,
+        "sourceHeight": 960
+      }
+    }
+  }
+}

@@ -35,6 +35,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 ROOT = os.path.dirname(os.path.abspath(__file__))
 GENERATION_MASTERS_DIR = os.environ.get("GENERATION_MASTERS_DIR", os.path.join(ROOT, "generation-masters"))
 ASSET_MANIFEST_FILE = os.environ.get("ASSET_MANIFEST_FILE", os.path.join(ROOT, "asset-manifest.json"))
+BLESSING_MANIFEST_FILE = os.environ.get("BLESSING_MANIFEST_FILE", os.path.join(ROOT, "blessing-manifest.json"))
 POC_SAMPLE_FILE = os.path.join(ROOT, "poc", "sample.mp4")
 FFMPEG = os.environ.get("FFMPEG_BIN", "ffmpeg")
 FONT_FILE = os.environ.get("FONT_FILE", "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc")
@@ -81,11 +82,39 @@ def _load_asset_manifest():
     return manifest
 
 
+def _load_blessing_manifest():
+    """Load the independent fox blessing contract without changing the legacy 19-item contract."""
+    with open(BLESSING_MANIFEST_FILE, "r", encoding="utf-8") as f:
+        manifest = json.load(f)
+    if manifest.get("schemaVersion") != 1:
+        raise RuntimeError("unsupported blessing manifest schema")
+    items = manifest.get("items") or {}
+    if len(items) != 7:
+        raise RuntimeError("invalid blessing item count")
+    for item_id, item in items.items():
+        if item.get("itemId") != item_id or item.get("status") != "production":
+            raise RuntimeError("invalid blessing identity: %s" % item_id)
+        if item.get("characterId") != "xinguang-fox" or item.get("contentType") != "blessing":
+            raise RuntimeError("invalid blessing ownership: %s" % item_id)
+        if not item.get("assetVersion"):
+            raise RuntimeError("missing blessing asset version: %s" % item_id)
+        master = item.get("generationMaster") or {}
+        if not master.get("ref") or not master.get("sha256"):
+            raise RuntimeError("missing blessing generation master: %s" % item_id)
+    return manifest
+
+
 ASSET_MANIFEST = _load_asset_manifest()
+BLESSING_MANIFEST = _load_blessing_manifest()
 RELEASE_ID = ASSET_MANIFEST["releaseId"]
 BUILD_ID = ASSET_MANIFEST["buildId"]
 MANIFEST_VERSION = ASSET_MANIFEST["manifestVersion"]
-_emotions = ASSET_MANIFEST["items"]
+BLESSING_RELEASE_ID = BLESSING_MANIFEST["releaseId"]
+BLESSING_BUILD_ID = BLESSING_MANIFEST["buildId"]
+BLESSING_MANIFEST_VERSION = BLESSING_MANIFEST["manifestVersion"]
+_emotion_items = ASSET_MANIFEST["items"]
+_blessing_items = BLESSING_MANIFEST["items"]
+_emotions = {**_emotion_items, **_blessing_items}
 MASTERS = {}
 JOURNEY_META = {}
 
@@ -117,12 +146,16 @@ for _item_id, _e in _emotions.items():
 
 
 def _contract_error(item, requested_character, build_id, manifest_version, asset_version="", expected_master_sha256=""):
-    if build_id != BUILD_ID or manifest_version != MANIFEST_VERSION:
+    is_blessing = item in _blessing_items
+    expected_build = BLESSING_BUILD_ID if is_blessing else BUILD_ID
+    expected_manifest = BLESSING_MANIFEST_VERSION if is_blessing else MANIFEST_VERSION
+    if build_id != expected_build or manifest_version != expected_manifest:
         return 409, {
             "error": "VERSION_MISMATCH",
             "message": "页面版本与生成服务不一致，请刷新页面后重试。",
-            "buildId": BUILD_ID,
-            "manifestVersion": MANIFEST_VERSION,
+            "buildId": expected_build,
+            "manifestVersion": expected_manifest,
+            "contentType": "blessing" if is_blessing else "emotion",
         }
     if item not in _emotions:
         return 404, {"error": "item not found", "item": item}
@@ -130,7 +163,7 @@ def _contract_error(item, requested_character, build_id, manifest_version, asset
     if not requested_character or requested_character != actual_character:
         return 409, {
             "error": "CHARACTER_MISMATCH",
-            "message": "角色与情绪映射不一致，请刷新页面后重试。",
+            "message": "角色与动作映射不一致，请刷新页面后重试。",
             "itemId": item,
             "characterId": actual_character,
         }
@@ -992,10 +1025,14 @@ def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts
     actual_entry = _emotions.get(actual_item)
     if not actual_entry or actual_item not in MASTERS:
         raise RuntimeError("item not found")
+    is_blessing = actual_item in _blessing_items
+    expected_release = BLESSING_RELEASE_ID if is_blessing else RELEASE_ID
+    expected_build = BLESSING_BUILD_ID if is_blessing else BUILD_ID
+    expected_manifest = BLESSING_MANIFEST_VERSION if is_blessing else MANIFEST_VERSION
     actual_character = actual_entry.get("characterId")
-    if build_id and build_id != BUILD_ID:
+    if build_id and build_id != expected_build:
         raise RuntimeError("build id mismatch")
-    if manifest_version and manifest_version != MANIFEST_VERSION:
+    if manifest_version and manifest_version != expected_manifest:
         raise RuntimeError("manifest version mismatch")
     if requested_item and requested_item != actual_item:
         raise RuntimeError("requested item mismatch")
@@ -1018,9 +1055,9 @@ def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts
         "actualItem": actual_item,
         "requestedCharacter": requested_character or actual_character,
         "actualCharacter": actual_character,
-        "releaseId": RELEASE_ID,
-        "buildId": BUILD_ID,
-        "manifestVersion": MANIFEST_VERSION,
+        "releaseId": expected_release,
+        "buildId": expected_build,
+        "manifestVersion": expected_manifest,
         "requestedAssetVersion": requested_asset_version or actual_asset_version,
         "actualAssetVersion": actual_asset_version,
         "expectedMasterSHA256": expected_master,
@@ -1412,7 +1449,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
         if path == "/status":
-            return self._send_json(200, {"enabled": read_enabled(), "releaseId": RELEASE_ID, "buildId": BUILD_ID, "manifestVersion": MANIFEST_VERSION, "rabbitMasters": sum(1 for k in MASTERS if k.startswith("rabbit-")), "foxMasters": sum(1 for k in MASTERS if k.startswith("fox-")), "productionItems": len(MASTERS), "fps": FPS, "bitrate_kbps": BITRATE_KBPS})
+            return self._send_json(200, {"enabled": read_enabled(), "releaseId": RELEASE_ID, "buildId": BUILD_ID, "manifestVersion": MANIFEST_VERSION, "blessingReleaseId": BLESSING_RELEASE_ID, "blessingBuildId": BLESSING_BUILD_ID, "blessingManifestVersion": BLESSING_MANIFEST_VERSION, "rabbitMasters": sum(1 for k in _emotion_items if k.startswith("rabbit-")), "foxMasters": sum(1 for k in _emotion_items if k.startswith("fox-")), "productionItems": len(_emotion_items), "blessingItems": len(_blessing_items), "fps": FPS, "bitrate_kbps": BITRATE_KBPS})
         if path == "/welcome":
             return self._welcome_public()
         if path == "/.well-known/assetlinks.json":
@@ -1685,9 +1722,9 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
             self.send_header("Content-Length", str(len(data)))
             self.send_header("Content-Disposition", 'attachment; filename="%s.mp4"' % item)
             self.send_header("Cache-Control", "no-store")
-            self.send_header("X-Release-Id", RELEASE_ID)
-            self.send_header("X-Build-Id", BUILD_ID)
-            self.send_header("X-Manifest-Version", MANIFEST_VERSION)
+            self.send_header("X-Release-Id", meta.get("releaseId", RELEASE_ID))
+            self.send_header("X-Build-Id", meta.get("buildId", BUILD_ID))
+            self.send_header("X-Manifest-Version", meta.get("manifestVersion", MANIFEST_VERSION))
             self.send_header("X-TTS-Provider", meta.get("actualProvider", ""))
             self.send_header("X-TTS-Voice", meta.get("actualVoiceId", ""))
             self.send_header("X-TTS-Provider-Voice", meta.get("providerVoiceId", ""))
