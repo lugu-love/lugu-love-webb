@@ -1,0 +1,363 @@
+{
+  "schemaVersion": 1,
+  "contract": {
+    "releaseId": "release-20260915-fox-blessing-v1",
+    "buildId": "release-20260915-fox-blessing-v1",
+    "manifestVersion": "20260915-fox-blessing-v1"
+  },
+  "updatedAt": "2026-09-15",
+  "actions": {
+    "fox-blessing-flowers": {
+      "itemId": "fox-blessing-flowers",
+      "status": "approved-manual-review",
+      "contentType": "blessing",
+      "action": "flowers",
+      "code": "01",
+      "label": "送花",
+      "displayName": "狐使者·送花",
+      "characterId": "xinguang-fox",
+      "assetVersion": "fox-blessing-flowers-v1",
+      "quickScenes": {
+        "general": "把这束花送给你，愿你今天也被温柔以待。",
+        "festival": "愿每一个值得庆祝的日子，都有花香和笑意。",
+        "thanks": "谢谢你一直在，这份心意送给你。"
+      },
+      "generationMaster": {
+        "ref": "fox_blessing_flowers_generation_alpha_v1.mkv",
+        "sha256": "3eba301336cd82b65d674b3b42c4663e5df28c6541b92b0c70af41308ea2c59e"
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/01-flowers/delivery/fox_blessing_flowers_alpha_vp9.webm",
+        "sha256": "9314287f24070b1a1747c3b774020db12447318c06d6838f44965f749630a2ac",
+        "size": 9288726,
+        "contentType": "video/webm",
+        "alpha": true,
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 361,
+        "duration": 15.041667
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/01-flowers/delivery/fox_blessing_flowers_alpha_hevc.mov",
+        "sha256": "21c8e091d638422b44f9a0e6072ec91747c506b3fc778ec7d95b5d0a33783228",
+        "size": 6118328,
+        "contentType": "video/quicktime",
+        "alpha": true,
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 361,
+        "duration": 15.041667
+      },
+      "master": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/01-flowers/delivery/fox_blessing_flowers_alpha_v1.mov",
+        "sha256": "c1dc377ed821bebc5bbc232c988dd5168469d4c528be2223e13d23907c2994aa",
+        "contentType": "video/quicktime"
+      }
+    },
+    "fox-blessing-cake": {
+      "itemId": "fox-blessing-cake",
+      "status": "approved-manual-review",
+      "contentType": "blessing",
+      "action": "cake",
+      "code": "02",
+      "label": "蛋糕",
+      "displayName": "狐使者·蛋糕",
+      "characterId": "xinguang-fox",
+      "assetVersion": "fox-blessing-cake-v1",
+      "quickScenes": {
+        "general": "愿甜甜的心意，陪你度过今天。",
+        "festival": "愿这份甜蜜，点亮你的每一个好日子。",
+        "thanks": "谢谢你带来的甜，也想把这份甜送给你。"
+      },
+      "generationMaster": {
+        "ref": "fox_blessing_cake_generation_alpha_v1.mkv",
+        "sha256": "a6078163dbb38eb5c73b46f5673d103b9657844c90419b5ff53fab8ee4e8769c"
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/02-cake/delivery/fox_blessing_cake_alpha_vp9.webm",
+        "sha256": "8ed5200f02ca8d9c8c3f514524f17cae54b26bc8eea689af94c6b4c6507971f7",
+        "size": 9261000,
+        "contentType": "video/webm",
+        "alpha": true,
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 361,
+        "duration": 15.041667
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/02-cake/delivery/fox_blessing_cake_alpha_hevc.mov",
+        "sha256": "b5d6b605cfc699ecbe3f2a8092fba60458417f06cdc6c300d66f1d139d148351",
+        "size": 5956788,
+        "contentType": "video/quicktime",
+        "alpha": true,
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 361,
+        "duration": 15.041667
+      },
+      "master": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/02-cake/delivery/fox_blessing_cake_alpha_v1.mov",
+        "sha256": "5f786fc3954cfbb7b7813cae0b5300c6f58cd5df19c75af717796e2df05e2b36",
+        "contentType": "video/quicktime"
+      }
+    },
+    "fox-blessing-hug": {
+      "itemId": "fox-blessing-hug",
+      "status": "approved-manual-review",
+      "contentType": "blessing",
+      "action": "hug",
+      "code": "04",
+      "label": "拥抱",
+      "displayName": "狐使者·拥抱",
+      "characterId": "xinguang-fox",
+      "assetVersion": "fox-blessing-hug-v1",
+      "quickScenes": {
+        "general": "想给你一个拥抱，愿你被温柔包围。",
+        "festival": "愿这一刻的拥抱，把快乐和安心都送给你。",
+        "thanks": "谢谢你一直在，想给你一个温暖的拥抱。"
+      },
+      "generationMaster": {
+        "ref": "fox_blessing_hug_generation_alpha_v1.mkv",
+        "sha256": "cb024993ffcf204cb4e8c004b6a1a4e70c247a03c40be93fb66dc824b06acc48"
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/04-hug/delivery/fox_blessing_hug_alpha_vp9.webm",
+        "sha256": "95e32a27e177d149901b386fc02a04bf051f2a55dd452abbaa02584618f3e720",
+        "size": 8242033,
+        "contentType": "video/webm",
+        "alpha": true,
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 361,
+        "duration": 15.041667
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/04-hug/delivery/fox_blessing_hug_alpha_hevc.mov",
+        "sha256": "e550d6a5f93fdc43a0f0d6f92b2cb6179085f10a572332cda132d258d765bb19",
+        "size": 5811307,
+        "contentType": "video/quicktime",
+        "alpha": true,
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 361,
+        "duration": 15.041667
+      },
+      "master": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/04-hug/delivery/fox_blessing_hug_alpha_v1.mov",
+        "sha256": "ddaa8426266c9bb921c6a042144d7a12a96151da3588120850f7c5cf51c934d7",
+        "contentType": "video/quicktime"
+      }
+    },
+    "fox-blessing-heart": {
+      "itemId": "fox-blessing-heart",
+      "status": "approved-manual-review",
+      "contentType": "blessing",
+      "action": "heart",
+      "code": "06",
+      "label": "爱心",
+      "displayName": "狐使者·爱心",
+      "characterId": "xinguang-fox",
+      "assetVersion": "fox-blessing-heart-v1",
+      "quickScenes": {
+        "general": "把一份真心送给你，愿你被好好珍惜。",
+        "festival": "愿每一份真心，都在今天被温柔回应。",
+        "thanks": "谢谢你出现在我的生活里，这份真心送给你。"
+      },
+      "generationMaster": {
+        "ref": "fox_blessing_heart_generation_alpha_v1.mkv",
+        "sha256": "8678aee6ad8754d9e9b6dc0b407462537b049673f88823a8c3cfe0894c1c7af4"
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/06-heart/delivery/fox_blessing_heart_alpha_vp9.webm",
+        "sha256": "5f5cd10a59d47d852216530a1bb2026548a3557f0ca11800972ae83498a724c1",
+        "size": 6267872,
+        "contentType": "video/webm",
+        "alpha": true,
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 361,
+        "duration": 15.041667
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/06-heart/delivery/fox_blessing_heart_alpha_hevc.mov",
+        "sha256": "fb9138935d0611c55da2dafa5c7072750f87f37073a096a57e886a3d68c221ee",
+        "size": 5633839,
+        "contentType": "video/quicktime",
+        "alpha": true,
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 361,
+        "duration": 15.041667
+      },
+      "master": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/06-heart/delivery/fox_blessing_heart_alpha_v1.mov",
+        "sha256": "b5d624c2a7376cab82c9fd1c41b558a840a039ab4a43c3f8c062da0d0e882786",
+        "contentType": "video/quicktime"
+      }
+    },
+    "fox-blessing-kiss": {
+      "itemId": "fox-blessing-kiss",
+      "status": "approved-manual-review",
+      "contentType": "blessing",
+      "action": "kiss",
+      "code": "07",
+      "label": "飞吻",
+      "displayName": "狐使者·飞吻",
+      "characterId": "xinguang-fox",
+      "assetVersion": "fox-blessing-kiss-v1",
+      "quickScenes": {
+        "general": "送你一个飞吻，愿你今天甜甜的。",
+        "festival": "愿这个飞吻，把快乐和好运一起带给你。",
+        "thanks": "谢谢你一直在，送你一个轻轻的飞吻。"
+      },
+      "generationMaster": {
+        "ref": "fox_blessing_kiss_generation_alpha_v1.mkv",
+        "sha256": "4a0d3e971c1f18ca1a287bef514ee9a6f86fd8dfcda8edf65691f4cb58d68c6a"
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/07-kiss/delivery/fox_blessing_kiss_alpha_vp9.webm",
+        "sha256": "b9465fff247872761fa704d2feba04efae230e8c15c8fac374c94f54d1423200",
+        "size": 6174510,
+        "contentType": "video/webm",
+        "alpha": true,
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 361,
+        "duration": 15.041667
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/07-kiss/delivery/fox_blessing_kiss_alpha_hevc.mov",
+        "sha256": "a71104bedd94d800095ae2bb0c8c7df1c97a996980e0c97172328f686dbb2860",
+        "size": 5775946,
+        "contentType": "video/quicktime",
+        "alpha": true,
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 361,
+        "duration": 15.041667
+      },
+      "master": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/07-kiss/delivery/fox_blessing_kiss_alpha_v1.mov",
+        "sha256": "137e5ebc77f1fb28b3b475254ac738527e6742b8125f5714027bd00b398f3b8c",
+        "contentType": "video/quicktime"
+      }
+    },
+    "fox-blessing-applause": {
+      "itemId": "fox-blessing-applause",
+      "status": "approved-manual-review",
+      "contentType": "blessing",
+      "action": "applause",
+      "code": "08",
+      "label": "鼓掌",
+      "displayName": "狐使者·鼓掌",
+      "characterId": "xinguang-fox",
+      "assetVersion": "fox-blessing-applause-v1",
+      "quickScenes": {
+        "general": "为你鼓掌，愿你每一步都闪闪发光。",
+        "festival": "愿所有值得庆祝的时刻，都有热烈掌声。",
+        "thanks": "谢谢你做到了，也谢谢一直努力的你。"
+      },
+      "generationMaster": {
+        "ref": "fox_blessing_applause_generation_alpha_v1.mkv",
+        "sha256": "bb21757cd46d6e7633e0f5e260eba9fec87f057dfc8234c52cff59880f422c33"
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/08-applause/delivery/fox_blessing_applause_alpha_vp9.webm",
+        "sha256": "73934a38fae7fd1432f7039e69ab57f851563a8bf8446515f40a6316af91bd11",
+        "size": 8042799,
+        "contentType": "video/webm",
+        "alpha": true,
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 361,
+        "duration": 15.041667
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/08-applause/delivery/fox_blessing_applause_alpha_hevc.mov",
+        "sha256": "4384fdd4551ca747668f0feb212a28a476621bbc424efd5c29c10ec68cf1bc6f",
+        "size": 5768590,
+        "contentType": "video/quicktime",
+        "alpha": true,
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 361,
+        "duration": 15.041667
+      },
+      "master": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/08-applause/delivery/fox_blessing_applause_alpha_v1.mov",
+        "sha256": "1b4271eecfef839b653cbd0a328bc75ba991d845a3e155e3775fded6e0801aec",
+        "contentType": "video/quicktime"
+      }
+    },
+    "fox-blessing-prayer": {
+      "itemId": "fox-blessing-prayer",
+      "status": "approved-manual-review",
+      "contentType": "blessing",
+      "action": "prayer",
+      "code": "09",
+      "label": "祈福",
+      "displayName": "狐使者·祈福",
+      "characterId": "xinguang-fox",
+      "assetVersion": "fox-blessing-prayer-v1",
+      "quickScenes": {
+        "general": "愿你所盼皆如愿，所行皆坦途。",
+        "festival": "愿所有美好都如约而至，平安喜乐常相伴。",
+        "thanks": "谢谢你一直都在，愿平安和好运常伴你左右。"
+      },
+      "generationMaster": {
+        "ref": "fox_blessing_prayer_generation_alpha_v1.mkv",
+        "sha256": "e08ed0ce8cde05b8e7faf58a5eb9a9a561ea3f15a69e15a0a4825af3dd935bd0"
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/09-prayer/delivery/fox_blessing_prayer_alpha_vp9.webm",
+        "sha256": "9e96d7fc9dfbfb942f65e6d706ad55a2bc064adf76b7f2a84b57b51f7689a83a",
+        "size": 7056249,
+        "contentType": "video/webm",
+        "alpha": true,
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 361,
+        "duration": 15.041667
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/09-prayer/delivery/fox_blessing_prayer_alpha_hevc.mov",
+        "sha256": "8a5d18cb6435315af05286392ee1c403ecb30c4b77d338d5e2df739b5dcee69f",
+        "size": 5645168,
+        "contentType": "video/quicktime",
+        "alpha": true,
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 361,
+        "duration": 15.041667
+      },
+      "master": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/09-prayer/delivery/fox_blessing_prayer_alpha_v1.mov",
+        "sha256": "5d03ce04f507a285e0f010fc3830913a9a4c0caf29c4922bac716bf85fbed973",
+        "contentType": "video/quicktime"
+      }
+    }
+  },
+  "order": [
+    "fox-blessing-flowers",
+    "fox-blessing-cake",
+    "fox-blessing-hug",
+    "fox-blessing-heart",
+    "fox-blessing-kiss",
+    "fox-blessing-applause",
+    "fox-blessing-prayer"
+  ]
+}
