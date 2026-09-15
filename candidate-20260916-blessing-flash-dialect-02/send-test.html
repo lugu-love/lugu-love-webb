@@ -1,0 +1,2311 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="assets/icons/favicon-v2-64.png" type="image/png">
+<meta name="theme-color" content="#0b0c18">
+<!-- 首屏优先（手机端提速 v1）：
+     1) 预连接 R2 素材源与后端，把 TLS 握手提前到 HTML 解析阶段；
+     2) 预加载 runtime-config.js，避免解析到脚本标签时才发起同源请求；
+     3) 在 head 阶段并行启动正式契约（build.json + asset-manifest.json），
+        不再等主脚本执行后串行请求。契约校验逻辑与错误分支保持不变。 -->
+<link rel="preconnect" href="https://pub-baeb836de8654e238577516dce76dea3.r2.dev" crossorigin>
+<link rel="dns-prefetch" href="https://pub-baeb836de8654e238577516dce76dea3.r2.dev">
+<link rel="preconnect" href="https://api.lugu.love" crossorigin>
+<link rel="dns-prefetch" href="https://api.lugu.love">
+<link rel="preload" as="script" href="runtime-config.js?v=20260912-03">
+<script>
+window.__LUGU_BOOT__ = (function () {
+  function getJson(url) {
+    var request;
+    try {
+      request = fetch(url, { cache: "no-store" }).then(function (response) {
+        if (!response.ok) throw new Error(url + " " + response.status);
+        return response.json();
+      });
+    } catch (error) {
+      request = Promise.reject(error);
+    }
+    request.catch(function () {});   // 主脚本会正式处理失败，这里只避免未处理拒绝告警
+    return request;
+  }
+  return { build: getJson("build.json"), manifest: getJson("asset-manifest.json") };
+})();
+</script>
+<title>七星使者 · 心意表达</title>
+<style>  :root { --bg:#0b0c18; --card:#17192e; --ink:#eef0ff; --muted:#9aa0c3; --accent:#7d8bff; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { margin:0; padding:0; height:100%; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased; overflow-x:hidden; overflow-y:auto; }
+  .app { display:flex; flex-direction:column; min-height:100vh; min-height:100svh; height:auto; }
+  html:not(.state-done) .app { padding:calc(env(safe-area-inset-top, 0px) + 16px) 16px calc(env(safe-area-inset-bottom, 0px) + 86px); }
+  .edit-top { position:sticky; top:env(safe-area-inset-top,0px); z-index:20; flex:0 0 auto; background:var(--bg); }
+  html:not(.state-done).keyboard-open .app { padding-top: calc(env(safe-area-inset-top,0px) + 6px); padding-bottom: calc(env(safe-area-inset-bottom,0px) + 10px); }
+  html:not(.state-done).keyboard-open .edit-top .stage-wrap { margin-top: 0; }
+  html:not(.state-done).keyboard-open .emotions { margin-top: 8px; margin-bottom: 6px; }
+  html:not(.state-done).keyboard-open #stage { width: min(56vw, 232px); }
+  html:not(.state-done).keyboard-open .emotion { padding: 4px 10px; font-size:12px; }
+  html:not(.state-done).keyboard-open .cta { display: none !important; }
+  .brand { display:flex; align-items:center; gap:12px; margin:0; padding:2px 12px 2px 12px; position:relative; z-index:60; }
+  .site-logo { display:inline-flex; align-items:center; gap:5px; color:rgba(238,240,255,.72); text-decoration:none; font-size:13px; font-weight:400; letter-spacing:.04em; padding:4px 6px 4px 0; border-radius:999px; }
+  .site-logo img { width:26px; height:26px; flex:0 0 26px; filter:drop-shadow(0 0 4px rgba(255,222,143,.4)); }
+  .back-home { display:inline-flex; align-items:center; justify-content:center; gap:5px; min-width:68px; min-height:44px; padding:0 16px; border-radius:10px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); color:rgba(238,240,255,.92); text-decoration:none; font-size:14px; font-weight:600; letter-spacing:.02em; white-space:nowrap; }
+  .back-home:active { opacity:.6; }
+  html.is-app-bridge .site-logo { display:none !important; }
+  .brand .heart { color:rgba(238,240,255,.82); margin-right:5px; font-weight:400; }
+  .brand .heart svg { width:17px; height:15px; }
+  .brand-sub { opacity:.66; font-weight:350; margin-left:3px; }
+  .brand-title { display:inline-flex; align-items:baseline; gap:2px; font-size:17px; font-weight:450; letter-spacing:.02em; color:rgba(238,240,255,.82); }
+  .brand-a { font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; font-weight:500; letter-spacing:.02em; }
+  .brand-b { font-family:"Kaiti SC","STKaiti","KaiTi",serif; font-weight:400; letter-spacing:.01em; }
+  .brand-c { font-family:"Avenir Next","PingFang SC","Hiragino Sans GB",sans-serif; font-weight:450; letter-spacing:.015em; }
+  .intent-nav { margin-left:auto; display:inline-flex; align-items:center; gap:4px; color:rgba(238,240,255,.42); font-size:13px; letter-spacing:0; white-space:nowrap; }
+  .intent-nav .active { color:rgba(238,240,255,.92); font-weight:650; }
+  .intent-nav a { color:inherit; text-decoration:none; }
+  .intent-nav .sep { color:rgba(238,240,255,.22); }
+  .stage-wrap { display:flex; align-items:center; justify-content:center; min-height:0; pointer-events:none; margin-top:8px; }
+  #stage { width:min(68vw,300px); height:auto; border-radius:18px; pointer-events:none; mix-blend-mode:lighten; }   /* 去黑底：黑色精灵背景与深色页面混合消失，只留兔子 */
+  /* 素材就绪前保持透明：只有拿到真实视频帧（loadeddata 且通过绿幕体检）才 is-ready 显现，
+     避免加载中间态出现 poster / 旧帧 / 缩略图。 */
+  #alphaVideo { display:block; width:min(68vw,300px); height:min(68vw,300px); object-fit:contain; pointer-events:none; border-radius:18px; background:transparent; opacity:0; transition:opacity .18s ease; }
+  #alphaVideo.is-ready { opacity:1; }
+  #alphaVideo[hidden], #stage[hidden] { display:none !important; }
+  .character-picker { position:relative; display:inline-flex; align-items:center; min-width:0; }
+  .character-trigger { flex:0 0 auto; min-width:0; height:34px; padding:0 11px; border:1px solid rgba(255,255,255,.14); border-radius:999px; background:rgba(255,255,255,.05); color:#b8c0ff; font-size:14px; font-weight:650; display:inline-flex; align-items:center; gap:5px; line-height:1; cursor:pointer; }
+  .character-trigger .picker-label { color:var(--muted); }
+  .character-trigger .character-current { color:#e8ebff; }
+  /* 使者选择也换成同一枚 CSS 箭头（原来用的是字体符号 ⌄，各平台渲染不一致） */
+  .chevron { display:inline-block; flex:0 0 auto; width:7px; height:7px; margin-left:1px;
+    border-right:1.6px solid currentColor; border-bottom:1.6px solid currentColor;
+    transform:rotate(45deg); transition:transform .16s ease; }
+  .character-trigger .chevron { color:rgba(184,192,255,.74); }
+  .character-trigger[aria-expanded="true"] .chevron { transform:rotate(225deg); }
+  .character-menu { position:absolute; left:0; bottom:calc(100% + 9px); z-index:80; width:min(82vw,318px); padding:10px; border:1px solid rgba(125,139,255,.28); border-radius:16px; background:rgba(17,20,40,.98); box-shadow:0 16px 36px rgba(0,0,0,.42); }
+  .character-menu[hidden] { display:none !important; }
+  .character-menu-title { margin:0 0 8px 2px; color:rgba(226,230,255,.78); font-size:11px; font-weight:700; letter-spacing:.08em; }
+  .character-menu-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; }
+  .character-option { flex:none; min-width:0; height:auto; min-height:68px; padding:6px 3px 5px; border:1px solid rgba(255,255,255,.10); border-radius:12px; background:rgba(255,255,255,.04); color:#dce1ff; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:4px; line-height:1; cursor:pointer; }
+  .character-option img { width:40px; height:40px; max-width:40px; max-height:40px; border-radius:50%; object-fit:contain; background:rgba(255,255,255,.04); display:block; }
+  .character-option .character-name { font-size:11px; font-weight:650; white-space:nowrap; }
+  .character-option .character-state { font-size:9px; color:#7f89ad; white-space:nowrap; }
+  .character-option.active { border-color:#96a4ff; background:rgba(125,139,255,.16); box-shadow:0 0 0 2px rgba(125,139,255,.12); }
+  /* 未开放使者：弱化但仍可点（点击只给“即将开放”反馈，不切换） */
+  .character-option[data-available="0"] { opacity:.42; filter:grayscale(.75); }
+  .character-option[data-available="0"] .character-state { color:#8a91ad; }
+  .character-avatar-placeholder { width:40px; height:40px; max-width:40px; max-height:40px; border-radius:50%;
+    border:1px dashed rgba(255,255,255,.30); background:rgba(255,255,255,.05);
+    color:rgba(226,230,255,.72); font-size:15px; font-weight:650; line-height:1;
+    display:flex; align-items:center; justify-content:center; }
+  .emotions { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:8px 10px; margin:14px 0 8px; position:relative; z-index:30; max-width:min(94vw,520px); }
+  .emotion { flex:0 0 auto; min-width:0; min-height:34px; height:auto; line-height:1.2; padding:5px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.14); background:rgba(255,255,255,.05); color:var(--muted); font-size:13px; font-weight:600; cursor:pointer; text-align:center; white-space:nowrap; }
+  .emotion.active { color:#fff; border-color:var(--accent); background:rgba(125,139,255,.22); box-shadow:0 0 16px rgba(125,139,255,.28); }
+  #emotions { flex-wrap:nowrap; justify-content:flex-start; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; padding:2px 2px 8px; gap:6px; }
+  #emotions::-webkit-scrollbar { display:none; }
+  #emotions::after { content:""; flex:0 0 12px; }
+  #emotions { -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent); mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent); }
+  .emotion { flex:0 0 auto; }
+  .sub-actions { display:flex; align-items:center; justify-content:center; gap:6px; margin:10px 0 0; flex-wrap:wrap; }   /* 说明栏已删除：输入框与这一行之间只留 10px 小间距 */
+  .sub-actions .suggest { margin:0; flex:0 1 auto; min-width:0; height:34px; display:inline-flex; align-items:center; gap:6px; padding:0 10px; border:1px solid rgba(255,255,255,.14); border-radius:999px; background:rgba(255,255,255,.05); color:#b8c0ff; font-size:14px; font-weight:600; cursor:pointer; white-space:nowrap; }
+  .voice-mini { display:inline-flex; align-items:center; gap:6px; flex:0 1 auto; min-width:0; height:34px; padding:0 10px; border:1px solid rgba(255,255,255,.12); border-radius:999px; background:rgba(255,255,255,.05); }
+  .voice-mini .voice-icon { font-size:13px; line-height:1; color:var(--muted); flex:0 0 auto; }
+  .voice-select { height:30px; max-width:190px; min-width:0; padding:0 2px; border:none; background:transparent; color:#b8c0ff; font-size:14px; font-weight:600; outline:none; }
+  .voice-scope { max-width:72px; color:#e6e8ff; }
+  .voice-dialect { max-width:86px; }
+  /* ---- 统一自定义下拉箭头（不依赖 iOS / Android / 桌面原生箭头）----
+     结构：<span class="select-wrap"><select>…</select></span>
+     箭头用 ::after 画在同一层，pointer-events:none，所以点文字、点空白、点箭头
+     都会落在 <select> 上并打开原生选择列表；右侧固定留 17px 给箭头，绝不被文字挤掉。 */
+  .select-wrap { position:relative; display:inline-flex; align-items:center; min-width:0; flex:0 1 auto; }
+  .select-wrap[hidden] { display:none !important; }
+  .select-wrap > select { appearance:none; -webkit-appearance:none; -moz-appearance:none; width:100%;
+    padding-right:17px; text-overflow:ellipsis; white-space:nowrap; }
+  .select-wrap::after { content:""; position:absolute; right:5px; top:50%; width:6px; height:6px; margin-top:-4px;
+    border-right:1.6px solid rgba(184,192,255,.74); border-bottom:1.6px solid rgba(184,192,255,.74);
+    transform:rotate(45deg); pointer-events:none; }
+  .select-wrap.is-disabled::after { border-right-color:rgba(138,145,173,.42); border-bottom-color:rgba(138,145,173,.42); }
+  select:disabled { opacity:.5; }
+  select option:disabled { color:#7f89ad; }
+  /* 原生 select 只当数据容器：文字照旧显示，但不再自己弹 iOS 原生选择器 */
+  .select-wrap { cursor:pointer; }
+  .select-wrap > select.native-select-hidden { pointer-events:none; }
+  .select-wrap:focus-visible { outline:2px solid rgba(125,139,255,.8); outline-offset:2px; border-radius:8px; }
+  /* ---- 自定义底部选择面板（普通话/方言、地区、声音 通用）---- */
+  html.picker-open, html.picker-open body { overflow:hidden !important; }
+  .picker-sheet { position:fixed; inset:0; z-index:300; display:flex; flex-direction:column; justify-content:flex-end; }
+  .picker-sheet[hidden] { display:none !important; }
+  .picker-mask { position:absolute; inset:0; background:rgba(3,5,14,.66); opacity:0; transition:opacity .22s ease; }
+  .picker-sheet.open .picker-mask { opacity:1; }
+  .picker-panel {
+    position:relative; width:92%; max-width:520px; margin:0 auto;
+    bottom:calc(env(safe-area-inset-bottom, 0px) + 10px);
+    max-height:60vh; display:flex; flex-direction:column; box-sizing:border-box;
+    padding:8px 8px 10px; border:1px solid rgba(125,139,255,.26); border-radius:22px;
+    background:rgba(17,20,40,.97); box-shadow:0 -16px 44px rgba(0,0,0,.55);
+    transform:translateY(110%); transition:transform .26s cubic-bezier(.22,.7,.3,1);
+  }
+  .picker-sheet.open .picker-panel { transform:translateY(0); }
+  .picker-handle { flex:0 0 auto; width:40px; height:4px; margin:2px auto 6px; border-radius:999px; background:rgba(184,192,255,.34); }
+  .picker-title { flex:0 0 auto; margin:0 6px 6px; color:rgba(226,230,255,.82); font-size:15px; font-weight:650; letter-spacing:.02em; text-align:center; }
+  .picker-list { flex:1 1 auto; min-height:0; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch;
+    padding:2px; scrollbar-width:none; }
+  .picker-list::-webkit-scrollbar { display:none; }
+  .picker-option {
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    width:100%; min-height:52px; padding:0 14px; margin:0 0 2px; box-sizing:border-box;
+    border:none; border-radius:14px; background:transparent; color:rgba(238,240,255,.82);
+    font-family:inherit; font-size:17px; font-weight:500; text-align:left; cursor:pointer;
+  }
+  .picker-option:last-child { margin-bottom:0; }
+  .picker-option.active { background:rgba(125,139,255,.20); color:#fff; }
+  .picker-option:active { background:rgba(125,139,255,.14); }
+  .picker-option .picker-check { flex:0 0 auto; color:#aab4ff; font-size:16px; font-weight:700; opacity:0; }
+  .picker-option.active .picker-check { opacity:1; }
+  .picker-option:disabled, .picker-option.is-disabled { color:#7f89ad; cursor:not-allowed; }
+  .voice-preview { flex:0 1 auto; min-width:0; height:34px; display:inline-flex; align-items:center; gap:6px; padding:0 10px; border:1px solid rgba(255,255,255,.14); border-radius:999px; background:rgba(255,255,255,.05); color:#b8c0ff; font-size:14px; font-weight:600; cursor:pointer; white-space:nowrap; }
+  .voice-preview:disabled { opacity:.55; cursor:default; }
+  .dialect-box { margin:8px 16px 0; padding:10px; border:1px solid rgba(125,139,255,.24); border-radius:14px; background:rgba(125,139,255,.06); }
+  .dialect-box[hidden] { display:none !important; }
+  .dialect-head { display:flex; align-items:center; gap:8px; }
+  .dialect-head select { flex:1 1 auto; min-width:0; height:32px; border:1px solid rgba(255,255,255,.12); border-radius:9px; background:#12142a; color:#dfe3ff; font-size:12px; padding:0 8px; outline:none; }
+  .dialect-head button { flex:0 0 auto; height:34px; padding:0 12px; border:1px solid rgba(125,139,255,.34); border-radius:9px; background:rgba(125,139,255,.12); color:#c7cdff; font-size:14px; font-weight:700; }
+  .dialect-box textarea { width:100%; min-height:58px; margin-top:8px; resize:vertical; border:1px solid rgba(255,255,255,.10); border-radius:10px; background:#101225; color:#f2f4ff; padding:9px 10px; font-size:15px; line-height:1.5; outline:none; }
+  .dialect-box textarea[readonly] { color:#aeb5d4; }
+  .dialect-tip { margin-top:6px; color:rgba(180,188,225,.72); font-size:12px; line-height:1.5; }
+  .suggest-box { display:flex; flex-direction:column; flex-shrink:0; margin-top:6px; padding:0 16px; max-height:132px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+  .suggest-chip { display:flex; align-items:flex-start; gap:9px; text-align:left; padding:11px 0; border:none; background:transparent; border-bottom:1px solid rgba(255,255,255,.06); color:rgba(224,218,240,.82); font-size:15px; line-height:1.55; cursor:pointer; }
+  .suggest-chip:last-child { border-bottom:none; }
+  .suggest-chip:active { color:#fff; background:rgba(125,139,255,.10); }
+  .suggest-chip.selected { color:#fff; background:rgba(125,139,255,.10); }
+  .suggest-chip .star { color:rgba(150,140,190,.48); font-size:11px; line-height:1.5; transform:translateY(1px); flex:0 0 auto; }
+  .suggest-chip .txt { flex:1; }
+  .editor { position:relative; }
+  .editor textarea { width:100%; min-height:68px; border-radius:14px; background:#12142a; color:#fff; border:1px solid rgba(255,255,255,.10); padding:12px 12px 24px 18px; font-size:17px; line-height:1.5; resize:none; outline:none; display:block; }
+  .char-count { position:absolute; right:12px; bottom:6px; font-size:12px; line-height:1; color:rgba(150,140,190,.55); pointer-events:none; margin:0; text-align:right; }
+  .preview-text { text-align:center; font-size:16px; line-height:1.55; min-height:22px; margin:6px 0 0; white-space:pre-wrap; color:#fff; }
+  html:not(.state-done) .preview-text { display:none !important; }   /* 编辑页不重复展示全文预览，仅结果页保留 */
+  .cta { position:fixed; left:0; right:0; bottom:0; z-index:40; display:flex; justify-content:center; margin:0; padding:10px 16px calc(env(safe-area-inset-bottom,0px) + 10px); background:var(--bg); border-top:1px solid rgba(255,255,255,.08); }
+  .generation-progress { position:fixed; left:50%; bottom:calc(env(safe-area-inset-bottom,0px) + 84px); transform:translateX(-50%); z-index:39; width:min(92vw,520px); padding:10px 12px 9px; border:1px solid rgba(125,139,255,.24); border-radius:14px; background:rgba(18,20,42,.94); box-shadow:0 10px 28px rgba(0,0,0,.28); }
+  .generation-progress[hidden] { display:none !important; }
+  .generation-progress-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:7px; color:#dfe3ff; font-size:12px; font-weight:700; }
+  .generation-progress-text { color:rgba(174,181,212,.88); font-size:11px; font-weight:500; }
+  .generation-progress-track { height:5px; overflow:hidden; border-radius:999px; background:rgba(255,255,255,.09); }
+  .generation-progress-fill { display:block; height:100%; width:18%; border-radius:inherit; background:linear-gradient(90deg,#7d8bff,#b06bff); transition:width .35s ease,background .2s ease; }
+  .generation-progress[data-phase="preparing"] .generation-progress-fill { width:18%; }
+  .generation-progress[data-phase="voice"] .generation-progress-fill { width:46%; }
+  .generation-progress[data-phase="compose"] .generation-progress-fill { width:78%; }
+  .generation-progress[data-phase="complete"] .generation-progress-fill { width:100%; background:linear-gradient(90deg,#58c98a,#9be6b7); }
+  .generation-progress[data-phase="failed"] .generation-progress-fill { width:100%; background:linear-gradient(90deg,#ff7785,#ffb1ac); }
+  .success-actions { display:flex; flex-direction:column; gap:10px; margin-top:14px; }
+  .success-actions #btnSend { width:100%; min-height:58px; height:58px; padding:15px 28px; border-radius:999px; font-size:16px; font-weight:750; background:linear-gradient(135deg,#8a7dff,#b06bff); color:#fff; border:none; box-shadow:0 8px 24px rgba(125,139,255,.35); }
+  .success-actions #btnSend:active { transform:scale(.97); }
+  .success-actions #btnSend:disabled { opacity:.45; pointer-events:none; }
+  .success-sub-actions { display:flex; flex-wrap:wrap; justify-content:center; gap:8px; }
+  .success-sub-actions button { flex:0 1 auto; min-width:118px; height:40px; padding:0 14px; font-size:13px; }
+  html.is-app-bridge.show-save-fallback #btnOpen, html.is-app-bridge.show-save-fallback #btnSave { display:inline-flex !important; }
+  html:not(.state-done) #btnSendWeChat { display:none !important; }
+  html.state-done .edit-top,
+  html.state-done .brand,
+  html.state-done .stage-wrap,
+  html.state-done .emotions,
+  html.state-done .editor,
+  html.state-done .sub-actions,
+  html.state-done .suggest-box,
+  html.state-done .cta,
+  html.state-done .status,
+  html.state-done .hint { display:none !important; }
+  html.state-done .app { justify-content:center; height:100dvh; min-height:0; overflow:hidden; background:transparent; padding:0 16px calc(env(safe-area-inset-bottom,0px) + 10px); }
+  html.state-done .video-wrap { order:1; align-self:center; position:relative; display:block; }
+  html:not(.state-done) .video-wrap { display:none !important; }
+  .sound-toggle { position:absolute; right:8px; bottom:8px; z-index:6; width:38px; height:38px; min-width:0; padding:0; border-radius:50%; background:rgba(8,10,22,.66); border:1px solid rgba(255,255,255,.24); color:#fff; font-size:16px; line-height:1; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .sound-toggle:active { transform:scale(.94); }
+  html.state-done #videoPreview { display:block; flex:0 1 auto; width:auto; height:min(54vh, calc(100vh - 260px)); min-height:180px; max-width:100%; max-height:58vh; aspect-ratio:9/16; object-fit:contain; border-radius:0; background:transparent; box-shadow:none; margin:0; }
+  html.state-done .preview-text { order:2; flex:0 0 auto; font-size:16px; margin:16px 0 0; }
+  html.state-done .success-actions { order:3; flex:0 0 auto; }
+  html.state-done .debug { order:99; }
+  button { flex:1; min-width:82px; height:44px; border-radius:14px; border:none; font-size:14px; font-weight:650; cursor:pointer; }
+  .btn-primary { background:rgba(255,255,255,.94); color:#15172b; }
+  #btnGenerate { width:100%; height:46px; font-size:15px; border-radius:14px; background:rgba(125,139,255,.16); color:rgba(238,240,255,.92); border:1px solid rgba(125,139,255,.20); box-shadow:none; }
+  .btn-secondary { background:rgba(255,255,255,.08); color:var(--ink); border:1px solid rgba(255,255,255,.14); }
+  button:disabled { opacity:.55; }
+  .status { min-height:18px; margin:8px 0 0; text-align:center; font-size:14px; color:#ffd47f; }
+  .status.ok { color:#a9e3a0; }
+  .status.err { color:#ff9aa6; }
+  .hint { min-height:14px; margin:4px 0 0; text-align:center; font-size:13px; color:var(--muted); }
+  html:not(.state-done) video { width:100%; max-height:30vh; border-radius:0; margin-top:8px; background:transparent; }
+  .toast { position:fixed; left:50%; bottom:calc(env(safe-area-inset-bottom,0px) + 92px); transform:translateX(-50%); z-index:9; padding:9px 14px; border-radius:999px; background:rgba(20,22,40,.88); border:1px solid rgba(255,255,255,.16); color:#fff; font-size:12px; opacity:0; transition:opacity .25s; max-width:80vw; text-align:center; }
+  .toast.show { opacity:1; }
+  .debug { margin-top:8px; font-size:11px; color:rgba(255,255,255,.35); border-top:1px solid rgba(255,255,255,.06); padding-top:4px; }
+  .debug summary { cursor:pointer; padding:3px 0; font-size:11px; color:rgba(255,255,255,.35); }
+  .diag { margin-top:6px; padding:8px 10px; border:1px solid rgba(255,255,255,.12); border-radius:10px; background:rgba(0,0,0,.22); font-size:11px; color:var(--muted); line-height:1.6; word-break:break-all; }
+  .diag b { color:#b8c0ff; }
+  .site-paused-overlay { display:none; position:fixed; inset:0; z-index:9999; background:var(--bg); align-items:center; justify-content:center; flex-direction:column; padding:0 34px; text-align:center; }
+  .site-paused-overlay.show { display:flex; }
+  .site-paused-overlay .t1 { font-size:18px; font-weight:500; letter-spacing:.02em; color:rgba(238,240,255,.92); }
+  .site-paused-overlay .t2 { margin-top:14px; font-size:13px; color:rgba(154,160,195,.8); line-height:1.7; }
+  /* ---- 手机版七星使者选择器：一行横向滑动 ----------------------------------
+     就地展开（作为 .sub-actions 的第二行），因此：
+       · 宽度永远 = 容器宽度，绝不撑宽页面，绝不超出 viewport；
+       · 不遮挡“写一句话 / 推荐语 / 声音区域”（它把下方内容顺移，而不是盖住）；
+     桌面端（>560px）保持原来的浮层 + 4 列网格，互不影响。 */
+  @media (max-width:560px) {
+    .character-menu {
+      position:static; left:auto; right:auto; bottom:auto;
+      order:20; flex:1 1 100%; width:100%; max-width:100%; box-sizing:border-box;
+      margin:2px 0 0; padding:8px 8px 5px; border-radius:14px;
+      background:rgba(17,20,40,.98); box-shadow:0 10px 24px rgba(0,0,0,.34);
+    }
+    .character-menu-title { margin:0 0 6px 4px; }
+    .character-menu-grid {
+      display:flex; grid-template-columns:none; align-items:stretch;
+      gap:8px; margin:0; padding:0 2px 3px;
+      overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch;
+      scrollbar-width:none; scroll-snap-type:x proximity; overscroll-behavior-x:contain;
+    }
+    .character-menu-grid::-webkit-scrollbar { display:none; }
+    .character-option {
+      flex:0 0 auto; width:64px; min-width:64px; max-width:64px;
+      min-height:64px; padding:6px 2px 5px; border-radius:12px; scroll-snap-align:center;
+    }
+    .character-option img { width:34px; height:34px; max-width:34px; max-height:34px; }
+    .character-option .character-avatar-placeholder { width:34px; height:34px; max-width:34px; max-height:34px; font-size:13px; }
+    .character-option .character-name { font-size:12px; }
+  }
+</style>
+</head>
+<body>
+<div class="site-paused-overlay" id="pauseScreen">
+  <div class="t1">七星使者 · 心意表达</div>
+  <div class="t2">服务暂时不可用，请稍后再试。</div>
+</div>
+
+  <div class="app">
+    <div class="edit-top">
+      <div class="brand" id="brand"><a class="back-home" href="index.html" aria-label="返回首页">← 首页</a><span class="brand-title"><span class="brand-main">七星使者</span><span class="brand-sub">· 心意表达</span></span><nav class="intent-nav" aria-label="心意表达入口"><span class="active">情绪</span><span class="sep">｜</span><a href="blessing.html">祝福</a><span class="sep">｜</span><span>问候</span></nav></div>
+
+      <div class="stage-wrap"><canvas id="stage" width="540" height="540" hidden></canvas><video id="alphaVideo" autoplay muted loop playsinline webkit-playsinline preload="metadata" crossorigin="anonymous"></video></div>
+
+
+      <div class="emotions" id="emotions"></div>
+    </div>
+
+    <div class="editor"><textarea id="textInput" placeholder="写一句话…"></textarea><div class="char-count" id="charCount" aria-live="polite">当前 0 字</div></div>
+    <div class="sub-actions">
+      <button class="suggest" id="btnSuggest" type="button">✨ 帮我选一句</button>
+      <div class="character-picker" id="characterPicker"><button class="character-trigger" id="characterTrigger" type="button" aria-expanded="false" aria-controls="characterMenu"><span class="picker-label">使者</span><span class="character-current" id="characterCurrent">风信兔</span><span class="chevron" aria-hidden="true"></span></button><div class="character-menu" id="characterMenu" hidden role="listbox" aria-label="七星使者头像"><div class="character-menu-title">七星使者</div><div class="character-menu-grid" id="characterMenuGrid"></div></div></div>
+      <select id="characterSelect" class="character-select" aria-label="选择使者" hidden></select>
+      <span class="voice-mini" role="group" aria-label="声音设置"><span class="voice-icon" aria-hidden="true">🔊</span><span class="select-wrap" id="voiceScopeWrap"><select id="voiceScopeSelect" class="voice-select voice-scope" aria-label="选择普通话或方言"><option value="standard">普通话</option><option value="dialect">方言</option></select></span><span class="select-wrap" id="dialectSelectWrap" hidden><select id="dialectSelect" class="voice-select voice-dialect" aria-label="选择方言"></select></span><span class="select-wrap" id="voiceSelectWrap"><select id="voiceSelect" class="voice-select" aria-label="选择声音"></select></span></span>
+      <button class="voice-preview" id="btnPreviewVoice" type="button">🔊 试听</button>
+    </div>
+    <div class="dialect-box" id="dialectBox" hidden>
+      <div class="dialect-head">
+        <button id="btnDialectSpeech" type="button">方言口语</button>
+        <button id="btnSyncOriginal" type="button">同步原文</button>
+      </div>
+      <textarea id="dialectTextInput" placeholder="默认同步原文；点击“方言口语”后可继续手动编辑"></textarea>
+      <div class="dialect-tip" id="dialectTip">默认朗读当前原文；主动转换或手动编辑后的文本才是实际朗读文本。</div>
+    </div>
+    <div class="suggest-box" id="suggestBox" hidden></div>
+    <div class="preview-text" id="previewText"></div>
+
+    <div class="cta">
+      <button class="btn-primary" id="btnGenerate" type="button">生成视频 →</button>
+    </div>
+    <div class="generation-progress" id="generationProgress" hidden role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuetext="准备中">
+      <div class="generation-progress-head"><span id="generationProgressLabel">准备中</span><span class="generation-progress-text" id="generationProgressText">正在准备生成任务</span></div>
+      <div class="generation-progress-track"><span class="generation-progress-fill"></span></div>
+    </div>
+    <div class="success-actions">
+      <button class="btn-primary" id="btnSend" type="button" disabled>发给TA</button>
+      <div class="success-sub-actions">
+        <button class="btn-secondary" id="btnSendWeChat" type="button" hidden>发给微信好友</button>
+        <button class="btn-secondary" id="btnOpen" type="button" hidden>打开视频</button>
+        <button class="btn-secondary" id="btnSave" type="button" hidden>保存到手机</button>
+        <button class="btn-secondary" id="btnHome" type="button" hidden>返回首页</button>
+        <button class="btn-secondary" id="btnReEdit" type="button" hidden>重新编辑</button>
+      </div>
+    </div>
+
+    <div class="status" id="status"></div>
+    <div class="hint" id="hint"></div>
+    <div class="video-wrap">
+      <video id="videoPreview" autoplay muted playsinline loop preload="auto" hidden></video>
+      <button class="sound-toggle" id="btnSound" type="button" aria-label="声音开关" title="声音开关" hidden>🔇</button>
+    </div>
+
+    <details class="debug" id="debugDetails" hidden>
+      <summary>调试</summary>
+      <div class="diag" id="bridgeDiag">Bridge：…</div>
+      <div class="diag" id="diag">诊断信息…</div>
+      <div class="diag" id="preloadDiag">预加载：…</div>
+      <div class="diag" id="tapDiag">点击命中：—</div>
+    </details>
+  </div>
+  <div class="toast" id="toast"></div>
+  <!-- 自定义底部选择面板：普通话/方言、地区、声音 三种下拉统一用它（替换 iOS 原生弹窗） -->
+  <div class="picker-sheet" id="pickerSheet" hidden>
+    <div class="picker-mask" id="pickerMask"></div>
+    <div class="picker-panel" id="pickerPanel" role="dialog" aria-modal="true" aria-labelledby="pickerTitle">
+      <div class="picker-handle" id="pickerHandle" aria-hidden="true"></div>
+      <div class="picker-title" id="pickerTitle">请选择</div>
+      <div class="picker-list" id="pickerList" role="listbox" aria-labelledby="pickerTitle" tabindex="-1"></div>
+    </div>
+  </div>
+<script src="runtime-config.js?v=20260912-03"></script>
+<script>
+(function () {
+  var app = document.querySelector('.app');
+  var staticOn = window.PRODUCTION_SITE_ENABLED !== false;
+  function pause() {
+    window.__SITE_PAUSED__ = true;
+    var ps = document.getElementById('pauseScreen');
+    if (ps) ps.className += ' show';
+    if (app) app.style.display = 'none';
+  }
+  function start() {
+    window.__SITE_PAUSED__ = false;
+    if (app) app.style.display = '';
+    if (typeof window.__MAIN__ === 'function') {
+      window.__MAIN__();
+    } else {
+      window.__MAIN_PENDING__ = true;
+    }
+  }
+  if (!staticOn) { pause(); return; }
+  start();  // 立即显示页面并初始化首屏，不再等待后端健康检查
+  // 后台健康检查：不阻塞首屏；后端禁用时仅置标记，真正生成视频前再提示。
+  // 首屏优先：延后 2s 再发，避免和“当前使者”R2 素材抢首屏连接与带宽。
+  setTimeout(function () {
+    try {
+      fetch('https://api.lugu.love/status', { cache: 'no-store' })
+        .then(function (r) { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
+        .then(function (d) { if (d && d.enabled === false) { window.__SITE_PAUSED__ = true; } })
+        .catch(function () {});
+    } catch (e) {}
+  }, 2000);
+})();
+</script>
+
+
+
+
+<script>
+window.__MAIN__ = function () {
+  var MAKE_SEND_API = window.LUGU_API_BASE || "https://api.lugu.love";
+  var EXPORT_FILE_NAME = "我的心情.mp4"; // 对外统一文件名（不暴露具体情绪）
+  var GENERATE_TIMEOUT_MS = 55000;
+  var BLOB_TIMEOUT_MS = 20000;
+  var VIDEO_UA = navigator.userAgent || "";
+  var VIDEO_PREFER_HEVC = /iPad|iPhone|iPod/.test(VIDEO_UA) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) || (/Safari/.test(VIDEO_UA) && !/Chrome|Chromium|CriOS|Edg|OPR|Android/.test(VIDEO_UA));
+  var VIDEO_IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(VIDEO_UA) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+  // 唯一生产契约：从 build.json + asset-manifest.json 派生，不再自持第二套情绪映射。
+  var BUILD_CONTRACT = null;
+  var CHARACTERS = {
+    "fengxin-rabbit": { id:"fengxin-rabbit", name:"风信兔", emotions:[] },
+    "xinguang-fox": { id:"xinguang-fox", name:"狐使者", emotions:[] }
+  };
+  var currentCharacterId = "fengxin-rabbit";
+  var requestedCharacterId = currentCharacterId;
+  try {
+    var _qc = new URLSearchParams(location.search).get("character") || "";
+    if(_qc === "xinguang-fox" || _qc === "fengxin-rabbit") requestedCharacterId = _qc;
+  } catch(e) {}
+  var EMOTIONS = CHARACTERS[currentCharacterId].emotions;
+
+  function mapManifestEntry(e, itemId){
+    if(!e) return null;
+    var webVp9 = e.webVp9 || {};
+    var webHevc = e.webHevc || {};
+    var mobileFallback = e.mobileFallback || {};
+    return {
+      id: String(e.sequenceId || ""),
+      name: e.label || itemId,
+      item: e.itemId || itemId,
+      characterId: e.characterId || "",
+      emotionId: e.emotionId || "",
+      totalFrames: e.previewFrames || webVp9.frames || webHevc.frames || 0,
+      sheetCount: e.previewSheets || 0,
+      previewProxy: e.previewProxy || null,
+      assetVersion: e.assetVersion || "",
+      generationMasterSha256: (e.generationMaster || {}).sha256 || "",
+      // 只登记已验收的正式交付；webHevc 是绿幕源，不进入调用清单。
+      delivery: { vp9: webVp9.url || "", mobileFallback: mobileFallback.url || "" }
+    };
+  }
+
+  function loadProductionManifest(){
+    // 首屏优先：head 里的 __LUGU_BOOT__ 已经并行发出两个请求；这里只是接住它们。
+    var boot = (window.__LUGU_BOOT__ && typeof window.__LUGU_BOOT__ === "object") ? window.__LUGU_BOOT__ : {};
+    var buildRequest = boot.build || fetch("build.json?v=" + encodeURIComponent(location.search || "0"), { cache:"no-store" })
+      .then(function(r){ if(!r.ok) throw new Error("build " + r.status); return r.json(); });
+    var manifestRequest = boot.manifest || fetch("asset-manifest.json", { cache:"no-store" })
+      .then(function(r){ if(!r.ok) throw new Error("manifest " + r.status); return r.json(); });
+    return Promise.resolve(buildRequest)
+      .then(function(build){
+        if(!build || build.releaseId !== "release-20260912-03" || build.buildId !== "release-20260912-03" || build.manifestVersion !== "20260912-03-c1") throw new Error("build contract mismatch");
+        BUILD_CONTRACT = build;
+        return Promise.resolve(manifestRequest);
+      })
+      .then(function(manifest){
+        // 兜底：预取若命中旧缓存，用带版本号的 URL 再取一次（保持原有 cache-busting 语义）。
+        if(manifest && manifest.manifestVersion !== BUILD_CONTRACT.manifestVersion){
+          return fetch("asset-manifest.json?v=" + encodeURIComponent(BUILD_CONTRACT.manifestVersion), { cache:"no-store" })
+            .then(function(r){ if(!r.ok) throw new Error("manifest " + r.status); return r.json(); });
+        }
+        return manifest;
+      })
+      .then(function(manifest){
+        if(!manifest || manifest.releaseId !== BUILD_CONTRACT.releaseId || manifest.buildId !== BUILD_CONTRACT.buildId || manifest.manifestVersion !== BUILD_CONTRACT.manifestVersion) throw new Error("manifest contract mismatch");
+        var denied = {"rabbit-aggrieved":1,"rabbit-sajiao":1,"rabbit-guilty":1,"rabbit-lowenergy":1};
+        ["fox-confused","fox-disgusted","fox-schadenfreude","fox-cool","fox-jealous","fox-guilty","fox-pleading"].forEach(function(id){ denied[id]=1; });
+        var chars = manifest.production && manifest.production.characters;
+        if(!Array.isArray(chars) || chars.length !== 2) throw new Error("characters contract mismatch");
+        var result = {"fengxin-rabbit":[],"xinguang-fox":[]};
+        chars.forEach(function(c){
+          var cid=c.characterId;
+          if(!result[cid] || !Array.isArray(c.itemOrder)) throw new Error("character order mismatch");
+          c.itemOrder.forEach(function(itemId){
+            if(denied[itemId]) throw new Error("isolated item in production: " + itemId);
+            var e=manifest.items && manifest.items[itemId];
+            if(!e || e.characterId !== cid) throw new Error("item character mismatch: " + itemId);
+            if(!e.generationMaster || !e.generationMaster.ref || !e.webVp9 || !e.webVp9.url || !e.webHevc || !e.webHevc.url || !e.mobileFallback || !e.mobileFallback.url) throw new Error("incomplete item contract: " + itemId);
+            result[cid].push(mapManifestEntry(e,itemId));
+          });
+        });
+        if(result["fengxin-rabbit"].length !== 11 || result["xinguang-fox"].length !== 8) throw new Error("production item count mismatch");
+        CHARACTERS["fengxin-rabbit"].emotions=result["fengxin-rabbit"];
+        CHARACTERS["xinguang-fox"].emotions=result["xinguang-fox"];
+        EMOTIONS=CHARACTERS[currentCharacterId].emotions;
+        return true;
+      })
+      .catch(function(err){
+        console.error("[production-contract]",err);
+        document.documentElement.classList.add("state-contract-error");
+        if(typeof setStatus === "function") setStatus("生产素材契约加载失败，已停止生成。","err");
+        return false;
+      });
+  }
+
+  // 说明文案表：输入框下方那一栏已按验收要求整栏删除，这里的数据保留备用，不再渲染。
+  var GUIDES = {
+    "1": "把这份开心，说给你想分享的人。",
+    "2": "有些委屈，不知道怎么说也没关系。",
+    "3": "把不开心说出来，也是一种表达。",
+    "4": "想被偏爱的时候，就撒个娇。",
+    "5": "今天想把世界轻轻逗笑。",
+    "6": "嘴上说没事，心里其实有点酸。",
+    "7": "输了气势，嘴上也绝不认输。",
+    "8": "惊喜来得太突然，先开心一下。",
+    "9": "有点想不明白，想听你说说。",
+    "10": "嘴上嫌弃，心里其实记着你的好。",
+    "11": "有点心虚，想把话说清楚。",
+    "12": "这次真的知道错了，求你原谅。",
+    "13": "世界有点累，今天先躺一会儿。",
+    "14": "表面很酷，心里其实早就动了。",
+    "15": "忍不住笑了一下，别介意呀。"
+  };
+
+  var FOX_UI_KEY = {"1":"2","2":"3","3":"4","4":"5","5":"1","6":"8","7":"7","8":"13","9":"9","10":"10","11":"15","12":"14","13":"6","14":"11","15":"12"};
+  function uiKey(){
+    if(current && current.characterId === "xinguang-fox") return FOX_UI_KEY[current.id] || current.id;
+    return current ? current.id : "1";
+  }
+
+  var SUGGESTIONS = {
+    "1": [
+      "今天心情不错，想把这份开心也分给你。",
+      "今天有点开心，忍不住想告诉你。",
+      "嘿，今天的快乐有点藏不住了。",
+      "没什么大事，就是突然觉得今天挺美好。",
+      "今天想笑，也想让你跟着笑一下。"
+    ],
+    "2": [
+      "我没事，就是有一点想被抱抱。",
+      "嘴上说没事，其实还是有一点难过。",
+      "今天不想讲道理，只想被哄一下。",
+      "我不是生气，我只是有点委屈。",
+      "如果你愿意，抱抱我就好了。"
+    ],
+    "3": [
+      "我现在真的有点生气，让我缓一缓。",
+      "这次我是真的不开心了。",
+      "我不是故意凶，我只是现在有点气。",
+      "有些话我不想憋着，这次真的让我不舒服。",
+      "我先气一会儿，等我消消气再说。"
+    ]
+,
+    "4": [
+      "抱一下嘛，就一下下。",
+      "我今天很乖，奖励我一个抱抱吧。",
+      "你理理我嘛，我等你好久了。",
+      "人家都主动找你了，还不哄哄我。",
+      "就今天，想当一次被捧在手心的小兔子。",
+    ],
+    "5": [
+      "嘿嘿，我要开始捣蛋了哦。",
+      "猜猜我这次藏了什么惊喜。",
+      "别眨眼，我马上要做个鬼脸。",
+      "逗你玩呢，别当真呀。",
+      "今天不想乖，想调皮一下。",
+    ],
+    "6": [
+      "你刚才对别人笑那么开心。",
+      "我没事，就是心里有点酸。",
+      "哼，我也要你哄，像哄别人那样。",
+      "你是不是更喜欢和她聊天呀。",
+      "我吃醋了，你看着办。",
+    ],
+    "7": [
+      "我才没有不服，我只是觉得还能更好。",
+      "哼，这次算你赢，下次可不一定。",
+      "我嘴硬怎么了，心里服你也不行啊。",
+      "别得意，我这是让着你。",
+      "你等着，我迟早扳回一城。",
+    ],
+    "8": [
+      "哇，真的假的？我没听错吧！",
+      "天哪，你怎么会记得这个！",
+      "这也太惊喜了吧，我缓一缓。",
+      "你居然偷偷准备了这些，我好开心。",
+      "这惊喜，我要记一辈子。",
+    ],
+    "9": [
+      "咦，为什么会这样呢？",
+      "我有点没看懂，能再解释一下吗？",
+      "奇怪，和我以为的不太一样。",
+      "让我想想，总觉得哪里不对。",
+      "你这样说，我反而更迷糊了。",
+    ],
+    "10": [
+      "咦，这个也太…算了吧。",
+      "我才不要，你拿走拿走。",
+      "有点嫌弃，不过还是谢谢你。",
+      "你这品味，我表示看不懂。",
+      "嘴上嫌弃，其实还是收了。",
+    ],
+    "11": [
+      "那个…我好像做错了一点事。",
+      "你听我解释，其实不是那样的。",
+      "我、我先把话说清楚再走。",
+      "你别这么看我，我心里发慌。",
+      "我错了嘛，你别生气。",
+    ],
+    "12": [
+      "对不起，我真的知道错了。",
+      "你原谅我这一次好不好？",
+      "我保证下次不会了，你信我。",
+      "你皱眉头的时候，我心里好难受。",
+      "让我用十个抱抱换你一个原谅。",
+    ],
+    "13": [
+      "今天先摆烂一下，明天再努力。",
+      "世界太累，我选择先躺平。",
+      "别叫我，让我静静瘫一会儿。",
+      "努力了三天，奖励自己躺三天。",
+      "躺平不可耻，快乐最重要。",
+    ],
+    "14": [
+      "嗯，还行吧，就那样。",
+      "我不在意的，真的不在意。",
+      "酷一点，不能让情绪露馅。",
+      "这种小事，不值得我皱眉头。",
+      "其实我开心死了，但不能说。",
+    ],
+    "15": [
+      "咳咳，我不该笑的，但真的没忍住。",
+      "我不是笑你，我是笑这件事。",
+      "让你上次笑话我，这次轮到我了。",
+      "对不起，我嘴角它自己扬起来了。",
+      "我不厚道地开心了一下。",
+    ]
+  };
+
+  var FRAME_SIZE=270, FRAMES_PER_SHEET=12, COLS=4, FRAME_RATE=18;   // 移动端轻量 B 规格
+  var RENDER_SIZE=375, RENDER_X=Math.round((540-RENDER_SIZE)/2), RENDER_Y=69;
+
+  var canvas=document.getElementById("stage"), ctx=canvas.getContext("2d");
+  var emotionsEl=document.getElementById("emotions");
+  var textInput=document.getElementById("textInput");
+  var charCountEl=document.getElementById("charCount");
+  var previewTextEl=document.getElementById("previewText");
+  var statusEl=document.getElementById("status");
+  var hintEl=document.getElementById("hint");
+  var videoEl=document.getElementById("videoPreview");
+  var alphaVideo=document.getElementById("alphaVideo");
+  var characterSelect=document.getElementById("characterSelect");
+  var diagEl=document.getElementById("diag");
+  var preloadDiagEl=document.getElementById("preloadDiag");
+  var tapDiagEl=document.getElementById("tapDiag");
+  var genCount=0;
+  var NO_PRELOAD = new URLSearchParams(location.search).get("nopreload") === "1";
+  var brandEl=document.getElementById("brand");
+  var brandParam = new URLSearchParams(location.search).get("brand");
+  if(brandEl && brandParam){ brandEl.classList.add("brand-" + brandParam); }
+  var lastTiming=null;
+  var generatePhase="idle";
+  var isGenerating=false;
+  var activeController=null;
+  var btnSuggest=document.getElementById("btnSuggest");
+  var suggestBox=document.getElementById("suggestBox");
+  var btnGenerate=document.getElementById("btnGenerate");
+  var btnOpen=document.getElementById("btnOpen");
+  var btnSave=document.getElementById("btnSave");
+  var btnSend=document.getElementById("btnSend");
+  var btnSound=document.getElementById("btnSound");
+  var btnReEdit=document.getElementById("btnReEdit");
+  var btnHome=document.getElementById("btnHome");
+  var btnSendWeChat=document.getElementById("btnSendWeChat");
+  var generationProgress=document.getElementById("generationProgress");
+  var generationProgressLabel=document.getElementById("generationProgressLabel");
+  var generationProgressText=document.getElementById("generationProgressText");
+  var generationProgressTimer=null;
+  var generationProgressStartedAt=0;
+  var bridgeDiagEl=document.getElementById("bridgeDiag");
+  var debugDetailsEl=document.getElementById("debugDetails");
+  var debugMode = /[?&]debug=1/.test(location.search);
+  var toastEl=document.getElementById("toast");
+  var userAgent=navigator.userAgent || "";
+  var isIOS=/iPad|iPhone|iPod/.test(userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var isAndroid=/Android/i.test(userAgent);
+  var isWeChat=/MicroMessenger/i.test(userAgent);
+  if(isIOS){ document.documentElement.classList.add("is-ios"); btnSave.textContent="打开并分享"; }
+  if(isAndroid){ document.documentElement.classList.add("is-android"); btnOpen.textContent="打开预览"; }
+  if(isWeChat){ document.documentElement.classList.add("is-wechat"); }
+  var isAppBridge = !!(window.AndroidShare && typeof window.AndroidShare.prepareVideo === "function" && typeof window.AndroidShare.sharePreparedVideo === "function");
+  var nativeReady=false, nativeVideoPath="";
+  var __SEND_TEST_VERSION__ = "2026-08-29-bridge-v14";
+  var bridgeDiag = { prepareCalled:false, lastNativeEvent:null, nativeStatus:null };
+  function bridgeAvailable(){
+    return !!(window.AndroidShare && typeof window.AndroidShare.prepareVideo === "function" && typeof window.AndroidShare.sharePreparedVideo === "function");
+  }
+  function renderBridgeDiag(){
+    if(!debugMode || !bridgeDiagEl) return;
+    var lines = [];
+    lines.push("<b>页面版本:</b> " + __SEND_TEST_VERSION__);
+    lines.push("<b>URL:</b> " + location.href);
+    lines.push("<b>typeof AndroidShare:</b> " + (typeof window.AndroidShare));
+    lines.push("<b>prepareVideo:</b> " + (window.AndroidShare && typeof window.AndroidShare.prepareVideo === "function" ? "有" : "无")
+      + " ｜ sharePreparedVideo: " + (window.AndroidShare && typeof window.AndroidShare.sharePreparedVideo === "function" ? "有" : "无")
+      + " ｜ getStatus: " + (window.AndroidShare && typeof window.AndroidShare.getStatus === "function" ? "有" : "无"));
+    lines.push("<b>isAppBridge:</b> " + (isAppBridge ? "true" : "false") + " ｜ html class: " + (document.documentElement.className || "(空)"));
+    lines.push("<b>finalMp4Url(nativeVideoPath):</b> " + (nativeVideoPath || "(空)"));
+    lines.push("<b>prepareVideo 已调用:</b> " + (bridgeDiag.prepareCalled ? "是" : "否"));
+    lines.push("<b>nativeReady:</b> " + (nativeReady ? "true" : "false"));
+    if(bridgeDiag.lastNativeEvent){
+      lines.push("<b>最近 native 事件:</b> phase=" + bridgeDiag.lastNativeEvent.phase
+        + " message=" + (bridgeDiag.lastNativeEvent.message || "")
+        + " canShare=" + (bridgeDiag.lastNativeEvent.canShare ? "true" : "false")
+        + " elapsedMs=" + (bridgeDiag.lastNativeEvent.elapsedMs || 0));
+    }
+    lines.push("<b>按钮:</b> 发微信 hidden=" + btnSendWeChat.hidden + " disabled=" + btnSendWeChat.disabled
+      + " ｜ 打开预览 hidden=" + btnOpen.hidden
+      + " ｜ 保存 hidden=" + btnSave.hidden
+      + " ｜ 发送(Web) disabled=" + btnSend.disabled);
+    if(bridgeDiag.nativeStatus){
+      lines.push("<b>native getStatus:</b> " + bridgeDiag.nativeStatus);
+    }
+    bridgeDiagEl.innerHTML = lines.join("<br>");
+  }
+  function handoffToNative(){
+    if(!isAppBridge || !nativeVideoPath || bridgeDiag.prepareCalled) return;
+    bridgeDiag.prepareCalled = true;
+    setStatus("视频已生成，正在准备发送…", "ok");
+    setHint("");
+    try {
+      window.AndroidShare.prepareVideo(MAKE_SEND_API + nativeVideoPath);
+    } catch(err){
+      console.error("[send-test] prepareVideo threw", err);
+      bridgeDiag.prepareCalled = false;
+      nativeReady = false;
+      if(btnSendWeChat){ btnSendWeChat.disabled = true; }
+      setStatus("视频准备失败，请重新生成后再试", "err");
+      document.documentElement.classList.add("show-save-fallback");
+    }
+    renderBridgeDiag();
+  }
+  function refreshAppBridgeUi(){
+    if(!isAppBridge) return;
+    document.documentElement.classList.add("is-app-bridge");
+    if(btnSendWeChat){ btnSendWeChat.hidden=false; btnSendWeChat.disabled=!nativeReady; }
+    renderBridgeDiag();
+  }
+  function detectBridgeNow(){
+    var now = bridgeAvailable();
+    if(now && !isAppBridge){
+      isAppBridge = true;
+      console.info("[send-test] AndroidShare bridge detected (late), isAppBridge -> true");
+      if(bridgeDiag.nativeStatus === null && window.AndroidShare && typeof window.AndroidShare.getStatus === "function"){
+        try { bridgeDiag.nativeStatus = window.AndroidShare.getStatus(); } catch(e){}
+      }
+      if(nativeVideoPath && !bridgeDiag.prepareCalled){ handoffToNative(); }
+    } else if(now && bridgeDiag.nativeStatus === null && window.AndroidShare && typeof window.AndroidShare.getStatus === "function"){
+      try { bridgeDiag.nativeStatus = window.AndroidShare.getStatus(); } catch(e){}
+    }
+    refreshAppBridgeUi();
+    renderDiag();
+    renderBridgeDiag();
+  }
+  var bridgeRetries = 0;
+  function scheduleBridgeChecks(){
+    if(bridgeRetries++ > 12) return;
+    var delays = [120, 300, 800, 1600, 3000, 5000, 8000, 12000];
+    var d = delays[Math.min(bridgeRetries-1, delays.length-1)];
+    setTimeout(function(){
+      detectBridgeNow();
+      if(!isAppBridge) scheduleBridgeChecks();
+    }, d);
+  }
+  if(isAppBridge){ document.documentElement.classList.add("is-app-bridge"); }
+  if(debugMode && debugDetailsEl){ debugDetailsEl.hidden = false; debugDetailsEl.open = true; }
+  scheduleBridgeChecks();
+  window.addEventListener("pageshow", function(){ setTimeout(detectBridgeNow, 0); });
+  document.addEventListener("visibilitychange", function(){
+    if(document.visibilityState === "visible"){ setTimeout(detectBridgeNow, 0); }
+  });
+  window.addEventListener("load", function(){ setTimeout(detectBridgeNow, 150); });
+
+  var current=null;
+  // A路转发接收：?e=1..15 预选情绪；from=home 时“←首页”优先浏览器返回。
+  var fwdE = 0;
+  try { var _fe = parseInt(new URLSearchParams(location.search).get("e") || "", 10); if (_fe >= 1 && _fe <= 15) fwdE = _fe; } catch (err) {}
+  var fwdFromHome = false;
+  try { fwdFromHome = new URLSearchParams(location.search).get("from") === "home"; } catch (err) {}
+  function applyForwardText(){
+    var stored = null;
+    try { stored = window.sessionStorage.getItem("lugu_forward_text"); } catch (e) {}
+    try { window.sessionStorage.removeItem("lugu_forward_text"); } catch (e) {}
+    try { window.sessionStorage.removeItem("lugu_forward_emotion"); } catch (e) {}
+    if(!stored || !textInput) return;
+    textInput.value = stored;
+    textInput.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+
+  var cache={}, preloadOrder=["2","3"], preloadStarted=false, activeUserLoad=false;
+  var sheets=[], loaded=0, frameIndex=0, lastFrameAt=0, animId=null;
+  var lastBlob=null, lastFile=null, lastUrl=null;
+
+  var VOICES = [
+    {name:"儿童·明亮活泼", label:"明亮", id:"child-bright"},
+    {name:"儿童·软糯委屈", label:"软糯", id:"child-soft"},
+    {name:"儿童·有脾气", label:"个性", id:"child-spirited"},
+    {name:"儿童·超软幼龄", label:"幼龄", id:"child-tiny"},
+    {name:"儿童·淘气戏剧", label:"戏剧", id:"child-dramatic"},
+    {name:"女性·年轻明亮", label:"明亮", id:"female-bright"},
+    {name:"女性·温柔细腻", label:"温柔", id:"female-gentle"},
+    {name:"女性·甜美少女", label:"甜美", id:"female-sweet"},
+    {name:"女性·成熟磁性", label:"磁性", id:"female-magnetic"},
+    {name:"女性·轻柔安定", label:"轻柔", id:"female-soft"},
+    {name:"男性·青年阳光", label:"阳光", id:"male-sunny"},
+    {name:"男性·青年温柔", label:"温柔", id:"male-gentle"},
+    {name:"男性·成熟有力量", label:"力量", id:"male-powerful"},
+    {name:"男性·少年清亮", label:"少年", id:"male-youth"},
+    {name:"男性·低沉磁性", label:"低沉", id:"male-deep"}
+  ];
+  var DIALECTS = [
+    {id:"sichuan", name:"四川", label:"四川话 / 川渝", voices:[
+      {name:"晴儿", label:"女声", id:"dialect-sichuan-female", gender:"female"},
+      {name:"程川", label:"男声", id:"dialect-sichuan-male", gender:"male"}
+    ]},
+    {id:"cantonese", name:"粤语", label:"广东话 / 粤语", voices:[
+      {name:"阿清", label:"女声", id:"dialect-cantonese-female", gender:"female"},
+      {name:"阿强", label:"男声", id:"dialect-cantonese-male", gender:"male"}
+    ]},
+    {id:"northeast", name:"东北", label:"东北话", voices:[
+      {name:"龙老铁", label:"男声", id:"dialect-northeast-male", gender:"male"}
+    ]},
+    {id:"shanghai", name:"上海", label:"上海话", voices:[
+      {name:"阿珍", label:"女声", id:"dialect-shanghai-female", gender:"female"}
+    ]},
+    {id:"hokkien", name:"闽南", label:"闽南语", voices:[
+      {name:"龙安闽", label:"女声", id:"dialect-hokkien-female", gender:"female"}
+    ]},
+    {id:"shaanxi", name:"陕西", label:"陕西话", voices:[
+      {name:"秦川", label:"男声", id:"dialect-shaanxi-male", gender:"male"}
+    ]}
+  ];
+  var voiceScopeSelect=document.getElementById("voiceScopeSelect");
+  var dialectSelect=document.getElementById("dialectSelect");
+  var dialectBox=document.getElementById("dialectBox");
+  var btnDialectSpeech=document.getElementById("btnDialectSpeech");
+  var btnSyncOriginal=document.getElementById("btnSyncOriginal");
+  var dialectTextInput=document.getElementById("dialectTextInput");
+  var dialectTip=document.getElementById("dialectTip");
+  var voiceSelect=document.getElementById("voiceSelect");
+  var dialectSelectWrap=document.getElementById("dialectSelectWrap");
+  var dialectDirty=false;
+  // 试听文本模型：默认 = 原文（自动同步到方言编辑框）；只有主动“方言口语”转换或手动编辑后才不同。
+  var DIALECT_TIP_DEFAULT="默认朗读当前原文（已自动同步）；需要方言时再点“方言口语”。";
+  var DIALECT_TIP_CONVERTED="已转换为方言口语；可以继续手动编辑。";
+  var composeVersion=0;      // 内容版本号：换情绪 / 换使者 都会 +1，用于作废旧异步请求
+  var dialectAbort=null;     // 正在进行的方言转换请求
+  function currentDialect(){
+    var id=dialectSelect.value || "sichuan";
+    for(var i=0;i<DIALECTS.length;i++){ if(DIALECTS[i].id===id) return DIALECTS[i]; }
+    return DIALECTS[0];
+  }
+  function renderStandardVoices(){
+    voiceSelect.innerHTML="";
+    VOICES.forEach(function(v){
+      var o=document.createElement("option"); o.value=v.id; o.textContent=v.name+"｜"+v.label; voiceSelect.appendChild(o);
+    });
+    voiceSelect.value="female-bright";
+    syncWrapLabel(voiceSelect);
+  }
+  function renderDialectVoices(){
+    var dialect=currentDialect();
+    voiceSelect.innerHTML="";
+    dialect.voices.forEach(function(v){
+      var o=document.createElement("option"); o.value=v.id; o.textContent=v.name+"·"+v.label; voiceSelect.appendChild(o);
+    });
+    voiceSelect.value=dialect.voices[0].id;
+    syncWrapLabel(voiceSelect);
+  }
+  function renderDialectSelect(){
+    dialectSelect.innerHTML="";
+    DIALECTS.forEach(function(d){
+      var o=document.createElement("option"); o.value=d.id; o.textContent=d.name; dialectSelect.appendChild(o);
+    });
+    dialectSelect.value="sichuan";
+    syncWrapLabel(dialectSelect);
+  }
+  function isDialectMode(){ return voiceScopeSelect.value==="dialect"; }
+  function syncDialectBox(forceOriginal){
+    var on=isDialectMode();
+    if(dialectSelectWrap) dialectSelectWrap.hidden=!on; else dialectSelect.hidden=!on;
+    dialectBox.hidden=!on;
+    if(!on) return;
+    if(forceOriginal || !dialectDirty){ dialectDirty=false; dialectTextInput.value=textInput.value; }
+    if(dialectTip) dialectTip.textContent=DIALECT_TIP_DEFAULT;
+  }
+  // 原文变了（输入 / 选中推荐文案 / 从首页带入）→ 未转换状态下方言编辑框始终跟着原文
+  function syncDialectWithOriginal(){
+    if(!isDialectMode()) return;
+    if(dialectDirty) return;
+    dialectTextInput.value=textInput.value;
+  }
+  function effectiveSpeechText(){
+    var original=(textInput.value||"").trim();
+    if(!isDialectMode()) return original;
+    var dialect=(dialectTextInput.value||"").trim();
+    // 兜底：方言编辑框为空时（例如刚切换情绪、或从旧状态恢复）直接朗读原文，
+    // 保证“未转换也能试听”，不再要求用户必须先点“方言口语 / 同步原文”。
+    return dialect || original;
+  }
+  function invalidateDialectPreview(){
+    if(typeof invalidatePreviewToken==="function") invalidatePreviewToken();
+  }
+  // 内容重置：切换情绪 / 切换使者 / 切换入口时统一调用。
+  // 清空主输入、方言编辑框与方言转换状态，并停止正在播放的旧试听音频，避免串内容。
+  function resetComposeContent(){
+    composeVersion++;                              // ① 旧异步请求（方言转换 / 试听）全部作废
+    if(dialectAbort){ try{ dialectAbort.abort(); }catch(e){} dialectAbort=null; }   // ② 取消在途方言转换
+    invalidatePreviewToken();                      // ③ 停旧音频 + 撤销旧音频 URL + 复位试听按钮 + 清 ttsToken
+    textInput.value="";
+    previewTextEl.textContent="";
+    dialectDirty=false;
+    dialectTextInput.value="";
+    if(dialectTip) dialectTip.textContent=DIALECT_TIP_DEFAULT;
+    if(btnDialectSpeech){ btnDialectSpeech.disabled=false; btnDialectSpeech.textContent="方言口语"; }
+    if(suggestBox) suggestBox.hidden=true;
+    updateCharCount();
+    syncGenerateEnabled();
+  }
+  renderStandardVoices();
+  renderDialectSelect();
+  syncDialectBox(true);
+  voiceScopeSelect.addEventListener("change", function(){
+    if(isDialectMode()){ dialectDirty=false; renderDialectVoices(); syncDialectBox(true); }
+    else { renderStandardVoices(); syncDialectBox(true); }
+    invalidateDialectPreview();
+  });
+  dialectSelect.addEventListener("change", function(){ renderDialectVoices(); syncDialectBox(true); invalidateDialectPreview(); });
+  dialectTextInput.addEventListener("input", function(){ dialectDirty=true; invalidateDialectPreview(); });
+  btnSyncOriginal.addEventListener("click", function(){
+    // 恢复原文（并让随后的试听朗读原文）
+    syncDialectBox(true);
+    if(dialectTip) dialectTip.textContent=DIALECT_TIP_DEFAULT;
+    invalidateDialectPreview();
+  });
+  btnDialectSpeech.addEventListener("click", function(){
+    var text=(textInput.value||"").trim();
+    if(!text){ showToast("请先输入或选择一句话"); return; }
+    if(!isDialectMode()) return;
+    var dialect=currentDialect();
+    var reqVersion=composeVersion;                 // 记录发起时的内容版本
+    if(dialectAbort){ try{ dialectAbort.abort(); }catch(e){} }
+    dialectAbort=typeof AbortController==="function" ? new AbortController() : null;
+    btnDialectSpeech.disabled=true;
+    btnDialectSpeech.textContent="转换中…";
+    fetch(MAKE_SEND_API + "/rewrite-dialect", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({text:text,dialectId:dialect.id}),
+      cache:"no-store",
+      mode:"cors",
+      signal:dialectAbort?dialectAbort.signal:undefined
+    }).then(function(resp){
+      return resp.json().catch(function(){ return {}; }).then(function(data){
+        if(!resp.ok) throw new Error((data&&data.message)||(data&&data.error)||("HTTP "+resp.status));
+        return data;
+      });
+    }).then(function(data){
+      if(reqVersion!==composeVersion) return;      // 期间切过情绪/使者：丢弃结果，绝不写回页面
+      dialectTextInput.value=(data&&data.speechText)||text;
+      dialectDirty=true;
+      if(dialectTip) dialectTip.textContent=DIALECT_TIP_CONVERTED;
+      invalidateDialectPreview();
+    }).catch(function(err){
+      if(reqVersion!==composeVersion) return;      // 旧请求的失败也不弹提示
+      var aborted = err && (err.name==="AbortError" || String(err.message||"").indexOf("abort")>=0);
+      if(aborted) return;
+      showToast((err&&err.message)||"方言转换失败");
+    }).finally(function(){
+      if(reqVersion!==composeVersion) return;      // 旧请求不改按钮状态
+      btnDialectSpeech.disabled=false;
+      btnDialectSpeech.textContent="方言口语";
+    });
+  });
+  voiceSelect.addEventListener("change", invalidatePreviewToken);
+
+  // ================= 自定义底部选择面板（替换 iOS 原生 <select> 弹窗）=================
+  // 三个下拉共用同一套面板：普通话/方言、地区、声音。原生 <select> 保留为数据容器，
+  // 只负责保存 .value 和显示当前文字，点击一律走这层面板。
+  var pickerSheet=document.getElementById("pickerSheet");
+  var pickerPanel=document.getElementById("pickerPanel");
+  var pickerList=document.getElementById("pickerList");
+  var pickerTitle=document.getElementById("pickerTitle");
+  var pickerMask=document.getElementById("pickerMask");
+  var pickerOwner=null;
+  function pickerWrapOf(sel){ return sel && sel.closest ? sel.closest(".select-wrap") : null; }
+  function pickerTitleFor(sel){
+    if(sel===voiceScopeSelect) return "选择语言类型";
+    if(sel===dialectSelect) return "选择方言地区";
+    if(sel===voiceSelect) return "选择声音";
+    return "请选择";
+  }
+  function syncWrapLabel(sel){
+    var wrap=pickerWrapOf(sel);
+    if(!wrap) return;
+    var opt=sel.options[sel.selectedIndex];
+    wrap.setAttribute("aria-label", pickerTitleFor(sel) + "：" + (opt ? opt.textContent : ""));
+  }
+  function renderPickerList(){
+    if(!pickerOwner) return;
+    pickerList.innerHTML="";
+    Array.prototype.forEach.call(pickerOwner.options, function(opt){
+      var row=document.createElement("button");
+      row.type="button";
+      row.className="picker-option"+(opt.value===pickerOwner.value?" active":"");
+      row.setAttribute("role","option");
+      row.setAttribute("aria-selected", opt.value===pickerOwner.value ? "true" : "false");
+      if(opt.disabled){ row.disabled=true; row.classList.add("is-disabled"); row.setAttribute("aria-disabled","true"); }
+      var label=document.createElement("span"); label.className="picker-option-label"; label.textContent=opt.textContent;
+      var check=document.createElement("span"); check.className="picker-check"; check.textContent="✓"; check.setAttribute("aria-hidden","true");
+      row.appendChild(label); row.appendChild(check);
+      if(!opt.disabled){
+        row.addEventListener("click", function(){ choosePickerOption(opt.value); });
+      }
+      pickerList.appendChild(row);
+    });
+    var active=pickerList.querySelector(".picker-option.active");
+    if(active && active.scrollIntoView){ try{ active.scrollIntoView({ block:"nearest" }); }catch(e){} }
+  }
+  function choosePickerOption(value){
+    if(!pickerOwner) return;
+    var sel=pickerOwner;
+    if(sel.value!==value){
+      sel.value=value;
+      syncWrapLabel(sel);
+      // 走原有 change 监听：地区/声音切换会顺带停掉旧试听并清空旧音频状态
+      sel.dispatchEvent(new Event("change", { bubbles:true }));
+    }
+    closePicker();
+  }
+  function openPicker(sel){
+    if(!pickerSheet || !sel) return;
+    var wrap=pickerWrapOf(sel);
+    if(!wrap || wrap.hidden) return;
+    try{ if(document.activeElement && document.activeElement.blur) document.activeElement.blur(); }catch(e){}
+    pickerOwner=sel;
+    pickerTitle.textContent=pickerTitleFor(sel);
+    renderPickerList();
+    pickerSheet.hidden=false;
+    document.documentElement.classList.add("picker-open");
+    requestAnimationFrame(function(){ pickerSheet.classList.add("open"); });
+    wrap.setAttribute("aria-expanded","true");
+    setTimeout(function(){
+      var first=pickerList.querySelector(".picker-option.active") || pickerList.querySelector(".picker-option");
+      if(first){ try{ first.focus({ preventScroll:true }); }catch(e){ try{ first.focus(); }catch(e2){} } }
+    }, 280);
+  }
+  function closePicker(){
+    if(!pickerSheet || pickerSheet.hidden) return;
+    var owner=pickerOwner;
+    pickerSheet.classList.remove("open");
+    document.documentElement.classList.remove("picker-open");
+    pickerPanel.style.transition=""; pickerPanel.style.transform="";
+    if(owner) { var w=pickerWrapOf(owner); if(w) w.setAttribute("aria-expanded","false"); }
+    pickerOwner=null;
+    setTimeout(function(){
+      if(!pickerSheet.classList.contains("open")) pickerSheet.hidden=true;
+      if(owner){ var w2=pickerWrapOf(owner); if(w2){ try{ w2.focus({ preventScroll:true }); }catch(e){ try{ w2.focus(); }catch(e2){} } } }
+    }, 250);
+  }
+  function bindPickerSelect(sel){
+    var wrap=pickerWrapOf(sel);
+    if(!wrap || wrap.dataset.pickerBound==="1") return;
+    wrap.dataset.pickerBound="1";
+    wrap.setAttribute("role","button");
+    wrap.setAttribute("tabindex","0");
+    wrap.setAttribute("aria-haspopup","listbox");
+    wrap.setAttribute("aria-expanded","false");
+    sel.setAttribute("tabindex","-1");
+    sel.setAttribute("aria-hidden","true");
+    sel.classList.add("native-select-hidden");
+    syncWrapLabel(sel);
+    wrap.addEventListener("click", function(e){ e.preventDefault(); e.stopPropagation(); openPicker(sel); });
+    wrap.addEventListener("keydown", function(e){
+      if(e.key==="Enter" || e.key===" " || e.key==="Spacebar" || e.key==="ArrowDown" || e.key==="ArrowUp"){
+        e.preventDefault(); e.stopPropagation(); openPicker(sel);
+      }
+    });
+  }
+  bindPickerSelect(voiceScopeSelect);
+  bindPickerSelect(dialectSelect);
+  bindPickerSelect(voiceSelect);
+  // 面板自身交互：点遮罩关闭、Esc 关闭、支持下滑关闭
+  if(pickerMask) pickerMask.addEventListener("click", closePicker);
+  if(pickerSheet) pickerSheet.addEventListener("keydown", function(e){
+    if(e.key==="Escape"){ e.preventDefault(); closePicker(); return; }
+    if(e.key==="ArrowDown" || e.key==="ArrowUp"){
+      var rows=Array.prototype.slice.call(pickerList.querySelectorAll(".picker-option:not([disabled])"));
+      if(!rows.length) return;
+      var cur=rows.indexOf(document.activeElement);
+      var next=e.key==="ArrowDown" ? Math.min(rows.length-1, cur+1) : Math.max(0, cur-1);
+      if(cur === -1) next = 0;
+      e.preventDefault();
+      try{ rows[next].focus({ preventScroll:true }); }catch(err){ rows[next].focus(); }
+    }
+  });
+  var pickerDrag=null;
+  function pickerDragStart(e){
+    if(!pickerSheet || pickerSheet.hidden || e.touches.length!==1) return;
+    var fromHandle=!!(e.target && e.target.closest && e.target.closest(".picker-handle,.picker-title"));
+    pickerDrag={ y0:e.touches[0].clientY, dy:0, fromHandle:fromHandle };
+    pickerPanel.style.transition="none";
+  }
+  function pickerDragMove(e){
+    if(!pickerDrag) return;
+    var dy=e.touches[0].clientY - pickerDrag.y0;
+    if(!pickerDrag.fromHandle && pickerList.scrollTop>0) return;   // 列表已滚动时先让列表滚
+    if(dy<=0){
+      if(pickerDrag.dy!==0){ pickerDrag.dy=0; pickerPanel.style.transform=""; }
+      return;
+    }
+    pickerDrag.dy=dy;
+    pickerPanel.style.transform="translateY("+dy+"px)";
+    if(e.cancelable) e.preventDefault();
+  }
+  function pickerDragEnd(){
+    if(!pickerDrag) return;
+    var dy=pickerDrag.dy;
+    pickerDrag=null;
+    pickerPanel.style.transition="";
+    pickerPanel.style.transform="";
+    if(dy>90) closePicker();
+  }
+  if(pickerPanel){
+    pickerPanel.addEventListener("touchstart", pickerDragStart, { passive:true });
+    pickerPanel.addEventListener("touchmove", pickerDragMove, { passive:false });
+    pickerPanel.addEventListener("touchend", pickerDragEnd);
+    pickerPanel.addEventListener("touchcancel", pickerDragEnd);
+  }
+  var btnPreviewVoice=document.getElementById("btnPreviewVoice");
+  var ttsToken=null;
+  var previewAudio=null;
+  var previewAudioUrl=null;
+  var previewAudioCtx=null;
+  var previewSource=null;
+  var previewHtmlAudio=null;
+  var SILENT_WAV="data:audio/wav;base64,UklGRkQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==";
+  var previewState="idle";
+  var previewReqId=0;
+
+  function scrollEmotionTo(id){
+    Array.prototype.forEach.call(emotionsEl.children, function(b){
+      if(b.dataset && b.dataset.em === id){
+        try{ b.scrollIntoView({ behavior:"smooth", inline:"center", block:"nearest" }); }catch(e){}
+      }
+    });
+  }
+  // 横滑顺序固定：兔｜狐｜鹿｜熊｜鹤｜猫｜鸥（与 assets/qixing-v1/manifest.json 的
+  // 角色表一致）。第 5 位是「鹤」，不是「鲸」——不得用鲸代替鹤。
+  // avatar 为 null 表示正式头像尚未验收：用中性占位，不新增、不伪造素材、不请求任何图。
+  var SEVEN_STARS = [
+    {id:"fengxin-rabbit", short:"兔", official:"风信兔", avatar:"assets/characters/seven-stars/fengxin-rabbit/portrait.png"},
+    {id:"xinguang-fox", short:"狐", official:"心光狐", avatar:"assets/characters/seven-stars/xinguang-fox/portrait.png"},
+    {id:"xingyu-deer", short:"鹿", official:"星语鹿", avatar:"assets/characters/seven-stars/xingyu-deer/portrait.png"},
+    {id:"shouye-bear", short:"熊", official:"守夜熊", avatar:"assets/characters/seven-stars/shouye-bear/portrait.png"},
+    {id:"crane", short:"鹤", official:"霁心鹤", avatar:null},
+    {id:"guangwei-cat", short:"猫", official:"光尾猫", avatar:"assets/characters/seven-stars/guangwei-cat/portrait.png"},
+    {id:"gongming-gull", short:"鸥", official:"共鸣鸥", avatar:"assets/characters/seven-stars/gongming-gull/portrait.png"}
+  ];
+  // 正式可用角色白名单：素材验收通过前，其余使者一律不能进入主舞台。
+  var UNLOCKED_CHARACTERS = { "fengxin-rabbit":1, "xinguang-fox":1 };
+  function isCharacterUnlocked(id){ return !!UNLOCKED_CHARACTERS[id]; }
+  var characterTrigger=document.getElementById("characterTrigger");
+  var characterMenu=document.getElementById("characterMenu");
+  var characterMenuGrid=document.getElementById("characterMenuGrid");
+  var characterCurrent=document.getElementById("characterCurrent");
+  var characterPickerEl=document.getElementById("characterPicker");
+  var subActionsEl=document.querySelector(".sub-actions");
+  // 手机版：选择器改为一行横向滑动，并搬到 .sub-actions 里就地展开（宽度=容器宽度）。
+  // 桌面版（>560px）保持原来的浮层 + 4 列网格，位置不变。
+  var compactPickerQuery=null;
+  try { compactPickerQuery=window.matchMedia("(max-width: 560px)"); } catch(e) { compactPickerQuery=null; }
+  function isCompactPicker(){ return compactPickerQuery ? compactPickerQuery.matches : (window.innerWidth||0) <= 560; }
+  // 【2026-09-16 修复】原来这里给 <video> 设了角色头像当 poster（首帧占位）。
+  // 实测：切换情绪/使者时 videoReadyState 还是 0、视频层已可见，浏览器就会把这张
+  // 256×256 头像画在舞台中央 —— 这就是真机上“使者出现前闪现的小东西”。
+  // 现已彻底移除 poster：素材就绪前舞台只保留页面背景，视频就绪后用透明度一次性显现。
+  function placeCharacterMenu(){
+    if(!characterMenu || !characterPickerEl || !subActionsEl) return;
+    var compact=isCompactPicker();
+    var parent=characterMenu.parentNode;
+    if(compact && parent !== subActionsEl){ closeCharacterMenu(); subActionsEl.appendChild(characterMenu); }
+    else if(!compact && parent !== characterPickerEl){ closeCharacterMenu(); characterPickerEl.appendChild(characterMenu); }
+  }
+  function currentCharacterName(){
+    var c=CHARACTERS[currentCharacterId];
+    return (c && c.name) || "使者";
+  }
+  function closeCharacterMenu(){
+    if(!characterMenu) return;
+    characterMenu.hidden=true;
+    characterTrigger.setAttribute("aria-expanded","false");
+  }
+  // 首屏优先：7 个头像里的 6 个“未开放使者”不在首屏请求，等当前使者可播放后空闲预取，
+  // 或用户点开选择器时立即取。
+  var pickerAvatarsRequested=false;
+  var pickerAvatarWarmTimer=-1;
+  function applyPickerAvatarSrc(){
+    if(!characterMenuGrid) return;
+    Array.prototype.forEach.call(characterMenuGrid.querySelectorAll("img[data-src]"), function(img){
+      if(!img.getAttribute("src")) img.setAttribute("src", img.dataset.src);
+    });
+  }
+  function loadPickerAvatars(){
+    pickerAvatarsRequested=true;
+    applyPickerAvatarSrc();
+  }
+  function runPickerAvatarWarmup(){
+    if(pickerAvatarsRequested) return;
+    if("requestIdleCallback" in window) window.requestIdleCallback(function(){ loadPickerAvatars(); }, { timeout:2500 });
+    else loadPickerAvatars();
+  }
+  function schedulePickerAvatarWarmup(){
+    if(pickerAvatarWarmTimer !== -1) return;
+    pickerAvatarWarmTimer=setTimeout(function(){ pickerAvatarWarmTimer=-2; runPickerAvatarWarmup(); }, 4000);
+    if(alphaVideo && alphaVideo.addEventListener){
+      alphaVideo.addEventListener("loadeddata", function(){
+        if(pickerAvatarWarmTimer === -2) return;
+        clearTimeout(pickerAvatarWarmTimer); pickerAvatarWarmTimer=-2; runPickerAvatarWarmup();
+      }, { once:true });
+    }
+  }
+  function syncCharacterMenu(){
+    if(!characterMenuGrid || !characterSelect) return;
+    characterMenuGrid.innerHTML="";
+    SEVEN_STARS.forEach(function(role){
+      // 只有白名单里的角色才算“已开放”；其余即便 manifest 里有素材也不得进入主舞台。
+      var option=characterSelect.querySelector('option[value="'+role.id+'"]');
+      var available=isCharacterUnlocked(role.id) && !!option;
+      var b=document.createElement("button");
+      b.type="button"; b.className="character-option"+(role.id===currentCharacterId?" active":"");
+      b.dataset.characterId=role.id; b.dataset.available=available?"1":"0";
+      b.setAttribute("role","option"); b.setAttribute("aria-selected",role.id===currentCharacterId?"true":"false");
+      if(role.avatar){
+        var img=document.createElement("img"); img.dataset.src=role.avatar; img.alt=role.official; img.loading="lazy"; b.appendChild(img);
+      } else {
+        // 正式头像未验收：中性占位，不发任何图片请求，也不用错角色头像顶上。
+        var ph=document.createElement("span"); ph.className="character-avatar-placeholder"; ph.textContent=role.short;
+        ph.setAttribute("aria-hidden","true"); b.appendChild(ph);
+      }
+      var name=document.createElement("span"); name.className="character-name"; name.textContent=role.short; b.appendChild(name);
+      var state=document.createElement("span"); state.className="character-state"; state.textContent=available?"":"即将开放"; b.appendChild(state);
+      if(available){
+        b.addEventListener("click", function(){ if(characterSelect.value!==role.id){ characterSelect.value=role.id; characterSelect.dispatchEvent(new Event("change",{bubbles:true})); } closeCharacterMenu(); });
+      } else {
+        // 未开放：只给轻量反馈，不切换、不加载任何素材。
+        b.setAttribute("aria-disabled","true");
+        b.addEventListener("click", function(e){ e.preventDefault(); e.stopPropagation(); showToast(role.official + " 即将开放"); });
+      }
+      characterMenuGrid.appendChild(b);
+    });
+    if(pickerAvatarsRequested) applyPickerAvatarSrc();
+    if(characterCurrent) characterCurrent.textContent=currentCharacterName();
+  }
+  function renderCharacterSelect(){
+    if(!characterSelect) return;
+    characterSelect.innerHTML = "";
+    Object.keys(CHARACTERS).forEach(function(id){
+      var c = CHARACTERS[id];
+      if(!c.emotions || c.emotions.length === 0) return;
+      var o = document.createElement("option"); o.value = id; o.textContent = c.name; characterSelect.appendChild(o);
+    });
+    characterSelect.value = currentCharacterId;
+    placeCharacterMenu();
+    syncCharacterMenu();
+    schedulePickerAvatarWarmup();
+  }
+  if(characterTrigger && characterMenu){
+    characterTrigger.addEventListener("click", function(e){
+      e.stopPropagation();
+      if(characterMenu.hidden) loadPickerAvatars();
+      characterMenu.hidden=!characterMenu.hidden;
+      characterTrigger.setAttribute("aria-expanded",characterMenu.hidden?"false":"true");
+    });
+    characterMenu.addEventListener("click", function(e){ e.stopPropagation(); });
+    document.addEventListener("click", closeCharacterMenu);
+    document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeCharacterMenu(); });
+  }
+  if(compactPickerQuery && compactPickerQuery.addEventListener){
+    compactPickerQuery.addEventListener("change", placeCharacterMenu);
+  } else {
+    window.addEventListener("resize", placeCharacterMenu);
+  }
+  var alphaVideoToken = 0;
+  function releaseAlphaVideo(){
+    alphaVideoToken++;
+    if(!alphaVideo) return;
+    alphaVideo.onerror = null;
+    alphaVideo.classList.remove("is-ready");
+    alphaVideo.pause();
+    alphaVideo.removeAttribute("src");
+    try { alphaVideo.load(); } catch(e) {}
+    alphaVideo.hidden = true;
+  }
+
+  function playAlphaVideo(delivery){
+    if(!alphaVideo || !delivery) return false;
+    // ---- 素材准入（2026-09-15 审计结论）------------------------------------
+    // R2 上 19 条素材的 webHevc(.mov) 全部是**未抠像的绿幕源**：ffprobe 显示单轨
+    // yuv420p、无 alpha 通道，逐帧采样绿色占比 82%–92%（manifest 里标注的
+    // "alpha": true 与实物不符）。因此正式调用一律不再使用 delivery.hevc。
+    // 已验收的正式交付只有两种：webVp9（透明）与 mobileFallback（黑底 MP4）。
+    // 桌面端按 VP9 → 黑底 MP4；手机端按 黑底 MP4 → VP9；全部失败才走备用动画。
+    var sources = VIDEO_IS_MOBILE
+      ? [delivery.mobileFallback, delivery.vp9]
+      : [delivery.vp9, delivery.mobileFallback];
+    sources = sources.filter(function(u){ return !!u; });
+    if(!sources.length){
+      setStatus("当前情绪暂无浏览器可用透明视频，已切换备用动画", "err");
+      return false;
+    }
+    var token = ++alphaVideoToken;
+    var sourceIndex = 0;
+    function fallbackCanvas(){
+      if(token !== alphaVideoToken) return;
+      alphaVideo.classList.remove("is-ready");
+      alphaVideo.hidden = true;
+      canvas.hidden = false;
+      // 失败不隐藏：把真实原因留在控制台，页面上给统一提示
+      if(failedSources.length) console.warn("[alpha-video] 全部交付源都不可用，已转备用动画", failedSources);
+      if(current && current.sheetCount > 0){
+        setStatus("当前浏览器透明视频不可用，已切换备用动画", "err");
+        loadSheets();
+      } else {
+        setStatus("当前浏览器暂时无法播放该透明视频", "err");
+      }
+    }
+    // 原子切换：先把媒体层收起（透明，但保留布局盒让浏览器继续解码），
+    // 换源 → 等 loadeddata + 绿幕体检通过 → 再一次性淡入。中间态绝不会画出
+    // poster / 旧一帧 / 缩略图 / 上一个使者的素材。
+    var failedSources = [];
+    function tryNextSource(){
+      if(token !== alphaVideoToken) return;
+      if(sourceIndex >= sources.length){ fallbackCanvas(); return; }
+      var url = sources[sourceIndex++];
+      canvas.hidden = true;
+      alphaVideo.classList.remove("is-ready");
+      alphaVideo.hidden = false;
+      alphaVideo.onerror = null;
+      alphaVideo.src = url;
+      try { alphaVideo.load(); } catch(e) {}
+      var revealed = false;
+      var reveal = function(){
+        if(revealed) return;
+        if(token !== alphaVideoToken) return;   // 旧回调不许覆盖新素材
+        revealed = true;
+        alphaVideo.classList.add("is-ready");
+      };
+      // 绿幕/透明度体检：手机与桌面都做，任何绿幕源都不允许上台。
+      var checkAlpha = function(){
+        alphaVideo.removeEventListener("loadeddata", checkAlpha);
+        if(token !== alphaVideoToken) return;
+        try {
+          var c=document.createElement("canvas"); c.width=8; c.height=8;
+          var cx=c.getContext("2d"); cx.drawImage(alphaVideo,0,0,8,8);
+          var d=cx.getImageData(0,0,8,8).data;
+          var transparent=0, opaqueGreen=0;
+          for(var i=0;i<d.length;i+=4){
+            if(d[i+3] < 20) transparent++;
+            else if(d[i+1] > d[i]+30 && d[i+1] > d[i+2]+30) opaqueGreen++;
+          }
+          if(transparent < 8 && opaqueGreen > 24){
+            failedSources.push({ url: url, reason: "green-screen" });
+            console.warn("[alpha-video] 该源是未抠像绿幕，已跳过", url);
+            tryNextSource();
+            return;
+          }
+        } catch(e) { /* 采样失败（跨域/解码差异）不阻断正常播放 */ }
+        reveal();
+      };
+      alphaVideo.addEventListener("loadeddata", checkAlpha, {once:true});
+      var pr = alphaVideo.play();
+      if(pr && pr.catch) pr.catch(function(){});
+      alphaVideo.onerror = function(){
+        if(token !== alphaVideoToken) return;
+        var code = alphaVideo.error ? alphaVideo.error.code : 0;
+        failedSources.push({ url: url, reason: "media-error", code: code });
+        console.warn("[alpha-video] 交付源加载失败 kind=media-error code=" + code, url);
+        tryNextSource();
+      };
+    }
+    tryNextSource();
+    return true;
+  }
+
+  // 从后台返回页面：浏览器可能把视频暂停了，回到前台只恢复播放，不改动任何显示状态
+  document.addEventListener("visibilitychange", function(){
+    if(document.visibilityState !== "visible") return;
+    if(!alphaVideo || alphaVideo.hidden) return;
+    if(alphaVideo.paused && alphaVideo.currentSrc){
+      var pr = alphaVideo.play();
+      if(pr && pr.catch) pr.catch(function(){});
+    }
+  });
+
+  function loadEmotionVisual(){
+    cancelAnimationFrame(animId);
+    if(!current) return;
+    if(current && current.delivery && (current.delivery.vp9 || current.delivery.mobileFallback)){
+      playAlphaVideo(current.delivery);
+      return;
+    }
+    releaseAlphaVideo();
+    canvas.hidden = false;
+    loadSheets();
+  }
+
+  function switchCharacter(id){
+    // 双重闸门：既要在正式白名单里，也要 manifest 真的交付了该角色的素材。
+    if(!isCharacterUnlocked(id)) return;
+    if(!CHARACTERS[id] || !CHARACTERS[id].emotions || CHARACTERS[id].emotions.length === 0) return;
+    userCancelInFlight();
+    releaseAlphaVideo();
+    cancelAnimationFrame(animId);
+    currentCharacterId = id;
+    EMOTIONS = CHARACTERS[id].emotions;
+    current = EMOTIONS[0];
+    renderCharacterSelect();
+    renderEmotionButtons();
+    clearGenerated();
+    resetComposeContent();   // 切换使者：同样清空文本 / 方言内容 / 试听状态
+    loadEmotionVisual();
+    renderDiag();
+    renderPreloadDiag();
+  }
+
+  function renderEmotionButtons(){
+    emotionsEl.innerHTML = "";
+    EMOTIONS.forEach(function(e){
+      var b=document.createElement("button"); b.type="button"; b.className="emotion";
+      b.dataset.em=e.id; b.textContent=e.name;
+      b.addEventListener("click", function(){ selectEmotion(e.id); });
+      emotionsEl.appendChild(b);
+    });
+    refreshUI(); renderSuggest();
+    if(current) scrollEmotionTo(current.id);
+  }
+  if(characterSelect){
+    characterSelect.addEventListener("change", function(){ switchCharacter(this.value); });
+  }
+  renderCharacterSelect();
+  if (fwdE) {
+    var _fwdEmo = EMOTIONS.find(function (x) { return x.id === String(fwdE); });
+    if (_fwdEmo) current = _fwdEmo;
+  }
+  renderEmotionButtons();
+
+  loadProductionManifest().then(function(ok){
+    if (ok) {
+      if(requestedCharacterId !== currentCharacterId && CHARACTERS[requestedCharacterId].emotions.length > 0){
+        currentCharacterId = requestedCharacterId;
+        EMOTIONS = CHARACTERS[currentCharacterId].emotions;
+      }
+      var keepId = fwdE ? String(fwdE) : (current && current.id);
+      current = EMOTIONS.find(function(e){ return e.id === keepId; }) || EMOTIONS[0];
+      renderCharacterSelect();
+      renderEmotionButtons();
+      loadEmotionVisual();
+      renderDiag(); renderPreloadDiag();
+    }
+    if(typeof syncGenerateEnabled === "function") syncGenerateEnabled();
+    applyForwardText();
+  });
+
+  function refreshUI(){ if(!current) return; Array.prototype.forEach.call(emotionsEl.children, function(b){ if(!b.dataset || !b.dataset.em) return; b.classList.toggle("active", b.dataset.em===current.id); }); }
+  function selectEmotion(id){
+    if(!current) return;
+    userCancelInFlight();
+    var prevId = current.id;
+    current = EMOTIONS.find(function(e){return e.id===id;}) || EMOTIONS[0];
+    scrollEmotionTo(current.id);
+    if(prevId !== current.id){
+      // 切换情绪：清空主输入 + 方言编辑框/转换状态 + 停止旧试听音频（避免上一情绪内容串进来）
+      resetComposeContent();
+    }
+    updateCharCount();
+    refreshUI(); clearGenerated(); loadEmotionVisual(); renderDiag(); renderPreloadDiag(); renderSuggest(); syncGenerateEnabled();
+  }
+
+  function renderSuggest(){
+    var list = SUGGESTIONS[uiKey()] || [];
+    suggestBox.innerHTML = "";
+    list.forEach(function(txt){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "suggest-chip";
+      b.innerHTML = '<span class="star">✦</span><span class="txt"></span>';
+      b.querySelector(".txt").textContent = txt;
+      if(txt === textInput.value) b.className = "suggest-chip selected";
+      b.addEventListener("click", function(){
+        invalidatePreviewToken();
+        textInput.value = txt;
+        previewTextEl.textContent = txt;
+        syncDialectWithOriginal();      // 选中推荐文案 → 自动同步到方言编辑框，可直接试听原文
+        suggestBox.hidden = true;
+        updateCharCount();
+        syncGenerateEnabled();
+      });
+      suggestBox.appendChild(b);
+    });
+  }
+
+  function sheetUrl(id, i){
+    var e = EMOTIONS.find(function(x){ return x.id === id; });
+    var dir = (e && e.previewProxy) || ("mobile/" + id);
+    return "assets/video/fengxin-rabbit-sequence/" + dir + "/sheet-" + String(i).padStart(2,"0") + ".webp?v=e15-2026-09-03";
+  }
+
+  function ensureSheets(id, cb, errCb){
+    var e = EMOTIONS.find(function(x){ return x.id === id; });
+    var c = cache[id];
+    if(c && c.state === "ready"){ cb(c.sheets); return; }
+    if(!c){ c = { sheets:[], state:"idle", sheetState:[], waiting:[], errWaiting:[], done:0 }; cache[id]=c; }
+    c.waiting.push(cb);
+    if(errCb) c.errWaiting.push(errCb);
+    if(c.state === "loading") return;
+
+    // error 或 idle 都允许重新加载（用户点击可重试）
+    c.state = "loading"; c.done = 0; c.sheets = []; c.sheetState = [];
+    for(var i=0;i<e.sheetCount;i++){
+      c.sheetState[i] = "loading";
+      (function(i){
+        var im = new Image();
+        im.onload = function(){
+          c.sheets[i] = im; c.sheetState[i] = "ready"; c.done++;
+          if(c.done === e.sheetCount){ c.state = "ready"; flushSheets(c, true); }
+        };
+        im.onerror = function(){
+          c.sheetState[i] = "error"; c.state = "error"; flushSheets(c, false);
+        };
+        im.src = sheetUrl(id, i);
+      })(i);
+    }
+    clearTimeout(c.timer);
+    c.timer = setTimeout(function(){ if(c.state === "loading"){ c.state = "error"; flushSheets(c, false); } }, 30000);
+  }
+
+  function flushSheets(c, ok){
+    var ws = c.waiting; c.waiting = [];
+    var es = c.errWaiting; c.errWaiting = [];
+    if(ok){ ws.forEach(function(f){ f(c.sheets); }); }
+    else { es.forEach(function(f){ f(); }); }
+    renderPreloadDiag();
+  }
+
+  function loadSheets(){
+    cancelAnimationFrame(animId);
+    activeUserLoad = true;
+    ensureSheets(current.id, function(sheetsReady){
+      sheets = sheetsReady;
+      startLoop();
+      activeUserLoad = false;
+      if(!NO_PRELOAD && !preloadStarted){
+        preloadStarted = true;
+        if ("requestIdleCallback" in window) {
+          window.requestIdleCallback(function(){ preloadNext(); }, { timeout: 6000 });
+        } else {
+          setTimeout(preloadNext, 4000);
+        }
+      }
+    }, function(){
+      activeUserLoad = false;
+      setStatus("情绪素材加载失败，点击该情绪重试", "err");
+    });
+  }
+
+  function preloadNext(){
+    if(activeUserLoad) return;
+    if(preloadOrder.length === 0) return;
+    var id = preloadOrder.shift();
+    ensureSheets(id, function(){ preloadNext(); }, function(){ preloadNext(); });
+  }
+
+  function renderPreloadDiag(){
+    if(!debugMode || !preloadDiagEl) return;
+    var parts = ["<b>预加载:</b>"];
+    EMOTIONS.forEach(function(e){
+      var c = cache[e.id];
+      var st = (current && e.id === current.id) ? "显示中" : (c ? c.state : "等待");
+      parts.push(e.name + "=" + st);
+    });
+    // 当前情绪的逐张状态
+    if(!current) return;
+    var cur = cache[current.id];
+    if(cur && cur.sheetState && cur.sheetState.length){
+      parts.push("&nbsp;·&nbsp;" + current.name + "明细:[" + cur.sheetState.join(" ") + "]");
+    }
+    if(preloadDiagEl) preloadDiagEl.innerHTML = parts.join(" ");
+  }
+  function paintFrame(){
+    var sheetIndex=Math.floor(frameIndex/FRAMES_PER_SHEET), local=frameIndex%FRAMES_PER_SHEET;
+    var sx=(local%COLS)*FRAME_SIZE, sy=Math.floor(local/COLS)*FRAME_SIZE;
+    ctx.clearRect(0,0,540,540); var img=sheets[sheetIndex];
+    if(img&&img.complete) ctx.drawImage(img,sx,sy,FRAME_SIZE,FRAME_SIZE,RENDER_X,RENDER_Y,RENDER_SIZE,RENDER_SIZE);
+  }
+  function startLoop(){ frameIndex=0; lastFrameAt=0; paintFrame(); cancelAnimationFrame(animId); animId=requestAnimationFrame(loop); }
+  function loop(now){ if(!lastFrameAt) lastFrameAt=now; if(now-lastFrameAt>=1000/FRAME_RATE){ lastFrameAt=now; frameIndex=(frameIndex+1)%current.totalFrames; paintFrame(); } animId=requestAnimationFrame(loop); }
+
+  var longTextHintShown=false;
+  function countChars(str){ return Array.from((str||"").trim()).length; }  // 与后端 Python len() 一致：按 Unicode 码点计数（中文/标点/英文/数字/空格/换行/emoji 均算 1）
+  function updateCharCount(){
+    var n = countChars(textInput.value);
+    var text = "当前 " + n + " 字";
+    if(charCountEl){ charCountEl.textContent = text; charCountEl.className = "char-count"; }
+    return n;
+  }
+  textInput.addEventListener("input", function(){
+    userCancelInFlight();
+    invalidatePreviewToken();
+    previewTextEl.textContent=textInput.value;
+    if(isDialectMode() && !dialectDirty){ dialectTextInput.value=textInput.value; }
+    var n=updateCharCount();
+    if(n>30 && !longTextHintShown){ showToast("文字较长，生成视频会相应更长。"); }
+    longTextHintShown=n>30;
+    syncGenerateEnabled();
+  });
+
+  // 键盘覆盖模式：只补偿输入框，不重排整页。
+  // 主动聚焦输入框 → 进入 keyboard-open（回收上方留白）；仅当输入框被键盘遮挡时做最小滚动，
+  // 输入框已可见则不动；失焦/键盘收起后立即恢复原布局。
+  function keyboardScrollTop(){
+    var se = document.scrollingElement || document.documentElement;
+    if(se && se.scrollHeight > se.clientHeight) return se.scrollTop;
+    if(document.body && document.body.scrollHeight > document.body.clientHeight) return document.body.scrollTop;
+    return (window.pageYOffset || 0);
+  }
+  function keyboardScrollBy(dy){
+    var se = document.scrollingElement || document.documentElement;
+    if(se && se.scrollHeight > se.clientHeight){ se.scrollTop += dy; return; }
+    if(document.body && document.body.scrollHeight > document.body.clientHeight){ document.body.scrollTop += dy; return; }
+    try { window.scrollBy(0, dy); } catch(e){}
+  }
+  function keyboardScrollTo(y){
+    var se = document.scrollingElement || document.documentElement;
+    if(se && se.scrollHeight > se.clientHeight){ se.scrollTop = y; return; }
+    if(document.body && document.body.scrollHeight > document.body.clientHeight){ document.body.scrollTop = y; return; }
+    try { window.scrollTo(0, y); } catch(e){}
+  }
+  var kbBaseHeight = window.innerHeight;      // 无键盘时的窗口高度基准
+  var kbSavedScroll = 0, kbFocusTimer = 0, kbPollTimer = 0, kbClosedCount = 0;
+  function kbRecover(){
+    // 键盘已关闭：立即恢复（停止轮询、清除 keyboard-open、还原滚动、刷新生成按钮）
+    clearInterval(kbPollTimer); kbPollTimer = 0;
+    kbClosedCount = 0;
+    document.documentElement.classList.remove("keyboard-open");
+    if(Math.abs(keyboardScrollTop() - kbSavedScroll) > 1){ keyboardScrollTo(kbSavedScroll); }
+    syncGenerateEnabled();
+  }
+  function kbKeyboardOpenNow(){
+    // 统一原生 resize 模式：window.innerHeight 在键盘弹出时一定缩小，是最可靠信号
+    return (kbBaseHeight - window.innerHeight) > 40;
+  }
+  function kbPollCheck(){
+    if(!document.documentElement.classList.contains("keyboard-open")){ kbRecover(); return; }
+    if(!kbKeyboardOpenNow()){
+      kbClosedCount++;
+      if(kbClosedCount >= 2){ kbRecover(); }   // 连续两次确认已关闭，避免开启动画误判
+    } else {
+      kbClosedCount = 0;
+    }
+  }
+  function kbEnsureInputVisible(){
+    // 输入框可见性第一优先级：resize 模式下布局视口底部即键盘上方，被遮挡才最小滚动
+    if(document.activeElement !== textInput) return;
+    var kbTop = window.innerHeight;
+    var r = textInput.getBoundingClientRect();
+    var overflow = r.bottom - (kbTop - 12);   // 需补距离，含 12px 安全间距
+    if(overflow > 0){ keyboardScrollBy(Math.ceil(overflow)); }
+  }
+  function syncKeyboardLayout(){
+    if(window.innerHeight > kbBaseHeight){ kbBaseHeight = window.innerHeight; }  // URL 栏收起等正常增大
+    if(!kbKeyboardOpenNow()){ kbRecover(); return; }
+    kbClosedCount = 0;
+    kbEnsureInputVisible();
+  }
+  textInput.addEventListener("focus", function(){
+    if(!(isAndroid || isIOS)) return;
+    kbSavedScroll = keyboardScrollTop();
+    document.documentElement.classList.add("keyboard-open");
+    clearTimeout(kbFocusTimer);
+    kbFocusTimer = setTimeout(function(){   // 兜底：原生未滚动到位时做最小补偿
+      if(document.activeElement === textInput) kbEnsureInputVisible();
+    }, 400);
+    // 轮询兜底：即使 blur/resize/visualViewport 事件全部缺失，键盘一关闭也必定恢复按钮
+    clearInterval(kbPollTimer);
+    kbClosedCount = 0;
+    kbPollTimer = setInterval(kbPollCheck, 250);
+  });
+  textInput.addEventListener("blur", function(){
+    if(!(isAndroid || isIOS)) return;
+    clearTimeout(kbFocusTimer);
+    kbRecover();
+  });
+  if(window.visualViewport){
+    window.visualViewport.addEventListener("resize", syncKeyboardLayout);
+    window.visualViewport.addEventListener("scroll", syncKeyboardLayout);
+  }
+  window.addEventListener("resize", syncKeyboardLayout);   // 旧 WebView 兜底
+
+  function setStatus(msg, cls){ statusEl.textContent=msg; statusEl.className="status" + (cls ? " "+cls : ""); }
+  function setGenerationProgress(phase, label, text){
+    if(!generationProgress) return;
+    if(phase === "preparing") generationProgressStartedAt = Date.now();
+    generationProgress.hidden = false;
+    generationProgress.setAttribute("data-phase", phase);
+    generationProgress.setAttribute("aria-valuetext", label);
+    if(generationProgressLabel) generationProgressLabel.textContent = label;
+    if(generationProgressText) generationProgressText.textContent = text || "";
+  }
+  function resetGenerationProgress(){
+    if(generationProgressTimer){ clearTimeout(generationProgressTimer); generationProgressTimer=null; }
+    if(generationProgress){ generationProgress.hidden=true; generationProgress.removeAttribute("data-phase"); generationProgress.setAttribute("aria-valuetext","准备中"); }
+    if(generationProgressLabel) generationProgressLabel.textContent="准备中";
+    if(generationProgressText) generationProgressText.textContent="正在准备生成任务";
+  }
+  window.onNativeStatus = function(ev){
+    try {
+      var phase = ev && ev.phase;
+      bridgeDiag.lastNativeEvent = { phase:phase, message:(ev && ev.message) || "", canShare:!!(ev && ev.canShare), elapsedMs:(ev && ev.elapsedMs) || 0 };
+      if(phase === "preparing"){ nativeReady=false; btnSendWeChat.disabled=true; btnSendWeChat.textContent="发给微信好友"; setStatus("视频已生成，正在准备发送…", "ok"); }
+      else if(phase === "ready"){ nativeReady=true; btnSendWeChat.disabled=false; btnSendWeChat.textContent="发给微信好友"; setStatus("准备完成，可以发送了", "ok"); }
+      else if(phase === "busy"){ setStatus(ev.message || "请先完成当前分享", ""); }
+      else if(phase === "error"){ nativeReady=false; btnSendWeChat.disabled=true; btnSendWeChat.textContent="发给微信好友"; setStatus(ev.message || "视频准备失败，请重新生成后再试", "err"); document.documentElement.classList.add("show-save-fallback"); }
+      else if(phase === "sharing"){ setStatus("正在打开系统分享…", ""); }
+      else if(phase === "video_share_returned"){ setStatus(ev.message || "视频已发送", "ok"); }
+      renderBridgeDiag();
+    } catch(err){ console.error("onNativeStatus error:", err); }
+  };
+  function setHint(msg){ hintEl.textContent=msg || ""; }
+  function showToast(msg){ toastEl.textContent=msg; toastEl.classList.add("show"); clearTimeout(showToast._t); showToast._t=setTimeout(function(){toastEl.classList.remove("show");},1800); }
+
+  function syncGenerateEnabled(){
+    btnGenerate.disabled = isGenerating || !current || !BUILD_CONTRACT;
+  }
+
+  var cancelReason=null, genToken=0, genTimerId=null, genTimeoutId=null;
+
+  function resetGenerateState(){
+    if(genTimerId){ clearInterval(genTimerId); genTimerId=null; }
+    if(genTimeoutId){ clearTimeout(genTimeoutId); genTimeoutId=null; }
+    if(activeController){ try { activeController.abort(); } catch(e){} activeController=null; }
+    isGenerating=false;
+    generatePhase="idle";
+    if(btnGenerate){ btnGenerate.textContent="生成视频 →"; }
+    syncGenerateEnabled();
+    renderDiag();
+    cancelReason = null;
+  }
+
+  function userCancelInFlight(){
+    if(!isGenerating) return;
+    cancelReason="user";
+    genToken++;
+    resetGenerateState();
+    resetGenerationProgress();
+  }
+
+  function withTimeout(promise, ms, controller){
+    return new Promise(function(resolve, reject){
+      var t=setTimeout(function(){
+        if(controller){ try { controller.abort(); } catch(e){} }
+        reject(new Error("generate timeout"));
+      }, ms);
+      promise.then(function(v){ clearTimeout(t); resolve(v); }, function(e){ clearTimeout(t); reject(e); });
+    });
+  }
+
+  function renderDiag(){
+    if(!debugMode || !diagEl) return;
+    var ua = navigator.userAgent || "";
+    var lines = [
+      "<b>UA:</b> " + ua,
+      "<b>请求阶段:</b> " + generatePhase,
+      "<b>情绪:</b> " + (current ? (current.name + " (id=" + current.id + ", item=" + current.item + ")") : "未加载"),
+      "<b>生成次数:</b> " + genCount,
+      "<b>预览src:</b> " + (lastUrl ? "(Blob MP4)" : "无"),
+      "<b>Bridge:</b> " + (isAppBridge ? "APK Native" : "Web")
+    ];
+    if(lastTiming){
+      lines.push("<b>耗时:</b> 点击→请求=" + lastTiming.clickToFetchMs + "ms fetch=" + lastTiming.fetchMs + "ms blob=" + lastTiming.blobMs + "ms 总=" + lastTiming.totalMs + "ms");
+    }
+    diagEl.innerHTML = lines.join("<br>");
+    renderBridgeDiag();
+  }
+
+  function clearGenerated(){
+    resetGenerationProgress();
+    document.documentElement.classList.remove("state-done");
+    document.documentElement.classList.remove("can-file-share");
+    document.documentElement.classList.remove("show-save-fallback");
+    nativeReady=false; nativeVideoPath="";
+    bridgeDiag.prepareCalled=false;
+    if(isAppBridge && window.AndroidShare && typeof window.AndroidShare.clearPreparedVideo === "function"){ try { window.AndroidShare.clearPreparedVideo(); } catch(e){} }
+    if(btnSendWeChat){ btnSendWeChat.hidden=true; btnSendWeChat.disabled=true; }
+    if(lastUrl){ URL.revokeObjectURL(lastUrl); lastUrl=null; }
+    lastBlob=null; lastFile=null;
+    videoEl.pause();
+    videoEl.muted=true;
+    videoEl.removeAttribute("src");
+    videoEl.load();
+    videoEl.hidden=true;
+    if(btnSound){ btnSound.hidden=true; }
+    btnOpen.hidden=true; btnSave.hidden=true; btnSend.disabled=true; btnReEdit.hidden=true; btnHome.hidden=true;
+    setStatus("");
+    setHint("");
+  }
+
+  function reEdit(){
+    userCancelInFlight();
+    clearGenerated();
+    syncGenerateEnabled();
+  }
+
+  function resetPreviewButton(){ btnPreviewVoice.disabled=false; btnPreviewVoice.textContent="🔊 试听"; }
+  function stopPreviewAudio(){
+    if(previewSource){
+      try{ previewSource.onended=null; previewSource.stop(); }catch(e){}
+      try{ previewSource.disconnect(); }catch(e){}
+      previewSource=null;
+    }
+    if(previewAudio){
+      try{ previewAudio.pause(); }catch(e){}
+      previewAudio.onended=null; previewAudio.onerror=null;
+      previewAudio.removeAttribute("src");
+      try{ previewAudio.load(); }catch(e){}
+      previewAudio=null;
+    }
+    if(previewHtmlAudio){
+      try{ previewHtmlAudio.pause(); }catch(e){}
+      previewHtmlAudio.onended=null; previewHtmlAudio.onerror=null;
+      previewHtmlAudio.removeAttribute("src");
+      try{ previewHtmlAudio.load(); }catch(e){}
+      previewHtmlAudio.muted=false;
+    }
+    if(previewAudioUrl){ try{ URL.revokeObjectURL(previewAudioUrl); }catch(e){} previewAudioUrl=null; }
+  }
+  function invalidatePreviewToken(){
+    previewReqId++;
+    stopPreviewAudio();
+    previewState="idle";
+    ttsToken=null;
+    resetPreviewButton();
+  }
+  function onPreviewAudioEnded(){
+    stopPreviewAudio();
+    previewState="idle";
+    resetPreviewButton();
+  }
+  function previewVoice(){
+    if(previewState==="playing"){ stopPreviewAudio(); previewState="idle"; resetPreviewButton(); return; }
+    if(previewState==="loading") return;
+    var text=effectiveSpeechText();
+    if(!text){ showToast("请先输入或选择一句话"); return; }
+    var myReq=++previewReqId;
+    previewState="loading";
+    btnPreviewVoice.disabled=true; btnPreviewVoice.textContent="生成语音…";
+
+    if(isIOS){
+      // iOS：点击手势内先用可复用的 HTMLAudioElement 做 muted 解锁（不播放可听内容），
+      // 之后同一 element 收到真实 MP3 时才能被 iOS 允许播放。
+      if(!previewHtmlAudio){ try{ previewHtmlAudio=new Audio(); }catch(e){ previewHtmlAudio=null; } }
+      if(previewHtmlAudio){
+        previewHtmlAudio.muted=true;
+        previewHtmlAudio.src=SILENT_WAV;
+        try{ previewHtmlAudio.play().catch(function(){}); }catch(e){}
+      }
+    } else {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if(!previewAudioCtx && AC){ try{ previewAudioCtx=new AC(); }catch(e){ previewAudioCtx=null; } }
+      if(previewAudioCtx && previewAudioCtx.state==="suspended"){ previewAudioCtx.resume().catch(function(){}); }
+    }
+
+    fetch(MAKE_SEND_API + "/tts", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ text:text, voiceId:voiceSelect.value, itemId:current ? current.item : "" }),
+      cache:"no-store",
+      mode:"cors"
+    }).then(function(resp){
+      if(myReq!==previewReqId) return null;
+      var token=resp.headers.get("X-TTS-Token");
+      if(!resp.ok){
+        return resp.json().catch(function(){ return {}; }).then(function(d){ throw new Error((d&&d.message)||(d&&d.error)||("HTTP "+resp.status)); });
+      }
+      return resp.blob().then(function(blob){
+        if(myReq!==previewReqId) return null;
+        if(!blob || blob.size===0) throw new Error("empty audio");
+        return { blob:blob, token:token };
+      });
+    }).then(async function(result){
+      if(myReq!==previewReqId || !result) return;
+      stopPreviewAudio();
+      ttsToken=result.token || null;
+
+      if(isIOS){
+        if(!previewHtmlAudio){ try{ previewHtmlAudio=new Audio(); }catch(e){ previewHtmlAudio=null; } }
+        previewAudioUrl=URL.createObjectURL(result.blob);
+        previewHtmlAudio.src=previewAudioUrl;
+        previewHtmlAudio.muted=false;
+        previewHtmlAudio.onended=onPreviewAudioEnded;
+        previewHtmlAudio.onerror=function(){ onPreviewAudioEnded(); };
+        try{ previewHtmlAudio.load(); }catch(e){}
+        previewState="playing";
+        btnPreviewVoice.disabled=false; btnPreviewVoice.textContent="⏹ 停止";
+        var pr=previewHtmlAudio.play();
+        if(pr && pr.catch){ pr.catch(function(){ if(myReq!==previewReqId) return; if(previewHtmlAudio){ onPreviewAudioEnded(); } showToast("播放失败，请重试"); }); }
+        return;
+      }
+
+      if(previewAudioCtx){
+        try {
+          if(previewAudioCtx.state !== "running"){
+            await previewAudioCtx.resume().catch(function(){});
+          }
+          if(previewAudioCtx.state !== "running"){
+            throw new Error("audio context not running");
+          }
+          var buf = await result.blob.arrayBuffer();
+          if(myReq!==previewReqId) return;
+          var audioBuffer = await new Promise(function(resolve, reject){
+            previewAudioCtx.decodeAudioData(buf, resolve, reject);
+          });
+          if(myReq!==previewReqId) return;
+          if(!audioBuffer) throw new Error("decode audio failed");
+          var src=previewAudioCtx.createBufferSource();
+          src.buffer=audioBuffer;
+          src.connect(previewAudioCtx.destination);
+          src.onended=function(){ if(previewSource===src){ previewSource=null; onPreviewAudioEnded(); } };
+          previewSource=src;
+          previewState="playing";
+          btnPreviewVoice.disabled=false; btnPreviewVoice.textContent="⏹ 停止";
+          src.start(0);
+          return;
+        } catch(e) {
+          if(myReq!==previewReqId) return;
+        }
+      }
+
+      // 非 iOS 兜底：无 AudioContext 或 AudioContext 播放失败时用 HTMLAudioElement
+      previewAudioUrl=URL.createObjectURL(result.blob);
+      previewAudio=new Audio(previewAudioUrl);
+      previewAudio.onended=onPreviewAudioEnded;
+      previewAudio.onerror=function(){ onPreviewAudioEnded(); };
+      previewState="playing";
+      btnPreviewVoice.disabled=false; btnPreviewVoice.textContent="⏹ 停止";
+      var pr=previewAudio.play();
+      if(pr && pr.catch){ pr.catch(function(){ if(previewAudio){ onPreviewAudioEnded(); showToast("播放失败，请重试"); } }); }
+    }).catch(function(err){
+      if(myReq!==previewReqId) return;
+      stopPreviewAudio();
+      previewState="idle";
+      ttsToken=null;
+      resetPreviewButton();
+      showToast(err && err.message ? err.message : "试听失败，请重试");
+    });
+  }
+
+  async function generateVideo(){
+    if(window.__SITE_PAUSED__ === true){ showToast("服务暂时不可用，请稍后再试"); return; }
+    if(isGenerating){
+      showToast("视频正在生成，请稍候");
+      return;
+    }
+    var text=(textInput.value||"").trim();
+    if(text && countChars(text) > 30){ showToast("文字较长，生成视频会相应更长。"); }
+
+    cancelReason=null;
+    var myToken=++genToken;
+    isGenerating=true;
+    genCount++;
+    var tClick = performance.now();
+    btnGenerate.textContent="正在生成…"; syncGenerateEnabled();
+    var msgs=text ? ["正在生成你的情绪视频…","正在加入你的文字…","正在生成声音…","视频马上好了…"] : ["正在生成你的情绪视频…","正在编排动作与表情…","视频马上好了…"];
+    var mi=0; setStatus(msgs[0]); setHint("");
+    generatePhase="feedback-visible";
+    lastTiming={ clickToFetchMs:"—", fetchMs:"—", blobMs:"—", totalMs:"—" };
+    renderDiag();
+    genTimerId=setInterval(function(){ mi=(mi+1)%msgs.length; setStatus(msgs[mi]); }, 2600);
+
+    try{
+      clearGenerated();
+      setGenerationProgress("preparing", "准备中", text ? "正在准备文字与声音" : "正在准备情绪视频");
+      await new Promise(function(resolve){
+        requestAnimationFrame(function(){ setTimeout(resolve, 0); });
+      });
+      var tFetchStart = performance.now();
+      lastTiming.clickToFetchMs=Math.round(tFetchStart-tClick);
+      if(!BUILD_CONTRACT || !current){ throw new Error("production contract not ready"); }
+      var speechText=text ? effectiveSpeechText() : "";
+      if(!text){ ttsToken=null; speechText=""; }
+      var url=MAKE_SEND_API + "/make-send?text=" + encodeURIComponent(text) + "&item=" + encodeURIComponent(current.item) + "&characterId=" + encodeURIComponent(current.characterId) + "&buildId=" + encodeURIComponent(BUILD_CONTRACT.buildId) + "&manifestVersion=" + encodeURIComponent(BUILD_CONTRACT.manifestVersion) + "&assetVersion=" + encodeURIComponent(current.assetVersion || "") + "&expectedMasterSHA256=" + encodeURIComponent(current.generationMasterSha256 || "") + "&voiceId=" + encodeURIComponent(voiceSelect.value) + (text && speechText && speechText!==text ? "&speechText=" + encodeURIComponent(speechText) : "") + (text && ttsToken ? "&ttsToken=" + encodeURIComponent(ttsToken) : "") + (isAppBridge ? "&app_bridge=1" : "") + "&async=1";
+      activeController = typeof AbortController === "function" ? new AbortController() : null;
+      generatePhase="request-sent";
+      renderDiag();
+      console.info("[send-test] request sent", { item:current.item, clickToFetchMs:lastTiming.clickToFetchMs });
+      var request = fetch(url, { cache:"no-store", mode:"cors", signal:activeController ? activeController.signal : undefined });
+      var resp=await withTimeout(request, GENERATE_TIMEOUT_MS, activeController);
+      var tHeaders = performance.now();
+      generatePhase="response-headers";
+      if(!resp.ok){
+        var errMsg=null;
+        try {
+          var errText=await withTimeout(resp.text(), 4000, activeController);
+          try { var j=JSON.parse(errText); errMsg=(j && (j.message || j.error)) || null; } catch(e){ errMsg=errText ? errText.slice(0,120) : null; }
+        } catch(e){ /* 错误响应体读取超时也直接按通用错误处理 */ }
+        var err=new Error("HTTP "+resp.status);
+        err.status=resp.status;
+        if(errMsg){ err.backendMessage=errMsg; }
+        throw err;
+      }
+      var jobData=null;
+      try { jobData=await withTimeout(resp.json(), 4000, activeController); } catch(e){}
+      if(!jobData || !jobData.job){ throw new Error("invalid job response"); }
+      var job=jobData.job;
+      var stageDelay = Math.max(0, 300 - (Date.now() - generationProgressStartedAt));
+      if(text && !ttsToken){
+        generationProgressTimer=setTimeout(function(){
+          setGenerationProgress("voice", "生成声音", "正在生成语音与字幕");
+          generationProgressTimer=setTimeout(function(){ setGenerationProgress("compose", "合成视频", "正在合成情绪视频"); }, 3500);
+        }, stageDelay);
+      } else {
+        generationProgressTimer=setTimeout(function(){ setGenerationProgress("compose", "合成视频", "正在合成情绪视频"); }, stageDelay);
+      }
+      // 长文本异步生成：后端立即返回 202 {job}，前端轮询 /make-send/result 拿 videoPath，
+      // 避免单次长连接等待超过网络/代理容忍窗口而被切断。
+      var videoPath="";
+      var pollDeadline = Date.now() + 150000;
+      generatePhase="polling";
+      renderDiag();
+      while(true){
+        if(myToken !== genToken || cancelReason === "user" || !isGenerating){ return; }
+        if(Date.now() > pollDeadline){
+          if(activeController){ try{ activeController.abort(); }catch(e){} }
+          throw new Error("generate timeout");
+        }
+        var pollUrl=MAKE_SEND_API + "/make-send/result?job=" + encodeURIComponent(job);
+        var pollResp=await withTimeout(fetch(pollUrl, { cache:"no-store", mode:"cors" }), 20000, activeController);
+        var pollJson=null;
+        try { pollJson=await pollResp.json(); } catch(e){}
+        if(!pollResp.ok || !pollJson){
+          var perr=new Error("HTTP "+(pollResp ? pollResp.status : "?"));
+          if(pollJson && (pollJson.error || pollJson.message)){ perr.backendMessage=pollJson.error || pollJson.message; }
+          throw perr;
+        }
+        if(pollJson.status === "done" && pollJson.videoPath){ videoPath=pollJson.videoPath; break; }
+        if(pollJson.status === "error"){
+          var e3=new Error(pollJson.error || "生成失败");
+          e3.backendMessage=pollJson.error || "生成失败";
+          throw e3;
+        }
+        if(pollJson.status === "busy"){
+          var e4=new Error(pollJson.error || "服务繁忙，请稍后重试");
+          e4.backendMessage=pollJson.error || "服务繁忙，请稍后重试";
+          throw e4;
+        }
+        await new Promise(function(res){ setTimeout(res, 2000); });
+        if(myToken !== genToken || cancelReason === "user" || !isGenerating){ return; }
+      }
+      var vresp=await withTimeout(fetch(MAKE_SEND_API + videoPath, { cache:"no-store", mode:"cors", signal:activeController ? activeController.signal : undefined }), BLOB_TIMEOUT_MS, activeController);
+      if(!vresp.ok) throw new Error("HTTP "+vresp.status);
+      var tBlob = performance.now();
+      var blob=await withTimeout(vresp.blob(), BLOB_TIMEOUT_MS, activeController);
+      if(!blob || blob.size===0) throw new Error("empty blob");
+      var file=new File([blob], EXPORT_FILE_NAME, { type:"video/mp4" });
+      lastBlob=blob; lastFile=file;
+      lastUrl=URL.createObjectURL(blob);
+      videoEl.src=lastUrl;
+      videoEl.hidden=false;
+      if(btnSound){ btnSound.hidden=false; syncSoundBtn(); }
+      videoEl.play().catch(function(){});
+      // 首帧设为 poster：个别 WebView 拦截自动播放时，预览区仍显示视频首帧而非空白
+      videoEl.addEventListener("loadeddata", function onFirstFrame(){
+        videoEl.removeEventListener("loadeddata", onFirstFrame);
+        try {
+          var fc=document.createElement("canvas");
+          fc.width=videoEl.videoWidth; fc.height=videoEl.videoHeight;
+          fc.getContext("2d").drawImage(videoEl, 0, 0);
+          videoEl.poster=fc.toDataURL("image/jpeg", 0.7);
+        } catch(e){}
+      });
+      // poster 仅作兜底：自动播放被拦截时，首次任意交互（或点击视频）即恢复真实视频播放
+      var ensurePlay = function(){
+        document.removeEventListener("touchstart", ensurePlay);
+        document.removeEventListener("click", ensurePlay);
+        try { if(videoEl.paused) videoEl.play().catch(function(){}); } catch(e){}
+      };
+      document.addEventListener("touchstart", ensurePlay, { passive:true });
+      document.addEventListener("click", ensurePlay);
+      videoEl.addEventListener("click", function(){ try { videoEl.play().catch(function(){}); } catch(e){} });
+      var tDone = performance.now();
+      lastTiming = { clickToFetchMs: Math.round(tFetchStart-tClick), fetchMs: Math.round(tHeaders-tFetchStart), blobMs: Math.round(tBlob-tHeaders), totalMs: Math.round(tDone-tClick) };
+      generatePhase="success";
+      if(generationProgressTimer){ clearTimeout(generationProgressTimer); generationProgressTimer=null; }
+      setGenerationProgress("complete", "完成", "视频已生成");
+      generationProgressTimer=setTimeout(function(){ if(generationProgress) generationProgress.hidden=true; generationProgressTimer=null; }, 1600);
+      if(isAppBridge){ nativeVideoPath = /^\/app-video\/[A-Za-z0-9_-]{20,128}\.mp4$/.test(videoPath) ? videoPath : ""; }
+      setStatus("视频生成成功", "ok");
+      document.documentElement.classList.add("state-done");
+      var canShareFile = false;
+      try { canShareFile = !!(navigator.canShare && navigator.canShare({files:[file]})); } catch(e) { canShareFile = false; }
+      var shareHint;
+      if(isIOS && !isWeChat && canShareFile){ shareHint = "点击“发给TA”，即可打开系统分享面板"; }
+      else if(isIOS){ shareHint = "打开后，点击右上角‘…’即可分享"; }
+      else if(isWeChat){ shareHint = "请在浏览器中打开后发送视频"; }
+      else if(isAndroid){ shareHint = "点击“发给TA”，选择微信发送。"; }
+      else { shareHint = "点击“发给TA”，可选择微信或其他应用。"; }
+      setHint(shareHint);
+      btnReEdit.hidden=false; btnHome.hidden=false;
+      if(isAppBridge){
+        setHint("");
+        btnSendWeChat.hidden=false; btnSendWeChat.disabled=true; btnSendWeChat.textContent="发给微信好友";
+        if(nativeVideoPath){
+          handoffToNative();
+        } else {
+          setStatus("视频已生成，但无法准备发送，请保存后从微信发送。", "err");
+          document.documentElement.classList.add("show-save-fallback");
+        }
+      }
+      btnSend.disabled=false;
+      if(!isWeChat && !isAppBridge){
+        if(canShareFile){
+          setHint("点击“发给TA”，可选择微信或其他应用。");
+        } else {
+          btnSave.hidden=false;
+          setHint("当前浏览器不能直接分享，点击“发给TA”将保存视频，再打开微信发送。");
+        }
+      }
+    } catch(err){
+      if(myToken !== genToken) return;
+      var timedOut = !!(activeController && activeController.signal.aborted && cancelReason !== "user");
+      console.error("generate error:", err);
+      generatePhase = timedOut ? "timeout" : "error";
+      if(cancelReason !== "user"){
+        if(generationProgressTimer){ clearTimeout(generationProgressTimer); generationProgressTimer=null; }
+        setGenerationProgress("failed", "失败", timedOut ? "生成超时，请重试" : "生成失败，请重试");
+      }
+      if(cancelReason === "user"){
+        // 用户主动修改文字/切换情绪：静默取消，不弹错误
+      } else if(timedOut){
+        setStatus("生成时间有点久，请再试一次。", "err");
+        showToast("生成时间有点久，请再试一次。");
+      } else if(err.status === 429 || (err.backendMessage && /server\s*busy/i.test(String(err.backendMessage)))){
+        setStatus("同时生成的视频有点多，请稍等几秒再试", "err");
+        showToast("同时生成的视频有点多，请稍等几秒再试");
+      } else if(err && err.backendMessage){
+        setStatus(err.backendMessage, "err");
+        showToast(err.backendMessage);
+      } else {
+        setStatus("视频生成失败，请重试", "err");
+        showToast("视频生成失败，请重试");
+      }
+    } finally {
+      if(myToken !== genToken) return;
+      resetGenerateState();
+    }
+  }
+
+  function openVideo(){
+    if(!lastUrl){ showToast("请先生成视频"); return; }
+    videoEl.hidden=false; videoEl.play && videoEl.play().catch(function(){});
+    setHint("可直接在上方播放查看；如需发送，请保存到手机后从微信选择该视频。");
+  }
+
+  function downloadBlob(blob, name){
+    var u=URL.createObjectURL(blob);
+    var a=document.createElement("a"); a.href=u; a.download=name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(u); }, 60000);
+  }
+
+  function saveVideo(){
+    if(!lastBlob){ showToast("请先生成视频"); return; }
+    downloadBlob(lastBlob, EXPORT_FILE_NAME);
+    if(isIOS){
+      setStatus("");
+      setHint("打开后，点击右上角‘…’即可分享");
+    } else {
+      setStatus("视频已保存", "ok");
+      setHint("已保存到手机；若找不到，可在浏览器下载记录中打开。");
+    }
+  }
+
+  function sendVideo(){
+    if(!lastFile){ showToast("请先生成视频"); return; }
+    if(navigator.canShare && navigator.canShare({files:[lastFile]})){
+      if(isAndroid) setStatus("正在打开系统分享…");
+      navigator.share({ files:[lastFile], title:"心意表达", text:textInput.value }).then(function(){
+        setStatus("已调起系统分享", "ok");
+      }).catch(function(e){
+        console.error("share error:", e);
+        if(isAndroid && e && e.name === "AbortError"){
+          setStatus("视频已生成", "ok");
+          setHint("已取消发送，可再次点击“发给TA”。");
+        } else if(isIOS && e && e.name === "AbortError"){
+          setStatus("视频已生成", "ok");
+          setHint("已取消分享，可再次点击“发给TA”。");
+        } else {
+          setStatus("分享失败", "err");
+          setHint("请重试");
+        }
+      });
+    } else {
+      downloadBlob(lastBlob, EXPORT_FILE_NAME);
+      setStatus("视频已保存，请从微信发送", "ok");
+      setHint("当前浏览器不能直接分享，视频已保存；请打开微信发送。");
+    }
+  }
+
+  btnSuggest.addEventListener("click", function(){
+    if(suggestBox.hidden){
+      renderSuggest();
+      suggestBox.hidden = false;
+    } else {
+      suggestBox.hidden = true;
+    }
+    syncGenerateEnabled();
+  });
+
+  btnPreviewVoice.addEventListener("click", previewVoice);
+  btnGenerate.addEventListener("click", generateVideo);
+  btnOpen.addEventListener("click", openVideo);
+  function syncSoundBtn(){
+    if(!btnSound) return;
+    btnSound.textContent = videoEl.muted ? "🔇" : "🔊";
+  }
+  if(btnSound){
+    btnSound.addEventListener("click", function(){
+      videoEl.muted = !videoEl.muted;
+      syncSoundBtn();
+      try { if(videoEl.paused) videoEl.play().catch(function(){}); } catch(e){}
+    });
+  }
+  btnSave.addEventListener("click", saveVideo);
+  btnSend.addEventListener("click", sendVideo);
+  btnReEdit.addEventListener("click", reEdit);
+  function backHomeOrIndex(){
+    if (fwdFromHome) {
+      try { if (window.history && window.history.length > 1) { window.history.back(); return; } } catch (e) {}
+    }
+    location.href = "index.html";
+  }
+  btnHome.addEventListener("click", backHomeOrIndex);
+  var backHomeLink = document.querySelector(".back-home");
+  if (backHomeLink && fwdFromHome) {
+    backHomeLink.addEventListener("click", function (ev) {
+      try { if (window.history && window.history.length > 1) { ev.preventDefault(); window.history.back(); } } catch (e) {}
+    });
+  }
+  btnSendWeChat.addEventListener("click", function(){
+    if(!nativeReady){ setStatus("视频正在准备，请稍候…", ""); return; }
+    try { window.AndroidShare.sharePreparedVideo(); } catch(err){ setStatus("无法打开系统分享，请重试", "err"); }
+    renderBridgeDiag();
+  });
+
+  if (debugMode) {
+    document.addEventListener("click", function(e){
+      var el = document.elementFromPoint(e.clientX, e.clientY);
+      var desc = el ? (el.tagName + "." + (typeof el.className === "string" ? el.className : "").split(" ")[0]) : "null";
+      if(tapDiagEl) tapDiagEl.innerHTML = "点击命中: " + desc;
+    }, true);
+  }
+
+
+  refreshUI();
+  loadEmotionVisual();
+  renderDiag();
+  renderBridgeDiag();
+  renderPreloadDiag();
+  updateCharCount();
+  syncGenerateEnabled();
+};
+
+if (window.__MAIN_PENDING__) {
+  window.__MAIN_PENDING__ = false;
+  window.__MAIN__();
+}
+</script>
+<script>
+// 诊断模式（仅 ?perf=1）：在页面右下角显示各阶段耗时（相对导航开始，毫秒）。
+// 用于真机定位“切换慢”的时间去向：HTML解析/初始化/兔子素材解码。
+(function () {
+  if (new URLSearchParams(location.search).get("perf") !== "1") return;
+  var navT = (window.performance && performance.timing && performance.timing.navigationStart) ? performance.timing.navigationStart : Date.now();
+  function now() {
+    return Math.round((window.performance && performance.now) ? performance.now() : (Date.now() - navT));
+  }
+  function show(html) {
+    var bar = document.getElementById("perfBar");
+    if (!bar) {
+      bar = document.createElement("div");
+      bar.id = "perfBar";
+      bar.style.cssText = "position:fixed;right:8px;bottom:120px;z-index:99999;background:rgba(0,0,0,.82);color:#7CFFB2;font:11px/1.6 monospace;padding:8px 10px;border-radius:10px;white-space:pre;max-width:78vw;pointer-events:none;";
+      document.body.appendChild(bar);
+    }
+    bar.innerHTML = html;
+  }
+  var R = { dcl: "-", load: "-", init: "-", rabbit: "-" };
+  document.addEventListener("DOMContentLoaded", function () { R.dcl = now(); });
+  window.addEventListener("load", function () { R.load = now(); });
+  var tries = 0;
+  function poll() {
+    tries++;
+    if (R.init === "-" && document.querySelectorAll(".emotion").length >= 3) R.init = now();
+    var cv = document.getElementById("stage");
+    var painted = false;
+    try { var c = cv && cv.getContext ? cv.getContext("2d") : null; if (c) { var d = c.getImageData(200, 200, 1, 1).data; painted = d[3] !== 0; } } catch (e) {}
+    if (R.rabbit === "-" && painted) R.rabbit = now();
+    show("页面解析/JS执行  → DOMContentLoaded: " + R.dcl + "ms\nload 事件: " + R.load + "ms\n情绪按钮渲染(初始化完成): " + R.init + "ms\n兔子首帧绘制(素材解码完成): " + R.rabbit + "ms\n网络传输(HTML+JS+素材): 另计");
+    if (R.rabbit !== "-" || tries > 400) { show("perf 完成\n→ DOMContentLoaded: " + R.dcl + "ms\n→ load: " + R.load + "ms\n→ 初始化(情绪按钮): " + R.init + "ms\n→ 兔子首帧: " + R.rabbit + "ms"); return; }
+    setTimeout(poll, 50);
+  }
+  setTimeout(poll, 100);
+  setTimeout(function () { show("perf(15s超时)\n→ DOMContentLoaded: " + R.dcl + "ms\n→ load: " + R.load + "ms\n→ 初始化: " + R.init + "ms\n→ 兔子首帧: " + R.rabbit + "ms"); }, 15000);
+})();
+</script>
+</body>
+</html>
