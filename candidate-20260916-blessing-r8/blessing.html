@@ -131,9 +131,9 @@ window.__LUGU_BOOT__ = (function () {
   .chevron { display:inline-block; flex:0 0 auto; width:7px; height:7px; margin-left:1px;
     border-right:1.6px solid currentColor; border-bottom:1.6px solid currentColor;
     transform:rotate(45deg); transition:transform .16s ease; }
-  .character-trigger .chevron { color:rgba(184,192,255,.74); display:inline-block; width:7px; height:7px; min-width:7px;
-    border-right:1.6px solid currentColor; border-bottom:1.6px solid currentColor; }
-  .character-trigger[aria-expanded="true"] .chevron { transform:rotate(225deg); }
+  .character-trigger .chevron { color:rgba(184,192,255,.74); }
+  .character-trigger .chevron svg { display:block; width:10px; height:6px; }
+  .character-trigger[aria-expanded="true"] .chevron svg { transform:rotate(180deg); }
   .character-menu { position:absolute; left:0; bottom:calc(100% + 9px); z-index:80; width:min(82vw,318px); padding:10px; border:1px solid rgba(125,139,255,.28); border-radius:16px; background:rgba(17,20,40,.98); box-shadow:0 16px 36px rgba(0,0,0,.42); }
   .character-menu[hidden] { display:none !important; }
   .character-menu-title { margin:0 0 8px 2px; color:rgba(226,230,255,.78); font-size:11px; font-weight:700; letter-spacing:.08em; }
@@ -303,7 +303,7 @@ window.__LUGU_BOOT__ = (function () {
         <span class="select-wrap" id="quickSceneWrap"><select id="quickSceneSelect" class="voice-select" aria-label="推荐文案场景"><option value="general">日常祝福</option><option value="festival">节日祝福</option><option value="thanks">感谢祝福</option></select></span>
       </div>
       <div class="sub-row sub-row-2">
-        <div class="character-picker" id="characterPicker"><button class="character-trigger" id="characterTrigger" type="button" aria-expanded="false" aria-controls="characterMenu"><span class="picker-label">使者</span><span class="character-current" id="characterCurrent">风信兔</span><span class="chevron" aria-hidden="true"></span></button><div class="character-menu" id="characterMenu" hidden role="listbox" aria-label="七星使者头像"><div class="character-menu-title">七星使者</div><div class="character-menu-grid" id="characterMenuGrid"></div></div></div>
+        <div class="character-picker" id="characterPicker"><button class="character-trigger" id="characterTrigger" type="button" aria-expanded="false" aria-controls="characterMenu"><span class="picker-label">使者</span><span class="character-current" id="characterCurrent">风信兔</span><span class="chevron" aria-hidden="true"><svg viewBox="0 0 10 6" width="10" height="6" focusable="false" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button><div class="character-menu" id="characterMenu" hidden role="listbox" aria-label="七星使者头像"><div class="character-menu-title">七星使者</div><div class="character-menu-grid" id="characterMenuGrid"></div></div></div>
         <select id="characterSelect" class="character-select" aria-label="选择使者" hidden></select>
         <span class="voice-cluster">
           <span class="voice-mini" role="group" aria-label="声音设置"><span class="voice-icon" aria-hidden="true">🔊</span><span class="select-wrap" id="voiceScopeWrap"><select id="voiceScopeSelect" class="voice-select voice-scope" aria-label="选择普通话或方言"><option value="standard">普通话</option><option value="dialect">方言</option></select></span><span class="select-wrap" id="dialectSelectWrap" hidden><select id="dialectSelect" class="voice-select voice-dialect" aria-label="选择方言"></select></span><span class="select-wrap" id="voiceSelectWrap"><select id="voiceSelect" class="voice-select" aria-label="选择声音"></select></span></span>
