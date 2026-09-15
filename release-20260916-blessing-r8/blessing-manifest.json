@@ -5,7 +5,7 @@
     "buildId": "release-20260915-fox-blessing-v1",
     "manifestVersion": "20260915-fox-blessing-v1"
   },
-  "updatedAt": "2026-09-15",
+  "updatedAt": "2026-09-15T07:31:42.564Z",
   "actions": {
     "fox-blessing-flowers": {
       "itemId": "fox-blessing-flowers",
@@ -54,6 +54,18 @@
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/01-flowers/delivery/fox_blessing_flowers_alpha_v1.mov",
         "sha256": "c1dc377ed821bebc5bbc232c988dd5168469d4c528be2223e13d23907c2994aa",
         "contentType": "video/quicktime"
+      },
+      "mobileFallback": {
+        "url": "assets/blessings/fox-blessing-flowers_mobile_black_v1.mp4",
+        "sha256": "da3229f5ad4b63758dbfc82b2c02c47769679ac3012c5859fe0f3891d808a654",
+        "size": 2319835,
+        "contentType": "video/mp4",
+        "width": 720,
+        "height": 960,
+        "fps": 30,
+        "duration": 15.033,
+        "background": "black",
+        "note": "由已验证 VP9 Alpha 合成到纯黑舞台背景的正式展示版（苹果端 fallback；不是绿幕母版）"
       }
     },
     "fox-blessing-cake": {
@@ -103,6 +115,18 @@
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/02-cake/delivery/fox_blessing_cake_alpha_v1.mov",
         "sha256": "5f786fc3954cfbb7b7813cae0b5300c6f58cd5df19c75af717796e2df05e2b36",
         "contentType": "video/quicktime"
+      },
+      "mobileFallback": {
+        "url": "assets/blessings/fox-blessing-cake_mobile_black_v1.mp4",
+        "sha256": "e2f1bae34f0f711238f58be5d31a131ddae65aca8d992be360036a50611574f3",
+        "size": 2399479,
+        "contentType": "video/mp4",
+        "width": 720,
+        "height": 960,
+        "fps": 30,
+        "duration": 15.033,
+        "background": "black",
+        "note": "由已验证 VP9 Alpha 合成到纯黑舞台背景的正式展示版（苹果端 fallback；不是绿幕母版）"
       }
     },
     "fox-blessing-hug": {
@@ -152,6 +176,18 @@
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/04-hug/delivery/fox_blessing_hug_alpha_v1.mov",
         "sha256": "ddaa8426266c9bb921c6a042144d7a12a96151da3588120850f7c5cf51c934d7",
         "contentType": "video/quicktime"
+      },
+      "mobileFallback": {
+        "url": "assets/blessings/fox-blessing-hug_mobile_black_v1.mp4",
+        "sha256": "71b1d1d3dd6c3d064e7dd8f55ace7dcdba4e620b2ce35d3fe95dcd9363ab9fda",
+        "size": 2031673,
+        "contentType": "video/mp4",
+        "width": 720,
+        "height": 960,
+        "fps": 30,
+        "duration": 15.033,
+        "background": "black",
+        "note": "由已验证 VP9 Alpha 合成到纯黑舞台背景的正式展示版（苹果端 fallback；不是绿幕母版）"
       }
     },
     "fox-blessing-heart": {
@@ -201,6 +237,18 @@
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/06-heart/delivery/fox_blessing_heart_alpha_v1.mov",
         "sha256": "b5d624c2a7376cab82c9fd1c41b558a840a039ab4a43c3f8c062da0d0e882786",
         "contentType": "video/quicktime"
+      },
+      "mobileFallback": {
+        "url": "assets/blessings/fox-blessing-heart_mobile_black_v1.mp4",
+        "sha256": "c4de6787bdf766713c4dd96ade1d2af27dbf3c89c26bddbe1a6f45bc35463ab5",
+        "size": 1681935,
+        "contentType": "video/mp4",
+        "width": 720,
+        "height": 960,
+        "fps": 30,
+        "duration": 15.033,
+        "background": "black",
+        "note": "由已验证 VP9 Alpha 合成到纯黑舞台背景的正式展示版（苹果端 fallback；不是绿幕母版）"
       }
     },
     "fox-blessing-kiss": {
@@ -250,6 +298,18 @@
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/07-kiss/delivery/fox_blessing_kiss_alpha_v1.mov",
         "sha256": "137e5ebc77f1fb28b3b475254ac738527e6742b8125f5714027bd00b398f3b8c",
         "contentType": "video/quicktime"
+      },
+      "mobileFallback": {
+        "url": "assets/blessings/fox-blessing-kiss_mobile_black_v1.mp4",
+        "sha256": "b74cf4b3d5648ec49bce27c054401b45be18484cfb011ddafcb6e34799142b2d",
+        "size": 1531769,
+        "contentType": "video/mp4",
+        "width": 720,
+        "height": 960,
+        "fps": 30,
+        "duration": 15.033,
+        "background": "black",
+        "note": "由已验证 VP9 Alpha 合成到纯黑舞台背景的正式展示版（苹果端 fallback；不是绿幕母版）"
       }
     },
     "fox-blessing-applause": {
@@ -299,6 +359,18 @@
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/08-applause/delivery/fox_blessing_applause_alpha_v1.mov",
         "sha256": "1b4271eecfef839b653cbd0a328bc75ba991d845a3e155e3775fded6e0801aec",
         "contentType": "video/quicktime"
+      },
+      "mobileFallback": {
+        "url": "assets/blessings/fox-blessing-applause_mobile_black_v1.mp4",
+        "sha256": "7688c49baa126df0d0ed1fce7f3680568239190de49da41972dcf362399e7d32",
+        "size": 2000979,
+        "contentType": "video/mp4",
+        "width": 720,
+        "height": 960,
+        "fps": 30,
+        "duration": 15.033,
+        "background": "black",
+        "note": "由已验证 VP9 Alpha 合成到纯黑舞台背景的正式展示版（苹果端 fallback；不是绿幕母版）"
       }
     },
     "fox-blessing-prayer": {
@@ -348,6 +420,18 @@
         "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/blessings/09-prayer/delivery/fox_blessing_prayer_alpha_v1.mov",
         "sha256": "5d03ce04f507a285e0f010fc3830913a9a4c0caf29c4922bac716bf85fbed973",
         "contentType": "video/quicktime"
+      },
+      "mobileFallback": {
+        "url": "assets/blessings/fox-blessing-prayer_mobile_black_v1.mp4",
+        "sha256": "9ca273f2c72b140a349b8f63cc1bd4d61a398f3a6d4b9f871d2fbaffd0b402e1",
+        "size": 1796639,
+        "contentType": "video/mp4",
+        "width": 720,
+        "height": 960,
+        "fps": 30,
+        "duration": 15.033,
+        "background": "black",
+        "note": "由已验证 VP9 Alpha 合成到纯黑舞台背景的正式展示版（苹果端 fallback；不是绿幕母版）"
       }
     }
   },
@@ -359,5 +443,16 @@
     "fox-blessing-kiss",
     "fox-blessing-applause",
     "fox-blessing-prayer"
-  ]
+  ],
+  "blessingDelivery": {
+    "apple": [
+      "mobileFallback",
+      "webVp9"
+    ],
+    "desktop": [
+      "webVp9",
+      "mobileFallback"
+    ],
+    "blocked": "webHevc（hvc1、无 alpha 通道，实测 0% 透明 / 57%–68% 绿幕，属未抠像母版，任何端都不得展示）"
+  }
 }

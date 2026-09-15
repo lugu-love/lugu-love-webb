@@ -68,14 +68,76 @@ window.__LUGU_BOOT__ = (function () {
   .character-picker { display:none !important; }
   .stage-wrap { display:flex; align-items:center; justify-content:center; min-height:0; pointer-events:none; margin-top:8px; }
   #stage { width:min(68vw,300px); height:auto; border-radius:18px; pointer-events:none; mix-blend-mode:lighten; }   /* 去黑底：黑色精灵背景与深色页面混合消失，只留兔子 */
-  #alphaVideo { display:block; width:min(68vw,300px); height:min(68vw,300px); object-fit:contain; pointer-events:none; border-radius:18px; background:transparent; }
+  /* 素材就绪前保持透明：只有拿到真实视频帧（loadeddata + 通过体检）才 is-ready 显现，
+     避免 poster / 旧一帧 / 缩略图等中间态闪现。 */
+  #alphaVideo { display:block; width:min(68vw,300px); height:min(68vw,300px); object-fit:contain; pointer-events:none; border-radius:18px; background:transparent; opacity:0; transition:opacity .18s ease; }
+  #alphaVideo.is-ready { opacity:1; }
+  /* ---- 统一自定义下拉箭头（不依赖 iOS / Android / 桌面原生箭头）----
+     结构：<span class="select-wrap"><select>…</select></span>
+     箭头用 ::after 画在同一层，pointer-events:none，所以点文字、点空白、点箭头
+     都会落在 <select> 上并打开原生选择列表；右侧固定留 17px 给箭头，绝不被文字挤掉。 */
+  .select-wrap { position:relative; display:inline-flex; align-items:center; min-width:0; flex:0 1 auto; }
+  .select-wrap[hidden] { display:none !important; }
+  .select-wrap > select { appearance:none; -webkit-appearance:none; -moz-appearance:none; width:100%;
+    padding-right:17px; text-overflow:ellipsis; white-space:nowrap; }
+  .select-wrap::after { content:""; position:absolute; right:5px; top:50%; width:6px; height:6px; margin-top:-4px;
+    border-right:1.6px solid rgba(184,192,255,.74); border-bottom:1.6px solid rgba(184,192,255,.74);
+    transform:rotate(45deg); pointer-events:none; }
+  .select-wrap.is-disabled::after { border-right-color:rgba(138,145,173,.42); border-bottom-color:rgba(138,145,173,.42); }
+  select:disabled { opacity:.5; }
+  select option:disabled { color:#7f89ad; }
+  /* 原生 select 只当数据容器：文字照旧显示，但不再自己弹 iOS 原生选择器 */
+  .select-wrap { cursor:pointer; }
+  .select-wrap > select.native-select-hidden { pointer-events:none; }
+  .select-wrap:focus-visible { outline:2px solid rgba(125,139,255,.8); outline-offset:2px; border-radius:8px; }
+  /* ---- 自定义底部选择面板（普通话/方言、地区、声音 通用）---- */
+  html.picker-open, html.picker-open body { overflow:hidden !important; }
+  .picker-sheet { position:fixed; inset:0; z-index:300; display:flex; flex-direction:column; justify-content:flex-end; }
+  .picker-sheet[hidden] { display:none !important; }
+  .picker-mask { position:absolute; inset:0; background:rgba(3,5,14,.66); opacity:0; transition:opacity .22s ease; }
+  .picker-sheet.open .picker-mask { opacity:1; }
+  .picker-panel {
+    position:relative; width:92%; max-width:520px; margin:0 auto;
+    bottom:calc(env(safe-area-inset-bottom, 0px) + 10px);
+    max-height:60vh; display:flex; flex-direction:column; box-sizing:border-box;
+    padding:8px 8px 10px; border:1px solid rgba(125,139,255,.26); border-radius:22px;
+    background:rgba(17,20,40,.97); box-shadow:0 -16px 44px rgba(0,0,0,.55);
+    transform:translateY(110%); transition:transform .26s cubic-bezier(.22,.7,.3,1);
+  }
+  .picker-sheet.open .picker-panel { transform:translateY(0); }
+  .picker-handle { flex:0 0 auto; width:40px; height:4px; margin:2px auto 6px; border-radius:999px; background:rgba(184,192,255,.34); }
+  .picker-title { flex:0 0 auto; margin:0 6px 6px; color:rgba(226,230,255,.82); font-size:15px; font-weight:650; letter-spacing:.02em; text-align:center; }
+  .picker-list { flex:1 1 auto; min-height:0; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch;
+    padding:2px; scrollbar-width:none; }
+  .picker-list::-webkit-scrollbar { display:none; }
+  .picker-option {
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    width:100%; min-height:52px; padding:0 14px; margin:0 0 2px; box-sizing:border-box;
+    border:none; border-radius:14px; background:transparent; color:rgba(238,240,255,.82);
+    font-family:inherit; font-size:17px; font-weight:500; text-align:left; cursor:pointer;
+  }
+  .picker-option:last-child { margin-bottom:0; }
+  .picker-option.active { background:rgba(125,139,255,.20); color:#fff; }
+  .picker-option:active { background:rgba(125,139,255,.14); }
+  .picker-option .picker-check { flex:0 0 auto; color:#aab4ff; font-size:16px; font-weight:700; opacity:0; }
+  .picker-option.active .picker-check { opacity:1; }
+  .picker-option:disabled, .picker-option.is-disabled { color:#7f89ad; cursor:not-allowed; }
   #alphaVideo[hidden], #stage[hidden] { display:none !important; }
   .character-picker { position:relative; display:inline-flex; align-items:center; min-width:0; }
   .character-trigger { flex:0 0 auto; min-width:0; height:34px; padding:0 11px; border:1px solid rgba(255,255,255,.14); border-radius:999px; background:rgba(255,255,255,.05); color:#b8c0ff; font-size:12px; font-weight:650; display:inline-flex; align-items:center; gap:5px; line-height:1; cursor:pointer; }
   .character-trigger .picker-label { color:var(--muted); }
   .character-trigger .character-current { color:#e8ebff; }
-  .character-trigger .chevron { color:rgba(184,192,255,.65); font-size:11px; transition:transform .16s ease; }
-  .character-trigger[aria-expanded="true"] .chevron { transform:rotate(180deg); }
+  /* 使者选择也换成 CSS 画的箭头（原来是字体符号 ⌄，iOS 上渲染不清） */
+  .chevron { display:inline-block; flex:0 0 auto; width:7px; height:7px; margin-left:1px;
+    border-right:1.6px solid currentColor; border-bottom:1.6px solid currentColor;
+    transform:rotate(45deg); transition:transform .16s ease; }
+  /* 使者按钮：与下拉框用同一套 ::after 画箭头（已验证在 iOS/桌面上都能显示） */
+  .character-trigger { position:relative; padding-right:24px; }
+  .character-trigger .chevron { display:none !important; }
+  .character-trigger::after { content:""; position:absolute; right:10px; top:50%; width:6px; height:6px; margin-top:-4px;
+    border-right:1.6px solid rgba(184,192,255,.82); border-bottom:1.6px solid rgba(184,192,255,.82);
+    transform:rotate(45deg); pointer-events:none; }
+  .character-trigger[aria-expanded="true"]::after { transform:rotate(225deg); }
   .character-menu { position:absolute; left:0; bottom:calc(100% + 9px); z-index:80; width:min(82vw,318px); padding:10px; border:1px solid rgba(125,139,255,.28); border-radius:16px; background:rgba(17,20,40,.98); box-shadow:0 16px 36px rgba(0,0,0,.42); }
   .character-menu[hidden] { display:none !important; }
   .character-menu-title { margin:0 0 8px 2px; color:rgba(226,230,255,.78); font-size:11px; font-weight:700; letter-spacing:.08em; }
@@ -100,7 +162,12 @@ window.__LUGU_BOOT__ = (function () {
   #emotions::after { content:""; flex:0 0 12px; }
   #emotions { -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent); mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent); }
   .emotion { flex:0 0 auto; }
-  .sub-actions { display:flex; align-items:center; justify-content:center; gap:6px; margin:10px 0 0; flex-wrap:wrap; }   /* 说明栏已删除：输入框与这一行之间只留 10px 小间距 */
+  /* 两行紧凑布局：第一行=帮我选一句＋场景；第二行=使者＋语言/地区/声音＋试听（试听与声音同簇，永不单独换行） */
+  .sub-actions { display:flex; flex-direction:column; align-items:center; gap:7px; margin:10px 0 0; }
+  .sub-row { display:flex; align-items:center; justify-content:center; gap:6px; flex-wrap:wrap; max-width:100%; }
+  .voice-cluster { display:inline-flex; align-items:center; gap:6px; min-width:0; flex:0 0 auto; }
+  /* 单一主按钮：内部兼容用的 #btnSend 永久隐藏，页面上只有固定栏那一个主按钮 */
+  #btnSend { display:none !important; }
   .sub-actions .suggest { margin:0; flex:0 1 auto; min-width:0; height:34px; display:inline-flex; align-items:center; gap:6px; padding:0 10px; border:1px solid rgba(255,255,255,.14); border-radius:999px; background:rgba(255,255,255,.05); color:#b8c0ff; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; }
   .voice-mini { display:inline-flex; align-items:center; gap:6px; flex:0 1 auto; min-width:0; height:34px; padding:0 10px; border:1px solid rgba(255,255,255,.12); border-radius:999px; background:rgba(255,255,255,.05); }
   .voice-mini .voice-icon { font-size:12px; line-height:1; color:var(--muted); flex:0 0 auto; }
@@ -156,7 +223,6 @@ window.__LUGU_BOOT__ = (function () {
   html.state-done .editor,
   html.state-done .sub-actions,
   html.state-done .suggest-box,
-  html.state-done .cta,
   html.state-done .status,
   html.state-done .hint { display:none !important; }
   html.state-done .app { justify-content:center; height:100dvh; min-height:0; overflow:hidden; background:transparent; padding:0 16px calc(env(safe-area-inset-bottom,0px) + 10px); }
@@ -228,7 +294,7 @@ window.__LUGU_BOOT__ = (function () {
     <div class="edit-top">
       <div class="brand" id="brand"><a class="back-home" href="index.html" aria-label="返回首页">← 首页</a><span class="brand-title"><span class="brand-main">七星使者</span><span class="brand-sub">· 祝福</span></span><nav class="intent-nav" aria-label="心意表达入口"><a href="send-test.html">情绪</a><span class="sep">｜</span><span class="active">祝福</span><span class="sep">｜</span><span>问候</span></nav></div>
 
-      <div class="stage-wrap"><canvas id="stage" width="540" height="540" hidden></canvas><video id="alphaVideo" autoplay muted loop playsinline webkit-playsinline preload="metadata" crossorigin="anonymous" poster="assets/characters/seven-stars/xinguang-fox/portrait.png"></video></div>
+      <div class="stage-wrap"><canvas id="stage" width="540" height="540" hidden></canvas><video id="alphaVideo" autoplay muted loop playsinline webkit-playsinline preload="metadata" crossorigin="anonymous"></video></div>
 
 
       <div class="emotions" id="emotions"></div>
@@ -236,20 +302,25 @@ window.__LUGU_BOOT__ = (function () {
 
     <div class="editor"><textarea id="textInput" placeholder="写一句祝福…"></textarea><div class="char-count" id="charCount" aria-live="polite">当前 0 字</div></div>
     <div class="sub-actions">
-      <button class="suggest" id="btnSuggest" type="button">✨ 帮我选一句</button>
-      <select id="quickSceneSelect" class="voice-select" aria-label="推荐文案场景"><option value="general">日常祝福</option><option value="festival">节日祝福</option><option value="thanks">感谢祝福</option></select>
-      <div class="character-picker" id="characterPicker"><button class="character-trigger" id="characterTrigger" type="button" aria-expanded="false" aria-controls="characterMenu"><span class="picker-label">使者</span><span class="character-current" id="characterCurrent">风信兔</span><span class="chevron">⌄</span></button><div class="character-menu" id="characterMenu" hidden role="listbox" aria-label="七星使者头像"><div class="character-menu-title">七星使者</div><div class="character-menu-grid" id="characterMenuGrid"></div></div></div>
-      <select id="characterSelect" class="character-select" aria-label="选择使者" hidden></select>
-      <label class="voice-mini"><span class="voice-icon">🔊</span><select id="voiceScopeSelect" class="voice-select voice-scope" aria-label="选择普通话或方言"><option value="standard">普通话</option><option value="dialect">方言</option></select><select id="dialectSelect" class="voice-select voice-dialect" aria-label="选择方言" hidden></select><select id="voiceSelect" class="voice-select" aria-label="选择声音"></select></label>
-      <button class="voice-preview" id="btnPreviewVoice" type="button">🔊 试听</button>
+      <div class="sub-row sub-row-1">
+        <button class="suggest" id="btnSuggest" type="button">✨ 帮我选一句</button>
+        <span class="select-wrap" id="quickSceneWrap"><select id="quickSceneSelect" class="voice-select" aria-label="推荐文案场景"><option value="general">日常祝福</option><option value="festival">节日祝福</option><option value="thanks">感谢祝福</option></select></span>
+      </div>
+      <div class="sub-row sub-row-2">
+        <div class="character-picker" id="characterPicker"><button class="character-trigger" id="characterTrigger" type="button" aria-expanded="false" aria-controls="characterMenu"><span class="picker-label">使者</span><span class="character-current" id="characterCurrent">风信兔</span><span class="chevron" aria-hidden="true"><svg viewBox="0 0 10 6" width="10" height="6" focusable="false" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button><div class="character-menu" id="characterMenu" hidden role="listbox" aria-label="七星使者头像"><div class="character-menu-title">七星使者</div><div class="character-menu-grid" id="characterMenuGrid"></div></div></div>
+        <select id="characterSelect" class="character-select" aria-label="选择使者" hidden></select>
+        <span class="voice-cluster">
+          <span class="voice-mini" role="group" aria-label="声音设置"><span class="voice-icon" aria-hidden="true">🔊</span><span class="select-wrap" id="voiceScopeWrap"><select id="voiceScopeSelect" class="voice-select voice-scope" aria-label="选择普通话或方言"><option value="standard">普通话</option><option value="dialect">方言</option></select></span><span class="select-wrap" id="dialectSelectWrap" hidden><select id="dialectSelect" class="voice-select voice-dialect" aria-label="选择方言"></select></span><span class="select-wrap" id="voiceSelectWrap"><select id="voiceSelect" class="voice-select" aria-label="选择声音"></select></span></span>
+          <button class="voice-preview" id="btnPreviewVoice" type="button">🔊 试听</button>
+        </span>
+      </div>
     </div>
     <div class="dialect-box" id="dialectBox" hidden>
       <div class="dialect-head">
         <button id="btnDialectSpeech" type="button">方言口语</button>
         <button id="btnSyncOriginal" type="button">同步原文</button>
       </div>
-      <textarea id="dialectTextInput" placeholder="默认同步原文；点击“方言口语”后可继续手动编辑"></textarea>
-      <div class="dialect-tip" id="dialectTip">默认朗读当前原文；主动转换或手动编辑后的文本才是实际朗读文本。</div>
+      <textarea id="dialectTextInput" placeholder="方言文本"></textarea>
     </div>
     <div class="suggest-box" id="suggestBox" hidden></div>
     <div class="preview-text" id="previewText"></div>
@@ -262,7 +333,9 @@ window.__LUGU_BOOT__ = (function () {
       <div class="generation-progress-track"><span class="generation-progress-fill"></span></div>
     </div>
     <div class="success-actions">
-      <button class="btn-primary" id="btnSend" type="button" disabled>发给TA</button>
+      <!-- 单一主按钮：真正的主按钮是下方固定栏的 #btnGenerate，它会按状态变成“发给TA →”。
+           这里保留内部元素仅为兼容原有逻辑，永久隐藏，页面上不会出现第二个操作按钮。 -->
+      <button class="btn-primary" id="btnSend" type="button" hidden disabled>发给TA</button>
       <div class="success-sub-actions">
         <button class="btn-secondary" id="btnSendWeChat" type="button" hidden>发给微信好友</button>
         <button class="btn-secondary" id="btnOpen" type="button" hidden>打开视频</button>
@@ -288,6 +361,15 @@ window.__LUGU_BOOT__ = (function () {
     </details>
   </div>
   <div class="toast" id="toast"></div>
+  <!-- 自定义底部选择面板：场景 / 普通话·方言 / 方言地区 / 声音 统一用它（替换 iOS 原生弹窗） -->
+  <div class="picker-sheet" id="pickerSheet" hidden>
+    <div class="picker-mask" id="pickerMask"></div>
+    <div class="picker-panel" id="pickerPanel" role="dialog" aria-modal="true" aria-labelledby="pickerTitle">
+      <div class="picker-handle" id="pickerHandle" aria-hidden="true"></div>
+      <div class="picker-title" id="pickerTitle">请选择</div>
+      <div class="picker-list" id="pickerList" role="listbox" aria-labelledby="pickerTitle" tabindex="-1"></div>
+    </div>
+  </div>
 <script src="runtime-config.js?v=20260912-03"></script>
 <script>
 (function () {
@@ -347,12 +429,15 @@ window.__MAIN__ = function () {
 
   function mapManifestEntry(e, itemId){
     if(!e) return null;
-    var webVp9=e.webVp9||{}, webHevc=e.webHevc||{};
+    var webVp9=e.webVp9||{}, webHevc=e.webHevc||{}, mf=e.mobileFallback||{};
     return {
       id:String(e.code||e.action||itemId), name:e.label||itemId, item:e.itemId||itemId,
       characterId:e.characterId||"xinguang-fox", emotionId:"blessing", action:e.action||"",
       assetVersion:e.assetVersion||"", generationMasterSha256:(e.generationMaster||{}).sha256||"",
-      quickScenes:e.quickScenes||{}, delivery:{vp9:webVp9.url||"",hevc:webHevc.url||""}
+      quickScenes:e.quickScenes||{},
+      // 只登记可公开展示的交付：webVp9（透明，桌面用）+ mobileFallback（正式黑底展示版，苹果端用）。
+      // webHevc 是未抠像绿幕母版（hvc1、无 alpha、实测 0% 透明 / 57%–68% 绿），永远不进调用清单。
+      delivery:{vp9:webVp9.url||"", mobileFallback:mf.url||""}
     };
   }
   function loadProductionManifest(){
@@ -726,7 +811,12 @@ window.__MAIN__ = function () {
   var dialectTextInput=document.getElementById("dialectTextInput");
   var dialectTip=document.getElementById("dialectTip");
   var voiceSelect=document.getElementById("voiceSelect");
+  var dialectSelectWrap=document.getElementById("dialectSelectWrap");
   var dialectDirty=false;
+  var DIALECT_TIP_DEFAULT="默认朗读当前原文（已自动同步）；需要方言时再点“方言口语”。";
+  var DIALECT_TIP_CONVERTED="已转换为方言口语；可以继续手动编辑。";
+  var composeVersion=0;      // 内容版本号：换动作 / 换使者 都会 +1，用于作废旧异步请求
+  var dialectAbort=null;     // 正在进行的方言转换请求
   function currentDialect(){
     var id=dialectSelect.value || "sichuan";
     for(var i=0;i<DIALECTS.length;i++){ if(DIALECTS[i].id===id) return DIALECTS[i]; }
@@ -738,6 +828,7 @@ window.__MAIN__ = function () {
       var o=document.createElement("option"); o.value=v.id; o.textContent=v.name+"｜"+v.label; voiceSelect.appendChild(o);
     });
     voiceSelect.value="female-bright";
+    syncWrapLabel(voiceSelect);
   }
   function renderDialectVoices(){
     var dialect=currentDialect();
@@ -746,6 +837,7 @@ window.__MAIN__ = function () {
       var o=document.createElement("option"); o.value=v.id; o.textContent=v.name+"·"+v.label; voiceSelect.appendChild(o);
     });
     voiceSelect.value=dialect.voices[0].id;
+    syncWrapLabel(voiceSelect);
   }
   function renderDialectSelect(){
     dialectSelect.innerHTML="";
@@ -753,24 +845,48 @@ window.__MAIN__ = function () {
       var o=document.createElement("option"); o.value=d.id; o.textContent=d.name; dialectSelect.appendChild(o);
     });
     dialectSelect.value="sichuan";
+    syncWrapLabel(dialectSelect);
   }
   function isDialectMode(){ return voiceScopeSelect.value==="dialect"; }
   function syncDialectBox(forceOriginal){
     var on=isDialectMode();
-    dialectSelect.hidden=!on;
+    if(dialectSelectWrap) dialectSelectWrap.hidden=!on; else dialectSelect.hidden=!on;
     dialectBox.hidden=!on;
     if(!on) return;
-    if(forceOriginal){ dialectDirty=false; dialectTextInput.value=textInput.value; }
-    else if(!dialectDirty){ dialectTextInput.value=textInput.value; }
-    dialectTip.textContent="默认朗读当前原文；主动转换或手动编辑后的文本才是实际朗读文本。";
+    if(forceOriginal || !dialectDirty){ dialectDirty=false; dialectTextInput.value=textInput.value; }
+    if(dialectTip) dialectTip.textContent=DIALECT_TIP_DEFAULT;
+  }
+  // 原文变了（输入 / 选中推荐文案 / 从首页带入）→ 未转换状态下方言编辑框始终跟着原文
+  function syncDialectWithOriginal(){
+    if(!isDialectMode()) return;
+    if(dialectDirty) return;
+    dialectTextInput.value=textInput.value;
   }
   function effectiveSpeechText(){
     var original=(textInput.value||"").trim();
     if(!isDialectMode()) return original;
-    return (dialectTextInput.value||"").trim();
+    var dialect=(dialectTextInput.value||"").trim();
+    // 兜底：方言框为空时直接朗读原文，未转换也能试听
+    return dialect || original;
   }
   function invalidateDialectPreview(){
     if(typeof invalidatePreviewToken==="function") invalidatePreviewToken();
+  }
+  // 内容重置：切换祝福动作 / 切换使者 时统一调用（清空主输入、方言内容与转换状态、
+  // 停掉旧试听音频、撤销旧音频 URL、作废仍在进行的方言转换请求）
+  function resetComposeContent(){
+    composeVersion++;                                   // 旧异步请求全部作废
+    if(dialectAbort){ try{ dialectAbort.abort(); }catch(e){} dialectAbort=null; }
+    invalidatePreviewToken();                           // 停音频 + 撤销 URL + 复位试听按钮 + 清 ttsToken
+    textInput.value="";
+    previewTextEl.textContent="";
+    dialectDirty=false;
+    dialectTextInput.value="";
+    if(dialectTip) dialectTip.textContent=DIALECT_TIP_DEFAULT;
+    if(btnDialectSpeech){ btnDialectSpeech.disabled=false; btnDialectSpeech.textContent="方言口语"; }
+    // 推荐文案区保持可见：紧接着的 renderSuggest() 会重新渲染 3 条
+    updateCharCount();
+    syncGenerateEnabled();
   }
   renderStandardVoices();
   renderDialectSelect();
@@ -779,15 +895,19 @@ window.__MAIN__ = function () {
     if(isDialectMode()){ dialectDirty=false; renderDialectVoices(); syncDialectBox(true); }
     else { renderStandardVoices(); syncDialectBox(true); }
     invalidateDialectPreview();
+    invalidateGeneratedResult();
   });
-  dialectSelect.addEventListener("change", function(){ renderDialectVoices(); syncDialectBox(true); invalidateDialectPreview(); });
-  dialectTextInput.addEventListener("input", function(){ dialectDirty=true; invalidateDialectPreview(); });
-  btnSyncOriginal.addEventListener("click", function(){ syncDialectBox(true); invalidateDialectPreview(); });
+  dialectSelect.addEventListener("change", function(){ renderDialectVoices(); syncDialectBox(true); invalidateDialectPreview(); invalidateGeneratedResult(); });
+  dialectTextInput.addEventListener("input", function(){ dialectDirty=true; invalidateDialectPreview(); invalidateGeneratedResult(); });
+  btnSyncOriginal.addEventListener("click", function(){ syncDialectBox(true); if(dialectTip) dialectTip.textContent=DIALECT_TIP_DEFAULT; invalidateDialectPreview(); });
   btnDialectSpeech.addEventListener("click", function(){
     var text=(textInput.value||"").trim();
-    if(!text){ showToast("请先写一句话"); return; }
+    if(!text){ showToast("请先输入或选择一句话"); return; }
     if(!isDialectMode()) return;
     var dialect=currentDialect();
+    var reqVersion=composeVersion;                       // 记录发起时的内容版本
+    if(dialectAbort){ try{ dialectAbort.abort(); }catch(e){} }
+    dialectAbort=typeof AbortController==="function" ? new AbortController() : null;
     btnDialectSpeech.disabled=true;
     btnDialectSpeech.textContent="转换中…";
     fetch(MAKE_SEND_API + "/rewrite-dialect", {
@@ -795,25 +915,197 @@ window.__MAIN__ = function () {
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({text:text,dialectId:dialect.id}),
       cache:"no-store",
-      mode:"cors"
+      mode:"cors",
+      signal:dialectAbort?dialectAbort.signal:undefined
     }).then(function(resp){
       return resp.json().catch(function(){ return {}; }).then(function(data){
         if(!resp.ok) throw new Error((data&&data.message)||(data&&data.error)||("HTTP "+resp.status));
         return data;
       });
     }).then(function(data){
+      if(reqVersion!==composeVersion) return;            // 期间换过动作/使者：丢弃，不写回页面
       dialectTextInput.value=(data&&data.speechText)||text;
       dialectDirty=true;
-      dialectTip.textContent="已转换为方言口语；可以继续手动编辑。";
+      if(dialectTip) dialectTip.textContent=DIALECT_TIP_CONVERTED;
       invalidateDialectPreview();
     }).catch(function(err){
+      if(reqVersion!==composeVersion) return;            // 旧请求的失败也不提示
+      var aborted = err && (err.name==="AbortError" || String(err.message||"").indexOf("abort")>=0);
+      if(aborted) return;
       showToast((err&&err.message)||"方言转换失败");
     }).finally(function(){
+      if(reqVersion!==composeVersion) return;            // 旧请求不改按钮状态
       btnDialectSpeech.disabled=false;
       btnDialectSpeech.textContent="方言口语";
     });
   });
-  voiceSelect.addEventListener("change", invalidatePreviewToken);
+  voiceSelect.addEventListener("change", function(){ invalidatePreviewToken(); invalidateGeneratedResult(); });
+  // ================= 自定义底部选择面板（替换 iOS 原生 <select> 弹窗）=================
+  // 三个下拉共用同一套面板：普通话/方言、地区、声音。原生 <select> 保留为数据容器，
+  // 只负责保存 .value 和显示当前文字，点击一律走这层面板。
+  var pickerSheet=document.getElementById("pickerSheet");
+  var pickerPanel=document.getElementById("pickerPanel");
+  var pickerList=document.getElementById("pickerList");
+  var pickerTitle=document.getElementById("pickerTitle");
+  var pickerMask=document.getElementById("pickerMask");
+  var pickerOwner=null;
+  function pickerWrapOf(sel){ return sel && sel.closest ? sel.closest(".select-wrap") : null; }
+  function pickerTitleFor(sel){
+    if(sel===quickSceneSelect) return "选择推荐场景";
+    if(sel===voiceScopeSelect) return "选择语言类型";
+    if(sel===dialectSelect) return "选择方言地区";
+    if(sel===voiceSelect) return "选择声音";
+    return "请选择";
+  }
+  function syncWrapLabel(sel){
+    var wrap=pickerWrapOf(sel);
+    if(!wrap) return;
+    var opt=sel.options[sel.selectedIndex];
+    wrap.setAttribute("aria-label", pickerTitleFor(sel) + "：" + (opt ? opt.textContent : ""));
+  }
+  function renderPickerList(){
+    if(!pickerOwner) return;
+    pickerList.innerHTML="";
+    Array.prototype.forEach.call(pickerOwner.options, function(opt){
+      var row=document.createElement("button");
+      row.type="button";
+      row.className="picker-option"+(opt.value===pickerOwner.value?" active":"");
+      row.setAttribute("role","option");
+      row.setAttribute("aria-selected", opt.value===pickerOwner.value ? "true" : "false");
+      if(opt.disabled){ row.disabled=true; row.classList.add("is-disabled"); row.setAttribute("aria-disabled","true"); }
+      var label=document.createElement("span"); label.className="picker-option-label"; label.textContent=opt.textContent;
+      var check=document.createElement("span"); check.className="picker-check"; check.textContent="✓"; check.setAttribute("aria-hidden","true");
+      row.appendChild(label); row.appendChild(check);
+      if(!opt.disabled){
+        row.addEventListener("click", function(){ choosePickerOption(opt.value); });
+      }
+      pickerList.appendChild(row);
+    });
+    var active=pickerList.querySelector(".picker-option.active");
+    if(active && active.scrollIntoView){ try{ active.scrollIntoView({ block:"nearest" }); }catch(e){} }
+  }
+  function choosePickerOption(value){
+    if(!pickerOwner) return;
+    var sel=pickerOwner;
+    if(sel.value!==value){
+      sel.value=value;
+      syncWrapLabel(sel);
+      // 走原有 change 监听：地区/声音切换会顺带停掉旧试听并清空旧音频状态
+      sel.dispatchEvent(new Event("change", { bubbles:true }));
+    }
+    closePicker();
+  }
+  function openPicker(sel){
+    if(!pickerSheet || !sel) return;
+    var wrap=pickerWrapOf(sel);
+    if(!wrap || wrap.hidden) return;
+    try{ if(document.activeElement && document.activeElement.blur) document.activeElement.blur(); }catch(e){}
+    pickerOwner=sel;
+    pickerTitle.textContent=pickerTitleFor(sel);
+    renderPickerList();
+    pickerSheet.hidden=false;
+    document.documentElement.classList.add("picker-open");
+    requestAnimationFrame(function(){ pickerSheet.classList.add("open"); });
+    wrap.setAttribute("aria-expanded","true");
+    setTimeout(function(){
+      var first=pickerList.querySelector(".picker-option.active") || pickerList.querySelector(".picker-option");
+      if(first){ try{ first.focus({ preventScroll:true }); }catch(e){ try{ first.focus(); }catch(e2){} } }
+    }, 280);
+  }
+  function closePicker(){
+    if(!pickerSheet || pickerSheet.hidden) return;
+    var owner=pickerOwner;
+    pickerSheet.classList.remove("open");
+    document.documentElement.classList.remove("picker-open");
+    pickerPanel.style.transition=""; pickerPanel.style.transform="";
+    if(owner) { var w=pickerWrapOf(owner); if(w) w.setAttribute("aria-expanded","false"); }
+    pickerOwner=null;
+    setTimeout(function(){
+      if(!pickerSheet.classList.contains("open")) pickerSheet.hidden=true;
+      if(owner){ var w2=pickerWrapOf(owner); if(w2){ try{ w2.focus({ preventScroll:true }); }catch(e){ try{ w2.focus(); }catch(e2){} } } }
+    }, 250);
+  }
+  function bindPickerSelect(sel){
+    var wrap=pickerWrapOf(sel);
+    if(!wrap || wrap.dataset.pickerBound==="1") return;
+    wrap.dataset.pickerBound="1";
+    wrap.setAttribute("role","button");
+    wrap.setAttribute("tabindex","0");
+    wrap.setAttribute("aria-haspopup","listbox");
+    wrap.setAttribute("aria-expanded","false");
+    sel.setAttribute("tabindex","-1");
+    sel.setAttribute("aria-hidden","true");
+    sel.classList.add("native-select-hidden");
+    syncWrapLabel(sel);
+    wrap.addEventListener("click", function(e){ e.preventDefault(); e.stopPropagation(); openPicker(sel); });
+    wrap.addEventListener("keydown", function(e){
+      if(e.key==="Enter" || e.key===" " || e.key==="Spacebar" || e.key==="ArrowDown" || e.key==="ArrowUp"){
+        e.preventDefault(); e.stopPropagation(); openPicker(sel);
+      }
+    });
+  }
+  bindPickerSelect(voiceScopeSelect);
+  bindPickerSelect(dialectSelect);
+  bindPickerSelect(voiceSelect);
+  bindPickerSelect(quickSceneSelect);
+  // 面板自身交互：点遮罩关闭、Esc 关闭、支持下滑关闭
+  if(pickerMask) pickerMask.addEventListener("click", closePicker);
+  if(pickerSheet) pickerSheet.addEventListener("keydown", function(e){
+    if(e.key==="Escape"){ e.preventDefault(); closePicker(); return; }
+    if(e.key==="ArrowDown" || e.key==="ArrowUp"){
+      var rows=Array.prototype.slice.call(pickerList.querySelectorAll(".picker-option:not([disabled])"));
+      if(!rows.length) return;
+      var cur=rows.indexOf(document.activeElement);
+      var next=e.key==="ArrowDown" ? Math.min(rows.length-1, cur+1) : Math.max(0, cur-1);
+      if(cur === -1) next = 0;
+      e.preventDefault();
+      try{ rows[next].focus({ preventScroll:true }); }catch(err){ rows[next].focus(); }
+    }
+  });
+  var pickerDrag=null;
+  function pickerDragStart(e){
+    if(!pickerSheet || pickerSheet.hidden || e.touches.length!==1) return;
+    var fromHandle=!!(e.target && e.target.closest && e.target.closest(".picker-handle,.picker-title"));
+    pickerDrag={ y0:e.touches[0].clientY, dy:0, fromHandle:fromHandle };
+    pickerPanel.style.transition="none";
+  }
+  function pickerDragMove(e){
+    if(!pickerDrag) return;
+    var dy=e.touches[0].clientY - pickerDrag.y0;
+    if(!pickerDrag.fromHandle && pickerList.scrollTop>0) return;   // 列表已滚动时先让列表滚
+    if(dy<=0){
+      if(pickerDrag.dy!==0){ pickerDrag.dy=0; pickerPanel.style.transform=""; }
+      return;
+    }
+    pickerDrag.dy=dy;
+    pickerPanel.style.transform="translateY("+dy+"px)";
+    if(e.cancelable) e.preventDefault();
+  }
+  function pickerDragEnd(){
+    if(!pickerDrag) return;
+    var dy=pickerDrag.dy;
+    pickerDrag=null;
+    pickerPanel.style.transition="";
+    pickerPanel.style.transform="";
+    if(dy>90) closePicker();
+  }
+  if(pickerPanel){
+    pickerPanel.addEventListener("touchstart", pickerDragStart, { passive:true });
+    pickerPanel.addEventListener("touchmove", pickerDragMove, { passive:false });
+    pickerPanel.addEventListener("touchend", pickerDragEnd);
+    pickerPanel.addEventListener("touchcancel", pickerDragEnd);
+  }
+  var btnPreviewVoice=document.getElementById("btnPreviewVoice");
+  var ttsToken=null;
+  var previewAudio=null;
+  var previewAudioUrl=null;
+  var previewAudioCtx=null;
+  var previewSource=null;
+  var previewHtmlAudio=null;
+  var SILENT_WAV="data:audio/wav;base64,UklGRkQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==";
+  var previewState="idle";
+  var previewReqId=0;
+
   var btnPreviewVoice=document.getElementById("btnPreviewVoice");
   var ttsToken=null;
   var previewAudio=null;
@@ -858,19 +1150,10 @@ window.__MAIN__ = function () {
   var compactPickerQuery=null;
   try { compactPickerQuery=window.matchMedia("(max-width: 560px)"); } catch(e) { compactPickerQuery=null; }
   function isCompactPicker(){ return compactPickerQuery ? compactPickerQuery.matches : (window.innerWidth||0) <= 560; }
-  // 首屏优先：当前使者用一张 28–35KB 的头像做“首帧占位”（poster），
-  // 页面一渲染就有角色可见；R2 正式视频首帧解码完成后浏览器自动用视频帧替换它。
-  var PORTRAIT_BY_CHARACTER=(function(){
-    var map={};
-    SEVEN_STARS.forEach(function(role){ if(role.avatar) map[role.id]=role.avatar; });
-    return map;
-  })();
-  function setStagePoster(characterId){
-    if(!alphaVideo) return;
-    var url=isCharacterUnlocked(characterId) ? PORTRAIT_BY_CHARACTER[characterId] : null;
-    if(!url || alphaVideo.getAttribute("poster") === url) return;
-    alphaVideo.setAttribute("poster", url);
-  }
+  // 【2026-09-16 修复】原祝福页沿用了情绪页的“头像 poster 首帧占位”。
+  // 实测：切换动作/使者时 videoReadyState 仍为 0、视频层已可见，浏览器会把那张
+  // 256×256 角色头像画在舞台中央 —— 就是真机上“使者出现前闪现的小东西”。
+  // 现与情绪页一致彻底移除 poster：素材就绪前舞台只保留背景，就绪后透明度淡入。
   function placeCharacterMenu(){
     if(!characterMenu || !characterPickerEl || !subActionsEl) return;
     var compact=isCompactPicker();
@@ -982,6 +1265,7 @@ window.__MAIN__ = function () {
     alphaVideoToken++;
     if(!alphaVideo) return;
     alphaVideo.onerror = null;
+    alphaVideo.classList.remove("is-ready");
     alphaVideo.pause();
     alphaVideo.removeAttribute("src");
     try { alphaVideo.load(); } catch(e) {}
@@ -990,23 +1274,71 @@ window.__MAIN__ = function () {
 
   function playAlphaVideo(delivery){
     if(!alphaVideo || !delivery) return false;
-    var sources=VIDEO_PREFER_HEVC ? [delivery.hevc,delivery.vp9] : [delivery.vp9,delivery.hevc];
+    // 2026-09-16 修复（苹果绿幕）：
+    //  · webHevc 是未抠像的绿幕母版（hvc1、无 alpha），实测 0% 透明、57%–68% 绿 —— 任何端都不再调用；
+    //  · 苹果端（Safari/iPhone）优先用**正式黑底展示版 MP4**（由已验证的 VP9 Alpha 合成到纯黑，
+    //    H.264 全平台可播），不再“退回绿幕”；
+    //  · 桌面端优先用透明 VP9，失败再退黑底 MP4。
+    var sources = VIDEO_IS_MOBILE ? [delivery.mobileFallback, delivery.vp9] : [delivery.vp9, delivery.mobileFallback];
     sources=sources.filter(function(u){ return !!u; });
     if(!sources.length){ setStatus("当前祝福动作暂无可播放的透明视频","err"); return false; }
-    var token=++alphaVideoToken, sourceIndex=0;
-    function failed(){ if(token===alphaVideoToken){ alphaVideo.hidden=true; setStatus("当前浏览器暂不支持该透明视频格式","err"); } }
+    var token=++alphaVideoToken, sourceIndex=0, failedSources=[];
+    function failed(){
+      if(token!==alphaVideoToken) return;
+      alphaVideo.classList.remove("is-ready");
+      alphaVideo.hidden=true;
+      if(failedSources.length) console.warn("[blessing alpha-video] 全部交付源都不可用", failedSources);
+      setStatus("当前浏览器暂不支持该透明视频格式","err");
+    }
+    // 原子切换：先收起媒体层（透明但保留布局盒，浏览器继续解码）→ 换源 →
+    // 等 loadeddata + 体检通过 → 一次性淡入。中间态不画 poster / 旧帧 / 缩略图。
     function tryNext(){
       if(token!==alphaVideoToken) return;
       if(sourceIndex>=sources.length){ failed(); return; }
-      var url=sources[sourceIndex++]; alphaVideo.hidden=false; alphaVideo.onerror=null; alphaVideo.src=url;
+      var url=sources[sourceIndex++];
+      alphaVideo.classList.remove("is-ready");
+      alphaVideo.hidden=false; alphaVideo.onerror=null; alphaVideo.src=url;
       try{alphaVideo.load();}catch(e){}
-      var check=function(){ alphaVideo.removeEventListener("loadeddata",check); if(token!==alphaVideoToken)return; try{ var c=document.createElement("canvas");c.width=8;c.height=8;var cx=c.getContext("2d");cx.drawImage(alphaVideo,0,0,8,8);var d=cx.getImageData(0,0,8,8).data,transparent=0,opaqueGreen=0,opaqueBlack=0;for(var i=0;i<d.length;i+=4){if(d[i+3]<20)transparent++;else{if(d[i+1]>d[i]+30&&d[i+1]>d[i+2]+30)opaqueGreen++;if(d[i]<12&&d[i+1]<12&&d[i+2]<12)opaqueBlack++;}}if(transparent<8&&(opaqueGreen>24||opaqueBlack>32))tryNext(); }catch(e){} };
+      var revealed=false;
+      var reveal=function(){ if(revealed) return; if(token!==alphaVideoToken) return; revealed=true; alphaVideo.classList.add("is-ready"); };
+      var check=function(){
+        alphaVideo.removeEventListener("loadeddata",check);
+        if(token!==alphaVideoToken) return;
+        try{
+          var c=document.createElement("canvas");c.width=8;c.height=8;
+          var cx=c.getContext("2d");cx.drawImage(alphaVideo,0,0,8,8);
+          var d=cx.getImageData(0,0,8,8).data,transparent=0,opaqueGreen=0;
+          for(var i=0;i<d.length;i+=4){ if(d[i+3]<20)transparent++; else if(d[i+1]>d[i]+30&&d[i+1]>d[i+2]+30)opaqueGreen++; }
+          // 只拦截「未抠像绿幕」；黑底展示版是正式交付，不能拦。
+          if(transparent<8&&opaqueGreen>24){
+            failedSources.push({url:url,reason:"green-screen"});
+            console.warn("[blessing alpha-video] 该源是未抠像绿幕，已跳过", url);
+            tryNext(); return;
+          }
+        }catch(e){}
+        reveal();
+      };
       alphaVideo.addEventListener("loadeddata",check,{once:true});
       var pr=alphaVideo.play(); if(pr&&pr.catch)pr.catch(function(){});
-      alphaVideo.onerror=function(){ if(token===alphaVideoToken) tryNext(); };
+      alphaVideo.onerror=function(){
+        if(token!==alphaVideoToken) return;
+        var code=alphaVideo.error?alphaVideo.error.code:0;
+        failedSources.push({url:url,reason:"media-error",code:code});
+        console.warn("[blessing alpha-video] 交付源加载失败 code="+code, url);
+        tryNext();
+      };
     }
     tryNext(); return true;
   }
+  // 从后台返回页面：只恢复播放，不改动任何显示状态
+  document.addEventListener("visibilitychange", function(){
+    if(document.visibilityState !== "visible") return;
+    if(!alphaVideo || alphaVideo.hidden) return;
+    if(alphaVideo.paused && alphaVideo.currentSrc){
+      var pr = alphaVideo.play();
+      if(pr && pr.catch) pr.catch(function(){});
+    }
+  });
   function loadEmotionVisual(){
     cancelAnimationFrame(animId);
     if(!current) return;
@@ -1027,12 +1359,12 @@ window.__MAIN__ = function () {
     releaseAlphaVideo();
     cancelAnimationFrame(animId);
     currentCharacterId = id;
-    setStagePoster(id);
     EMOTIONS = CHARACTERS[id].emotions;
     current = EMOTIONS[0];
     renderCharacterSelect();
     renderEmotionButtons();
     clearGenerated();
+    resetComposeContent();   // 切换使者：清空文本 / 方言内容 / 试听状态，作废旧异步请求
     loadEmotionVisual();
     renderDiag();
     renderPreloadDiag();
@@ -1052,7 +1384,6 @@ window.__MAIN__ = function () {
   if(characterSelect){
     characterSelect.addEventListener("change", function(){ switchCharacter(this.value); });
   }
-  setStagePoster(currentCharacterId);
   renderCharacterSelect();
   if (fwdE) {
     var _fwdEmo = EMOTIONS.find(function (x) { return x.id === String(fwdE); });
@@ -1066,7 +1397,6 @@ window.__MAIN__ = function () {
         currentCharacterId = requestedCharacterId;
         EMOTIONS = CHARACTERS[currentCharacterId].emotions;
       }
-      setStagePoster(currentCharacterId);
       var keepId = fwdE ? String(fwdE) : (current && current.id);
       current = EMOTIONS.find(function(e){ return e.id === keepId; }) || EMOTIONS[0];
       renderCharacterSelect();
@@ -1086,10 +1416,8 @@ window.__MAIN__ = function () {
     current = EMOTIONS.find(function(e){return e.id===id;}) || EMOTIONS[0];
     scrollEmotionTo(current.id);
     if(prevId !== current.id){
-      invalidatePreviewToken();
-      textInput.value = "";
-      previewTextEl.textContent = "";
-      suggestBox.hidden = true;
+      // 切换祝福动作：清空主输入 + 方言编辑框/转换状态 + 旧试听音频 + 作废旧转换请求
+      resetComposeContent();
     }
     updateCharCount();
     refreshUI(); clearGenerated(); loadEmotionVisual(); renderDiag(); renderPreloadDiag(); renderSuggest(); syncGenerateEnabled();
@@ -1098,16 +1426,30 @@ window.__MAIN__ = function () {
   function renderSuggest(){
     var q=current && current.quickScenes ? current.quickScenes : {};
     var scene=(quickSceneSelect && quickSceneSelect.value) || "general";
-    var one=q[scene] || q.general || "";
-    var list=one ? [one] : [];
+    // 默认完整显示 3 条推荐文案：当前场景优先，其后补齐其它场景；>3 条时在推荐区内部滚动
+    var order=[scene].concat(Object.keys(q).filter(function(k){ return k!==scene; }));
+    var list=[];
+    order.forEach(function(k){ if(q[k] && list.indexOf(q[k])<0) list.push(q[k]); });
+    list=list.slice(0,3);
     suggestBox.innerHTML="";
     list.forEach(function(txt){
       var b=document.createElement("button"); b.type="button"; b.className="suggest-chip";
       b.innerHTML='<span class="star">✦</span><span class="txt"></span>'; b.querySelector(".txt").textContent=txt;
       if(txt===textInput.value) b.className="suggest-chip selected";
-      b.addEventListener("click",function(){ invalidatePreviewToken(); textInput.value=txt; previewTextEl.textContent=txt; suggestBox.hidden=true; updateCharCount(); syncGenerateEnabled(); });
+      b.addEventListener("click",function(){
+        invalidatePreviewToken();
+        invalidateGeneratedResult();
+        textInput.value=txt; previewTextEl.textContent=txt;
+        syncDialectWithOriginal();
+        suggestBox.hidden=false;                      // 选中后保持 3 条可见（高亮当前条）
+        Array.prototype.forEach.call(suggestBox.children,function(el){ el.classList.remove("selected"); });
+        b.classList.add("selected");
+        updateCharCount(); syncGenerateEnabled();
+      });
       suggestBox.appendChild(b);
     });
+    // 默认完整显示 3 条推荐文案（不因按钮或说明文字被压缩成一条）
+    suggestBox.hidden = list.length === 0;
   }
   function sheetUrl(id, i){
     var e = EMOTIONS.find(function(x){ return x.id === id; });
@@ -1216,6 +1558,7 @@ window.__MAIN__ = function () {
   textInput.addEventListener("input", function(){
     userCancelInFlight();
     invalidatePreviewToken();
+    invalidateGeneratedResult();       // 改了文字 → 之前生成的结果失效，主按钮回到“生成祝福 →”
     previewTextEl.textContent=textInput.value;
     if(isDialectMode() && !dialectDirty){ dialectTextInput.value=textInput.value; }
     var n=updateCharCount();
@@ -1339,7 +1682,28 @@ window.__MAIN__ = function () {
   function showToast(msg){ toastEl.textContent=msg; toastEl.classList.add("show"); clearTimeout(showToast._t); showToast._t=setTimeout(function(){toastEl.classList.remove("show");},1800); }
 
   function syncGenerateEnabled(){
+    if(!btnGenerate) return;
+    if(primaryMode === "done"){ btnGenerate.disabled = false; return; }        // 已生成 → 按钮是“发给TA →”
+    if(primaryMode === "generating"){ btnGenerate.disabled = true; return; }
     btnGenerate.disabled = isGenerating || !current || !BUILD_CONTRACT;
+  }
+
+  // ---- 单一主按钮：#btnGenerate 在「生成祝福 →」「正在生成…」「发给TA →」之间切换 ----
+  var primaryMode="idle";   // idle | generating | done
+  function setPrimaryMode(mode){
+    primaryMode=mode;
+    if(!btnGenerate) return;
+    btnGenerate.setAttribute("data-mode", mode);
+    if(mode==="generating"){ btnGenerate.textContent="正在生成…"; btnGenerate.disabled=true; return; }
+    if(mode==="done"){ btnGenerate.textContent="发给TA →"; btnGenerate.disabled=false; return; }
+    btnGenerate.textContent="生成祝福 →";
+    btnGenerate.disabled = isGenerating || !current || !BUILD_CONTRACT;
+  }
+  // 内容变化（文字/动作/方言/声音/使者）→ 之前的结果失效，主按钮回到“生成祝福 →”
+  function invalidateGeneratedResult(){
+    if(primaryMode !== "done") return;
+    clearGenerated();          // 内含 setPrimaryMode("idle")
+    userCancelInFlight();
   }
 
   var cancelReason=null, genToken=0, genTimerId=null, genTimeoutId=null;
@@ -1350,7 +1714,7 @@ window.__MAIN__ = function () {
     if(activeController){ try { activeController.abort(); } catch(e){} activeController=null; }
     isGenerating=false;
     generatePhase="idle";
-    if(btnGenerate){ btnGenerate.textContent="生成视频 →"; }
+    if(primaryMode==="generating") setPrimaryMode("idle");
     syncGenerateEnabled();
     renderDiag();
     cancelReason = null;
@@ -1412,6 +1776,8 @@ window.__MAIN__ = function () {
     btnOpen.hidden=true; btnSave.hidden=true; btnSend.disabled=true; btnReEdit.hidden=true; btnHome.hidden=true;
     setStatus("");
     setHint("");
+    // 结果作废 → 主按钮回到“生成祝福 →”；生成过程内的 clearGenerated() 不能把“正在生成…”打回
+    if(primaryMode !== "generating") setPrimaryMode("idle");
   }
 
   function reEdit(){
@@ -1576,6 +1942,7 @@ window.__MAIN__ = function () {
     cancelReason=null;
     var myToken=++genToken;
     isGenerating=true;
+    setPrimaryMode("generating");     // 单一主按钮：正在生成…（禁止重复点击）
     genCount++;
     var tClick = performance.now();
     btnGenerate.textContent="正在生成…"; syncGenerateEnabled();
@@ -1726,6 +2093,7 @@ window.__MAIN__ = function () {
         }
       }
       btnSend.disabled=false;
+      setPrimaryMode("done");        // 生成成功：同一个按钮变成“发给TA →”
       if(!isWeChat && !isAppBridge){
         if(canShareFile){
           setHint("点击“发给TA”，可选择微信或其他应用。");
@@ -1814,7 +2182,7 @@ window.__MAIN__ = function () {
     }
   }
 
-  if(quickSceneSelect) quickSceneSelect.addEventListener("change", function(){ suggestBox.hidden=true; renderSuggest(); });
+  if(quickSceneSelect) quickSceneSelect.addEventListener("change", function(){ suggestBox.hidden=false; invalidateGeneratedResult(); renderSuggest(); });
   btnSuggest.addEventListener("click", function(){
     if(suggestBox.hidden){
       renderSuggest();
@@ -1826,7 +2194,12 @@ window.__MAIN__ = function () {
   });
 
   btnPreviewVoice.addEventListener("click", previewVoice);
-  btnGenerate.addEventListener("click", generateVideo);
+  // 单一主按钮：未生成时点它=生成祝福；生成成功后同一个按钮=发给TA
+  btnGenerate.addEventListener("click", function(){
+    if(primaryMode === "done"){ sendVideo(); return; }
+    if(primaryMode === "generating") return;
+    generateVideo();
+  });
   btnOpen.addEventListener("click", openVideo);
   function syncSoundBtn(){
     if(!btnSound) return;
