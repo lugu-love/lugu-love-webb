@@ -131,9 +131,13 @@ window.__LUGU_BOOT__ = (function () {
   .chevron { display:inline-block; flex:0 0 auto; width:7px; height:7px; margin-left:1px;
     border-right:1.6px solid currentColor; border-bottom:1.6px solid currentColor;
     transform:rotate(45deg); transition:transform .16s ease; }
-  .character-trigger .chevron { color:rgba(184,192,255,.74); }
-  .character-trigger .chevron svg { display:block; width:10px; height:6px; }
-  .character-trigger[aria-expanded="true"] .chevron svg { transform:rotate(180deg); }
+  /* 使者按钮：与下拉框用同一套 ::after 画箭头（已验证在 iOS/桌面上都能显示） */
+  .character-trigger { position:relative; padding-right:24px; }
+  .character-trigger .chevron { display:none !important; }
+  .character-trigger::after { content:""; position:absolute; right:10px; top:50%; width:6px; height:6px; margin-top:-4px;
+    border-right:1.6px solid rgba(184,192,255,.82); border-bottom:1.6px solid rgba(184,192,255,.82);
+    transform:rotate(45deg); pointer-events:none; }
+  .character-trigger[aria-expanded="true"]::after { transform:rotate(225deg); }
   .character-menu { position:absolute; left:0; bottom:calc(100% + 9px); z-index:80; width:min(82vw,318px); padding:10px; border:1px solid rgba(125,139,255,.28); border-radius:16px; background:rgba(17,20,40,.98); box-shadow:0 16px 36px rgba(0,0,0,.42); }
   .character-menu[hidden] { display:none !important; }
   .character-menu-title { margin:0 0 8px 2px; color:rgba(226,230,255,.78); font-size:11px; font-weight:700; letter-spacing:.08em; }
