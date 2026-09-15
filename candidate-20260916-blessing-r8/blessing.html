@@ -131,7 +131,8 @@ window.__LUGU_BOOT__ = (function () {
   .chevron { display:inline-block; flex:0 0 auto; width:7px; height:7px; margin-left:1px;
     border-right:1.6px solid currentColor; border-bottom:1.6px solid currentColor;
     transform:rotate(45deg); transition:transform .16s ease; }
-  .character-trigger .chevron { color:rgba(184,192,255,.74); }
+  .character-trigger .chevron { color:rgba(184,192,255,.74); display:inline-block; width:7px; height:7px; min-width:7px;
+    border-right:1.6px solid currentColor; border-bottom:1.6px solid currentColor; }
   .character-trigger[aria-expanded="true"] .chevron { transform:rotate(225deg); }
   .character-menu { position:absolute; left:0; bottom:calc(100% + 9px); z-index:80; width:min(82vw,318px); padding:10px; border:1px solid rgba(125,139,255,.28); border-radius:16px; background:rgba(17,20,40,.98); box-shadow:0 16px 36px rgba(0,0,0,.42); }
   .character-menu[hidden] { display:none !important; }
@@ -218,7 +219,6 @@ window.__LUGU_BOOT__ = (function () {
   html.state-done .editor,
   html.state-done .sub-actions,
   html.state-done .suggest-box,
-  html.state-done .cta,
   html.state-done .status,
   html.state-done .hint { display:none !important; }
   html.state-done .app { justify-content:center; height:100dvh; min-height:0; overflow:hidden; background:transparent; padding:0 16px calc(env(safe-area-inset-bottom,0px) + 10px); }
@@ -1772,7 +1772,8 @@ window.__MAIN__ = function () {
     btnOpen.hidden=true; btnSave.hidden=true; btnSend.disabled=true; btnReEdit.hidden=true; btnHome.hidden=true;
     setStatus("");
     setHint("");
-    setPrimaryMode("idle");        // 结果作废 → 主按钮回到“生成祝福 →”
+    // 结果作废 → 主按钮回到“生成祝福 →”；生成过程内的 clearGenerated() 不能把“正在生成…”打回
+    if(primaryMode !== "generating") setPrimaryMode("idle");
   }
 
   function reEdit(){
