@@ -3077,6 +3077,9 @@ window.__MAIN__ = function () {
     };
     if(navigator.canShare && navigator.canShare({files:[lastFile]})){
       if(isAndroid) setStatus("正在打开系统分享…");
+      // 先把「继续编辑 / 再做一条」显示出来：即使系统分享面板的 Promise 没有回调
+      // （部分 iPhone / 微信 / 浏览器在取消分享时不会 resolve），返回页面也一定有这两个入口。
+      keepResultPage();
       navigator.share({ files:[lastFile], title:"心意表达", text:textInput.value }).then(function(){
         setStatus("已调起系统分享", "ok");
         keepResultPage();
