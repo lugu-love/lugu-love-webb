@@ -432,7 +432,7 @@ window.__MAIN__ = function () {
       generationMasterSha256: (e.generationMaster || {}).sha256 || "",
       alphaVideoPolicy: e.alphaVideoPolicy || "",
       // 凌遥猴使用已验收的 HEVC Alpha；兔/狐保持原有 VP9/黑底策略不变。
-      delivery: { vp9: webVp9.url || "", hevc: webHevc.url || "", mobileFallback: mobileFallback.url || "" }
+      delivery: { vp9: webVp9.url || "", hevc: webHevc.url || "", mobileFallback: mobileFallback.url || "", alphaVideoPolicy: e.alphaVideoPolicy || "" }
     };
   }
 
