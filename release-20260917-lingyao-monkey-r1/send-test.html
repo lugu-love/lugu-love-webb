@@ -445,7 +445,7 @@ window.__MAIN__ = function () {
       .then(function(r){ if(!r.ok) throw new Error("manifest " + r.status); return r.json(); });
     return Promise.resolve(buildRequest)
       .then(function(build){
-        if(!build || build.releaseId !== "release-20260917-lingyao-monkey-r1" || build.buildId !== "release-20260917-lingyao-monkey-r1" || build.manifestVersion !== "20260917-lingyao-monkey-r1") throw new Error("build contract mismatch");
+        if(!build || build.releaseId !== "release-20260912-03" || build.buildId !== "release-20260912-03" || build.manifestVersion !== "20260912-03-c1") throw new Error("build contract mismatch");
         BUILD_CONTRACT = build;
         return Promise.resolve(manifestRequest);
       })

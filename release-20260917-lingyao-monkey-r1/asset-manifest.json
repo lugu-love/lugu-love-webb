@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
-  "releaseId": "release-20260917-lingyao-monkey-r1",
-  "buildId": "release-20260917-lingyao-monkey-r1",
-  "manifestVersion": "20260917-lingyao-monkey-r1",
+  "releaseId": "release-20260912-03",
+  "buildId": "release-20260912-03",
+  "manifestVersion": "20260912-03-c1",
   "generatedAt": "2026-09-17T03:01:19.176010Z",
   "canonicalUrl": "https://lugu.love/",
   "production": {

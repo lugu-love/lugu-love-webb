@@ -1,8 +1,8 @@
 {
-  "releaseId": "release-20260917-lingyao-monkey-r1",
-  "buildId": "release-20260917-lingyao-monkey-r1",
-  "manifestVersion": "20260917-lingyao-monkey-r1",
-  "manifestSha256": "784085704f1e0283e0b34add48d2b25026f0417c2e8efdcff4ba6fab70655831",
+  "releaseId": "release-20260912-03",
+  "buildId": "release-20260912-03",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "03adf706327dcbb529045bde349daa229dad388c15d03aba47fe38a4a0e52359",
   "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
   "releasePath": "/release-20260917-lingyao-monkey-r1/",
   "backendBaseUrl": "https://api.lugu.love",
