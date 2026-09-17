@@ -1,0 +1,16 @@
+{
+  "releaseId": "release-20260912-03",
+  "buildId": "release-20260912-03",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "5e5b49f88da8ccf4e01238449cf8b86ba71be2db8768abed58c0abc2b616f95d",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/candidate-20260917-monkey-ui-simplify-r1/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-17T04:20:00Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "baseline": "lingyao-monkey-ui-simplify-candidate-2026-09-17",
+  "baselineSource": "candidate-bottle-20260914-23（19 条统一模式 + 停稳小跳 2.48s / 最高 -6.6px）",
+  "frozenIndexSha256": "af0a1b4de76b5792d65f3a6fdf34ee2e03dedaf6e7df92c9c56c6f40cb01025c",
+  "releaseNote": "UI Candidate：顶部标题移除、角色切换移到舞台、七位正式名称、清空/收藏/我的收藏/选一句单行；凌遥猴沿用已上线视频与SHA"
+}
