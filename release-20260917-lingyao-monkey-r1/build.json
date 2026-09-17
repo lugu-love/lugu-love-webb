@@ -1,0 +1,17 @@
+{
+  "releaseId": "release-20260917-lingyao-monkey-r1",
+  "buildId": "release-20260917-lingyao-monkey-r1",
+  "manifestVersion": "20260917-lingyao-monkey-r1",
+  "manifestSha256": "784085704f1e0283e0b34add48d2b25026f0417c2e8efdcff4ba6fab70655831",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/release-20260917-lingyao-monkey-r1/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-17T03:01:19.178988Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "baseline": "lingyao-monkey-20260917-v1",
+  "baselineSource": "release-20260916-blessing-r8 + approved Candidate 15-item monkey delivery",
+  "previousRelease": "release-20260916-blessing-r8",
+  "releaseNote": "仅新增凌遥猴15条情绪视频与必要角色入口；兔/狐/方言/语音及其他页面保持不变",
+  "frozenIndexSha256": "f534031dcb591f442dbc1495e6bbe0fcecae83f1daac2cd59282d37be8d45c8e"
+}
