@@ -1293,6 +1293,10 @@ window.__MAIN__ = function () {
 
   function playAlphaVideo(delivery){
     if(!alphaVideo || !delivery) return false;
+    // 凌遥猴使用无CORS的公开R2交付；移动Chrome在crossorigin=anonymous
+    // 下会拒绝透明VP9解码。仅对该角色移除属性，兔/狐保持原设置。
+    if(delivery.alphaVideoPolicy === "lingyao-monkey-v1") alphaVideo.removeAttribute("crossorigin");
+    else alphaVideo.setAttribute("crossorigin","anonymous");
     // ---- 素材准入（2026-09-15 审计结论）------------------------------------
     // R2 上 19 条素材的 webHevc(.mov) 全部是**未抠像的绿幕源**：ffprobe 显示单轨
     // yuv420p、无 alpha 通道，逐帧采样绿色占比 82%–92%（manifest 里标注的
