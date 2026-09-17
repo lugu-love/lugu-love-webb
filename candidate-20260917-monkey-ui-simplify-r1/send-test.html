@@ -368,7 +368,7 @@ window.__LUGU_BOOT__ = (function () {
     <!-- 用户内容系统 V1：清空 / 撤销 / 收藏（低干扰，仅占一行，不新增大段说明） -->
     <div class="editor-actions" id="editorActions">
       <button class="editor-mini" id="btnClearText" type="button" disabled>清空</button>
-      <button class="editor-mini fav-text" id="btnFavText" type="button" aria-pressed="false" aria-label="收藏当前文字" title="收藏当前文字"><span class="heart-ico" id="favHeartIcon">♡</span><span>收藏</span></button>
+      <button class="editor-mini fav-text" id="btnFavText" type="button" aria-pressed="false" aria-label="收藏当前文字" title="收藏当前文字"><span class="heart-ico" id="favHeartIcon" hidden>♡</span>收藏</button>
       <button class="editor-mini" id="btnMyContent" type="button">我的收藏</button>
       <button class="editor-mini suggest-inline" id="btnSuggest" type="button">选一句</button>
       <span class="undo-bar" id="clearUndoBar" role="status">已清空<button id="btnUndoClear" type="button">撤销</button></span>
@@ -2412,7 +2412,7 @@ window.__MAIN__ = function () {
         var ph=document.createElement("span"); ph.className="character-avatar-placeholder"; ph.textContent=role.short;
         ph.setAttribute("aria-hidden","true"); b.appendChild(ph);
       }
-      var name=document.createElement("span"); name.className="character-name"; name.textContent=role.short; b.appendChild(name);
+      var name=document.createElement("span"); name.className="character-name"; name.textContent=role.official; b.appendChild(name);
       var state=document.createElement("span"); state.className="character-state"; state.textContent=available?"":"即将开放"; b.appendChild(state);
       if(available){
         b.addEventListener("click", function(){ if(characterSelect.value!==role.id){ characterSelect.value=role.id; characterSelect.dispatchEvent(new Event("change",{bubbles:true})); } closeCharacterMenu(); });
