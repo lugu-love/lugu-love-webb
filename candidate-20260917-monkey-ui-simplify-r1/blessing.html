@@ -162,7 +162,7 @@ window.__LUGU_BOOT__ = (function () {
   #emotions::after { content:""; flex:0 0 12px; }
   #emotions { -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent); mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent); }
   .emotion { flex:0 0 auto; }
-  /* 两行紧凑布局：第一行=帮我选一句＋场景；第二行=使者＋语言/地区/声音＋试听（试听与声音同簇，永不单独换行） */
+  /* 两行紧凑布局：第一行=选一句＋场景；第二行=使者＋语言/地区/声音＋试听（试听与声音同簇，永不单独换行） */
   .sub-actions { display:flex; flex-direction:column; align-items:center; gap:7px; margin:10px 0 0; }
   .sub-row { display:flex; align-items:center; justify-content:center; gap:6px; flex-wrap:wrap; max-width:100%; }
   .voice-cluster { display:inline-flex; align-items:center; gap:6px; min-width:0; flex:0 0 auto; }
@@ -303,7 +303,7 @@ window.__LUGU_BOOT__ = (function () {
     <div class="editor"><textarea id="textInput" placeholder="写一句祝福…"></textarea><div class="char-count" id="charCount" aria-live="polite">当前 0 字</div></div>
     <div class="sub-actions">
       <div class="sub-row sub-row-1">
-        <button class="suggest" id="btnSuggest" type="button">✨ 帮我选一句</button>
+        <button class="suggest" id="btnSuggest" type="button">选一句</button>
         <span class="select-wrap" id="quickSceneWrap"><select id="quickSceneSelect" class="voice-select" aria-label="推荐文案场景"><option value="general">日常祝福</option><option value="festival">节日祝福</option><option value="thanks">感谢祝福</option></select></span>
       </div>
       <div class="sub-row sub-row-2">
