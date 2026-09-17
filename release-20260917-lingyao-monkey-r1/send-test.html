@@ -1358,6 +1358,9 @@ window.__MAIN__ = function () {
       var checkAlpha = function(){
         alphaVideo.removeEventListener("loadeddata", checkAlpha);
         if(token !== alphaVideoToken) return;
+        // 凌遥猴交付文件已逐帧验证真实Alpha；旧canvas绿幕探测在部分Android
+        // 硬件解码器上会把透明VP9误判成绿幕，因此仅对该策略跳过探测。
+        if(delivery.alphaVideoPolicy === "lingyao-monkey-v1"){ reveal(); return; }
         try {
           var c=document.createElement("canvas"); c.width=8; c.height=8;
           var cx=c.getContext("2d"); cx.drawImage(alphaVideo,0,0,8,8);
