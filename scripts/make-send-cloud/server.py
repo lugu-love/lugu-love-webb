@@ -54,7 +54,7 @@ def _load_asset_manifest():
     manifest_version = manifest.get("manifestVersion")
     items = manifest.get("items") or {}
     characters = ((manifest.get("production") or {}).get("characters") or [])
-    expected = {"fengxin-rabbit": 11, "xinguang-fox": 8}
+    expected = {"fengxin-rabbit": 11, "xinguang-fox": 8, "lingyao-monkey": 15}
     seen = {}
     for character in characters:
         cid = character.get("characterId")
@@ -1449,7 +1449,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
         if path == "/status":
-            return self._send_json(200, {"enabled": read_enabled(), "releaseId": RELEASE_ID, "buildId": BUILD_ID, "manifestVersion": MANIFEST_VERSION, "blessingReleaseId": BLESSING_RELEASE_ID, "blessingBuildId": BLESSING_BUILD_ID, "blessingManifestVersion": BLESSING_MANIFEST_VERSION, "rabbitMasters": sum(1 for k in _emotion_items if k.startswith("rabbit-")), "foxMasters": sum(1 for k in _emotion_items if k.startswith("fox-")), "productionItems": len(_emotion_items), "blessingItems": len(_blessing_items), "fps": FPS, "bitrate_kbps": BITRATE_KBPS})
+            return self._send_json(200, {"enabled": read_enabled(), "releaseId": RELEASE_ID, "buildId": BUILD_ID, "manifestVersion": MANIFEST_VERSION, "blessingReleaseId": BLESSING_RELEASE_ID, "blessingBuildId": BLESSING_BUILD_ID, "blessingManifestVersion": BLESSING_MANIFEST_VERSION, "rabbitMasters": sum(1 for k in _emotion_items if k.startswith("rabbit-")), "foxMasters": sum(1 for k in _emotion_items if k.startswith("fox-")), "monkeyMasters": sum(1 for k in _emotion_items if k.startswith("monkey-")), "productionItems": len(_emotion_items), "blessingItems": len(_blessing_items), "fps": FPS, "bitrate_kbps": BITRATE_KBPS})
         if path == "/welcome":
             return self._welcome_public()
         if path == "/.well-known/assetlinks.json":
