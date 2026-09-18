@@ -1,0 +1,598 @@
+{
+  "schemaVersion": 1,
+  "renderContract": "seven-star-visual-normalization-v1",
+  "sourceCanvas": {
+    "width": 834,
+    "height": 1112,
+    "note": "monkey remains 720x960 source; box coordinates are source-pixel based"
+  },
+  "standardBox": {
+    "stageSize": 540,
+    "x": 135,
+    "y": 80,
+    "width": 270,
+    "height": 330,
+    "centerX": 270,
+    "baselineY": 410
+  },
+  "items": {
+    "rabbit-happy": {
+      "characterId": "fengxin-rabbit",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        222,
+        228,
+        405,
+        655
+      ],
+      "normalizedBoundingBox": [
+        0.26619,
+        0.20504,
+        0.48561,
+        0.58903
+      ]
+    },
+    "rabbit-angry": {
+      "characterId": "fengxin-rabbit",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        268,
+        292,
+        327,
+        515
+      ],
+      "normalizedBoundingBox": [
+        0.32134,
+        0.26259,
+        0.39209,
+        0.46313
+      ]
+    },
+    "rabbit-playful": {
+      "characterId": "fengxin-rabbit",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        200,
+        212,
+        407,
+        669
+      ],
+      "normalizedBoundingBox": [
+        0.23981,
+        0.19065,
+        0.48801,
+        0.60162
+      ]
+    },
+    "rabbit-jealous": {
+      "characterId": "fengxin-rabbit",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        204,
+        228,
+        395,
+        653
+      ],
+      "normalizedBoundingBox": [
+        0.2446,
+        0.20504,
+        0.47362,
+        0.58723
+      ]
+    },
+    "rabbit-stubborn": {
+      "characterId": "fengxin-rabbit",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        224,
+        236,
+        423,
+        645
+      ],
+      "normalizedBoundingBox": [
+        0.26859,
+        0.21223,
+        0.50719,
+        0.58004
+      ]
+    },
+    "rabbit-surprise": {
+      "characterId": "fengxin-rabbit",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        220,
+        228,
+        395,
+        653
+      ],
+      "normalizedBoundingBox": [
+        0.26379,
+        0.20504,
+        0.47362,
+        0.58723
+      ]
+    },
+    "rabbit-confused": {
+      "characterId": "fengxin-rabbit",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        194,
+        222,
+        433,
+        659
+      ],
+      "normalizedBoundingBox": [
+        0.23261,
+        0.19964,
+        0.51918,
+        0.59263
+      ]
+    },
+    "rabbit-disgust": {
+      "characterId": "fengxin-rabbit",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        248,
+        224,
+        381,
+        657
+      ],
+      "normalizedBoundingBox": [
+        0.29736,
+        0.20144,
+        0.45683,
+        0.59083
+      ]
+    },
+    "rabbit-apology": {
+      "characterId": "fengxin-rabbit",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        224,
+        224,
+        391,
+        657
+      ],
+      "normalizedBoundingBox": [
+        0.26859,
+        0.20144,
+        0.46882,
+        0.59083
+      ]
+    },
+    "rabbit-cool": {
+      "characterId": "fengxin-rabbit",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        264,
+        238,
+        467,
+        643
+      ],
+      "normalizedBoundingBox": [
+        0.31655,
+        0.21403,
+        0.55995,
+        0.57824
+      ]
+    },
+    "rabbit-gloat": {
+      "characterId": "fengxin-rabbit",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        222,
+        214,
+        405,
+        667
+      ],
+      "normalizedBoundingBox": [
+        0.26619,
+        0.19245,
+        0.48561,
+        0.59982
+      ]
+    },
+    "fox-white-hurt": {
+      "characterId": "xinguang-fox",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        224,
+        242,
+        547,
+        639
+      ],
+      "normalizedBoundingBox": [
+        0.26859,
+        0.21763,
+        0.65588,
+        0.57464
+      ]
+    },
+    "fox-navy-angry": {
+      "characterId": "xinguang-fox",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        198,
+        230,
+        495,
+        653
+      ],
+      "normalizedBoundingBox": [
+        0.23741,
+        0.20683,
+        0.59353,
+        0.58723
+      ]
+    },
+    "fox-pink-coquettish": {
+      "characterId": "xinguang-fox",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        212,
+        248,
+        563,
+        635
+      ],
+      "normalizedBoundingBox": [
+        0.2542,
+        0.22302,
+        0.67506,
+        0.57104
+      ]
+    },
+    "fox-black-playful": {
+      "characterId": "xinguang-fox",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        174,
+        228,
+        493,
+        655
+      ],
+      "normalizedBoundingBox": [
+        0.20863,
+        0.20504,
+        0.59113,
+        0.58903
+      ]
+    },
+    "fox-red-happy": {
+      "characterId": "xinguang-fox",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        126,
+        244,
+        607,
+        639
+      ],
+      "normalizedBoundingBox": [
+        0.15108,
+        0.21942,
+        0.72782,
+        0.57464
+      ]
+    },
+    "fox-teal-surprised": {
+      "characterId": "xinguang-fox",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        218,
+        234,
+        505,
+        649
+      ],
+      "normalizedBoundingBox": [
+        0.26139,
+        0.21043,
+        0.60552,
+        0.58363
+      ]
+    },
+    "fox-defiant": {
+      "characterId": "xinguang-fox",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        282,
+        232,
+        435,
+        651
+      ],
+      "normalizedBoundingBox": [
+        0.33813,
+        0.20863,
+        0.52158,
+        0.58543
+      ]
+    },
+    "fox-giveup": {
+      "characterId": "xinguang-fox",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        176,
+        328,
+        605,
+        553
+      ],
+      "normalizedBoundingBox": [
+        0.21103,
+        0.29496,
+        0.72542,
+        0.4973
+      ]
+    },
+    "monkey-happy": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        30,
+        42,
+        645,
+        897
+      ],
+      "normalizedBoundingBox": [
+        0.04167,
+        0.04375,
+        0.89583,
+        0.93437
+      ]
+    },
+    "monkey-wronged": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        44,
+        86,
+        651,
+        855
+      ],
+      "normalizedBoundingBox": [
+        0.06111,
+        0.08958,
+        0.90417,
+        0.89062
+      ]
+    },
+    "monkey-angry": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        0,
+        46,
+        653,
+        883
+      ],
+      "normalizedBoundingBox": [
+        0.0,
+        0.04792,
+        0.90694,
+        0.91979
+      ]
+    },
+    "monkey-surprised": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        42,
+        50,
+        677,
+        881
+      ],
+      "normalizedBoundingBox": [
+        0.05833,
+        0.05208,
+        0.94028,
+        0.91771
+      ]
+    },
+    "monkey-playful": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        42,
+        64,
+        645,
+        877
+      ],
+      "normalizedBoundingBox": [
+        0.05833,
+        0.06667,
+        0.89583,
+        0.91354
+      ]
+    },
+    "monkey-stubborn": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        72,
+        26,
+        643,
+        905
+      ],
+      "normalizedBoundingBox": [
+        0.1,
+        0.02708,
+        0.89306,
+        0.94271
+      ]
+    },
+    "monkey-lowenergy": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        54,
+        26,
+        615,
+        895
+      ],
+      "normalizedBoundingBox": [
+        0.075,
+        0.02708,
+        0.85417,
+        0.93229
+      ]
+    },
+    "monkey-confused": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        54,
+        40,
+        623,
+        903
+      ],
+      "normalizedBoundingBox": [
+        0.075,
+        0.04167,
+        0.86528,
+        0.94063
+      ]
+    },
+    "monkey-disgusted": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        78,
+        64,
+        621,
+        857
+      ],
+      "normalizedBoundingBox": [
+        0.10833,
+        0.06667,
+        0.8625,
+        0.89271
+      ]
+    },
+    "monkey-schadenfreude": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        78,
+        60,
+        641,
+        867
+      ],
+      "normalizedBoundingBox": [
+        0.10833,
+        0.0625,
+        0.89028,
+        0.90312
+      ]
+    },
+    "monkey-coquettish": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        56,
+        0,
+        591,
+        929
+      ],
+      "normalizedBoundingBox": [
+        0.07778,
+        0.0,
+        0.82083,
+        0.96771
+      ]
+    },
+    "monkey-cool": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        52,
+        10,
+        643,
+        919
+      ],
+      "normalizedBoundingBox": [
+        0.07222,
+        0.01042,
+        0.89306,
+        0.95729
+      ]
+    },
+    "monkey-jealous": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        52,
+        20,
+        615,
+        917
+      ],
+      "normalizedBoundingBox": [
+        0.07222,
+        0.02083,
+        0.85417,
+        0.95521
+      ]
+    },
+    "monkey-guilty": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        34,
+        34,
+        653,
+        891
+      ],
+      "normalizedBoundingBox": [
+        0.04722,
+        0.03542,
+        0.90694,
+        0.92812
+      ]
+    },
+    "monkey-pleading": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        36,
+        36,
+        593,
+        889
+      ],
+      "normalizedBoundingBox": [
+        0.05,
+        0.0375,
+        0.82361,
+        0.92604
+      ]
+    }
+  }
+}
