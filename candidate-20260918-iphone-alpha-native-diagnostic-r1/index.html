@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>iPhone HEVC Alpha Native Diagnostic</title>
+  <style>
+    :root { color-scheme: dark; }
+    html, body { margin: 0; background: #07101f; color: #edf3ff; font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    main { max-width: 760px; margin: 0 auto; padding: 18px 14px 44px; }
+    h1 { font-size: 20px; margin: 0 0 4px; }
+    .note { color: #aebbd4; margin: 0 0 18px; }
+    .case { margin: 0 0 26px; }
+    .case h2 { font-size: 16px; margin: 0 0 8px; }
+    .case p { color: #9fb0ce; margin: 0 0 8px; }
+    .stage {
+      width: min(100%, 540px); margin: 0 auto; overflow: hidden;
+      background-color: #111a2d;
+      background-image: linear-gradient(45deg, #26324e 25%, transparent 25%), linear-gradient(-45deg, #26324e 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #26324e 75%), linear-gradient(-45deg, transparent 75%, #26324e 75%);
+      background-size: 28px 28px; background-position: 0 0, 0 14px, 14px -14px, -14px 0px;
+    }
+    video { display: block; width: 100%; height: auto; background: transparent; }
+    code { display: block; text-align: left; overflow-wrap: anywhere; margin-top: 8px; padding: 8px; border-radius: 8px; background: #0b1427; color: #8fa3c7; font-size: 11px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>iPhone HEVC Alpha 真机对照</h1>
+    <p class="note">只做媒体解码对照，不接 resolver、不接 manifest、无 fallback、无 poster。请依次点播放并观察棋盘格是否透出。</p>
+
+    <section class="case">
+      <h2>1. 当前 ffmpeg 生成（已知真机绿底）</h2>
+      <p>baseline，只用于确认旧链路。</p>
+      <div class="stage">
+        <video id="v1" controls muted loop playsinline webkit-playsinline preload="metadata">
+          <source src="https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/05-rabbit-playful/delivery/rabbit_05_playful_alpha_hevc_successpipe_r1.mov" type="video/quicktime">
+        </video>
+      </div>
+      <code id="d1">waiting…</code>
+    </section>
+
+    <section class="case">
+      <h2>2. Apple 系统原生 HEVC Alpha 样本</h2>
+      <p>用于判断这台 iPhone Safari 是否能解码 Apple 原生 HEVC Alpha。</p>
+      <div class="stage">
+        <video id="v2" controls muted loop playsinline webkit-playsinline preload="metadata">
+          <source src="https://pub-baeb836de8654e238577516dce76dea3.r2.dev/diagnostics/iphone-alpha/apple-px-footer-alpha.mov" type="video/quicktime">
+        </video>
+      </div>
+      <code id="d2">waiting…</code>
+    </section>
+
+    <section class="case">
+      <h2>3. Apple avconvert HEVC Alpha 重编码</h2>
+      <p>rabbit-playful 的 Apple 原生 WithAlpha 预设版本。</p>
+      <div class="stage">
+        <video id="v3" controls muted loop playsinline webkit-playsinline preload="metadata">
+          <source src="https://pub-baeb836de8654e238577516dce76dea3.r2.dev/diagnostics/iphone-alpha/rabbit_05_playful_alpha_hevc_avconvert_r1.mov" type="video/quicktime">
+        </video>
+      </div>
+      <code id="d3">waiting…</code>
+    </section>
+  </main>
+  <script>
+    (function () {
+      var videos = [document.getElementById('v1'), document.getElementById('v2'), document.getElementById('v3')];
+      var out = [document.getElementById('d1'), document.getElementById('d2'), document.getElementById('d3')];
+      videos.forEach(function (v, i) {
+        function update() {
+          out[i].textContent = JSON.stringify({
+            currentSrc: v.currentSrc || '',
+            readyState: v.readyState,
+            networkState: v.networkState,
+            error: v.error ? v.error.code : null,
+            width: v.videoWidth,
+            height: v.videoHeight,
+            playing: !v.paused
+          }, null, 2);
+        }
+        ['loadedmetadata','loadeddata','canplay','play','pause','error'].forEach(function (e) { v.addEventListener(e, update); });
+        v.addEventListener('play', function () { videos.forEach(function (other) { if (other !== v) other.pause(); }); });
+        update();
+      });
+    })();
+  </script>
+</body>
+</html>
