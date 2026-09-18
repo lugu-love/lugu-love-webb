@@ -1,0 +1,17 @@
+{
+  "releaseId": "release-20260912-03",
+  "buildId": "release-20260912-03",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "03adf706327dcbb529045bde349daa229dad388c15d03aba47fe38a4a0e52359",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/release-20260917-r4-monkey15/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-17T14:25:00.000000Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "baseline": "20260917-r4-monkey15",
+  "baselineSource": "release-20260917-lingyao-monkey-r1 + accepted r4 shared intent template",
+  "previousRelease": "release-20260917-lingyao-monkey-r1",
+  "releaseNote": "统一上线今日已验收成果：情绪/祝福/问候共享页面骨架、紧凑锚定使者浮窗、七位正式名称、凌遥猴15条正式视频及既有声音/收藏/生成逻辑",
+  "frozenIndexSha256": "01883bd832516d1d455fe4aafde6ee21c9febcb24b976922c2ca656c6397156e"
+}
