@@ -11,10 +11,10 @@
       "emotionId": "happy",
       "itemId": "yunqi-koala-01-kaixin",
       "vp9": {
-        "local": "/Users/liangminghua/Desktop/转笔记本电脑/01_WebM-Alpha_网站用/01-开心.webm",
-        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/delivery/yunqi-koala-01-kaixin_alpha_vp9.webm",
-        "sha256": "534fe632c20271abe4db5102ae75183adc918fc9e7fc8c04839e459d1b01a46b",
-        "size": 2862578,
+        "local": "/Users/liangminghua/Desktop/云栖考拉-01-水印修复成品/01-开心-去水印-alpha-vp9.webm",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/delivery/yunqi-koala-01-kaixin_alpha_vp9_watermarkfix_r1.webm",
+        "sha256": "2de0fe0cad101dbef432af64ba54f251117c6cd8d1830d497a500db831d9e375",
+        "size": 2814597,
         "spec": {
           "codec": "vp9",
           "profile": "Profile 0",
@@ -28,10 +28,10 @@
         }
       },
       "hevc": {
-        "local": "/Users/liangminghua/Desktop/云栖考拉-11条-HEVC-Alpha成品/01-开心-hevc-alpha.mov",
-        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/delivery/yunqi-koala-01-kaixin_alpha_hevc.mov",
-        "sha256": "f411ae2a72ec6695e9899614dc0eb31fd4139ef6085cbd5f867fc43ee918563b",
-        "size": 7138563,
+        "local": "/Users/liangminghua/Desktop/云栖考拉-01-水印修复成品/01-开心-去水印-hevc-alpha.mov",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/delivery/yunqi-koala-01-kaixin_alpha_hevc_avconvert_watermarkfix_r1.mov",
+        "sha256": "dabae5f46c42d6aaa402698da37593f11392708a2bd26ffe79560eb454d36617",
+        "size": 7115393,
         "spec": {
           "codec": "hevc",
           "profile": "Main",
@@ -76,6 +76,17 @@
         ],
         "anchorX": 396,
         "anchorY": 943
+      },
+      "watermarkFix": {
+        "fixId": "yunqi-koala-01-watermarkfix-r1",
+        "method": "temporal-median-alpha-mask",
+        "appliedTo": [
+          "vp9Alpha",
+          "hevcAlpha"
+        ],
+        "sourceStage": "ProRes 4444 Alpha",
+        "note": "仅清除右下角/左上角“豆包生成”水印笔画及其透明残留，不裁切、不缩放、不改帧率、不改时长",
+        "localMaster": "/Users/liangminghua/Desktop/云栖考拉-01-水印修复成品/01-开心-去水印-ProRes4444-Alpha.mov"
       }
     },
     {
@@ -808,5 +819,6 @@
         "anchorY": 943
       }
     }
-  ]
+  ],
+  "watermarkFixRevision": "yunqi-koala-01-watermarkfix-r1"
 }

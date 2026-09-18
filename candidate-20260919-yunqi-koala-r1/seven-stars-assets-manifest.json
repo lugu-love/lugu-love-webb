@@ -968,15 +968,15 @@
     "yunqi-koala-01-kaixin": {
       "itemId": "yunqi-koala-01-kaixin",
       "characterId": "yunqi-koala",
-      "vp9Alpha": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/delivery/yunqi-koala-01-kaixin_alpha_vp9.webm",
-      "hevcAlpha": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/delivery/yunqi-koala-01-kaixin_alpha_hevc.mov",
+      "vp9Alpha": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/delivery/yunqi-koala-01-kaixin_alpha_vp9_watermarkfix_r1.webm",
+      "hevcAlpha": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/delivery/yunqi-koala-01-kaixin_alpha_hevc_avconvert_watermarkfix_r1.mov",
       "h264Fallback": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/mobile/yunqi-koala-01-kaixin_mobile_black_v1.mp4",
       "poster": "assets/characters/seven-stars/yunqi-koala/items/yunqi-koala-01-kaixin.webp",
       "posterFallback": "assets/characters/seven-stars/yunqi-koala/portrait.png",
       "alphaVerified": true,
       "status": "candidate",
       "fallbackReason": "none",
-      "assetVersion": "yunqi-koala-01-kaixin-v1",
+      "assetVersion": "yunqi-koala-01-kaixin-watermarkfix-v1",
       "sourceWidth": 720,
       "sourceHeight": 960,
       "contentBoundingBox": [
@@ -986,7 +986,17 @@
         913
       ],
       "anchorX": 396,
-      "anchorY": 943
+      "anchorY": 943,
+      "watermarkFix": {
+        "fixId": "yunqi-koala-01-watermarkfix-r1",
+        "method": "temporal-median-alpha-mask",
+        "appliedTo": [
+          "vp9Alpha",
+          "hevcAlpha"
+        ],
+        "sourceStage": "ProRes 4444 Alpha",
+        "note": "仅清除右下角/左上角“豆包生成”水印笔画及其透明残留，不裁切、不缩放、不改帧率、不改时长"
+      }
     },
     "yunqi-koala-02-weiqu": {
       "itemId": "yunqi-koala-02-weiqu",
