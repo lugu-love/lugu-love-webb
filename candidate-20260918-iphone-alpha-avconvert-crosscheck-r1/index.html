@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>iPhone Apple avconvert WithAlpha Crosscheck</title>
+  <style>
+    :root { color-scheme: dark; }
+    html, body { margin: 0; background: #07101f; color: #edf3ff; font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    main { max-width: 700px; margin: 0 auto; padding: 18px 14px 44px; }
+    h1 { font-size: 20px; margin: 0 0 6px; }
+    .note { color: #aebbd4; margin: 0 0 20px; }
+    section { margin: 0 0 28px; }
+    h2 { font-size: 16px; margin: 0 0 8px; }
+    .stage {
+      width: min(100%, 520px); margin: 0 auto; overflow: hidden;
+      background-color: #111a2d;
+      background-image: linear-gradient(45deg, #26324e 25%, transparent 25%), linear-gradient(-45deg, #26324e 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #26324e 75%), linear-gradient(-45deg, transparent 75%, #26324e 75%);
+      background-size: 28px 28px; background-position: 0 0, 0 14px, 14px -14px, -14px 0px;
+    }
+    video { display: block; width: 100%; height: auto; background: transparent; }
+    code { display: block; margin-top: 8px; padding: 8px; border-radius: 8px; background: #0b1427; color: #8fa3c7; font-size: 11px; overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Apple avconvert WithAlpha 交叉确认</h1>
+    <p class="note">三条均使用 Apple 原生 avconvert，不接 resolver/manifest/fallback。请用真实 iPhone Safari 分别点播放。</p>
+
+    <section>
+      <h2>1. 风信兔 · rabbit-playful</h2>
+      <div class="stage"><video id="v1" controls muted loop playsinline webkit-playsinline preload="metadata"><source src="https://pub-baeb836de8654e238577516dce76dea3.r2.dev/diagnostics/iphone-alpha/rabbit_05_playful_alpha_hevc_avconvert_r1.mov" type="video/quicktime"></video></div>
+      <code id="d1">waiting…</code>
+    </section>
+
+    <section>
+      <h2>2. 光尾狐 · fox-pink-coquettish</h2>
+      <div class="stage"><video id="v2" controls muted loop playsinline webkit-playsinline preload="metadata"><source src="https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/03-fox-pink-coquettish/delivery/fox_pink_coquettish_alpha_hevc_avconvert_r1.mov" type="video/quicktime"></video></div>
+      <code id="d2">waiting…</code>
+    </section>
+
+    <section>
+      <h2>3. 凌遥猴 · monkey-wronged</h2>
+      <div class="stage"><video id="v3" controls muted loop playsinline webkit-playsinline preload="metadata"><source src="https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/lingyao-monkey/02-monkey-wronged/delivery/monkey_02_wronged_alpha_hevc_avconvert_r1.mov" type="video/quicktime"></video></div>
+      <code id="d3">waiting…</code>
+    </section>
+  </main>
+  <script>
+    (function () {
+      var videos = [document.getElementById('v1'), document.getElementById('v2'), document.getElementById('v3')];
+      var out = [document.getElementById('d1'), document.getElementById('d2'), document.getElementById('d3')];
+      videos.forEach(function (v, i) {
+        function update() {
+          out[i].textContent = JSON.stringify({
+            currentSrc: v.currentSrc || '',
+            readyState: v.readyState,
+            networkState: v.networkState,
+            error: v.error ? v.error.code : null,
+            width: v.videoWidth,
+            height: v.videoHeight,
+            playing: !v.paused
+          }, null, 2);
+        }
+        ['loadedmetadata','loadeddata','canplay','play','pause','error'].forEach(function (e) { v.addEventListener(e, update); });
+        v.addEventListener('play', function () { videos.forEach(function (other) { if (other !== v) other.pause(); }); });
+        update();
+      });
+    })();
+  </script>
+</body>
+</html>

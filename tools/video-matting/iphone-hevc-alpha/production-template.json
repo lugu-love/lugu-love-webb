@@ -1,0 +1,11 @@
+{
+  "templateId": "apple-avconvert-hevc-alpha-v1",
+  "status": "real-iphone-verified",
+  "verifiedItemId": "rabbit-playful",
+  "inputSourcePath": "/Users/liangminghua/Desktop/rabbit_15_firstframes_v1/rabbit_05_playful_birefnet_alpha_v1.mov",
+  "outputPath": "/tmp/iphone-single-alpha-r1/rabbit_05_playful_alpha_hevc_avconvert_r1.mov",
+  "command": "/usr/bin/avconvert --source \"/Users/liangminghua/Desktop/rabbit_15_firstframes_v1/rabbit_05_playful_birefnet_alpha_v1.mov\" --preset PresetHEVCHighestQualityWithAlpha --output \"/tmp/iphone-single-alpha-r1/rabbit_05_playful_alpha_hevc_avconvert_r1.mov\" --replace --progress",
+  "verifiedOn": "real iPhone Safari",
+  "oldFfmpegHevcPolicy": "retain-only-do-not-use-for-iphone",
+  "desktopAndroidPolicy": "keep-existing-vp9-alpha"
+}
