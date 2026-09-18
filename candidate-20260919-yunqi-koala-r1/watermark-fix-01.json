@@ -19,6 +19,11 @@
       "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/delivery/yunqi-koala-01-kaixin_alpha_hevc_avconvert_watermarkfix_r1.mov",
       "sha256": "dabae5f46c42d6aaa402698da37593f11392708a2bd26ffe79560eb454d36617",
       "size": 7115393
+    },
+    "h264Fallback": {
+      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/mobile/yunqi-koala-01-kaixin_mobile_black_watermarkfix_r1.mp4",
+      "sha256": "305edf958b152811d63799dffaa37b20d9bad747fd30dee2fbfb82bae86f9e7e",
+      "size": 1910879
     }
   },
   "method": {
@@ -26,7 +31,8 @@
     "method": "temporal-median-alpha-mask",
     "appliedTo": [
       "vp9Alpha",
-      "hevcAlpha"
+      "hevcAlpha",
+      "h264Fallback"
     ],
     "sourceStage": "ProRes 4444 Alpha",
     "note": "仅清除右下角/左上角“豆包生成”水印笔画及其透明残留，不裁切、不缩放、不改帧率、不改时长"

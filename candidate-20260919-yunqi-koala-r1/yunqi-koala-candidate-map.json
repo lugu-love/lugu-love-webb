@@ -45,10 +45,10 @@
         }
       },
       "mobile": {
-        "local": "/Users/liangminghua/Desktop/转笔记本电脑/03_验收预览MP4/01-开心.mp4",
-        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/mobile/yunqi-koala-01-kaixin_mobile_black_v1.mp4",
-        "sha256": "5ae5a7e48394f6cb4c113cac7955e9567a3ad78cc950aadb6b6a53e2c5006134",
-        "size": 2787431,
+        "local": "/tmp/yunqi-koala-01-watermark-fix/01-开心-watermark-fixed-mobile-black.mp4",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/mobile/yunqi-koala-01-kaixin_mobile_black_watermarkfix_r1.mp4",
+        "sha256": "305edf958b152811d63799dffaa37b20d9bad747fd30dee2fbfb82bae86f9e7e",
+        "size": 1910879,
         "spec": {
           "codec": "h264",
           "profile": "Main",
@@ -82,7 +82,8 @@
         "method": "temporal-median-alpha-mask",
         "appliedTo": [
           "vp9Alpha",
-          "hevcAlpha"
+          "hevcAlpha",
+          "h264Fallback"
         ],
         "sourceStage": "ProRes 4444 Alpha",
         "note": "仅清除右下角/左上角“豆包生成”水印笔画及其透明残留，不裁切、不缩放、不改帧率、不改时长",

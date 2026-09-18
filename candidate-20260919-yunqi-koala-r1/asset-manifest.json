@@ -2891,16 +2891,16 @@
         "assetVersion": "yunqi-koala-01-kaixin-watermarkfix-v1"
       },
       "mobileFallback": {
-        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/mobile/yunqi-koala-01-kaixin_mobile_black_v1.mp4",
-        "sha256": "5ae5a7e48394f6cb4c113cac7955e9567a3ad78cc950aadb6b6a53e2c5006134",
-        "size": 2787431,
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/mobile/yunqi-koala-01-kaixin_mobile_black_watermarkfix_r1.mp4",
+        "sha256": "305edf958b152811d63799dffaa37b20d9bad747fd30dee2fbfb82bae86f9e7e",
+        "size": 1910879,
         "contentType": "video/mp4",
         "width": 720,
         "height": 960,
         "fps": 24,
         "frames": 241,
         "duration": 10.041667,
-        "assetVersion": "yunqi-koala-01-kaixin-v1"
+        "assetVersion": "yunqi-koala-01-kaixin-watermarkfix-v1"
       },
       "backend": {
         "displayName": "开心",
@@ -2927,7 +2927,8 @@
         "method": "temporal-median-alpha-mask",
         "appliedTo": [
           "vp9Alpha",
-          "hevcAlpha"
+          "hevcAlpha",
+          "h264Fallback"
         ],
         "sourceStage": "ProRes 4444 Alpha",
         "note": "仅清除右下角/左上角“豆包生成”水印笔画及其透明残留，不裁切、不缩放、不改帧率、不改时长"
