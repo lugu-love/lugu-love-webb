@@ -2,7 +2,7 @@
   "releaseId": "release-20260912-03",
   "buildId": "release-20260912-03",
   "manifestVersion": "20260912-03-c1",
-  "manifestSha256": "b4045f5fcab0c4aded47c1c5ea90c2f1f730aec4c58bea592d2ded3e40e7bef7",
+  "manifestSha256": "a7b687ac862e20907ce919d70447853a8b4affb436ad9371c82ab87d9470a546",
   "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
   "releasePath": "/release-20260917-r4-monkey15/",
   "backendBaseUrl": "https://api.lugu.love",
@@ -14,6 +14,6 @@
   "previousRelease": "release-20260917-lingyao-monkey-r1",
   "releaseNote": "统一上线今日已验收成果：情绪/祝福/问候共享页面骨架、紧凑锚定使者浮窗、七位正式名称、凌遥猴15条正式视频及既有声音/收藏/生成逻辑",
   "frozenIndexSha256": "01883bd832516d1d455fe4aafde6ee21c9febcb24b976922c2ca656c6397156e",
-  "candidateRevision": "yunqi-koala-01-watermarkfix-r1",
-  "candidateNote": "仅云栖考拉 yunqi-koala-01-kaixin 使用去水印后的 VP9/Apple HEVC Alpha 投递文件；其余10条与正式站/视频逻辑不变。"
+  "candidateRevision": "yunqi-koala-01-watermarkfix-r2",
+  "candidateNote": "云栖考拉 01 使用逐帧动态去水印版 VP9/HEVC/H.264；其余条目不变。"
 }

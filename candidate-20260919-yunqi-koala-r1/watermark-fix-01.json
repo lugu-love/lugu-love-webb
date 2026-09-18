@@ -1,5 +1,5 @@
 {
-  "revision": "yunqi-koala-01-watermarkfix-r1",
+  "revision": "yunqi-koala-01-watermarkfix-r2",
   "itemId": "yunqi-koala-01-kaixin",
   "status": "candidate-watermark-fixed",
   "availableStageEvidence": {
@@ -11,33 +11,38 @@
   "originalDoubaoAndWorkStage": "not present in Mac handoff package; E: source paths are unavailable on this Mac",
   "delivery": {
     "vp9Alpha": {
-      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/delivery/yunqi-koala-01-kaixin_alpha_vp9_watermarkfix_r1.webm",
-      "sha256": "2de0fe0cad101dbef432af64ba54f251117c6cd8d1830d497a500db831d9e375",
-      "size": 2814597
+      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/delivery/yunqi-koala-01-kaixin_alpha_vp9_watermarkfix_r2.webm",
+      "sha256": "12613075f7db4d57550c28cacbe18199e51f313a0f06040f06a3fd3560910d17",
+      "size": 2787358
     },
     "hevcAlpha": {
-      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/delivery/yunqi-koala-01-kaixin_alpha_hevc_avconvert_watermarkfix_r1.mov",
-      "sha256": "dabae5f46c42d6aaa402698da37593f11392708a2bd26ffe79560eb454d36617",
-      "size": 7115393
+      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/delivery/yunqi-koala-01-kaixin_alpha_hevc_avconvert_watermarkfix_r2.mov",
+      "sha256": "bed61afda28b44a08e29479f11f6494f65159338c69c32dbd168f39445436b33",
+      "size": 7113550
     },
     "h264Fallback": {
-      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/mobile/yunqi-koala-01-kaixin_mobile_black_watermarkfix_r1.mp4",
-      "sha256": "305edf958b152811d63799dffaa37b20d9bad747fd30dee2fbfb82bae86f9e7e",
-      "size": 1910879
+      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/mobile/yunqi-koala-01-kaixin_mobile_black_watermarkfix_r2.mp4",
+      "sha256": "41cbad8d9ac43bff9a94d193e7f9e94ab2500edd1e5c15f758718c0832007709",
+      "size": 1908445
     }
   },
   "method": {
-    "fixId": "yunqi-koala-01-watermarkfix-r1",
-    "method": "temporal-median-alpha-mask",
+    "fixId": "yunqi-koala-01-watermarkfix-r2",
+    "method": "per-frame-dynamic-alpha-mask-r6",
     "appliedTo": [
       "vp9Alpha",
       "hevcAlpha",
       "h264Fallback"
     ],
     "sourceStage": "ProRes 4444 Alpha",
-    "note": "仅清除右下角/左上角“豆包生成”水印笔画及其透明残留，不裁切、不缩放、不改帧率、不改时长"
+    "note": "逐帧检测并清除两角移动水印及其低 Alpha 残留，半径 6px 防编码回溢；不裁切、不缩放、不改帧率、不改时长"
   },
   "evidenceDirectory": "watermark-fix-01/",
   "localOutputDirectory": "/Users/liangminghua/Desktop/云栖考拉-01-水印修复成品",
-  "localMaster": "/Users/liangminghua/Desktop/云栖考拉-01-水印修复成品/01-开心-去水印-ProRes4444-Alpha.mov"
+  "localMaster": "/Users/liangminghua/Desktop/云栖考拉-01-水印修复成品/01-开心-去水印-ProRes4444-Alpha.mov",
+  "master": {
+    "path": "/tmp/yunqi-koala-01-watermark-fix-dynamic3/01-开心-watermarkfixed4-compatible.mov",
+    "sha256": "da8755557c552757426fdf5ac6375894baa6f3ee840a10c76e7524e3473e1a50",
+    "size": 102007946
+  }
 }
