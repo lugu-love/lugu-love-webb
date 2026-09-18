@@ -1,0 +1,889 @@
+{
+  "schemaVersion": 3,
+  "renderContract": "seven-star-assets-and-render-v1",
+  "sourceCanvas": {
+    "width": 834,
+    "height": 1112,
+    "note": "content bbox uses each source video pixel coordinate; monkey remains 720x960"
+  },
+  "standardBox": {
+    "stageSize": 540,
+    "x": 145,
+    "y": 70,
+    "width": 250,
+    "height": 300,
+    "centerX": 270,
+    "baselineY": 370
+  },
+  "alignmentRules": {
+    "x": "fit scale from full union contentBoundingBox; align median foreground centerX to standardBox.centerX",
+    "y": "use full-union bottomY as foot baseline; align to standardBox.baselineY",
+    "safeArea": "all contentBoundingBox coordinates must fit inside standardBox after fit scale"
+  },
+  "items": {
+    "rabbit-happy": {
+      "characterId": "fengxin-rabbit",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        222,
+        228,
+        405,
+        655
+      ],
+      "normalizedBoundingBox": [
+        0.26619,
+        0.20504,
+        0.48561,
+        0.58903
+      ],
+      "anchorX": 448.5,
+      "anchorY": 883,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline",
+      "iphoneTrueAlpha": {
+        "verified": true,
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/01-rabbit-happy/delivery/rabbit_01_happy_alpha_hevc.mov",
+        "verifiedBy": "iPhone WebKit magenta-background corner test; no green/black corners"
+      }
+    },
+    "rabbit-angry": {
+      "characterId": "fengxin-rabbit",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        268,
+        292,
+        327,
+        515
+      ],
+      "normalizedBoundingBox": [
+        0.32134,
+        0.26259,
+        0.39209,
+        0.46313
+      ],
+      "anchorX": 428.5,
+      "anchorY": 807,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline",
+      "iphoneTrueAlpha": {
+        "verified": true,
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/03-rabbit-angry/delivery/rabbit_03_angry_alpha_hevc.mov",
+        "verifiedBy": "iPhone WebKit magenta-background corner test; no green/black corners"
+      }
+    },
+    "rabbit-playful": {
+      "characterId": "fengxin-rabbit",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        200,
+        212,
+        407,
+        669
+      ],
+      "normalizedBoundingBox": [
+        0.23981,
+        0.19065,
+        0.48801,
+        0.60162
+      ],
+      "anchorX": 415.5,
+      "anchorY": 881,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "rabbit-jealous": {
+      "characterId": "fengxin-rabbit",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        204,
+        228,
+        395,
+        653
+      ],
+      "normalizedBoundingBox": [
+        0.2446,
+        0.20504,
+        0.47362,
+        0.58723
+      ],
+      "anchorX": 431.5,
+      "anchorY": 881,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "rabbit-stubborn": {
+      "characterId": "fengxin-rabbit",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        224,
+        236,
+        423,
+        645
+      ],
+      "normalizedBoundingBox": [
+        0.26859,
+        0.21223,
+        0.50719,
+        0.58004
+      ],
+      "anchorX": 429.0,
+      "anchorY": 881,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "rabbit-surprise": {
+      "characterId": "fengxin-rabbit",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        220,
+        228,
+        395,
+        653
+      ],
+      "normalizedBoundingBox": [
+        0.26379,
+        0.20504,
+        0.47362,
+        0.58723
+      ],
+      "anchorX": 424.5,
+      "anchorY": 881,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "rabbit-confused": {
+      "characterId": "fengxin-rabbit",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        194,
+        222,
+        433,
+        659
+      ],
+      "normalizedBoundingBox": [
+        0.23261,
+        0.19964,
+        0.51918,
+        0.59263
+      ],
+      "anchorX": 418.5,
+      "anchorY": 881,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "rabbit-disgust": {
+      "characterId": "fengxin-rabbit",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        248,
+        224,
+        381,
+        657
+      ],
+      "normalizedBoundingBox": [
+        0.29736,
+        0.20144,
+        0.45683,
+        0.59083
+      ],
+      "anchorX": 418.0,
+      "anchorY": 881,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "rabbit-apology": {
+      "characterId": "fengxin-rabbit",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        224,
+        224,
+        391,
+        657
+      ],
+      "normalizedBoundingBox": [
+        0.26859,
+        0.20144,
+        0.46882,
+        0.59083
+      ],
+      "anchorX": 424.0,
+      "anchorY": 881,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "rabbit-cool": {
+      "characterId": "fengxin-rabbit",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        264,
+        238,
+        467,
+        643
+      ],
+      "normalizedBoundingBox": [
+        0.31655,
+        0.21403,
+        0.55995,
+        0.57824
+      ],
+      "anchorX": 489.5,
+      "anchorY": 881,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "rabbit-gloat": {
+      "characterId": "fengxin-rabbit",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        222,
+        214,
+        405,
+        667
+      ],
+      "normalizedBoundingBox": [
+        0.26619,
+        0.19245,
+        0.48561,
+        0.59982
+      ],
+      "anchorX": 424.0,
+      "anchorY": 881,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "fox-white-hurt": {
+      "characterId": "xinguang-fox",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        224,
+        242,
+        547,
+        639
+      ],
+      "normalizedBoundingBox": [
+        0.26859,
+        0.21763,
+        0.65588,
+        0.57464
+      ],
+      "anchorX": 434.0,
+      "anchorY": 881,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline",
+      "iphoneTrueAlpha": {
+        "verified": true,
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/01-fox-white-hurt/delivery/fox_white_hurt_sad_alpha_hevc.mov",
+        "verifiedBy": "iPhone WebKit magenta-background corner test; no green/black corners"
+      }
+    },
+    "fox-navy-angry": {
+      "characterId": "xinguang-fox",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        198,
+        230,
+        495,
+        653
+      ],
+      "normalizedBoundingBox": [
+        0.23741,
+        0.20683,
+        0.59353,
+        0.58723
+      ],
+      "anchorX": 424.5,
+      "anchorY": 883,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline",
+      "iphoneTrueAlpha": {
+        "verified": true,
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/xinguang-fox/02-fox-navy-angry/delivery/fox_navy_angry_alpha_hevc.mov",
+        "verifiedBy": "iPhone WebKit magenta-background corner test; no green/black corners"
+      }
+    },
+    "fox-pink-coquettish": {
+      "characterId": "xinguang-fox",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        212,
+        248,
+        563,
+        635
+      ],
+      "normalizedBoundingBox": [
+        0.2542,
+        0.22302,
+        0.67506,
+        0.57104
+      ],
+      "anchorX": 491.5,
+      "anchorY": 883,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "fox-black-playful": {
+      "characterId": "xinguang-fox",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        174,
+        228,
+        493,
+        655
+      ],
+      "normalizedBoundingBox": [
+        0.20863,
+        0.20504,
+        0.59113,
+        0.58903
+      ],
+      "anchorX": 422.0,
+      "anchorY": 883,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "fox-red-happy": {
+      "characterId": "xinguang-fox",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        126,
+        244,
+        607,
+        639
+      ],
+      "normalizedBoundingBox": [
+        0.15108,
+        0.21942,
+        0.72782,
+        0.57464
+      ],
+      "anchorX": 435.0,
+      "anchorY": 883,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "fox-teal-surprised": {
+      "characterId": "xinguang-fox",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        218,
+        234,
+        505,
+        649
+      ],
+      "normalizedBoundingBox": [
+        0.26139,
+        0.21043,
+        0.60552,
+        0.58363
+      ],
+      "anchorX": 454.5,
+      "anchorY": 883,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "fox-defiant": {
+      "characterId": "xinguang-fox",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        282,
+        232,
+        435,
+        651
+      ],
+      "normalizedBoundingBox": [
+        0.33813,
+        0.20863,
+        0.52158,
+        0.58543
+      ],
+      "anchorX": 477.5,
+      "anchorY": 883,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "fox-giveup": {
+      "characterId": "xinguang-fox",
+      "sourceWidth": 834,
+      "sourceHeight": 1112,
+      "contentBoundingBox": [
+        176,
+        328,
+        605,
+        553
+      ],
+      "normalizedBoundingBox": [
+        0.21103,
+        0.29496,
+        0.72542,
+        0.4973
+      ],
+      "anchorX": 432.5,
+      "anchorY": 881,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "monkey-happy": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        30,
+        42,
+        645,
+        897
+      ],
+      "normalizedBoundingBox": [
+        0.04167,
+        0.04375,
+        0.89583,
+        0.93437
+      ],
+      "anchorX": 351.0,
+      "anchorY": 939,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline",
+      "iphoneTrueAlpha": {
+        "verified": true,
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/lingyao-monkey/01-monkey-happy/delivery/monkey_01_happy_alpha_hevc.mov",
+        "verifiedBy": "iPhone WebKit magenta-background corner test; no green/black corners"
+      }
+    },
+    "monkey-wronged": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        44,
+        86,
+        651,
+        855
+      ],
+      "normalizedBoundingBox": [
+        0.06111,
+        0.08958,
+        0.90417,
+        0.89062
+      ],
+      "anchorX": 387.5,
+      "anchorY": 941,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "monkey-angry": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        0,
+        46,
+        653,
+        883
+      ],
+      "normalizedBoundingBox": [
+        0.0,
+        0.04792,
+        0.90694,
+        0.91979
+      ],
+      "anchorX": 333.5,
+      "anchorY": 929,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline",
+      "iphoneTrueAlpha": {
+        "verified": true,
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/lingyao-monkey/03-monkey-angry/delivery/monkey_03_angry_alpha_hevc.mov",
+        "verifiedBy": "iPhone WebKit magenta-background corner test; no green/black corners"
+      }
+    },
+    "monkey-surprised": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        42,
+        50,
+        677,
+        881
+      ],
+      "normalizedBoundingBox": [
+        0.05833,
+        0.05208,
+        0.94028,
+        0.91771
+      ],
+      "anchorX": 361.5,
+      "anchorY": 931,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "monkey-playful": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        42,
+        64,
+        645,
+        877
+      ],
+      "normalizedBoundingBox": [
+        0.05833,
+        0.06667,
+        0.89583,
+        0.91354
+      ],
+      "anchorX": 356.0,
+      "anchorY": 941,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "monkey-stubborn": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        72,
+        26,
+        643,
+        905
+      ],
+      "normalizedBoundingBox": [
+        0.1,
+        0.02708,
+        0.89306,
+        0.94271
+      ],
+      "anchorX": 392.5,
+      "anchorY": 931,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "monkey-lowenergy": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        54,
+        26,
+        615,
+        895
+      ],
+      "normalizedBoundingBox": [
+        0.075,
+        0.02708,
+        0.85417,
+        0.93229
+      ],
+      "anchorX": 370.0,
+      "anchorY": 921,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "monkey-confused": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        54,
+        40,
+        623,
+        903
+      ],
+      "normalizedBoundingBox": [
+        0.075,
+        0.04167,
+        0.86528,
+        0.94063
+      ],
+      "anchorX": 352.0,
+      "anchorY": 943,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "monkey-disgusted": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        78,
+        64,
+        621,
+        857
+      ],
+      "normalizedBoundingBox": [
+        0.10833,
+        0.06667,
+        0.8625,
+        0.89271
+      ],
+      "anchorX": 391.0,
+      "anchorY": 921,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "monkey-schadenfreude": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        78,
+        60,
+        641,
+        867
+      ],
+      "normalizedBoundingBox": [
+        0.10833,
+        0.0625,
+        0.89028,
+        0.90312
+      ],
+      "anchorX": 381.5,
+      "anchorY": 927,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "monkey-coquettish": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        56,
+        0,
+        591,
+        929
+      ],
+      "normalizedBoundingBox": [
+        0.07778,
+        0.0,
+        0.82083,
+        0.96771
+      ],
+      "anchorX": 346.0,
+      "anchorY": 929,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "monkey-cool": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        52,
+        10,
+        643,
+        919
+      ],
+      "normalizedBoundingBox": [
+        0.07222,
+        0.01042,
+        0.89306,
+        0.95729
+      ],
+      "anchorX": 342.5,
+      "anchorY": 929,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "monkey-jealous": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        52,
+        20,
+        615,
+        917
+      ],
+      "normalizedBoundingBox": [
+        0.07222,
+        0.02083,
+        0.85417,
+        0.95521
+      ],
+      "anchorX": 362.5,
+      "anchorY": 937,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "monkey-guilty": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        34,
+        34,
+        653,
+        891
+      ],
+      "normalizedBoundingBox": [
+        0.04722,
+        0.03542,
+        0.90694,
+        0.92812
+      ],
+      "anchorX": 372.0,
+      "anchorY": 925,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    },
+    "monkey-pleading": {
+      "characterId": "lingyao-monkey",
+      "sourceWidth": 720,
+      "sourceHeight": 960,
+      "contentBoundingBox": [
+        36,
+        36,
+        593,
+        889
+      ],
+      "normalizedBoundingBox": [
+        0.05,
+        0.0375,
+        0.82361,
+        0.92604
+      ],
+      "anchorX": 364.0,
+      "anchorY": 925,
+      "anchorRule": "median foreground centerX; full-union bottomY baseline"
+    }
+  },
+  "characters": {
+    "fengxin-rabbit": {
+      "characterId": "fengxin-rabbit",
+      "displayName": "风信兔",
+      "canonicalMainImage": "assets/characters/seven-stars/fengxin-rabbit/main.png",
+      "canonicalPortrait": "assets/characters/seven-stars/fengxin-rabbit/portrait.png",
+      "canonicalPoster": "assets/characters/seven-stars/fengxin-rabbit/items/{itemId}.webp",
+      "emotionVideos": [
+        "rabbit-happy",
+        "rabbit-angry",
+        "rabbit-playful",
+        "rabbit-jealous",
+        "rabbit-stubborn",
+        "rabbit-surprise",
+        "rabbit-confused",
+        "rabbit-disgust",
+        "rabbit-apology",
+        "rabbit-cool",
+        "rabbit-gloat"
+      ],
+      "blessingVideos": [],
+      "fallbackAsset": "asset-manifest.json#/items/{itemId}/mobileFallback",
+      "assetVersion": "fengxin-rabbit-v1",
+      "status": "active"
+    },
+    "xinguang-fox": {
+      "characterId": "xinguang-fox",
+      "displayName": "光尾狐",
+      "canonicalMainImage": "assets/characters/seven-stars/xinguang-fox/main.png",
+      "canonicalPortrait": "assets/characters/seven-stars/xinguang-fox/portrait.png",
+      "canonicalPoster": "assets/characters/seven-stars/xinguang-fox/items/{itemId}.webp",
+      "emotionVideos": [
+        "fox-white-hurt",
+        "fox-navy-angry",
+        "fox-pink-coquettish",
+        "fox-black-playful",
+        "fox-red-happy",
+        "fox-teal-surprised",
+        "fox-defiant",
+        "fox-giveup"
+      ],
+      "blessingVideos": [
+        "fox-blessing-flowers",
+        "fox-blessing-cake",
+        "fox-blessing-hug",
+        "fox-blessing-heart",
+        "fox-blessing-kiss",
+        "fox-blessing-applause",
+        "fox-blessing-prayer"
+      ],
+      "fallbackAsset": "asset-manifest.json#/items/{itemId}/mobileFallback",
+      "assetVersion": "xinguang-fox-v1",
+      "status": "active"
+    },
+    "xingyu-deer": {
+      "characterId": "xingyu-deer",
+      "displayName": "星语鹿",
+      "canonicalMainImage": "assets/characters/seven-stars/xingyu-deer/main.png",
+      "canonicalPortrait": "assets/characters/seven-stars/xingyu-deer/portrait.png",
+      "canonicalPoster": null,
+      "emotionVideos": [],
+      "blessingVideos": [],
+      "fallbackAsset": null,
+      "assetVersion": "pending",
+      "status": "pending"
+    },
+    "nuanshan-bear": {
+      "characterId": "nuanshan-bear",
+      "displayName": "暖山熊",
+      "canonicalMainImage": null,
+      "canonicalPortrait": null,
+      "canonicalPoster": null,
+      "emotionVideos": [],
+      "blessingVideos": [],
+      "fallbackAsset": null,
+      "assetVersion": "pending",
+      "status": "pending",
+      "legacyAssets": [
+        "assets/characters/seven-stars/shouye-bear/main.png",
+        "assets/characters/seven-stars/shouye-bear/portrait.png"
+      ]
+    },
+    "yunqi-koala": {
+      "characterId": "yunqi-koala",
+      "displayName": "云栖考拉",
+      "canonicalMainImage": null,
+      "canonicalPortrait": null,
+      "canonicalPoster": null,
+      "emotionVideos": [],
+      "blessingVideos": [],
+      "fallbackAsset": null,
+      "assetVersion": "pending",
+      "status": "pending"
+    },
+    "lingyao-monkey": {
+      "characterId": "lingyao-monkey",
+      "displayName": "凌遥猴",
+      "canonicalMainImage": "assets/characters/seven-stars/lingyao-monkey/main.png",
+      "canonicalPortrait": "assets/characters/seven-stars/lingyao-monkey/portrait.png",
+      "canonicalPoster": null,
+      "emotionVideos": [
+        "monkey-happy",
+        "monkey-wronged",
+        "monkey-angry",
+        "monkey-surprised",
+        "monkey-playful",
+        "monkey-stubborn",
+        "monkey-lowenergy",
+        "monkey-confused",
+        "monkey-disgusted",
+        "monkey-schadenfreude",
+        "monkey-coquettish",
+        "monkey-cool",
+        "monkey-jealous",
+        "monkey-guilty",
+        "monkey-pleading"
+      ],
+      "blessingVideos": [],
+      "fallbackAsset": "asset-manifest.json#/items/{itemId}/mobileFallback",
+      "assetVersion": "lingyao-monkey-01-happy-v2",
+      "status": "active",
+      "posterStatus": "canonical-poster-pending"
+    },
+    "xuanxing-cat": {
+      "characterId": "xuanxing-cat",
+      "displayName": "玄星猫",
+      "canonicalMainImage": null,
+      "canonicalPortrait": null,
+      "canonicalPoster": null,
+      "emotionVideos": [],
+      "blessingVideos": [],
+      "fallbackAsset": null,
+      "assetVersion": "pending",
+      "status": "pending"
+    }
+  },
+  "legacyInventory": {
+    "note": "Historical assets retained outside canonical paths; never use for active roles.",
+    "legacyDirectories": [
+      "assets/characters/seven-stars/shouye-bear",
+      "assets/characters/seven-stars/guangwei-cat",
+      "assets/characters/seven-stars/menghu-whale",
+      "assets/characters/seven-stars/gongming-gull"
+    ],
+    "legacyIds": [
+      "shouye-bear",
+      "guangwei-cat",
+      "crane",
+      "menghu-whale",
+      "gongming-gull"
+    ],
+    "testOnly": true,
+    "source": "legacy"
+  }
+}
