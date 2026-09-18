@@ -1,0 +1,16 @@
+{
+    "releaseId":  "candidate-20260918-yunqi-koala-r1",
+    "buildId":  "candidate-20260918-yunqi-koala-r1",
+    "manifestVersion":  "yunqi-koala-v1",
+    "canonicalUrl":  "https://lugu-love.github.io/lugu-love-webb/",
+    "releasePath":  "/candidate-20260918-yunqi-koala-r1/",
+    "productionUrl":  "https://lugu-love.github.io/lugu-love-webb/",
+    "candidate":  true,
+    "candidateOf":  "release-20260918-no-frontstage-r1",
+    "builtAt":  "2026-09-18T21:13:04Z",
+    "pwaEnabled":  false,
+    "itemCount":  11,
+    "mediaVersion":  "20260918-yunqi-koala-vp9-r1",
+    "candidateNote":  "云栖考拉 11 条情绪视频上线前真机验证: Android/Chrome 走 VP9 WebM Alpha(候选目录同源托管, 便于 canvas 实测 Alpha); iPhone/Safari 等 Mac 用 Apple avconvert 生成 HEVC Alpha 后写入 hevcAlpha 字段。本候选目录独立, 不改动正式站 index.html 与既有角色映射。",
+    "qcSource":  "E:\\HeartRealm\\SevenStars-Factory\\qc\\yunqi-koala\\production-report.json"
+}
