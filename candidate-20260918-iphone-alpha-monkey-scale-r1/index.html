@@ -1682,11 +1682,6 @@ overflow: hidden;
 pointer-events: none;
 }
 
-.fengxin-rabbit-demo[data-character-id="lingyao-monkey"] .fengxin-rabbit-crop {
-transform: scale(.88);
-transform-origin: 50% 92%;
-}
-
 .fengxin-rabbit-demo .fengxin-rabbit-crop > video {
 position: absolute;
 display: block;
@@ -3841,6 +3836,17 @@ const bottleCopyLibraryByEmotion = {
 const bottleFallbackCopies = ["愿你此刻的心情，也能被温柔看见。"];
 // 运行时由正式清单填充；不再有第二份兔子名单。
 const fengxinRabbitSequence = [];
+// 统一角色级最终渲染配置；当前只调整已验收的凌遥猴，兔/狐保持 1.00。
+const CHARACTER_RENDER_CONFIG = {
+  "fengxin-rabbit": { scale: 1.00 },
+  "xinguang-fox": { scale: 1.00 },
+  "lingyao-monkey": { scale: .88 },
+  "xingyu-deer": { scale: 1.00 },
+  "shouye-bear": { scale: 1.00 },
+  "crane": { scale: 1.00 },
+  "guangwei-cat": { scale: 1.00 }
+};
+window.__LUGU_CHARACTER_RENDER_CONFIG__ = CHARACTER_RENDER_CONFIG;
 const bottleItemsById = new Map();
 const bottleItemsByCharacter = new Map();
 const bottleDecks = new Map();
@@ -4422,6 +4428,9 @@ const frame = bottleVideoFrame(sequence);
 const cropWindow = document.createElement("div");
 cropWindow.className = "fengxin-rabbit-crop";
 stageElement.dataset.characterId = sequence.characterId;
+const characterRenderScale = (CHARACTER_RENDER_CONFIG[sequence.characterId] || { scale: 1 }).scale;
+controller.element.style.transformOrigin = "50% 92%";
+controller.element.style.transform = `scale(${characterRenderScale})`;
 Object.keys(frame.cropWindow).forEach((key) => cropWindow.style.setProperty(key, frame.cropWindow[key]));
 Object.keys(frame.video).forEach((key) => controller.element.style.setProperty(key, frame.video[key]));
 cropWindow.appendChild(controller.element);
@@ -4430,6 +4439,10 @@ cover.className = "fengxin-rabbit-cover";
 cover.alt = "";
 cover.decoding = "async";
 cover.src = sequence.poster;
+cover.onerror = function () {
+  cover.onerror = null;
+  cover.src = sequence.posterFallback;
+};
 stageElement.appendChild(cover);
 stageElement.appendChild(cropWindow);
 controller.ready.then(() => {
