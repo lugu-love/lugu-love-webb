@@ -182,7 +182,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "rabbit-happy-v1-avconvert-r1",
+      "assetVersion": "rabbit-happy-v1",
       "sourceWidth": 834,
       "sourceHeight": 1112,
       "contentBoundingBox": [
@@ -205,7 +205,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "rabbit-angry-v2-avconvert-r1",
+      "assetVersion": "rabbit-angry-v2",
       "sourceWidth": 834,
       "sourceHeight": 1112,
       "contentBoundingBox": [
@@ -228,7 +228,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "rabbit-playful-v1-avconvert-r1",
+      "assetVersion": "rabbit-playful-v1",
       "sourceWidth": 834,
       "sourceHeight": 1112,
       "contentBoundingBox": [
@@ -251,7 +251,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "rabbit-jealous-v3-avconvert-r1",
+      "assetVersion": "rabbit-jealous-v3",
       "sourceWidth": 834,
       "sourceHeight": 1112,
       "contentBoundingBox": [
@@ -274,7 +274,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "rabbit-stubborn-v2-avconvert-r1",
+      "assetVersion": "rabbit-stubborn-v2",
       "sourceWidth": 834,
       "sourceHeight": 1112,
       "contentBoundingBox": [
@@ -297,7 +297,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "rabbit-surprise-v1-avconvert-r1",
+      "assetVersion": "rabbit-surprise-v1",
       "sourceWidth": 834,
       "sourceHeight": 1112,
       "contentBoundingBox": [
@@ -320,7 +320,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "rabbit-confused-v3-avconvert-r1",
+      "assetVersion": "rabbit-confused-v3",
       "sourceWidth": 834,
       "sourceHeight": 1112,
       "contentBoundingBox": [
@@ -343,7 +343,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "rabbit-disgust-v1-avconvert-r1",
+      "assetVersion": "rabbit-disgust-v1",
       "sourceWidth": 834,
       "sourceHeight": 1112,
       "contentBoundingBox": [
@@ -366,7 +366,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "rabbit-apology-v4-avconvert-r1",
+      "assetVersion": "rabbit-apology-v4",
       "sourceWidth": 834,
       "sourceHeight": 1112,
       "contentBoundingBox": [
@@ -389,7 +389,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "rabbit-cool-v1-avconvert-r1",
+      "assetVersion": "rabbit-cool-v1",
       "sourceWidth": 834,
       "sourceHeight": 1112,
       "contentBoundingBox": [
@@ -412,7 +412,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "rabbit-gloat-v3-avconvert-r1",
+      "assetVersion": "rabbit-gloat-v3",
       "sourceWidth": 834,
       "sourceHeight": 1112,
       "contentBoundingBox": [
@@ -435,7 +435,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "fox-white-hurt-v1-avconvert-r1",
+      "assetVersion": "fox-white-hurt-v1",
       "sourceWidth": 834,
       "sourceHeight": 1112,
       "contentBoundingBox": [
@@ -458,7 +458,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "fox-navy-angry-v1-avconvert-r1",
+      "assetVersion": "fox-navy-angry-v1",
       "sourceWidth": 834,
       "sourceHeight": 1112,
       "contentBoundingBox": [
@@ -481,7 +481,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "fox-pink-coquettish-v1-avconvert-r1",
+      "assetVersion": "fox-pink-coquettish-v1",
       "sourceWidth": 834,
       "sourceHeight": 1112,
       "contentBoundingBox": [
@@ -504,7 +504,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "fox-black-playful-v1-avconvert-r1",
+      "assetVersion": "fox-black-playful-v1",
       "sourceWidth": 834,
       "sourceHeight": 1112,
       "contentBoundingBox": [
@@ -527,7 +527,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "fox-red-happy-v1-avconvert-r1",
+      "assetVersion": "fox-red-happy-v1",
       "sourceWidth": 834,
       "sourceHeight": 1112,
       "contentBoundingBox": [
@@ -550,7 +550,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "fox-teal-surprised-v1-avconvert-r1",
+      "assetVersion": "fox-teal-surprised-v1",
       "sourceWidth": 834,
       "sourceHeight": 1112,
       "contentBoundingBox": [
@@ -573,7 +573,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "fox-defiant-v1-avconvert-r1",
+      "assetVersion": "fox-defiant-v1",
       "sourceWidth": 834,
       "sourceHeight": 1112,
       "contentBoundingBox": [
@@ -596,7 +596,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "fox-giveup-v1-avconvert-r1",
+      "assetVersion": "fox-giveup-v1",
       "sourceWidth": 834,
       "sourceHeight": 1112,
       "contentBoundingBox": [
@@ -619,7 +619,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "lingyao-monkey-01-happy-v2-avconvert-r1",
+      "assetVersion": "lingyao-monkey-01-happy-v2",
       "sourceWidth": 720,
       "sourceHeight": 960,
       "contentBoundingBox": [
@@ -642,7 +642,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "lingyao-monkey-02-wronged-v2-avconvert-r1",
+      "assetVersion": "lingyao-monkey-02-wronged-v2",
       "sourceWidth": 720,
       "sourceHeight": 960,
       "contentBoundingBox": [
@@ -665,7 +665,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "lingyao-monkey-03-angry-v2-avconvert-r1",
+      "assetVersion": "lingyao-monkey-03-angry-v2",
       "sourceWidth": 720,
       "sourceHeight": 960,
       "contentBoundingBox": [
@@ -688,7 +688,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "lingyao-monkey-04-surprised-v2-avconvert-r1",
+      "assetVersion": "lingyao-monkey-04-surprised-v2",
       "sourceWidth": 720,
       "sourceHeight": 960,
       "contentBoundingBox": [
@@ -711,7 +711,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "lingyao-monkey-05-playful-v2-avconvert-r1",
+      "assetVersion": "lingyao-monkey-05-playful-v2",
       "sourceWidth": 720,
       "sourceHeight": 960,
       "contentBoundingBox": [
@@ -734,7 +734,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "lingyao-monkey-06-stubborn-v2-avconvert-r1",
+      "assetVersion": "lingyao-monkey-06-stubborn-v2",
       "sourceWidth": 720,
       "sourceHeight": 960,
       "contentBoundingBox": [
@@ -757,7 +757,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "lingyao-monkey-07-lowenergy-v1-avconvert-r1",
+      "assetVersion": "lingyao-monkey-07-lowenergy-v1",
       "sourceWidth": 720,
       "sourceHeight": 960,
       "contentBoundingBox": [
@@ -780,7 +780,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "lingyao-monkey-08-confused-v1-avconvert-r1",
+      "assetVersion": "lingyao-monkey-08-confused-v1",
       "sourceWidth": 720,
       "sourceHeight": 960,
       "contentBoundingBox": [
@@ -803,7 +803,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "lingyao-monkey-09-disgusted-v2-avconvert-r1",
+      "assetVersion": "lingyao-monkey-09-disgusted-v2",
       "sourceWidth": 720,
       "sourceHeight": 960,
       "contentBoundingBox": [
@@ -826,7 +826,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "lingyao-monkey-10-gloating-v2-avconvert-r1",
+      "assetVersion": "lingyao-monkey-10-gloating-v2",
       "sourceWidth": 720,
       "sourceHeight": 960,
       "contentBoundingBox": [
@@ -849,7 +849,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "lingyao-monkey-11-coquettish-v2-avconvert-r1",
+      "assetVersion": "lingyao-monkey-11-coquettish-v2",
       "sourceWidth": 720,
       "sourceHeight": 960,
       "contentBoundingBox": [
@@ -872,7 +872,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "lingyao-monkey-12-cool-v2-avconvert-r1",
+      "assetVersion": "lingyao-monkey-12-cool-v2",
       "sourceWidth": 720,
       "sourceHeight": 960,
       "contentBoundingBox": [
@@ -895,7 +895,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "lingyao-monkey-13-jealous-v1-avconvert-r1",
+      "assetVersion": "lingyao-monkey-13-jealous-v1",
       "sourceWidth": 720,
       "sourceHeight": 960,
       "contentBoundingBox": [
@@ -918,7 +918,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "lingyao-monkey-14-guilty-v2-avconvert-r1",
+      "assetVersion": "lingyao-monkey-14-guilty-v2",
       "sourceWidth": 720,
       "sourceHeight": 960,
       "contentBoundingBox": [
@@ -941,7 +941,7 @@
       "alphaVerified": true,
       "status": "verified-alpha",
       "fallbackReason": "none",
-      "assetVersion": "lingyao-monkey-15-apologetic-v1-avconvert-r1",
+      "assetVersion": "lingyao-monkey-15-apologetic-v1",
       "sourceWidth": 720,
       "sourceHeight": 960,
       "contentBoundingBox": [
