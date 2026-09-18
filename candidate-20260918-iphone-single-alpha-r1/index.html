@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>iPhone True Alpha Single Test R1</title>
+  <style>
+    :root { color-scheme: dark; }
+    html, body { margin: 0; min-height: 100%; background: #07101f; color: #edf3ff; font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    main { max-width: 720px; margin: 0 auto; padding: 20px 16px 40px; text-align: center; }
+    h1 { font-size: 20px; margin: 0 0 6px; }
+    p { margin: 4px 0 16px; color: #aebbd4; }
+    .stage { width: min(92vw, 540px); margin: 0 auto; background: #07101f; }
+    video { display: block; width: 100%; height: auto; background: transparent; }
+    code { display: block; overflow-wrap: anywhere; font-size: 11px; color: #8fa3c7; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>凌遥兔 · 调皮幽默</h1>
+    <p>iPhone Safari 单条真透明测试 r1</p>
+    <div class="stage">
+      <video id="alphaVideo" controls autoplay muted loop playsinline webkit-playsinline preload="auto">
+        <source src="https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/05-rabbit-playful/delivery/rabbit_05_playful_alpha_hevc_successpipe_r1.mov" type="video/quicktime">
+      </video>
+    </div>
+    <code id="status">waiting…</code>
+  </main>
+  <script>
+    (function () {
+      var v = document.getElementById('alphaVideo');
+      var out = document.getElementById('status');
+      function update() {
+        out.textContent = JSON.stringify({
+          currentSrc: v.currentSrc || '',
+          readyState: v.readyState,
+          error: v.error ? v.error.code : null,
+          width: v.videoWidth,
+          height: v.videoHeight
+        }, null, 2);
+      }
+      ['loadedmetadata','loadeddata','canplay','play','error'].forEach(function (e) { v.addEventListener(e, update); });
+      update();
+      var play = v.play();
+      if (play && play.catch) play.catch(function () {});
+    })();
+  </script>
+</body>
+</html>
