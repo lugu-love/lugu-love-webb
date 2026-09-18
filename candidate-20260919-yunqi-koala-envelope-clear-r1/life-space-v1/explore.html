@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6efe3">
+  <title>世界生命空间展馆｜我的生命空间</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>
+    .explore-placeholder {
+      min-height: calc(100vh - 52px);
+      display: grid;
+      align-content: center;
+      gap: 24px;
+    }
+    .placeholder-card {
+      position: relative;
+      overflow: hidden;
+      padding: 34px 24px;
+      border: 1px solid rgba(93,108,84,.18);
+      border-radius: 30px;
+      background: linear-gradient(145deg, rgba(255,254,249,.98), rgba(226,234,219,.94));
+      box-shadow: var(--shadow);
+    }
+    .placeholder-globe {
+      width: 68px;
+      height: 68px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 26px;
+      border-radius: 22px;
+      font-size: 34px;
+      background: rgba(255,255,255,.8);
+      box-shadow: 0 8px 22px rgba(65,78,59,.08);
+    }
+    .placeholder-card .eyebrow { color: var(--sage-dark); }
+    .placeholder-card h1 {
+      margin: 0 0 12px;
+      font: 600 31px/1.25 Georgia, "Songti SC", serif;
+    }
+    .placeholder-card p:last-of-type {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+    .placeholder-card::after {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      right: -94px;
+      bottom: -106px;
+      border-radius: 50%;
+      background: rgba(111,128,100,.11);
+    }
+    .return-button {
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 17px;
+      color: #fff;
+      font-weight: 600;
+      background: var(--sage-dark);
+      box-shadow: 0 8px 20px rgba(66,85,59,.2);
+    }
+  </style>
+</head>
+<body>
+  <main class="page-shell explore-placeholder">
+    <section class="placeholder-card" aria-labelledby="pageTitle">
+      <div class="placeholder-globe" aria-hidden="true">🌍</div>
+      <p class="eyebrow">Explore Life Spaces</p>
+      <h1 id="pageTitle">世界生命空间展馆</h1>
+      <p>世界各地的生命故事，正在这里慢慢汇聚。</p>
+    </section>
+    <a class="return-button" href="index.html">返回生命空间</a>
+  </main>
+</body>
+</html>

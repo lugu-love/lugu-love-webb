@@ -1,0 +1,19 @@
+{
+  "releaseId": "release-20260912-03",
+  "buildId": "release-20260912-03",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "111d1c0aa87ba3124c66667c02011b7b781adb467a2a0cedaa8a1331115b089d",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/release-20260917-r4-monkey15/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-17T14:25:00.000000Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "baseline": "20260917-r4-monkey15",
+  "baselineSource": "release-20260917-lingyao-monkey-r1 + accepted r4 shared intent template",
+  "previousRelease": "release-20260917-lingyao-monkey-r1",
+  "releaseNote": "统一上线今日已验收成果：情绪/祝福/问候共享页面骨架、紧凑锚定使者浮窗、七位正式名称、凌遥猴15条正式视频及既有声音/收藏/生成逻辑",
+  "frozenIndexSha256": "01883bd832516d1d455fe4aafde6ee21c9febcb24b976922c2ca656c6397156e",
+  "candidateRevision": "yunqi-koala-01-watermarkfix-envelope-clear-r1",
+  "candidateNote": "云栖考拉 01 最大水印活动包络永久透明清场；其他条目和正式站不变。"
+}

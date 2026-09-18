@@ -1,0 +1,825 @@
+{
+  "candidate": "candidate-20260919-yunqi-koala-envelope-clear-r1",
+  "createdAt": "2026-09-18T16:49:02.646Z",
+  "sourceHEVC": "/Users/liangminghua/Desktop/云栖考拉-11条-HEVC-Alpha成品",
+  "sourceVP9": "/Users/liangminghua/Desktop/转笔记本电脑/01_WebM-Alpha_网站用",
+  "sourceMobile": "/Users/liangminghua/Desktop/转笔记本电脑/03_验收预览MP4",
+  "items": [
+    {
+      "seq": "01",
+      "label": "开心",
+      "emotionId": "happy",
+      "itemId": "yunqi-koala-01-kaixin",
+      "vp9": {
+        "local": "/Users/liangminghua/Desktop/云栖考拉-01-水印修复成品-包络清场-r1/01-开心-包络清场-alpha-vp9.webm",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/delivery/yunqi-koala-01-kaixin_alpha_vp9_envelope_clear_r1.webm",
+        "sha256": "480197d64e697d5747444b07ca7ab0e48e44b8ee21c8a9ccd3c296e5e2221431",
+        "size": 2786327,
+        "spec": {
+          "codec": "vp9",
+          "profile": "Profile 0",
+          "pixFmt": "yuv420p",
+          "codecTag": "[0][0][0][0]",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": null,
+          "frames": null
+        }
+      },
+      "hevc": {
+        "local": "/Users/liangminghua/Desktop/云栖考拉-01-水印修复成品-包络清场-r1/01-开心-包络清场-hevc-alpha.mov",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/delivery/yunqi-koala-01-kaixin_alpha_hevc_avconvert_envelope_clear_r1.mov",
+        "sha256": "3b21abac51c2d33d056a1050b1323445b07f3ab0be1c8255fea6901fb1b0a23c",
+        "size": 7101349,
+        "spec": {
+          "codec": "hevc",
+          "profile": "Main",
+          "pixFmt": "yuv420p",
+          "codecTag": "hvc1",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": 10.041667,
+          "frames": 241
+        }
+      },
+      "mobile": {
+        "local": "/Users/liangminghua/Desktop/云栖考拉-01-水印修复成品-包络清场-r1/01-开心-包络清场-mobile-black.mp4",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/mobile/yunqi-koala-01-kaixin_mobile_black_envelope_clear_r1.mp4",
+        "sha256": "41cbad8d9ac43bff9a94d193e7f9e94ab2500edd1e5c15f758718c0832007709",
+        "size": 1908445,
+        "spec": {
+          "codec": "h264",
+          "profile": "Main",
+          "pixFmt": "yuv420p",
+          "codecTag": "avc1",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": 10.041667,
+          "frames": 241
+        }
+      },
+      "source": {
+        "local": "/Users/liangminghua/Desktop/云栖考拉-01-水印修复成品-包络清场-r1/01-开心-包络清场-ProRes4444-Alpha.mov",
+        "sha256": "34a47d534a5f775c749c6aea5b95a4456b16ba6da1cf3b268bd70c7d7e37ebd1",
+        "note": "最大水印活动包络永久透明清场母版"
+      },
+      "render": {
+        "sourceWidth": 720,
+        "sourceHeight": 960,
+        "contentBoundingBox": [
+          36,
+          30,
+          663,
+          913
+        ],
+        "anchorX": 396,
+        "anchorY": 943
+      },
+      "watermarkFix": {
+        "fixId": "yunqi-koala-01-watermarkfix-envelope-clear-r1",
+        "method": "fixed-envelope-clear-subject-restore",
+        "appliedTo": [
+          "vp9Alpha",
+          "hevcAlpha",
+          "h264Fallback"
+        ],
+        "sourceStage": "ProRes 4444 Alpha",
+        "note": "左上/右下最大水印活动包络 + 12px 保护带永久透明清场；Alpha>=128 角色不透明主体按原帧恢复，不裁切、不缩放、不改帧率、不改时长"
+      }
+    },
+    {
+      "seq": "02",
+      "label": "委屈",
+      "emotionId": "wronged",
+      "itemId": "yunqi-koala-02-weiqu",
+      "vp9": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/01_WebM-Alpha_网站用/02-委屈.webm",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/02-yunqi-koala-02-weiqu/delivery/yunqi-koala-02-weiqu_alpha_vp9.webm",
+        "sha256": "70a8aace1d970727089f94843481303df2fe2c24dd469888bb805cf03c69db31",
+        "size": 1848326,
+        "spec": {
+          "codec": "vp9",
+          "profile": "Profile 0",
+          "pixFmt": "yuv420p",
+          "codecTag": "[0][0][0][0]",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": null,
+          "frames": null
+        }
+      },
+      "hevc": {
+        "local": "/Users/liangminghua/Desktop/云栖考拉-11条-HEVC-Alpha成品/02-委屈-hevc-alpha.mov",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/02-yunqi-koala-02-weiqu/delivery/yunqi-koala-02-weiqu_alpha_hevc.mov",
+        "sha256": "d0790b61d78659d123066dc4dbc2ee8db1309f710b7275d91a5b7c5cccd6c7af",
+        "size": 7038268,
+        "spec": {
+          "codec": "hevc",
+          "profile": "Main",
+          "pixFmt": "yuv420p",
+          "codecTag": "hvc1",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": 10.041667,
+          "frames": 241
+        }
+      },
+      "mobile": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/03_验收预览MP4/02-委屈.mp4",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/02-yunqi-koala-02-weiqu/mobile/yunqi-koala-02-weiqu_mobile_black_v1.mp4",
+        "sha256": "3c6f23270003972a935f723e84d525eae30567a0e3fb332f98ff56127c3af36f",
+        "size": 2133347,
+        "spec": {
+          "codec": "h264",
+          "profile": "Main",
+          "pixFmt": "yuv420p",
+          "codecTag": "avc1",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": 10.041667,
+          "frames": 241
+        }
+      },
+      "source": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/02_ProRes4444_Mac待转HEVC/02-委屈.mov",
+        "sha256": "03d5b661f79364bf3118ef349ab8086b1f780ead2c3bbd8c4feb4e5dd278b869"
+      },
+      "render": {
+        "sourceWidth": 720,
+        "sourceHeight": 960,
+        "contentBoundingBox": [
+          52,
+          154,
+          629,
+          795
+        ],
+        "anchorX": 360,
+        "anchorY": 949
+      }
+    },
+    {
+      "seq": "03",
+      "label": "生气",
+      "emotionId": "angry",
+      "itemId": "yunqi-koala-03-shengqi",
+      "vp9": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/01_WebM-Alpha_网站用/03-生气.webm",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/03-yunqi-koala-03-shengqi/delivery/yunqi-koala-03-shengqi_alpha_vp9.webm",
+        "sha256": "f66e8169fa1353d2b1bd54cab5656f50871752710898822670ade31368b079bc",
+        "size": 1305737,
+        "spec": {
+          "codec": "vp9",
+          "profile": "Profile 0",
+          "pixFmt": "yuv420p",
+          "codecTag": "[0][0][0][0]",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": null,
+          "frames": null
+        }
+      },
+      "hevc": {
+        "local": "/Users/liangminghua/Desktop/云栖考拉-11条-HEVC-Alpha成品/03-生气-hevc-alpha.mov",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/03-yunqi-koala-03-shengqi/delivery/yunqi-koala-03-shengqi_alpha_hevc.mov",
+        "sha256": "316d77f1ff2e2d6b8575980a110c19ff9744c2b07149bb1f3340911473d9b2ef",
+        "size": 3488316,
+        "spec": {
+          "codec": "hevc",
+          "profile": "Main",
+          "pixFmt": "yuv420p",
+          "codecTag": "hvc1",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": 5.041667,
+          "frames": 121
+        }
+      },
+      "mobile": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/03_验收预览MP4/03-生气.mp4",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/03-yunqi-koala-03-shengqi/mobile/yunqi-koala-03-shengqi_mobile_black_v1.mp4",
+        "sha256": "a634de70e4ceb353a78849042e758d9c09f443a22ea06a1c4739d9e86e7cfa02",
+        "size": 1372613,
+        "spec": {
+          "codec": "h264",
+          "profile": "Main",
+          "pixFmt": "yuv420p",
+          "codecTag": "avc1",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": 5.041667,
+          "frames": 121
+        }
+      },
+      "source": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/02_ProRes4444_Mac待转HEVC/03-生气.mov",
+        "sha256": "a28fbd9e3119e7b4d2b7ad3b5660378a85909be7c37b02515347d189390a9244"
+      },
+      "render": {
+        "sourceWidth": 720,
+        "sourceHeight": 960,
+        "contentBoundingBox": [
+          46,
+          30,
+          653,
+          915
+        ],
+        "anchorX": 407,
+        "anchorY": 945
+      }
+    },
+    {
+      "seq": "04",
+      "label": "惊喜",
+      "emotionId": "surprised",
+      "itemId": "yunqi-koala-04-jingxi",
+      "vp9": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/01_WebM-Alpha_网站用/04-惊喜.webm",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/04-yunqi-koala-04-jingxi/delivery/yunqi-koala-04-jingxi_alpha_vp9.webm",
+        "sha256": "13dafb7497cec27978a19e745bdc9b538687292bcd4f1a8b5954adfd8d263cf1",
+        "size": 2248723,
+        "spec": {
+          "codec": "vp9",
+          "profile": "Profile 0",
+          "pixFmt": "yuv420p",
+          "codecTag": "[0][0][0][0]",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": null,
+          "frames": null
+        }
+      },
+      "hevc": {
+        "local": "/Users/liangminghua/Desktop/云栖考拉-11条-HEVC-Alpha成品/04-惊喜-hevc-alpha.mov",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/04-yunqi-koala-04-jingxi/delivery/yunqi-koala-04-jingxi_alpha_hevc.mov",
+        "sha256": "5e50bc0ffc241fdb60d40a14431d4feebd50323b972cf4640f401560af3309f3",
+        "size": 6836236,
+        "spec": {
+          "codec": "hevc",
+          "profile": "Main",
+          "pixFmt": "yuv420p",
+          "codecTag": "hvc1",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": 10.041667,
+          "frames": 241
+        }
+      },
+      "mobile": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/03_验收预览MP4/04-惊喜.mp4",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/04-yunqi-koala-04-jingxi/mobile/yunqi-koala-04-jingxi_mobile_black_v1.mp4",
+        "sha256": "17da575917bf5a95dcbbb85e03cb7571d0d02d66d1e67fde650abb5f7abad7c1",
+        "size": 2476300,
+        "spec": {
+          "codec": "h264",
+          "profile": "Main",
+          "pixFmt": "yuv420p",
+          "codecTag": "avc1",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": 10.041667,
+          "frames": 241
+        }
+      },
+      "source": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/02_ProRes4444_Mac待转HEVC/04-惊喜.mov",
+        "sha256": "cd283e6501a0f2da36224e022b66a48ab9529dcb2850723bb06d0ca4effe402e"
+      },
+      "render": {
+        "sourceWidth": 720,
+        "sourceHeight": 960,
+        "contentBoundingBox": [
+          22,
+          28,
+          679,
+          917
+        ],
+        "anchorX": 395,
+        "anchorY": 945
+      }
+    },
+    {
+      "seq": "05",
+      "label": "调皮",
+      "emotionId": "playful",
+      "itemId": "yunqi-koala-05-tiaopi",
+      "vp9": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/01_WebM-Alpha_网站用/05-调皮.webm",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/05-yunqi-koala-05-tiaopi/delivery/yunqi-koala-05-tiaopi_alpha_vp9.webm",
+        "sha256": "ce4f974c2e16a43016ec038b717d4c174973f742b884342beef7aba9032f5502",
+        "size": 2071020,
+        "spec": {
+          "codec": "vp9",
+          "profile": "Profile 0",
+          "pixFmt": "yuv420p",
+          "codecTag": "[0][0][0][0]",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": null,
+          "frames": null
+        }
+      },
+      "hevc": {
+        "local": "/Users/liangminghua/Desktop/云栖考拉-11条-HEVC-Alpha成品/05-调皮-hevc-alpha.mov",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/05-yunqi-koala-05-tiaopi/delivery/yunqi-koala-05-tiaopi_alpha_hevc.mov",
+        "sha256": "8301d8466d0dcb66b96a3c01775b9dfc0ad7c4a248d610a369762a55e0dbdbf9",
+        "size": 6933514,
+        "spec": {
+          "codec": "hevc",
+          "profile": "Main",
+          "pixFmt": "yuv420p",
+          "codecTag": "hvc1",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": 10.041667,
+          "frames": 241
+        }
+      },
+      "mobile": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/03_验收预览MP4/05-调皮.mp4",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/05-yunqi-koala-05-tiaopi/mobile/yunqi-koala-05-tiaopi_mobile_black_v1.mp4",
+        "sha256": "025224b0171284b64607f77943d348f0132ff5412cfdfaee511be49918aa9957",
+        "size": 2202580,
+        "spec": {
+          "codec": "h264",
+          "profile": "Main",
+          "pixFmt": "yuv420p",
+          "codecTag": "avc1",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": 10.041667,
+          "frames": 241
+        }
+      },
+      "source": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/02_ProRes4444_Mac待转HEVC/05-调皮.mov",
+        "sha256": "7d2ca94729ed287ddbe13be23823479045b3eadda6da3d89e28051aa6f91d15c"
+      },
+      "render": {
+        "sourceWidth": 720,
+        "sourceHeight": 960,
+        "contentBoundingBox": [
+          24,
+          30,
+          675,
+          913
+        ],
+        "anchorX": 368.5,
+        "anchorY": 943
+      }
+    },
+    {
+      "seq": "06",
+      "label": "吃醋",
+      "emotionId": "jealous",
+      "itemId": "yunqi-koala-06-chicu",
+      "vp9": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/01_WebM-Alpha_网站用/06-吃醋.webm",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/06-yunqi-koala-06-chicu/delivery/yunqi-koala-06-chicu_alpha_vp9.webm",
+        "sha256": "5f5b1678defc1d76a77850e9fae1bf99f17f4cdff7556cb8f3fd9badec65f644",
+        "size": 881640,
+        "spec": {
+          "codec": "vp9",
+          "profile": "Profile 0",
+          "pixFmt": "yuv420p",
+          "codecTag": "[0][0][0][0]",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": null,
+          "frames": null
+        }
+      },
+      "hevc": {
+        "local": "/Users/liangminghua/Desktop/云栖考拉-11条-HEVC-Alpha成品/06-吃醋-hevc-alpha.mov",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/06-yunqi-koala-06-chicu/delivery/yunqi-koala-06-chicu_alpha_hevc.mov",
+        "sha256": "dab7a7295103c2f8570bd87224982c38c9aa419b11135f94db2208eed7987b25",
+        "size": 2869654,
+        "spec": {
+          "codec": "hevc",
+          "profile": "Main",
+          "pixFmt": "yuv420p",
+          "codecTag": "hvc1",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": 5.041667,
+          "frames": 121
+        }
+      },
+      "mobile": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/03_验收预览MP4/06-吃醋.mp4",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/06-yunqi-koala-06-chicu/mobile/yunqi-koala-06-chicu_mobile_black_v1.mp4",
+        "sha256": "1d666a77711d99dd89243d1c32b9209d26d2e5e1c09855fc13f6aa30435d795c",
+        "size": 950240,
+        "spec": {
+          "codec": "h264",
+          "profile": "Main",
+          "pixFmt": "yuv420p",
+          "codecTag": "avc1",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": 5.041667,
+          "frames": 121
+        }
+      },
+      "source": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/02_ProRes4444_Mac待转HEVC/06-吃醋.mov",
+        "sha256": "ef90cf82409b849252612f4f9b6142c1ad673b310b9800cadc2dc5f3eae9bdb2"
+      },
+      "render": {
+        "sourceWidth": 720,
+        "sourceHeight": 960,
+        "contentBoundingBox": [
+          46,
+          32,
+          653,
+          911
+        ],
+        "anchorX": 429.5,
+        "anchorY": 943
+      }
+    },
+    {
+      "seq": "07",
+      "label": "嘴硬",
+      "emotionId": "stubborn",
+      "itemId": "yunqi-koala-07-zuiying",
+      "vp9": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/01_WebM-Alpha_网站用/07-嘴硬.webm",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/07-yunqi-koala-07-zuiying/delivery/yunqi-koala-07-zuiying_alpha_vp9.webm",
+        "sha256": "b24adb7d2107fbf4da75927b2fc74ea4bac747ffd4756bae54704945e4e0d4d7",
+        "size": 1316920,
+        "spec": {
+          "codec": "vp9",
+          "profile": "Profile 0",
+          "pixFmt": "yuv420p",
+          "codecTag": "[0][0][0][0]",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": null,
+          "frames": null
+        }
+      },
+      "hevc": {
+        "local": "/Users/liangminghua/Desktop/云栖考拉-11条-HEVC-Alpha成品/07-嘴硬-hevc-alpha.mov",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/07-yunqi-koala-07-zuiying/delivery/yunqi-koala-07-zuiying_alpha_hevc.mov",
+        "sha256": "9ececf3a49261fa4a16ce0d636db62914b056329b2857f7a198eb045ee5a5ca7",
+        "size": 3766779,
+        "spec": {
+          "codec": "hevc",
+          "profile": "Main",
+          "pixFmt": "yuv420p",
+          "codecTag": "hvc1",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": 5.041667,
+          "frames": 121
+        }
+      },
+      "mobile": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/03_验收预览MP4/07-嘴硬.mp4",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/07-yunqi-koala-07-zuiying/mobile/yunqi-koala-07-zuiying_mobile_black_v1.mp4",
+        "sha256": "c2a8b32aa0357cefb0a506aff95fbb8ba04a6134f7ee0349956f3a9567401c40",
+        "size": 1377461,
+        "spec": {
+          "codec": "h264",
+          "profile": "Main",
+          "pixFmt": "yuv420p",
+          "codecTag": "avc1",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": 5.041667,
+          "frames": 121
+        }
+      },
+      "source": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/02_ProRes4444_Mac待转HEVC/07-嘴硬.mov",
+        "sha256": "ad0d0f72a05fb2f910e1a6def8860f063dd7ef07fa75b7bdd43d2f7dec625fbf"
+      },
+      "render": {
+        "sourceWidth": 720,
+        "sourceHeight": 960,
+        "contentBoundingBox": [
+          36,
+          30,
+          663,
+          913
+        ],
+        "anchorX": 367.5,
+        "anchorY": 943
+      }
+    },
+    {
+      "seq": "08",
+      "label": "疑惑",
+      "emotionId": "confused",
+      "itemId": "yunqi-koala-08-yihuo",
+      "vp9": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/01_WebM-Alpha_网站用/08-疑惑.webm",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/08-yunqi-koala-08-yihuo/delivery/yunqi-koala-08-yihuo_alpha_vp9.webm",
+        "sha256": "38ec56d49b7c75de0b499e662438278393227ccc589eed140e9ca7abe0debb2b",
+        "size": 1344404,
+        "spec": {
+          "codec": "vp9",
+          "profile": "Profile 0",
+          "pixFmt": "yuv420p",
+          "codecTag": "[0][0][0][0]",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": null,
+          "frames": null
+        }
+      },
+      "hevc": {
+        "local": "/Users/liangminghua/Desktop/云栖考拉-11条-HEVC-Alpha成品/08-疑惑-hevc-alpha.mov",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/08-yunqi-koala-08-yihuo/delivery/yunqi-koala-08-yihuo_alpha_hevc.mov",
+        "sha256": "e121a4ae352a35a306a0effc48907703de945cec195ea2aac0ce8f5bb5a507c2",
+        "size": 3634611,
+        "spec": {
+          "codec": "hevc",
+          "profile": "Main",
+          "pixFmt": "yuv420p",
+          "codecTag": "hvc1",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": 5.041667,
+          "frames": 121
+        }
+      },
+      "mobile": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/03_验收预览MP4/08-疑惑.mp4",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/08-yunqi-koala-08-yihuo/mobile/yunqi-koala-08-yihuo_mobile_black_v1.mp4",
+        "sha256": "117a4931446de699104d31b5608fb67aa60fb284818833991ea7b92a89a03706",
+        "size": 1335066,
+        "spec": {
+          "codec": "h264",
+          "profile": "Main",
+          "pixFmt": "yuv420p",
+          "codecTag": "avc1",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": 5.041667,
+          "frames": 121
+        }
+      },
+      "source": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/02_ProRes4444_Mac待转HEVC/08-疑惑.mov",
+        "sha256": "8d07d745b45a5005a6643a62838648d6462e0d2b390234f5fb794995beb80001"
+      },
+      "render": {
+        "sourceWidth": 720,
+        "sourceHeight": 960,
+        "contentBoundingBox": [
+          2,
+          30,
+          713,
+          913
+        ],
+        "anchorX": 372,
+        "anchorY": 943
+      }
+    },
+    {
+      "seq": "09",
+      "label": "嫌弃",
+      "emotionId": "disgust",
+      "itemId": "yunqi-koala-09-xianqi",
+      "vp9": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/01_WebM-Alpha_网站用/09-嫌弃.webm",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/09-yunqi-koala-09-xianqi/delivery/yunqi-koala-09-xianqi_alpha_vp9.webm",
+        "sha256": "a22c613d803fc04d380d4514e19153798dbdd66d4afd72b814dc7d2629e4f101",
+        "size": 1137720,
+        "spec": {
+          "codec": "vp9",
+          "profile": "Profile 0",
+          "pixFmt": "yuv420p",
+          "codecTag": "[0][0][0][0]",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": null,
+          "frames": null
+        }
+      },
+      "hevc": {
+        "local": "/Users/liangminghua/Desktop/云栖考拉-11条-HEVC-Alpha成品/09-嫌弃-hevc-alpha.mov",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/09-yunqi-koala-09-xianqi/delivery/yunqi-koala-09-xianqi_alpha_hevc.mov",
+        "sha256": "b3cea40a8961fe42157ad6cc5660ef71c597bc1d603dd396f89abc94d5aa3ae2",
+        "size": 3156879,
+        "spec": {
+          "codec": "hevc",
+          "profile": "Main",
+          "pixFmt": "yuv420p",
+          "codecTag": "hvc1",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": 5.041667,
+          "frames": 121
+        }
+      },
+      "mobile": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/03_验收预览MP4/09-嫌弃.mp4",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/09-yunqi-koala-09-xianqi/mobile/yunqi-koala-09-xianqi_mobile_black_v1.mp4",
+        "sha256": "bc26ac438f2faac0740eb4182bcc313749c37c51f24646caf8fcabe562ddd9c9",
+        "size": 1228954,
+        "spec": {
+          "codec": "h264",
+          "profile": "Main",
+          "pixFmt": "yuv420p",
+          "codecTag": "avc1",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": 5.041667,
+          "frames": 121
+        }
+      },
+      "source": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/02_ProRes4444_Mac待转HEVC/09-嫌弃.mov",
+        "sha256": "f3e512ba6486f94f7f494db3cae285d52c4b36578755ebaaddb06ad3bc37cbff"
+      },
+      "render": {
+        "sourceWidth": 720,
+        "sourceHeight": 960,
+        "contentBoundingBox": [
+          46,
+          30,
+          653,
+          913
+        ],
+        "anchorX": 402.5,
+        "anchorY": 943
+      }
+    },
+    {
+      "seq": "10",
+      "label": "幸灾乐祸",
+      "emotionId": "schadenfreude",
+      "itemId": "yunqi-koala-10-xingzai",
+      "vp9": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/01_WebM-Alpha_网站用/10-幸灾乐祸.webm",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/10-yunqi-koala-10-xingzai/delivery/yunqi-koala-10-xingzai_alpha_vp9.webm",
+        "sha256": "94bb334d710162c13d3531f9e59160732201d7f884d2f9f194960c78da689a90",
+        "size": 1540269,
+        "spec": {
+          "codec": "vp9",
+          "profile": "Profile 0",
+          "pixFmt": "yuv420p",
+          "codecTag": "[0][0][0][0]",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": null,
+          "frames": null
+        }
+      },
+      "hevc": {
+        "local": "/Users/liangminghua/Desktop/云栖考拉-11条-HEVC-Alpha成品/10-幸灾乐祸-hevc-alpha.mov",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/10-yunqi-koala-10-xingzai/delivery/yunqi-koala-10-xingzai_alpha_hevc.mov",
+        "sha256": "c717912f6e507f44b1bc0c8aae002609cff3174bad4f59e001e7778520853eae",
+        "size": 3955531,
+        "spec": {
+          "codec": "hevc",
+          "profile": "Main",
+          "pixFmt": "yuv420p",
+          "codecTag": "hvc1",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": 5.041667,
+          "frames": 121
+        }
+      },
+      "mobile": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/03_验收预览MP4/10-幸灾乐祸.mp4",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/10-yunqi-koala-10-xingzai/mobile/yunqi-koala-10-xingzai_mobile_black_v1.mp4",
+        "sha256": "635fdce45142a9ebe11da7bcb3473027f6a5cc28cf7e0606812bb637b0724280",
+        "size": 1526827,
+        "spec": {
+          "codec": "h264",
+          "profile": "Main",
+          "pixFmt": "yuv420p",
+          "codecTag": "avc1",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": 5.041667,
+          "frames": 121
+        }
+      },
+      "source": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/02_ProRes4444_Mac待转HEVC/10-幸灾乐祸.mov",
+        "sha256": "ad96aed81c79893ba4b9adb511a9b94202917747380302c1ad40fa2e32ca5079"
+      },
+      "render": {
+        "sourceWidth": 720,
+        "sourceHeight": 960,
+        "contentBoundingBox": [
+          46,
+          30,
+          653,
+          913
+        ],
+        "anchorX": 376.5,
+        "anchorY": 943
+      }
+    },
+    {
+      "seq": "11",
+      "label": "撒娇",
+      "emotionId": "coquettish",
+      "itemId": "yunqi-koala-11-sajiao",
+      "vp9": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/01_WebM-Alpha_网站用/11-撒娇.webm",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/11-yunqi-koala-11-sajiao/delivery/yunqi-koala-11-sajiao_alpha_vp9.webm",
+        "sha256": "e14d8a0a1ba151f2e9253d22c04f77cd44ade97b03b962acfedc09cf857f8947",
+        "size": 1138152,
+        "spec": {
+          "codec": "vp9",
+          "profile": "Profile 0",
+          "pixFmt": "yuv420p",
+          "codecTag": "[0][0][0][0]",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": null,
+          "frames": null
+        }
+      },
+      "hevc": {
+        "local": "/Users/liangminghua/Desktop/云栖考拉-11条-HEVC-Alpha成品/11-撒娇-hevc-alpha.mov",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/11-yunqi-koala-11-sajiao/delivery/yunqi-koala-11-sajiao_alpha_hevc.mov",
+        "sha256": "31795a63dd97b4c6084de8a56e56007d9cad71bd61af0d30873eee899dc03030",
+        "size": 3272685,
+        "spec": {
+          "codec": "hevc",
+          "profile": "Main",
+          "pixFmt": "yuv420p",
+          "codecTag": "hvc1",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": 5.041667,
+          "frames": 121
+        }
+      },
+      "mobile": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/03_验收预览MP4/11-撒娇.mp4",
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/11-yunqi-koala-11-sajiao/mobile/yunqi-koala-11-sajiao_mobile_black_v1.mp4",
+        "sha256": "8c231020c49c850b05a2b963c8f36acd5cd957799d6901da14cf1e9b6668d17f",
+        "size": 1175281,
+        "spec": {
+          "codec": "h264",
+          "profile": "Main",
+          "pixFmt": "yuv420p",
+          "codecTag": "avc1",
+          "width": 720,
+          "height": 960,
+          "fps": "24/1",
+          "duration": 5.041667,
+          "frames": 121
+        }
+      },
+      "source": {
+        "local": "/Users/liangminghua/Desktop/转笔记本电脑/02_ProRes4444_Mac待转HEVC/11-撒娇.mov",
+        "sha256": "5ed2ceac12011f85b8bd32c1e9c46b0f7f02616018634fd2f9dc58e212a32637"
+      },
+      "render": {
+        "sourceWidth": 720,
+        "sourceHeight": 960,
+        "contentBoundingBox": [
+          48,
+          30,
+          651,
+          913
+        ],
+        "anchorX": 391,
+        "anchorY": 943
+      }
+    }
+  ],
+  "watermarkFixRevision": "yunqi-koala-01-watermarkfix-envelope-clear-r1"
+}

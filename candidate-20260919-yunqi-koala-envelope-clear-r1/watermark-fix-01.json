@@ -1,0 +1,131 @@
+{
+  "revision": "yunqi-koala-01-watermarkfix-envelope-clear-r1",
+  "itemId": "yunqi-koala-01-kaixin",
+  "status": "candidate-envelope-clear",
+  "availableStageEvidence": {
+    "proresAlpha": "watermark visible in RGB",
+    "vp9Alpha": "watermark visible before fix",
+    "hevcAlpha": "watermark visible before fix",
+    "poster": "no watermark detected"
+  },
+  "originalDoubaoAndWorkStage": "not present in Mac handoff package; E: source paths are unavailable on this Mac",
+  "delivery": {
+    "vp9Alpha": {
+      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/delivery/yunqi-koala-01-kaixin_alpha_vp9_envelope_clear_r1.webm",
+      "sha256": "480197d64e697d5747444b07ca7ab0e48e44b8ee21c8a9ccd3c296e5e2221431",
+      "size": 2786327
+    },
+    "hevcAlpha": {
+      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/delivery/yunqi-koala-01-kaixin_alpha_hevc_avconvert_envelope_clear_r1.mov",
+      "sha256": "3b21abac51c2d33d056a1050b1323445b07f3ab0be1c8255fea6901fb1b0a23c",
+      "size": 7101349
+    },
+    "h264Fallback": {
+      "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/mobile/yunqi-koala-01-kaixin_mobile_black_envelope_clear_r1.mp4",
+      "sha256": "41cbad8d9ac43bff9a94d193e7f9e94ab2500edd1e5c15f758718c0832007709",
+      "size": 1908445
+    }
+  },
+  "method": {
+    "fixId": "yunqi-koala-01-watermarkfix-envelope-clear-r1",
+    "method": "fixed-envelope-clear-subject-restore",
+    "appliedTo": [
+      "vp9Alpha",
+      "hevcAlpha",
+      "h264Fallback"
+    ],
+    "sourceStage": "ProRes 4444 Alpha",
+    "note": "左上/右下最大水印活动包络 + 12px 保护带永久透明清场；Alpha>=128 角色不透明主体按原帧恢复，不裁切、不缩放、不改帧率、不改时长"
+  },
+  "evidenceDirectory": "watermark-fix-01/",
+  "localOutputDirectory": "/Users/liangminghua/Desktop/云栖考拉-01-水印修复成品-包络清场-r1",
+  "localMaster": "/Users/liangminghua/Desktop/云栖考拉-01-水印修复成品-包络清场-r1/01-开心-包络清场-ProRes4444-Alpha.mov",
+  "master": {
+    "path": "/Users/liangminghua/Desktop/云栖考拉-01-水印修复成品-包络清场-r1/01-开心-包络清场-ProRes4444-Alpha.mov",
+    "sha256": "34a47d534a5f775c749c6aea5b95a4456b16ba6da1cf3b268bd70c7d7e37ebd1",
+    "size": 101535987
+  },
+  "clearBoxes": [
+    [
+      2,
+      0,
+      194,
+      92
+    ],
+    [
+      526,
+      868,
+      718,
+      960
+    ]
+  ],
+  "watermarkActivityBBoxes": {
+    "leftTop": [
+      14,
+      8,
+      181,
+      79
+    ],
+    "rightBottom": [
+      538,
+      880,
+      705,
+      952
+    ]
+  },
+  "clearBoxesWithGuard": {
+    "leftTop": [
+      2,
+      0,
+      193,
+      91
+    ],
+    "rightBottom": [
+      526,
+      868,
+      717,
+      959
+    ],
+    "guardPx": 12,
+    "note": "数组为闭区间像素坐标；实际生成使用对应右/下边界加一。"
+  },
+  "scanStats": {
+    "frames": 241,
+    "resolution": [
+      720,
+      960
+    ],
+    "watermarkResidualAfterProResClear": {
+      "leftTop": 0,
+      "rightBottom": 0
+    },
+    "watermarkResidualAfterHevc": {
+      "leftTop": 216,
+      "rightBottom": 355,
+      "farFromCharacter": {
+        "leftTop": 11,
+        "rightBottom": 13
+      }
+    },
+    "watermarkResidualAfterVp9": {
+      "leftTop": 372,
+      "rightBottom": 569,
+      "farFromCharacter": {
+        "leftTop": 30,
+        "rightBottom": 58
+      }
+    },
+    "restoredOpaqueCharacterPixels": {
+      "leftTop": 3824,
+      "rightBottom": 3979,
+      "total": 7803,
+      "alphaThreshold": 128
+    },
+    "effectiveCharacterLossProRes": {
+      "alphaGte128": 0,
+      "bboxDeltaPx": 0
+    },
+    "softAlphaRemovedInEnvelopes": 114753,
+    "note": "水印最大 Alpha 约 120；Alpha>=128 角色主体全部恢复。编码后少量像素位于角色边缘 3px 内，属于压缩回溢，不是水印文字。"
+  }
+}
