@@ -1,0 +1,18 @@
+{
+  "releaseId": "release-20260912-03",
+  "buildId": "release-20260912-03",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "a7b687ac862e20907ce919d70447853a8b4affb436ad9371c82ab87d9470a546",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/release-20260919-yunqi-koala-r1/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-17T14:25:00.000000Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "baseline": "release-20260918-no-frontstage-r1",
+  "baselineSource": "release-20260917-lingyao-monkey-r1 + accepted r4 shared intent template",
+  "previousRelease": "release-20260918-no-frontstage-r1",
+  "releaseNote": "仅新增云栖考拉11条情绪视频、必要角色入口和映射；兔、狐、猴媒体链路、方言、语音、祝福、问候及页面逻辑不变。",
+  "frozenIndexSha256": "65f0ca38801f13b39ddc728da81b9dda052214eb48adb782dd4a73f7e421d819",
+  "releaseName": "release-20260919-yunqi-koala-r1"
+}
