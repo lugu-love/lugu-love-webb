@@ -5035,6 +5035,13 @@ runSpritePlayback("large");
 function expandRabbitPerformance() {
 if (rabbitStage !== "large" || canvas.dataset.exiting === "1" || !canvas.isConnected) return;
 const entryStartRect = canvas.getBoundingClientRect();
+const foregroundMustWait = isNarrativeTest && !!entryStartRect;
+if (foregroundMustWait) {
+// Do not expose the foreground layer until the existing video has decoded a
+// frame and its reparented geometry is fully written.
+canvas.style.visibility = "hidden";
+canvas.style.opacity = "0";
+}
 const stageRect = (stage || document.body).getBoundingClientRect();
 // The real usable content band: below the actual top chrome (brand/logo) and
 // above the bottom entry buttons.  The composition is centred inside it.
@@ -5113,7 +5120,7 @@ container?.classList.add("rabbit-expanded");
 // a canvas is reparented, which makes a successful jump look invisible.
 canvas.style.position = "fixed";
 canvas.style.zIndex = "60";
-canvas.style.opacity = "1";
+canvas.style.opacity = foregroundMustWait ? "0" : "1";
 canvas.style.pointerEvents = isNarrativeTest ? "none" : "auto";
 canvas.addEventListener("click", keepExpandedPlayback);
 if (container) {
@@ -5130,8 +5137,30 @@ canvas.style.top = `${entryStartRect.top}px`;
 canvas.style.width = `${entryStartRect.width}px`;
 canvas.style.height = `${entryStartRect.height}px`;
 canvas.style.transform = "none";
-requestAnimationFrame(() => {
+const waitForDecodedForeground = () => new Promise((resolve) => {
+let settled = false;
+const revealAfterFrame = () => {
+if (settled) return;
+settled = true;
+requestAnimationFrame(resolve);
+};
+const ready = () => { if (sourceVideo && sourceVideo.readyState >= 2) revealAfterFrame(); };
+if (sourceVideo && typeof sourceVideo.requestVideoFrameCallback === "function") {
+sourceVideo.requestVideoFrameCallback(function () { revealAfterFrame(); });
+} else if (sourceVideo && sourceVideo.readyState >= 2) {
+requestAnimationFrame(revealAfterFrame);
+} else if (sourceVideo) {
+sourceVideo.addEventListener("loadeddata", ready, { once: true });
+sourceVideo.addEventListener("canplay", ready, { once: true });
+sourceVideo.addEventListener("seeked", ready, { once: true });
+} else {
+requestAnimationFrame(revealAfterFrame);
+}
+});
+waitForDecodedForeground().then(() => requestAnimationFrame(() => {
 if (rabbitStage !== "expanded" || !canvas.isConnected) return;
+canvas.style.visibility = "visible";
+canvas.style.opacity = "1";
 foregroundEntryAnimation = canvas.animate([
 { left: `${entryStartRect.left}px`, top: `${entryStartRect.top}px`, width: `${entryStartRect.width}px`, height: `${entryStartRect.height}px`, transform: "translateY(0) scale(1)", opacity: 1, filter: entryStartFilter },
 { offset: .2, left: `${entryStartRect.left}px`, top: `${entryStartRect.top - 7}px`, width: `${entryStartRect.width * 1.12}px`, height: `${entryStartRect.height * 1.12}px`, transform: "translateY(-2px) scale(1)", opacity: 1, filter: entryStartFilter },
@@ -5155,7 +5184,7 @@ spritesReady.then(() => {
 if (rabbitStage === "expanded" && canvas.isConnected) runSpritePlayback("narrative-replay", 1);
 }).catch(abortSpritePlayback);
 };
-});
+}));
 } else if (!isNarrativeTest) {
 canvas.style.left = "50%";
 canvas.style.top = "calc(50svh - 62px - min(60vw, 255px))";
