@@ -4632,6 +4632,7 @@ let replayHint = null;
 let foregroundEntryAnimation = null;
 let narrativeHandoffTimer = 0;
 let narrativeReplayActive = false;
+let foregroundVideoPrepared = false;
 let returningToBottle = false;
 let videoEndTimer = 0;
 let videoFinishHandler = null;
@@ -4706,6 +4707,7 @@ if (activeFengxinRabbitDemo === canvas) activeFengxinRabbitDemo = null;
 
 function returnRabbitToBottle({ becomeStarAtBottle = false } = {}) {
 if (!canvas.isConnected || canvas.dataset.exiting === "1" || (rabbitStage !== "expanded" && rabbitStage !== "finished")) return;
+foregroundVideoPrepared = false;
 rabbitStage = "returning";
 canvas.removeEventListener("click", keepExpandedPlayback);
 if (!bottleVisual?.isConnected) {
@@ -4971,8 +4973,13 @@ clearTimeout(videoEndTimer);
 if (!sourceVideo) return;
 // 小瓶等待文案书写期间循环播放；正式表演阶段只播一次。
 const loopForever = mode === "initial" || mode === "narrative-idle" || mode === "large";
+const usePreparedFrame = mode === "narrative-replay" && foregroundVideoPrepared;
 sourceVideo.loop = loopForever;
+if (usePreparedFrame) {
+foregroundVideoPrepared = false;
+} else {
 try { sourceVideo.currentTime = 0; } catch (error) {}
+}
 const stopPlayback = () => {
 try { sourceVideo.pause(); } catch (error) {}
 };
@@ -5137,27 +5144,38 @@ canvas.style.top = `${entryStartRect.top}px`;
 canvas.style.width = `${entryStartRect.width}px`;
 canvas.style.height = `${entryStartRect.height}px`;
 canvas.style.transform = "none";
-const waitForDecodedForeground = () => new Promise((resolve) => {
+const prepareForegroundVideo = () => new Promise((resolve) => {
+if (!sourceVideo) {
+requestAnimationFrame(resolve);
+return;
+}
 let settled = false;
-const revealAfterFrame = () => {
+const finishAfterFrame = () => {
 if (settled) return;
+if (sourceVideo.readyState < 2) return;
 settled = true;
+foregroundVideoPrepared = true;
 requestAnimationFrame(resolve);
 };
-const ready = () => { if (sourceVideo && sourceVideo.readyState >= 2) revealAfterFrame(); };
-if (sourceVideo && typeof sourceVideo.requestVideoFrameCallback === "function") {
-sourceVideo.requestVideoFrameCallback(function () { revealAfterFrame(); });
-} else if (sourceVideo && sourceVideo.readyState >= 2) {
-requestAnimationFrame(revealAfterFrame);
-} else if (sourceVideo) {
-sourceVideo.addEventListener("loadeddata", ready, { once: true });
-sourceVideo.addEventListener("canplay", ready, { once: true });
-sourceVideo.addEventListener("seeked", ready, { once: true });
+const afterSeek = () => {
+if (typeof sourceVideo.requestVideoFrameCallback === "function") {
+sourceVideo.requestVideoFrameCallback(function () { finishAfterFrame(); });
 } else {
-requestAnimationFrame(revealAfterFrame);
+finishAfterFrame();
+}
+};
+try { sourceVideo.pause(); } catch (error) {}
+sourceVideo.loop = false;
+try { sourceVideo.currentTime = 0; } catch (error) {}
+if (sourceVideo.readyState >= 2 && sourceVideo.currentTime < 0.02) {
+afterSeek();
+} else {
+sourceVideo.addEventListener("seeked", afterSeek, { once: true });
+sourceVideo.addEventListener("loadeddata", afterSeek, { once: true });
+sourceVideo.addEventListener("canplay", afterSeek, { once: true });
 }
 });
-waitForDecodedForeground().then(() => requestAnimationFrame(() => {
+prepareForegroundVideo().then(() => requestAnimationFrame(() => {
 if (rabbitStage !== "expanded" || !canvas.isConnected) return;
 canvas.style.visibility = "visible";
 canvas.style.opacity = "1";
