@@ -36,6 +36,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 GENERATION_MASTERS_DIR = os.environ.get("GENERATION_MASTERS_DIR", os.path.join(ROOT, "generation-masters"))
 ASSET_MANIFEST_FILE = os.environ.get("ASSET_MANIFEST_FILE", os.path.join(ROOT, "asset-manifest.json"))
 BLESSING_MANIFEST_FILE = os.environ.get("BLESSING_MANIFEST_FILE", os.path.join(ROOT, "blessing-manifest.json"))
+PRODUCTION_MASTER_REGISTRY_FILE = os.environ.get("PRODUCTION_MASTER_REGISTRY_FILE", os.path.join(ROOT, "production-master-registry.json"))
 POC_SAMPLE_FILE = os.path.join(ROOT, "poc", "sample.mp4")
 FFMPEG = os.environ.get("FFMPEG_BIN", "ffmpeg")
 FONT_FILE = os.environ.get("FONT_FILE", "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc")
@@ -104,7 +105,61 @@ def _load_blessing_manifest():
     return manifest
 
 
-ASSET_MANIFEST = _load_asset_manifest()
+def _load_production_master_registry():
+    """Load the backend-only runtime master overlay.
+
+    The frontend release contract remains the source of itemId/assetVersion and
+    the approved source-master SHA. The overlay only specifies the backend
+    runtime master used by FFmpeg and keeps the frontend immutable.
+    """
+    with open(PRODUCTION_MASTER_REGISTRY_FILE, "r", encoding="utf-8") as f:
+        registry = json.load(f)
+    if registry.get("schemaVersion") != 1:
+        raise RuntimeError("unsupported production master registry schema")
+    character = registry.get("character") or {}
+    if character.get("characterId") != "nuanshan-bear":
+        raise RuntimeError("invalid production master registry character")
+    items = registry.get("items") or {}
+    if len(items) != 15:
+        raise RuntimeError("invalid production master registry item count")
+    for item_id, item in items.items():
+        if item.get("itemId") != item_id or item.get("characterId") != "nuanshan-bear":
+            raise RuntimeError("invalid production master registry identity: %s" % item_id)
+        if item.get("status") != "production":
+            raise RuntimeError("production master registry item is not production: %s" % item_id)
+        source_master = item.get("generationMaster") or {}
+        runtime_master = item.get("runtimeMaster") or {}
+        if not source_master.get("ref") or not source_master.get("sha256"):
+            raise RuntimeError("missing source generation master contract: %s" % item_id)
+        if not runtime_master.get("ref") or not runtime_master.get("sha256"):
+            raise RuntimeError("missing runtime generation master: %s" % item_id)
+    return registry
+
+
+def _merge_production_master_registry(manifest, registry):
+    """Add backend-only runtime masters without changing the frontend contract."""
+    items = manifest.setdefault("items", {})
+    character = registry["character"]
+    character_id = character["characterId"]
+    item_order = list((registry.get("items") or {}).keys())
+    for item_id in item_order:
+        if item_id in items:
+            raise RuntimeError("duplicate production item in registry: %s" % item_id)
+        items[item_id] = registry["items"][item_id]
+    production = manifest.setdefault("production", {})
+    characters = production.setdefault("characters", [])
+    for existing in characters:
+        if existing.get("characterId") == character_id:
+            raise RuntimeError("duplicate production character in registry: %s" % character_id)
+    characters.append({
+        "characterId": character_id,
+        "displayName": character.get("displayName", "暖山熊"),
+        "itemOrder": item_order,
+    })
+    return manifest
+
+
+ASSET_MANIFEST = _merge_production_master_registry(_load_asset_manifest(), _load_production_master_registry())
 BLESSING_MANIFEST = _load_blessing_manifest()
 RELEASE_ID = ASSET_MANIFEST["releaseId"]
 BUILD_ID = ASSET_MANIFEST["buildId"]
@@ -133,13 +188,14 @@ def _sha256_file(path):
 
 for _item_id, _e in _emotions.items():
     _generation = _e.get("generationMaster") or {}
-    _master = _generation.get("ref")
+    _runtime = _e.get("runtimeMaster") or _generation
+    _master = _runtime.get("ref")
     if not _master:
         raise RuntimeError("missing generation master: %s" % _item_id)
     _path = os.path.join(_master_root(), _master)
     if not os.path.isfile(_path):
         raise RuntimeError("generation master file missing: %s" % _item_id)
-    if _sha256_file(_path) != _generation.get("sha256"):
+    if _sha256_file(_path) != _runtime.get("sha256"):
         raise RuntimeError("generation master SHA mismatch: %s" % _item_id)
     MASTERS[_item_id] = (_master, _e.get("label", _item_id))
     JOURNEY_META[_item_id] = (_e.get("characterId", ""), _e.get("emotionId", _item_id))
@@ -1044,10 +1100,12 @@ def generate(item, text, workdir, tts=None, voice_id=None, speech_text=None, tts
     expected_master = (actual_entry.get("generationMaster") or {}).get("sha256")
     if expected_master_sha256 and expected_master_sha256 != expected_master:
         raise RuntimeError("expected master SHA mismatch")
+    runtime_master = actual_entry.get("runtimeMaster") or {}
+    expected_runtime_master = runtime_master.get("sha256") or expected_master
     master_rel, _emotion = MASTERS[actual_item]
     master = os.path.join(_master_root(), master_rel)
     actual_master_sha256 = _sha256_file(master)
-    if actual_master_sha256 != expected_master:
+    if actual_master_sha256 != expected_runtime_master:
         raise RuntimeError("actual master SHA mismatch")
     final = os.path.join(workdir, "final.mp4")
     meta = {
@@ -1449,7 +1507,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
         if path == "/status":
-            return self._send_json(200, {"enabled": read_enabled(), "releaseId": RELEASE_ID, "buildId": BUILD_ID, "manifestVersion": MANIFEST_VERSION, "blessingReleaseId": BLESSING_RELEASE_ID, "blessingBuildId": BLESSING_BUILD_ID, "blessingManifestVersion": BLESSING_MANIFEST_VERSION, "rabbitMasters": sum(1 for k in _emotion_items if k.startswith("rabbit-")), "foxMasters": sum(1 for k in _emotion_items if k.startswith("fox-")), "monkeyMasters": sum(1 for k in _emotion_items if k.startswith("monkey-")), "productionItems": len(_emotion_items), "blessingItems": len(_blessing_items), "fps": FPS, "bitrate_kbps": BITRATE_KBPS})
+            return self._send_json(200, {"enabled": read_enabled(), "releaseId": RELEASE_ID, "buildId": BUILD_ID, "manifestVersion": MANIFEST_VERSION, "blessingReleaseId": BLESSING_RELEASE_ID, "blessingBuildId": BLESSING_BUILD_ID, "blessingManifestVersion": BLESSING_MANIFEST_VERSION, "rabbitMasters": sum(1 for k in _emotion_items if k.startswith("rabbit-")), "foxMasters": sum(1 for k in _emotion_items if k.startswith("fox-")), "monkeyMasters": sum(1 for k in _emotion_items if k.startswith("monkey-")), "bearMasters": sum(1 for k in _emotion_items if k.startswith("nuanshan-bear-")), "productionItems": len(_emotion_items), "blessingItems": len(_blessing_items), "fps": FPS, "bitrate_kbps": BITRATE_KBPS})
         if path == "/welcome":
             return self._welcome_public()
         if path == "/.well-known/assetlinks.json":
