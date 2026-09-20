@@ -36,7 +36,13 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 GENERATION_MASTERS_DIR = os.environ.get("GENERATION_MASTERS_DIR", os.path.join(ROOT, "generation-masters"))
 ASSET_MANIFEST_FILE = os.environ.get("ASSET_MANIFEST_FILE", os.path.join(ROOT, "asset-manifest.json"))
 BLESSING_MANIFEST_FILE = os.environ.get("BLESSING_MANIFEST_FILE", os.path.join(ROOT, "blessing-manifest.json"))
-PRODUCTION_MASTER_REGISTRY_FILE = os.environ.get("PRODUCTION_MASTER_REGISTRY_FILE", os.path.join(ROOT, "production-master-registry.json"))
+PRODUCTION_MASTER_REGISTRY_FILES = os.environ.get(
+    "PRODUCTION_MASTER_REGISTRY_FILES",
+    os.pathsep.join([
+        os.path.join(ROOT, "production-master-registry.json"),
+        os.path.join(ROOT, "production-master-registry-koala.json"),
+    ]),
+)
 POC_SAMPLE_FILE = os.path.join(ROOT, "poc", "sample.mp4")
 FFMPEG = os.environ.get("FFMPEG_BIN", "ffmpeg")
 FONT_FILE = os.environ.get("FONT_FILE", "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc")
@@ -105,61 +111,68 @@ def _load_blessing_manifest():
     return manifest
 
 
-def _load_production_master_registry():
-    """Load the backend-only runtime master overlay.
+def _load_production_master_registries():
+    """Load backend-only runtime master overlays without changing frontend files."""
+    registries = []
+    paths = [p for p in PRODUCTION_MASTER_REGISTRY_FILES.split(os.pathsep) if p]
+    expected_counts = {"nuanshan-bear": 15, "yunqi-koala": 11}
+    seen_characters = set()
+    for path in paths:
+        with open(path, "r", encoding="utf-8") as f:
+            registry = json.load(f)
+        if registry.get("schemaVersion") != 1:
+            raise RuntimeError("unsupported production master registry schema")
+        character = registry.get("character") or {}
+        character_id = character.get("characterId")
+        if character_id not in expected_counts:
+            raise RuntimeError("invalid production master registry character")
+        if character_id in seen_characters:
+            raise RuntimeError("duplicate production master registry character: %s" % character_id)
+        seen_characters.add(character_id)
+        items = registry.get("items") or {}
+        if len(items) != expected_counts[character_id]:
+            raise RuntimeError("invalid production master registry item count: %s" % character_id)
+        for item_id, item in items.items():
+            if item.get("itemId") != item_id or item.get("characterId") != character_id:
+                raise RuntimeError("invalid production master registry identity: %s" % item_id)
+            if item.get("status") != "production":
+                raise RuntimeError("production master registry item is not production: %s" % item_id)
+            source_master = item.get("generationMaster") or {}
+            runtime_master = item.get("runtimeMaster") or {}
+            if not source_master.get("ref") or not source_master.get("sha256"):
+                raise RuntimeError("missing source generation master contract: %s" % item_id)
+            if not runtime_master.get("ref") or not runtime_master.get("sha256"):
+                raise RuntimeError("missing runtime generation master: %s" % item_id)
+        registries.append(registry)
+    if set(seen_characters) != set(expected_counts):
+        raise RuntimeError("missing production master registry")
+    return registries
 
-    The frontend release contract remains the source of itemId/assetVersion and
-    the approved source-master SHA. The overlay only specifies the backend
-    runtime master used by FFmpeg and keeps the frontend immutable.
-    """
-    with open(PRODUCTION_MASTER_REGISTRY_FILE, "r", encoding="utf-8") as f:
-        registry = json.load(f)
-    if registry.get("schemaVersion") != 1:
-        raise RuntimeError("unsupported production master registry schema")
-    character = registry.get("character") or {}
-    if character.get("characterId") != "nuanshan-bear":
-        raise RuntimeError("invalid production master registry character")
-    items = registry.get("items") or {}
-    if len(items) != 15:
-        raise RuntimeError("invalid production master registry item count")
-    for item_id, item in items.items():
-        if item.get("itemId") != item_id or item.get("characterId") != "nuanshan-bear":
-            raise RuntimeError("invalid production master registry identity: %s" % item_id)
-        if item.get("status") != "production":
-            raise RuntimeError("production master registry item is not production: %s" % item_id)
-        source_master = item.get("generationMaster") or {}
-        runtime_master = item.get("runtimeMaster") or {}
-        if not source_master.get("ref") or not source_master.get("sha256"):
-            raise RuntimeError("missing source generation master contract: %s" % item_id)
-        if not runtime_master.get("ref") or not runtime_master.get("sha256"):
-            raise RuntimeError("missing runtime generation master: %s" % item_id)
-    return registry
 
-
-def _merge_production_master_registry(manifest, registry):
+def _merge_production_master_registries(manifest, registries):
     """Add backend-only runtime masters without changing the frontend contract."""
     items = manifest.setdefault("items", {})
-    character = registry["character"]
-    character_id = character["characterId"]
-    item_order = list((registry.get("items") or {}).keys())
-    for item_id in item_order:
-        if item_id in items:
-            raise RuntimeError("duplicate production item in registry: %s" % item_id)
-        items[item_id] = registry["items"][item_id]
     production = manifest.setdefault("production", {})
     characters = production.setdefault("characters", [])
-    for existing in characters:
-        if existing.get("characterId") == character_id:
+    for registry in registries:
+        character = registry["character"]
+        character_id = character["characterId"]
+        item_order = list((registry.get("items") or {}).keys())
+        for item_id in item_order:
+            if item_id in items:
+                raise RuntimeError("duplicate production item in registry: %s" % item_id)
+            items[item_id] = registry["items"][item_id]
+        if any(existing.get("characterId") == character_id for existing in characters):
             raise RuntimeError("duplicate production character in registry: %s" % character_id)
-    characters.append({
-        "characterId": character_id,
-        "displayName": character.get("displayName", "暖山熊"),
-        "itemOrder": item_order,
-    })
+        characters.append({
+            "characterId": character_id,
+            "displayName": character.get("displayName", character_id),
+            "itemOrder": item_order,
+        })
     return manifest
 
 
-ASSET_MANIFEST = _merge_production_master_registry(_load_asset_manifest(), _load_production_master_registry())
+ASSET_MANIFEST = _merge_production_master_registries(_load_asset_manifest(), _load_production_master_registries())
 BLESSING_MANIFEST = _load_blessing_manifest()
 RELEASE_ID = ASSET_MANIFEST["releaseId"]
 BUILD_ID = ASSET_MANIFEST["buildId"]
@@ -1507,7 +1520,7 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
         if path == "/status":
-            return self._send_json(200, {"enabled": read_enabled(), "releaseId": RELEASE_ID, "buildId": BUILD_ID, "manifestVersion": MANIFEST_VERSION, "blessingReleaseId": BLESSING_RELEASE_ID, "blessingBuildId": BLESSING_BUILD_ID, "blessingManifestVersion": BLESSING_MANIFEST_VERSION, "rabbitMasters": sum(1 for k in _emotion_items if k.startswith("rabbit-")), "foxMasters": sum(1 for k in _emotion_items if k.startswith("fox-")), "monkeyMasters": sum(1 for k in _emotion_items if k.startswith("monkey-")), "bearMasters": sum(1 for k in _emotion_items if k.startswith("nuanshan-bear-")), "productionItems": len(_emotion_items), "blessingItems": len(_blessing_items), "fps": FPS, "bitrate_kbps": BITRATE_KBPS})
+            return self._send_json(200, {"enabled": read_enabled(), "releaseId": RELEASE_ID, "buildId": BUILD_ID, "manifestVersion": MANIFEST_VERSION, "blessingReleaseId": BLESSING_RELEASE_ID, "blessingBuildId": BLESSING_BUILD_ID, "blessingManifestVersion": BLESSING_MANIFEST_VERSION, "rabbitMasters": sum(1 for k in _emotion_items if k.startswith("rabbit-")), "foxMasters": sum(1 for k in _emotion_items if k.startswith("fox-")), "monkeyMasters": sum(1 for k in _emotion_items if k.startswith("monkey-")), "bearMasters": sum(1 for k in _emotion_items if k.startswith("nuanshan-bear-")), "koalaMasters": sum(1 for k in _emotion_items if k.startswith("yunqi-koala-")), "productionItems": len(_emotion_items), "blessingItems": len(_blessing_items), "fps": FPS, "bitrate_kbps": BITRATE_KBPS})
         if path == "/welcome":
             return self._welcome_public()
         if path == "/.well-known/assetlinks.json":

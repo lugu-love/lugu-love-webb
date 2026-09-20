@@ -1,0 +1,1002 @@
+{
+  "schemaVersion": 1,
+  "character": {
+    "characterId": "yunqi-koala",
+    "displayName": "云栖考拉",
+    "itemOrder": [
+      "yunqi-koala-01-kaixin",
+      "yunqi-koala-02-weiqu",
+      "yunqi-koala-03-shengqi",
+      "yunqi-koala-04-jingxi",
+      "yunqi-koala-05-tiaopi",
+      "yunqi-koala-06-chicu",
+      "yunqi-koala-07-zuiying",
+      "yunqi-koala-08-yihuo",
+      "yunqi-koala-09-xianqi",
+      "yunqi-koala-10-xingzai",
+      "yunqi-koala-11-sajiao"
+    ]
+  },
+  "items": {
+    "yunqi-koala-01-kaixin": {
+      "itemId": "yunqi-koala-01-kaixin",
+      "characterId": "yunqi-koala",
+      "emotionId": "happy",
+      "label": "开心",
+      "sequenceId": "01",
+      "status": "production",
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "01-开心.mov",
+        "sha256": "23d481203cd76fa42020120332568f4178f8071cc9bb79c1449a479e8a2e3ae1",
+        "container": "mov",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "01-开心.mov",
+          "sha256": "23d481203cd76fa42020120332568f4178f8071cc9bb79c1449a479e8a2e3ae1",
+          "assetVersion": "yunqi-koala-01-kaixin-v1"
+        }
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/delivery/yunqi-koala-01-kaixin_alpha_vp9_watermarkfix_r2.webm",
+        "sha256": "12613075f7db4d57550c28cacbe18199e51f313a0f06040f06a3fd3560910d17",
+        "size": 2787358,
+        "contentType": "video/webm",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": null,
+        "duration": null,
+        "alpha": true,
+        "assetVersion": "yunqi-koala-01-kaixin-watermarkfix-v2"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/delivery/yunqi-koala-01-kaixin_alpha_hevc_avconvert_watermarkfix_r2.mov",
+        "sha256": "bed61afda28b44a08e29479f11f6494f65159338c69c32dbd168f39445436b33",
+        "size": 7113550,
+        "contentType": "video/quicktime",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 241,
+        "duration": 10.041667,
+        "alpha": true,
+        "assetVersion": "yunqi-koala-01-kaixin-watermarkfix-v2"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/mobile/yunqi-koala-01-kaixin_mobile_black_watermarkfix_r2.mp4",
+        "sha256": "41cbad8d9ac43bff9a94d193e7f9e94ab2500edd1e5c15f758718c0832007709",
+        "size": 1908445,
+        "contentType": "video/mp4",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 241,
+        "duration": 10.041667,
+        "assetVersion": "yunqi-koala-01-kaixin-watermarkfix-v2"
+      },
+      "backend": {
+        "displayName": "开心",
+        "code": "01",
+        "speechStart": 1.4,
+        "unionSource": [
+          0,
+          0,
+          719,
+          959
+        ],
+        "subjectBox": [
+          36,
+          30,
+          699,
+          943
+        ],
+        "sourceWidth": 720,
+        "sourceHeight": 960
+      },
+      "assetVersion": "yunqi-koala-01-kaixin-watermarkfix-v2",
+      "watermarkFix": {
+        "fixId": "yunqi-koala-01-watermarkfix-r2",
+        "method": "per-frame-dynamic-alpha-mask-r6",
+        "appliedTo": [
+          "vp9Alpha",
+          "hevcAlpha",
+          "h264Fallback"
+        ],
+        "sourceStage": "ProRes 4444 Alpha",
+        "note": "逐帧检测并清除两角移动水印及其低 Alpha 残留，半径 6px 防编码回溢；不裁切、不缩放、不改帧率、不改时长"
+      },
+      "runtimeMaster": {
+        "kind": "ffmpeg-remux-vp9-alpha",
+        "ref": "yunqi_koala_01_kaixin_generation_alpha_v1.mkv",
+        "sha256": "ecd7006f9f00fa42c97a9daf04ecae4faa895467ce9efe00efcbe2c6ad04d4fd",
+        "container": "mkv",
+        "source": "accepted formal VP9 WebM Alpha",
+        "sourceSha256": "12613075f7db4d57550c28cacbe18199e51f313a0f06040f06a3fd3560910d17",
+        "sourceApprovedMasterRef": "01-开心.mov",
+        "sourceApprovedMasterSha256": "23d481203cd76fa42020120332568f4178f8071cc9bb79c1449a479e8a2e3ae1"
+      }
+    },
+    "yunqi-koala-02-weiqu": {
+      "itemId": "yunqi-koala-02-weiqu",
+      "characterId": "yunqi-koala",
+      "emotionId": "wronged",
+      "label": "委屈",
+      "sequenceId": "02",
+      "status": "production",
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "02-委屈.mov",
+        "sha256": "03d5b661f79364bf3118ef349ab8086b1f780ead2c3bbd8c4feb4e5dd278b869",
+        "container": "mov",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "02-委屈.mov",
+          "sha256": "03d5b661f79364bf3118ef349ab8086b1f780ead2c3bbd8c4feb4e5dd278b869",
+          "assetVersion": "yunqi-koala-02-weiqu-v1"
+        }
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/02-yunqi-koala-02-weiqu/delivery/yunqi-koala-02-weiqu_alpha_vp9.webm",
+        "sha256": "70a8aace1d970727089f94843481303df2fe2c24dd469888bb805cf03c69db31",
+        "size": 1848326,
+        "contentType": "video/webm",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": null,
+        "duration": null,
+        "alpha": true,
+        "assetVersion": "yunqi-koala-02-weiqu-v1"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/02-yunqi-koala-02-weiqu/delivery/yunqi-koala-02-weiqu_alpha_hevc.mov",
+        "sha256": "d0790b61d78659d123066dc4dbc2ee8db1309f710b7275d91a5b7c5cccd6c7af",
+        "size": 7038268,
+        "contentType": "video/quicktime",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 241,
+        "duration": 10.041667,
+        "alpha": true,
+        "assetVersion": "yunqi-koala-02-weiqu-v1"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/02-yunqi-koala-02-weiqu/mobile/yunqi-koala-02-weiqu_mobile_black_v1.mp4",
+        "sha256": "3c6f23270003972a935f723e84d525eae30567a0e3fb332f98ff56127c3af36f",
+        "size": 2133347,
+        "contentType": "video/mp4",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 241,
+        "duration": 10.041667,
+        "assetVersion": "yunqi-koala-02-weiqu-v1"
+      },
+      "backend": {
+        "displayName": "委屈",
+        "code": "02",
+        "speechStart": 1.4,
+        "unionSource": [
+          0,
+          0,
+          719,
+          959
+        ],
+        "subjectBox": [
+          52,
+          154,
+          681,
+          949
+        ],
+        "sourceWidth": 720,
+        "sourceHeight": 960
+      },
+      "assetVersion": "yunqi-koala-02-weiqu-v1",
+      "runtimeMaster": {
+        "kind": "ffmpeg-remux-vp9-alpha",
+        "ref": "yunqi_koala_02_weiqu_generation_alpha_v1.mkv",
+        "sha256": "9a26c904879aea4ec16be14438b88bd481e565c8f8d5ba4c6b2dc01d11e32fde",
+        "container": "mkv",
+        "source": "accepted formal VP9 WebM Alpha",
+        "sourceSha256": "70a8aace1d970727089f94843481303df2fe2c24dd469888bb805cf03c69db31",
+        "sourceApprovedMasterRef": "02-委屈.mov",
+        "sourceApprovedMasterSha256": "03d5b661f79364bf3118ef349ab8086b1f780ead2c3bbd8c4feb4e5dd278b869"
+      }
+    },
+    "yunqi-koala-03-shengqi": {
+      "itemId": "yunqi-koala-03-shengqi",
+      "characterId": "yunqi-koala",
+      "emotionId": "angry",
+      "label": "生气",
+      "sequenceId": "03",
+      "status": "production",
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "03-生气.mov",
+        "sha256": "a28fbd9e3119e7b4d2b7ad3b5660378a85909be7c37b02515347d189390a9244",
+        "container": "mov",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "03-生气.mov",
+          "sha256": "a28fbd9e3119e7b4d2b7ad3b5660378a85909be7c37b02515347d189390a9244",
+          "assetVersion": "yunqi-koala-03-shengqi-v1"
+        }
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/03-yunqi-koala-03-shengqi/delivery/yunqi-koala-03-shengqi_alpha_vp9.webm",
+        "sha256": "f66e8169fa1353d2b1bd54cab5656f50871752710898822670ade31368b079bc",
+        "size": 1305737,
+        "contentType": "video/webm",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": null,
+        "duration": null,
+        "alpha": true,
+        "assetVersion": "yunqi-koala-03-shengqi-v1"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/03-yunqi-koala-03-shengqi/delivery/yunqi-koala-03-shengqi_alpha_hevc.mov",
+        "sha256": "316d77f1ff2e2d6b8575980a110c19ff9744c2b07149bb1f3340911473d9b2ef",
+        "size": 3488316,
+        "contentType": "video/quicktime",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "yunqi-koala-03-shengqi-v1"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/03-yunqi-koala-03-shengqi/mobile/yunqi-koala-03-shengqi_mobile_black_v1.mp4",
+        "sha256": "a634de70e4ceb353a78849042e758d9c09f443a22ea06a1c4739d9e86e7cfa02",
+        "size": 1372613,
+        "contentType": "video/mp4",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "yunqi-koala-03-shengqi-v1"
+      },
+      "backend": {
+        "displayName": "生气",
+        "code": "03",
+        "speechStart": 1.4,
+        "unionSource": [
+          0,
+          0,
+          719,
+          959
+        ],
+        "subjectBox": [
+          46,
+          30,
+          699,
+          945
+        ],
+        "sourceWidth": 720,
+        "sourceHeight": 960
+      },
+      "assetVersion": "yunqi-koala-03-shengqi-v1",
+      "runtimeMaster": {
+        "kind": "ffmpeg-remux-vp9-alpha",
+        "ref": "yunqi_koala_03_shengqi_generation_alpha_v1.mkv",
+        "sha256": "afac31742a2c65b1d6a9cb37a91b2f24f6ffb7364c10867b30162f1b0b784585",
+        "container": "mkv",
+        "source": "accepted formal VP9 WebM Alpha",
+        "sourceSha256": "f66e8169fa1353d2b1bd54cab5656f50871752710898822670ade31368b079bc",
+        "sourceApprovedMasterRef": "03-生气.mov",
+        "sourceApprovedMasterSha256": "a28fbd9e3119e7b4d2b7ad3b5660378a85909be7c37b02515347d189390a9244"
+      }
+    },
+    "yunqi-koala-04-jingxi": {
+      "itemId": "yunqi-koala-04-jingxi",
+      "characterId": "yunqi-koala",
+      "emotionId": "surprised",
+      "label": "惊喜",
+      "sequenceId": "04",
+      "status": "production",
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "04-惊喜.mov",
+        "sha256": "cd283e6501a0f2da36224e022b66a48ab9529dcb2850723bb06d0ca4effe402e",
+        "container": "mov",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "04-惊喜.mov",
+          "sha256": "cd283e6501a0f2da36224e022b66a48ab9529dcb2850723bb06d0ca4effe402e",
+          "assetVersion": "yunqi-koala-04-jingxi-v1"
+        }
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/04-yunqi-koala-04-jingxi/delivery/yunqi-koala-04-jingxi_alpha_vp9.webm",
+        "sha256": "13dafb7497cec27978a19e745bdc9b538687292bcd4f1a8b5954adfd8d263cf1",
+        "size": 2248723,
+        "contentType": "video/webm",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": null,
+        "duration": null,
+        "alpha": true,
+        "assetVersion": "yunqi-koala-04-jingxi-v1"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/04-yunqi-koala-04-jingxi/delivery/yunqi-koala-04-jingxi_alpha_hevc.mov",
+        "sha256": "5e50bc0ffc241fdb60d40a14431d4feebd50323b972cf4640f401560af3309f3",
+        "size": 6836236,
+        "contentType": "video/quicktime",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 241,
+        "duration": 10.041667,
+        "alpha": true,
+        "assetVersion": "yunqi-koala-04-jingxi-v1"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/04-yunqi-koala-04-jingxi/mobile/yunqi-koala-04-jingxi_mobile_black_v1.mp4",
+        "sha256": "17da575917bf5a95dcbbb85e03cb7571d0d02d66d1e67fde650abb5f7abad7c1",
+        "size": 2476300,
+        "contentType": "video/mp4",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 241,
+        "duration": 10.041667,
+        "assetVersion": "yunqi-koala-04-jingxi-v1"
+      },
+      "backend": {
+        "displayName": "惊喜",
+        "code": "04",
+        "speechStart": 1.4,
+        "unionSource": [
+          0,
+          0,
+          719,
+          959
+        ],
+        "subjectBox": [
+          22,
+          28,
+          701,
+          945
+        ],
+        "sourceWidth": 720,
+        "sourceHeight": 960
+      },
+      "assetVersion": "yunqi-koala-04-jingxi-v1",
+      "runtimeMaster": {
+        "kind": "ffmpeg-remux-vp9-alpha",
+        "ref": "yunqi_koala_04_jingxi_generation_alpha_v1.mkv",
+        "sha256": "608300cc356c0d731d80f6d2dfdc9f431e8d5da15da291e9c6d65ca919fb86f8",
+        "container": "mkv",
+        "source": "accepted formal VP9 WebM Alpha",
+        "sourceSha256": "13dafb7497cec27978a19e745bdc9b538687292bcd4f1a8b5954adfd8d263cf1",
+        "sourceApprovedMasterRef": "04-惊喜.mov",
+        "sourceApprovedMasterSha256": "cd283e6501a0f2da36224e022b66a48ab9529dcb2850723bb06d0ca4effe402e"
+      }
+    },
+    "yunqi-koala-05-tiaopi": {
+      "itemId": "yunqi-koala-05-tiaopi",
+      "characterId": "yunqi-koala",
+      "emotionId": "playful",
+      "label": "调皮",
+      "sequenceId": "05",
+      "status": "production",
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "05-调皮.mov",
+        "sha256": "7d2ca94729ed287ddbe13be23823479045b3eadda6da3d89e28051aa6f91d15c",
+        "container": "mov",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "05-调皮.mov",
+          "sha256": "7d2ca94729ed287ddbe13be23823479045b3eadda6da3d89e28051aa6f91d15c",
+          "assetVersion": "yunqi-koala-05-tiaopi-v1"
+        }
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/05-yunqi-koala-05-tiaopi/delivery/yunqi-koala-05-tiaopi_alpha_vp9.webm",
+        "sha256": "ce4f974c2e16a43016ec038b717d4c174973f742b884342beef7aba9032f5502",
+        "size": 2071020,
+        "contentType": "video/webm",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": null,
+        "duration": null,
+        "alpha": true,
+        "assetVersion": "yunqi-koala-05-tiaopi-v1"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/05-yunqi-koala-05-tiaopi/delivery/yunqi-koala-05-tiaopi_alpha_hevc.mov",
+        "sha256": "8301d8466d0dcb66b96a3c01775b9dfc0ad7c4a248d610a369762a55e0dbdbf9",
+        "size": 6933514,
+        "contentType": "video/quicktime",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 241,
+        "duration": 10.041667,
+        "alpha": true,
+        "assetVersion": "yunqi-koala-05-tiaopi-v1"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/05-yunqi-koala-05-tiaopi/mobile/yunqi-koala-05-tiaopi_mobile_black_v1.mp4",
+        "sha256": "025224b0171284b64607f77943d348f0132ff5412cfdfaee511be49918aa9957",
+        "size": 2202580,
+        "contentType": "video/mp4",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 241,
+        "duration": 10.041667,
+        "assetVersion": "yunqi-koala-05-tiaopi-v1"
+      },
+      "backend": {
+        "displayName": "调皮",
+        "code": "05",
+        "speechStart": 1.4,
+        "unionSource": [
+          0,
+          0,
+          719,
+          959
+        ],
+        "subjectBox": [
+          24,
+          30,
+          699,
+          943
+        ],
+        "sourceWidth": 720,
+        "sourceHeight": 960
+      },
+      "assetVersion": "yunqi-koala-05-tiaopi-v1",
+      "runtimeMaster": {
+        "kind": "ffmpeg-remux-vp9-alpha",
+        "ref": "yunqi_koala_05_tiaopi_generation_alpha_v1.mkv",
+        "sha256": "c5be8419eaeb07440a86fafe1fba9183c28c5dff368c51b77638aba565b59f46",
+        "container": "mkv",
+        "source": "accepted formal VP9 WebM Alpha",
+        "sourceSha256": "ce4f974c2e16a43016ec038b717d4c174973f742b884342beef7aba9032f5502",
+        "sourceApprovedMasterRef": "05-调皮.mov",
+        "sourceApprovedMasterSha256": "7d2ca94729ed287ddbe13be23823479045b3eadda6da3d89e28051aa6f91d15c"
+      }
+    },
+    "yunqi-koala-06-chicu": {
+      "itemId": "yunqi-koala-06-chicu",
+      "characterId": "yunqi-koala",
+      "emotionId": "jealous",
+      "label": "吃醋",
+      "sequenceId": "06",
+      "status": "production",
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "06-吃醋.mov",
+        "sha256": "ef90cf82409b849252612f4f9b6142c1ad673b310b9800cadc2dc5f3eae9bdb2",
+        "container": "mov",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "06-吃醋.mov",
+          "sha256": "ef90cf82409b849252612f4f9b6142c1ad673b310b9800cadc2dc5f3eae9bdb2",
+          "assetVersion": "yunqi-koala-06-chicu-v1"
+        }
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/06-yunqi-koala-06-chicu/delivery/yunqi-koala-06-chicu_alpha_vp9.webm",
+        "sha256": "5f5b1678defc1d76a77850e9fae1bf99f17f4cdff7556cb8f3fd9badec65f644",
+        "size": 881640,
+        "contentType": "video/webm",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": null,
+        "duration": null,
+        "alpha": true,
+        "assetVersion": "yunqi-koala-06-chicu-v1"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/06-yunqi-koala-06-chicu/delivery/yunqi-koala-06-chicu_alpha_hevc.mov",
+        "sha256": "dab7a7295103c2f8570bd87224982c38c9aa419b11135f94db2208eed7987b25",
+        "size": 2869654,
+        "contentType": "video/quicktime",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "yunqi-koala-06-chicu-v1"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/06-yunqi-koala-06-chicu/mobile/yunqi-koala-06-chicu_mobile_black_v1.mp4",
+        "sha256": "1d666a77711d99dd89243d1c32b9209d26d2e5e1c09855fc13f6aa30435d795c",
+        "size": 950240,
+        "contentType": "video/mp4",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "yunqi-koala-06-chicu-v1"
+      },
+      "backend": {
+        "displayName": "吃醋",
+        "code": "06",
+        "speechStart": 1.4,
+        "unionSource": [
+          0,
+          0,
+          719,
+          959
+        ],
+        "subjectBox": [
+          46,
+          32,
+          699,
+          943
+        ],
+        "sourceWidth": 720,
+        "sourceHeight": 960
+      },
+      "assetVersion": "yunqi-koala-06-chicu-v1",
+      "runtimeMaster": {
+        "kind": "ffmpeg-remux-vp9-alpha",
+        "ref": "yunqi_koala_06_chicu_generation_alpha_v1.mkv",
+        "sha256": "77f705db31f359dd63a9a6bf4d93c4bce3e9add4e32c9e6b971fa39458f3214b",
+        "container": "mkv",
+        "source": "accepted formal VP9 WebM Alpha",
+        "sourceSha256": "5f5b1678defc1d76a77850e9fae1bf99f17f4cdff7556cb8f3fd9badec65f644",
+        "sourceApprovedMasterRef": "06-吃醋.mov",
+        "sourceApprovedMasterSha256": "ef90cf82409b849252612f4f9b6142c1ad673b310b9800cadc2dc5f3eae9bdb2"
+      }
+    },
+    "yunqi-koala-07-zuiying": {
+      "itemId": "yunqi-koala-07-zuiying",
+      "characterId": "yunqi-koala",
+      "emotionId": "stubborn",
+      "label": "嘴硬",
+      "sequenceId": "07",
+      "status": "production",
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "07-嘴硬.mov",
+        "sha256": "ad0d0f72a05fb2f910e1a6def8860f063dd7ef07fa75b7bdd43d2f7dec625fbf",
+        "container": "mov",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "07-嘴硬.mov",
+          "sha256": "ad0d0f72a05fb2f910e1a6def8860f063dd7ef07fa75b7bdd43d2f7dec625fbf",
+          "assetVersion": "yunqi-koala-07-zuiying-v1"
+        }
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/07-yunqi-koala-07-zuiying/delivery/yunqi-koala-07-zuiying_alpha_vp9.webm",
+        "sha256": "b24adb7d2107fbf4da75927b2fc74ea4bac747ffd4756bae54704945e4e0d4d7",
+        "size": 1316920,
+        "contentType": "video/webm",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": null,
+        "duration": null,
+        "alpha": true,
+        "assetVersion": "yunqi-koala-07-zuiying-v1"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/07-yunqi-koala-07-zuiying/delivery/yunqi-koala-07-zuiying_alpha_hevc.mov",
+        "sha256": "9ececf3a49261fa4a16ce0d636db62914b056329b2857f7a198eb045ee5a5ca7",
+        "size": 3766779,
+        "contentType": "video/quicktime",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "yunqi-koala-07-zuiying-v1"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/07-yunqi-koala-07-zuiying/mobile/yunqi-koala-07-zuiying_mobile_black_v1.mp4",
+        "sha256": "c2a8b32aa0357cefb0a506aff95fbb8ba04a6134f7ee0349956f3a9567401c40",
+        "size": 1377461,
+        "contentType": "video/mp4",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "yunqi-koala-07-zuiying-v1"
+      },
+      "backend": {
+        "displayName": "嘴硬",
+        "code": "07",
+        "speechStart": 1.4,
+        "unionSource": [
+          0,
+          0,
+          719,
+          959
+        ],
+        "subjectBox": [
+          36,
+          30,
+          699,
+          943
+        ],
+        "sourceWidth": 720,
+        "sourceHeight": 960
+      },
+      "assetVersion": "yunqi-koala-07-zuiying-v1",
+      "runtimeMaster": {
+        "kind": "ffmpeg-remux-vp9-alpha",
+        "ref": "yunqi_koala_07_zuiying_generation_alpha_v1.mkv",
+        "sha256": "f7520d996776baddadde22c54117cb1109cf0062156681e0e5591a460c386369",
+        "container": "mkv",
+        "source": "accepted formal VP9 WebM Alpha",
+        "sourceSha256": "b24adb7d2107fbf4da75927b2fc74ea4bac747ffd4756bae54704945e4e0d4d7",
+        "sourceApprovedMasterRef": "07-嘴硬.mov",
+        "sourceApprovedMasterSha256": "ad0d0f72a05fb2f910e1a6def8860f063dd7ef07fa75b7bdd43d2f7dec625fbf"
+      }
+    },
+    "yunqi-koala-08-yihuo": {
+      "itemId": "yunqi-koala-08-yihuo",
+      "characterId": "yunqi-koala",
+      "emotionId": "confused",
+      "label": "疑惑",
+      "sequenceId": "08",
+      "status": "production",
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "08-疑惑.mov",
+        "sha256": "8d07d745b45a5005a6643a62838648d6462e0d2b390234f5fb794995beb80001",
+        "container": "mov",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "08-疑惑.mov",
+          "sha256": "8d07d745b45a5005a6643a62838648d6462e0d2b390234f5fb794995beb80001",
+          "assetVersion": "yunqi-koala-08-yihuo-v1"
+        }
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/08-yunqi-koala-08-yihuo/delivery/yunqi-koala-08-yihuo_alpha_vp9.webm",
+        "sha256": "38ec56d49b7c75de0b499e662438278393227ccc589eed140e9ca7abe0debb2b",
+        "size": 1344404,
+        "contentType": "video/webm",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": null,
+        "duration": null,
+        "alpha": true,
+        "assetVersion": "yunqi-koala-08-yihuo-v1"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/08-yunqi-koala-08-yihuo/delivery/yunqi-koala-08-yihuo_alpha_hevc.mov",
+        "sha256": "e121a4ae352a35a306a0effc48907703de945cec195ea2aac0ce8f5bb5a507c2",
+        "size": 3634611,
+        "contentType": "video/quicktime",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "yunqi-koala-08-yihuo-v1"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/08-yunqi-koala-08-yihuo/mobile/yunqi-koala-08-yihuo_mobile_black_v1.mp4",
+        "sha256": "117a4931446de699104d31b5608fb67aa60fb284818833991ea7b92a89a03706",
+        "size": 1335066,
+        "contentType": "video/mp4",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "yunqi-koala-08-yihuo-v1"
+      },
+      "backend": {
+        "displayName": "疑惑",
+        "code": "08",
+        "speechStart": 1.4,
+        "unionSource": [
+          0,
+          0,
+          719,
+          959
+        ],
+        "subjectBox": [
+          2,
+          30,
+          715,
+          943
+        ],
+        "sourceWidth": 720,
+        "sourceHeight": 960
+      },
+      "assetVersion": "yunqi-koala-08-yihuo-v1",
+      "runtimeMaster": {
+        "kind": "ffmpeg-remux-vp9-alpha",
+        "ref": "yunqi_koala_08_yihuo_generation_alpha_v1.mkv",
+        "sha256": "9d96f5748548865c21fa9c69c127d40a74d4b50abdcb816ce509c87aa0d43633",
+        "container": "mkv",
+        "source": "accepted formal VP9 WebM Alpha",
+        "sourceSha256": "38ec56d49b7c75de0b499e662438278393227ccc589eed140e9ca7abe0debb2b",
+        "sourceApprovedMasterRef": "08-疑惑.mov",
+        "sourceApprovedMasterSha256": "8d07d745b45a5005a6643a62838648d6462e0d2b390234f5fb794995beb80001"
+      }
+    },
+    "yunqi-koala-09-xianqi": {
+      "itemId": "yunqi-koala-09-xianqi",
+      "characterId": "yunqi-koala",
+      "emotionId": "disgust",
+      "label": "嫌弃",
+      "sequenceId": "09",
+      "status": "production",
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "09-嫌弃.mov",
+        "sha256": "f3e512ba6486f94f7f494db3cae285d52c4b36578755ebaaddb06ad3bc37cbff",
+        "container": "mov",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "09-嫌弃.mov",
+          "sha256": "f3e512ba6486f94f7f494db3cae285d52c4b36578755ebaaddb06ad3bc37cbff",
+          "assetVersion": "yunqi-koala-09-xianqi-v1"
+        }
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/09-yunqi-koala-09-xianqi/delivery/yunqi-koala-09-xianqi_alpha_vp9.webm",
+        "sha256": "a22c613d803fc04d380d4514e19153798dbdd66d4afd72b814dc7d2629e4f101",
+        "size": 1137720,
+        "contentType": "video/webm",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": null,
+        "duration": null,
+        "alpha": true,
+        "assetVersion": "yunqi-koala-09-xianqi-v1"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/09-yunqi-koala-09-xianqi/delivery/yunqi-koala-09-xianqi_alpha_hevc.mov",
+        "sha256": "b3cea40a8961fe42157ad6cc5660ef71c597bc1d603dd396f89abc94d5aa3ae2",
+        "size": 3156879,
+        "contentType": "video/quicktime",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "yunqi-koala-09-xianqi-v1"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/09-yunqi-koala-09-xianqi/mobile/yunqi-koala-09-xianqi_mobile_black_v1.mp4",
+        "sha256": "bc26ac438f2faac0740eb4182bcc313749c37c51f24646caf8fcabe562ddd9c9",
+        "size": 1228954,
+        "contentType": "video/mp4",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "yunqi-koala-09-xianqi-v1"
+      },
+      "backend": {
+        "displayName": "嫌弃",
+        "code": "09",
+        "speechStart": 1.4,
+        "unionSource": [
+          0,
+          0,
+          719,
+          959
+        ],
+        "subjectBox": [
+          46,
+          30,
+          699,
+          943
+        ],
+        "sourceWidth": 720,
+        "sourceHeight": 960
+      },
+      "assetVersion": "yunqi-koala-09-xianqi-v1",
+      "runtimeMaster": {
+        "kind": "ffmpeg-remux-vp9-alpha",
+        "ref": "yunqi_koala_09_xianqi_generation_alpha_v1.mkv",
+        "sha256": "e3995ab99cb16535c5e0d0b14137380149de6fa1b2ee1f590aa333a1fc7975e3",
+        "container": "mkv",
+        "source": "accepted formal VP9 WebM Alpha",
+        "sourceSha256": "a22c613d803fc04d380d4514e19153798dbdd66d4afd72b814dc7d2629e4f101",
+        "sourceApprovedMasterRef": "09-嫌弃.mov",
+        "sourceApprovedMasterSha256": "f3e512ba6486f94f7f494db3cae285d52c4b36578755ebaaddb06ad3bc37cbff"
+      }
+    },
+    "yunqi-koala-10-xingzai": {
+      "itemId": "yunqi-koala-10-xingzai",
+      "characterId": "yunqi-koala",
+      "emotionId": "schadenfreude",
+      "label": "幸灾乐祸",
+      "sequenceId": "10",
+      "status": "production",
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "10-幸灾乐祸.mov",
+        "sha256": "ad96aed81c79893ba4b9adb511a9b94202917747380302c1ad40fa2e32ca5079",
+        "container": "mov",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "10-幸灾乐祸.mov",
+          "sha256": "ad96aed81c79893ba4b9adb511a9b94202917747380302c1ad40fa2e32ca5079",
+          "assetVersion": "yunqi-koala-10-xingzai-v1"
+        }
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/10-yunqi-koala-10-xingzai/delivery/yunqi-koala-10-xingzai_alpha_vp9.webm",
+        "sha256": "94bb334d710162c13d3531f9e59160732201d7f884d2f9f194960c78da689a90",
+        "size": 1540269,
+        "contentType": "video/webm",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": null,
+        "duration": null,
+        "alpha": true,
+        "assetVersion": "yunqi-koala-10-xingzai-v1"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/10-yunqi-koala-10-xingzai/delivery/yunqi-koala-10-xingzai_alpha_hevc.mov",
+        "sha256": "c717912f6e507f44b1bc0c8aae002609cff3174bad4f59e001e7778520853eae",
+        "size": 3955531,
+        "contentType": "video/quicktime",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "yunqi-koala-10-xingzai-v1"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/10-yunqi-koala-10-xingzai/mobile/yunqi-koala-10-xingzai_mobile_black_v1.mp4",
+        "sha256": "635fdce45142a9ebe11da7bcb3473027f6a5cc28cf7e0606812bb637b0724280",
+        "size": 1526827,
+        "contentType": "video/mp4",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "yunqi-koala-10-xingzai-v1"
+      },
+      "backend": {
+        "displayName": "幸灾乐祸",
+        "code": "10",
+        "speechStart": 1.4,
+        "unionSource": [
+          0,
+          0,
+          719,
+          959
+        ],
+        "subjectBox": [
+          46,
+          30,
+          699,
+          943
+        ],
+        "sourceWidth": 720,
+        "sourceHeight": 960
+      },
+      "assetVersion": "yunqi-koala-10-xingzai-v1",
+      "runtimeMaster": {
+        "kind": "ffmpeg-remux-vp9-alpha",
+        "ref": "yunqi_koala_10_xingzai_generation_alpha_v1.mkv",
+        "sha256": "c0472c2b883971d5fa0662c7b60f621effbbec86b53dda4d018a47fc71aa80a3",
+        "container": "mkv",
+        "source": "accepted formal VP9 WebM Alpha",
+        "sourceSha256": "94bb334d710162c13d3531f9e59160732201d7f884d2f9f194960c78da689a90",
+        "sourceApprovedMasterRef": "10-幸灾乐祸.mov",
+        "sourceApprovedMasterSha256": "ad96aed81c79893ba4b9adb511a9b94202917747380302c1ad40fa2e32ca5079"
+      }
+    },
+    "yunqi-koala-11-sajiao": {
+      "itemId": "yunqi-koala-11-sajiao",
+      "characterId": "yunqi-koala",
+      "emotionId": "coquettish",
+      "label": "撒娇",
+      "sequenceId": "11",
+      "status": "production",
+      "generationMaster": {
+        "kind": "approved-content-version",
+        "ref": "11-撒娇.mov",
+        "sha256": "5ed2ceac12011f85b8bd32c1e9c46b0f7f02616018634fd2f9dc58e212a32637",
+        "container": "mov",
+        "source": {
+          "type": "approved-birefnet-alpha",
+          "fileName": "11-撒娇.mov",
+          "sha256": "5ed2ceac12011f85b8bd32c1e9c46b0f7f02616018634fd2f9dc58e212a32637",
+          "assetVersion": "yunqi-koala-11-sajiao-v1"
+        }
+      },
+      "webVp9": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/11-yunqi-koala-11-sajiao/delivery/yunqi-koala-11-sajiao_alpha_vp9.webm",
+        "sha256": "e14d8a0a1ba151f2e9253d22c04f77cd44ade97b03b962acfedc09cf857f8947",
+        "size": 1138152,
+        "contentType": "video/webm",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": null,
+        "duration": null,
+        "alpha": true,
+        "assetVersion": "yunqi-koala-11-sajiao-v1"
+      },
+      "webHevc": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/11-yunqi-koala-11-sajiao/delivery/yunqi-koala-11-sajiao_alpha_hevc.mov",
+        "sha256": "31795a63dd97b4c6084de8a56e56007d9cad71bd61af0d30873eee899dc03030",
+        "size": 3272685,
+        "contentType": "video/quicktime",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "alpha": true,
+        "assetVersion": "yunqi-koala-11-sajiao-v1"
+      },
+      "mobileFallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/11-yunqi-koala-11-sajiao/mobile/yunqi-koala-11-sajiao_mobile_black_v1.mp4",
+        "sha256": "8c231020c49c850b05a2b963c8f36acd5cd957799d6901da14cf1e9b6668d17f",
+        "size": 1175281,
+        "contentType": "video/mp4",
+        "width": 720,
+        "height": 960,
+        "fps": 24,
+        "frames": 121,
+        "duration": 5.041667,
+        "assetVersion": "yunqi-koala-11-sajiao-v1"
+      },
+      "backend": {
+        "displayName": "撒娇",
+        "code": "11",
+        "speechStart": 1.4,
+        "unionSource": [
+          0,
+          0,
+          719,
+          959
+        ],
+        "subjectBox": [
+          48,
+          30,
+          699,
+          943
+        ],
+        "sourceWidth": 720,
+        "sourceHeight": 960
+      },
+      "assetVersion": "yunqi-koala-11-sajiao-v1",
+      "runtimeMaster": {
+        "kind": "ffmpeg-remux-vp9-alpha",
+        "ref": "yunqi_koala_11_sajiao_generation_alpha_v1.mkv",
+        "sha256": "9e8009b7cd487acba55a8dfce7b6d070e0e5ee8e8d33da947e89fdea4dc0c9dc",
+        "container": "mkv",
+        "source": "accepted formal VP9 WebM Alpha",
+        "sourceSha256": "e14d8a0a1ba151f2e9253d22c04f77cd44ade97b03b962acfedc09cf857f8947",
+        "sourceApprovedMasterRef": "11-撒娇.mov",
+        "sourceApprovedMasterSha256": "5ed2ceac12011f85b8bd32c1e9c46b0f7f02616018634fd2f9dc58e212a32637"
+      }
+    }
+  },
+  "runtimePolicy": "Use frontend generationMaster SHA as public contract; use runtimeMaster VP9 Alpha MKV for backend FFmpeg input."
+}
