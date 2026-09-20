@@ -1,0 +1,20 @@
+{
+  "releaseId": "release-20260912-03",
+  "buildId": "release-20260912-03",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "9ea902fef27168cfd9fd28d454e8557ca6eff49999cff6f4879ff06994471704",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/candidate-20260920-nuanshan-bear-r1/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-17T14:25:00.000000Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "baseline": "release-20260918-no-frontstage-r1",
+  "baselineSource": "release-20260917-lingyao-monkey-r1 + accepted r4 shared intent template",
+  "previousRelease": "release-20260918-no-frontstage-r1",
+  "releaseNote": "仅新增云栖考拉11条情绪视频、必要角色入口和映射；兔、狐、猴媒体链路、方言、语音、祝福、问候及页面逻辑不变。",
+  "frozenIndexSha256": "c8255a6e2b0c4996bcb789d1761fb59f7d8502846d9585e5d60c7b8a78f5a640",
+  "releaseName": "candidate-20260920-nuanshan-bear-r1",
+  "candidateRevision": "nuanshan-bear-15-v1",
+  "candidateNote": "仅新增暖山熊 15 条情绪视频、角色入口、映射和首帧资源；现有风信兔、光尾狐、凌遥猴、云栖考拉映射及业务逻辑不变。"
+}

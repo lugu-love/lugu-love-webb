@@ -1,0 +1,337 @@
+{
+  "candidate": "candidate-20260920-nuanshan-bear-r1",
+  "characterId": "nuanshan-bear",
+  "displayName": "暖山熊",
+  "items": [
+    {
+      "seq": "01",
+      "label": "开心",
+      "itemId": "nuanshan-bear-01-kaixin",
+      "emotionId": "happy",
+      "assetVersion": "nuanshan-bear-01-kaixin-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/01-nuanshan-bear-01-kaixin/delivery/nuanshan-bear-01-kaixin_alpha_vp9.webm",
+        "sha256": "7bd871e4b437679850c866a66c43c5a7a91e40813f9ec058dc9a63aaea4c8595",
+        "size": 3121619
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/01-nuanshan-bear-01-kaixin/delivery/nuanshan-bear-01-kaixin_alpha_hevc.mov",
+        "sha256": "8b14cf09efe908f4985cb70e277b3379b1b2f320336ff501f3f039afb6022b07",
+        "size": 7401155
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/01-nuanshan-bear-01-kaixin/mobile/nuanshan-bear-01-kaixin_mobile_black_v1.mp4",
+        "sha256": "e33635eae9f15c901a0d241ce3a42a00335c58f3fec3743b70f42c530876c65d",
+        "size": 2932452
+      }
+    },
+    {
+      "seq": "02",
+      "label": "委屈",
+      "itemId": "nuanshan-bear-02-weiqu",
+      "emotionId": "wronged",
+      "assetVersion": "nuanshan-bear-02-weiqu-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/02-nuanshan-bear-02-weiqu/delivery/nuanshan-bear-02-weiqu_alpha_vp9.webm",
+        "sha256": "340d24ab097c69c3ffae3f5aec900bb4b057f2241707ea807d5551c1ad982018",
+        "size": 2440393
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/02-nuanshan-bear-02-weiqu/delivery/nuanshan-bear-02-weiqu_alpha_hevc.mov",
+        "sha256": "7ead38fd634ffbda4ef886ffdfe9efe8008068920daa9449eaa75b024655b866",
+        "size": 7542800
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/02-nuanshan-bear-02-weiqu/mobile/nuanshan-bear-02-weiqu_mobile_black_v1.mp4",
+        "sha256": "38349487ea6073b213f7efe9fedc620ce5d1d07cf555855ff0dbe7913362e474",
+        "size": 2680642
+      }
+    },
+    {
+      "seq": "03",
+      "label": "生气",
+      "itemId": "nuanshan-bear-03-shengqi",
+      "emotionId": "angry",
+      "assetVersion": "nuanshan-bear-03-shengqi-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/03-nuanshan-bear-03-shengqi/delivery/nuanshan-bear-03-shengqi_alpha_vp9.webm",
+        "sha256": "9e6bc87801e5f0b8794add1022f743ae4c74ba5d4db6bfb20b876721eaf676ec",
+        "size": 2199647
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/03-nuanshan-bear-03-shengqi/delivery/nuanshan-bear-03-shengqi_alpha_hevc.mov",
+        "sha256": "bc52e965654e25a8c9456b4b702998db31e5c1877f5f20028f66fbfd8086ee35",
+        "size": 6928563
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/03-nuanshan-bear-03-shengqi/mobile/nuanshan-bear-03-shengqi_mobile_black_v1.mp4",
+        "sha256": "34289cf05a840161aa23b08971fdae8b1c20c4510758007e1d525e1a773c6751",
+        "size": 2445351
+      }
+    },
+    {
+      "seq": "04",
+      "label": "惊喜",
+      "itemId": "nuanshan-bear-04-jingxi",
+      "emotionId": "surprise",
+      "assetVersion": "nuanshan-bear-04-jingxi-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/04-nuanshan-bear-04-jingxi/delivery/nuanshan-bear-04-jingxi_alpha_vp9.webm",
+        "sha256": "5ae5f20e6d2fc7ac8d98ab77dae3428f65839f55f8b5125326c9232e49a8af6b",
+        "size": 3006023
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/04-nuanshan-bear-04-jingxi/delivery/nuanshan-bear-04-jingxi_alpha_hevc.mov",
+        "sha256": "474403812432692cb8db2f3f342d67ed658022139501832b6d3884382ad98fa3",
+        "size": 7720322
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/04-nuanshan-bear-04-jingxi/mobile/nuanshan-bear-04-jingxi_mobile_black_v1.mp4",
+        "sha256": "fc76d8f0fc43dcba8342e46f452f3832c0ac2e4129f5620982dc0b2ef7d35dbd",
+        "size": 3032709
+      }
+    },
+    {
+      "seq": "05",
+      "label": "调皮",
+      "itemId": "nuanshan-bear-05-tiaopi",
+      "emotionId": "playful",
+      "assetVersion": "nuanshan-bear-05-tiaopi-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/05-nuanshan-bear-05-tiaopi/delivery/nuanshan-bear-05-tiaopi_alpha_vp9.webm",
+        "sha256": "bc477ad59a2b34b573cc40129c2cb3cd2c23dd25add5be52f2aefbd5f30de96f",
+        "size": 1456533
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/05-nuanshan-bear-05-tiaopi/delivery/nuanshan-bear-05-tiaopi_alpha_hevc.mov",
+        "sha256": "cd0c5855becfb515a235f388a334ec608b9eea319e74ff8557749bcb57efb6f9",
+        "size": 5964201
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/05-nuanshan-bear-05-tiaopi/mobile/nuanshan-bear-05-tiaopi_mobile_black_v1.mp4",
+        "sha256": "af265abead455b4618294ae579fd4ad772e56e222fbedccd40601538e6191676",
+        "size": 1781137
+      }
+    },
+    {
+      "seq": "06",
+      "label": "吃醋",
+      "itemId": "nuanshan-bear-06-chicu",
+      "emotionId": "jealous",
+      "assetVersion": "nuanshan-bear-06-chicu-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/06-nuanshan-bear-06-chicu/delivery/nuanshan-bear-06-chicu_alpha_vp9.webm",
+        "sha256": "efdb867b0a3c6a4be1239b9d81c627fad92c628ee4b5ce78790fb26dd2ea05de",
+        "size": 2700879
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/06-nuanshan-bear-06-chicu/delivery/nuanshan-bear-06-chicu_alpha_hevc.mov",
+        "sha256": "fd3f8b767cd86ab1c01788f93cba2079c8adb7e3ce3dfbb13e2ac6b4309ac8b4",
+        "size": 7368674
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/06-nuanshan-bear-06-chicu/mobile/nuanshan-bear-06-chicu_mobile_black_v1.mp4",
+        "sha256": "332962b63854fd9c112c54575630124de845d988c41c061fc467849f8d82e168",
+        "size": 3001908
+      }
+    },
+    {
+      "seq": "07",
+      "label": "嘴硬",
+      "itemId": "nuanshan-bear-07-zuiying",
+      "emotionId": "stubborn",
+      "assetVersion": "nuanshan-bear-07-zuiying-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/07-nuanshan-bear-07-zuiying/delivery/nuanshan-bear-07-zuiying_alpha_vp9.webm",
+        "sha256": "67e7c97443d8e6441b560098c3995266e0a6e04c915b710f6d8bae909900fad7",
+        "size": 3090758
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/07-nuanshan-bear-07-zuiying/delivery/nuanshan-bear-07-zuiying_alpha_hevc.mov",
+        "sha256": "fd0f3306abc10e42bd4ac5f2e5a21c0ff88d6efd0f3d364bfc6cfb420a3b0bac",
+        "size": 8225269
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/07-nuanshan-bear-07-zuiying/mobile/nuanshan-bear-07-zuiying_mobile_black_v1.mp4",
+        "sha256": "ab8a6f66fd0a20ddb5f31d85c6a68cde404626b0f0ff01bcbae71d3c1fc0eef8",
+        "size": 2959409
+      }
+    },
+    {
+      "seq": "08",
+      "label": "疑惑",
+      "itemId": "nuanshan-bear-08-yihuo",
+      "emotionId": "confused",
+      "assetVersion": "nuanshan-bear-08-yihuo-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/08-nuanshan-bear-08-yihuo/delivery/nuanshan-bear-08-yihuo_alpha_vp9.webm",
+        "sha256": "1963df4a4f6aeeeab1fdf34a024dddb615dae07008b8ee5f08f5d36cb544f84e",
+        "size": 2472771
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/08-nuanshan-bear-08-yihuo/delivery/nuanshan-bear-08-yihuo_alpha_hevc.mov",
+        "sha256": "057666b40a62fe4beed5c37b4bdab595c3099a4720d1e7e794e2c22c415c91b2",
+        "size": 7414946
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/08-nuanshan-bear-08-yihuo/mobile/nuanshan-bear-08-yihuo_mobile_black_v1.mp4",
+        "sha256": "a953fd13eeb84d9bcdbe514d211f80d0fac79498eed5bdcdafe9a9d7511cac75",
+        "size": 2712274
+      }
+    },
+    {
+      "seq": "09",
+      "label": "嫌弃",
+      "itemId": "nuanshan-bear-09-xianqi",
+      "emotionId": "disgusted",
+      "assetVersion": "nuanshan-bear-09-xianqi-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/09-nuanshan-bear-09-xianqi/delivery/nuanshan-bear-09-xianqi_alpha_vp9.webm",
+        "sha256": "ce4a7e0bee7a30a7bf1a86808bea8823297169fc09dd41c46938baa2c4ca90e9",
+        "size": 2504471
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/09-nuanshan-bear-09-xianqi/delivery/nuanshan-bear-09-xianqi_alpha_hevc.mov",
+        "sha256": "84c9fdcb604e38db4bb9b9f80ef9806899ac636a2f0490ea1237d8b627c2e0c9",
+        "size": 7209844
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/09-nuanshan-bear-09-xianqi/mobile/nuanshan-bear-09-xianqi_mobile_black_v1.mp4",
+        "sha256": "68223abfa700b1d08f63257d1074282f9134b826637c98ac1bdc459042696fef",
+        "size": 2752840
+      }
+    },
+    {
+      "seq": "10",
+      "label": "幸灾乐祸",
+      "itemId": "nuanshan-bear-10-xingzai",
+      "emotionId": "gloating",
+      "assetVersion": "nuanshan-bear-10-xingzai-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/10-nuanshan-bear-10-xingzai/delivery/nuanshan-bear-10-xingzai_alpha_vp9.webm",
+        "sha256": "0e5bb33325701845d6bc9830a28ff75c2cb43a55dcede1924abc5128cd7037aa",
+        "size": 2419045
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/10-nuanshan-bear-10-xingzai/delivery/nuanshan-bear-10-xingzai_alpha_hevc.mov",
+        "sha256": "946b1222b4338ce2e0475d3cf679e2e7c43965023b1c32738f8ea85ccf9aa879",
+        "size": 7382460
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/10-nuanshan-bear-10-xingzai/mobile/nuanshan-bear-10-xingzai_mobile_black_v1.mp4",
+        "sha256": "cda805e0bad37499fb9fa43531b60661a43905a346d2d0329e426a7006eb6b2f",
+        "size": 2743141
+      }
+    },
+    {
+      "seq": "11",
+      "label": "撒娇",
+      "itemId": "nuanshan-bear-11-sajiao",
+      "emotionId": "coquettish",
+      "assetVersion": "nuanshan-bear-11-sajiao-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/11-nuanshan-bear-11-sajiao/delivery/nuanshan-bear-11-sajiao_alpha_vp9.webm",
+        "sha256": "8b296e79204834ca9db5f9bd97340593ad4332f0a0fd509adeb5e5754f4eb1f1",
+        "size": 2634296
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/11-nuanshan-bear-11-sajiao/delivery/nuanshan-bear-11-sajiao_alpha_hevc.mov",
+        "sha256": "b167cd270381c465843f63f010e3058e8be35c3b20cbd744c4c8178c1d5e6b1c",
+        "size": 7481422
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/11-nuanshan-bear-11-sajiao/mobile/nuanshan-bear-11-sajiao_mobile_black_v1.mp4",
+        "sha256": "b79b6a7a56f974c1e14cd43e816b2f12595491a906c9aabdeb85258d03896c61",
+        "size": 3025507
+      }
+    },
+    {
+      "seq": "12",
+      "label": "求原谅",
+      "itemId": "nuanshan-bear-12-qiuyuanliang",
+      "emotionId": "apology",
+      "assetVersion": "nuanshan-bear-12-qiuyuanliang-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/12-nuanshan-bear-12-qiuyuanliang/delivery/nuanshan-bear-12-qiuyuanliang_alpha_vp9.webm",
+        "sha256": "a24f8729c80305bb965d206b819a90fe9410f5bc9a7a718ccefc7fb628d6ab3c",
+        "size": 2068543
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/12-nuanshan-bear-12-qiuyuanliang/delivery/nuanshan-bear-12-qiuyuanliang_alpha_hevc.mov",
+        "sha256": "ad9c46aa40742f36f726965625b628cdbbc21a73e0f7676c30f5c66d3f5d107f",
+        "size": 6887051
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/12-nuanshan-bear-12-qiuyuanliang/mobile/nuanshan-bear-12-qiuyuanliang_mobile_black_v1.mp4",
+        "sha256": "9c7234dd731fd42215d56f6a8154564630bd18cfcead5905b44754d0e5ecd80d",
+        "size": 2385094
+      }
+    },
+    {
+      "seq": "13",
+      "label": "躺平",
+      "itemId": "nuanshan-bear-13-tangping",
+      "emotionId": "lowenergy",
+      "assetVersion": "nuanshan-bear-13-tangping-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/13-nuanshan-bear-13-tangping/delivery/nuanshan-bear-13-tangping_alpha_vp9.webm",
+        "sha256": "e1155e02d5e585421c15f0a25971c6b2e4a7250ea003015e5ddac212eebe9c6a",
+        "size": 2091609
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/13-nuanshan-bear-13-tangping/delivery/nuanshan-bear-13-tangping_alpha_hevc.mov",
+        "sha256": "7d6ce4520fe63cb6ed700f21a611bf572cf7567faa19cfb7d7ae2ab5120c3887",
+        "size": 6241969
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/13-nuanshan-bear-13-tangping/mobile/nuanshan-bear-13-tangping_mobile_black_v1.mp4",
+        "sha256": "f0053aeb50f229305510ffff1a43ca92bbb43a9b2a9dbc1f56913679a5be751d",
+        "size": 2433224
+      }
+    },
+    {
+      "seq": "14",
+      "label": "装酷",
+      "itemId": "nuanshan-bear-14-zhuangku",
+      "emotionId": "cool",
+      "assetVersion": "nuanshan-bear-14-zhuangku-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/14-nuanshan-bear-14-zhuangku/delivery/nuanshan-bear-14-zhuangku_alpha_vp9.webm",
+        "sha256": "c8843916e6f82b64a0cb5b77e1dd996e87aa907e061dc54de3c6e6ffcb28b527",
+        "size": 2034821
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/14-nuanshan-bear-14-zhuangku/delivery/nuanshan-bear-14-zhuangku_alpha_hevc.mov",
+        "sha256": "14a0a44bbb012360dac5b870d2422985b8148e25a2644daba5a82758d0c43649",
+        "size": 7266193
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/14-nuanshan-bear-14-zhuangku/mobile/nuanshan-bear-14-zhuangku_mobile_black_v1.mp4",
+        "sha256": "2e2fa3f412fdf023f88e2a9dc9d5e89f855a9c49e0dbba2036475b375129ad5b",
+        "size": 2395234
+      }
+    },
+    {
+      "seq": "15",
+      "label": "看笑话",
+      "itemId": "nuanshan-bear-15-kanxiaohua",
+      "emotionId": "amused",
+      "assetVersion": "nuanshan-bear-15-kanxiaohua-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/15-nuanshan-bear-15-kanxiaohua/delivery/nuanshan-bear-15-kanxiaohua_alpha_vp9.webm",
+        "sha256": "a4b5a6e6ee19f870182faf135707040df2abfe3af9c3c150e91b3fb9c3208206",
+        "size": 2948073
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/15-nuanshan-bear-15-kanxiaohua/delivery/nuanshan-bear-15-kanxiaohua_alpha_hevc.mov",
+        "sha256": "2a9fef8db41e625b05687bac821211044d79bef3d4b622e2e41d55c07f83c365",
+        "size": 7773105
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/nuanshan-bear/15-nuanshan-bear-15-kanxiaohua/mobile/nuanshan-bear-15-kanxiaohua_mobile_black_v1.mp4",
+        "sha256": "e1f77aa9eb3ca087f7e04dd659ac28039eb1f3f6aba2bfe1e518b3aa4a338933",
+        "size": 3192518
+      }
+    }
+  ]
+}
