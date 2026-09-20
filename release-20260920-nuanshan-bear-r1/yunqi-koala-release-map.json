@@ -1,0 +1,247 @@
+{
+  "release": "release-20260919-yunqi-koala-r1",
+  "baseline": "release-20260918-no-frontstage-r1",
+  "generatedAt": "2026-09-19T00:23:34.849982Z",
+  "policy": {
+    "androidDesktop": "VP9 WebM Alpha",
+    "iphoneSafari": "Apple HEVC Alpha",
+    "fallback": "H.264 black-background MP4"
+  },
+  "mediaVersionNote": {
+    "01": "watermarkfix_r2",
+    "02-11": "v1"
+  },
+  "items": [
+    {
+      "seq": "01",
+      "label": "开心",
+      "itemId": "yunqi-koala-01-kaixin",
+      "assetVersion": "yunqi-koala-01-kaixin-watermarkfix-v2",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/delivery/yunqi-koala-01-kaixin_alpha_vp9_watermarkfix_r2.webm",
+        "sha256": "12613075f7db4d57550c28cacbe18199e51f313a0f06040f06a3fd3560910d17",
+        "size": 2787358
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/delivery/yunqi-koala-01-kaixin_alpha_hevc_avconvert_watermarkfix_r2.mov",
+        "sha256": "bed61afda28b44a08e29479f11f6494f65159338c69c32dbd168f39445436b33",
+        "size": 7113550
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/01-yunqi-koala-01-kaixin/mobile/yunqi-koala-01-kaixin_mobile_black_watermarkfix_r2.mp4",
+        "sha256": "41cbad8d9ac43bff9a94d193e7f9e94ab2500edd1e5c15f758718c0832007709",
+        "size": 1908445
+      }
+    },
+    {
+      "seq": "02",
+      "label": "委屈",
+      "itemId": "yunqi-koala-02-weiqu",
+      "assetVersion": "yunqi-koala-02-weiqu-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/02-yunqi-koala-02-weiqu/delivery/yunqi-koala-02-weiqu_alpha_vp9.webm",
+        "sha256": "70a8aace1d970727089f94843481303df2fe2c24dd469888bb805cf03c69db31",
+        "size": 1848326
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/02-yunqi-koala-02-weiqu/delivery/yunqi-koala-02-weiqu_alpha_hevc.mov",
+        "sha256": "d0790b61d78659d123066dc4dbc2ee8db1309f710b7275d91a5b7c5cccd6c7af",
+        "size": 7038268
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/02-yunqi-koala-02-weiqu/mobile/yunqi-koala-02-weiqu_mobile_black_v1.mp4",
+        "sha256": "3c6f23270003972a935f723e84d525eae30567a0e3fb332f98ff56127c3af36f",
+        "size": 2133347
+      }
+    },
+    {
+      "seq": "03",
+      "label": "生气",
+      "itemId": "yunqi-koala-03-shengqi",
+      "assetVersion": "yunqi-koala-03-shengqi-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/03-yunqi-koala-03-shengqi/delivery/yunqi-koala-03-shengqi_alpha_vp9.webm",
+        "sha256": "f66e8169fa1353d2b1bd54cab5656f50871752710898822670ade31368b079bc",
+        "size": 1305737
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/03-yunqi-koala-03-shengqi/delivery/yunqi-koala-03-shengqi_alpha_hevc.mov",
+        "sha256": "316d77f1ff2e2d6b8575980a110c19ff9744c2b07149bb1f3340911473d9b2ef",
+        "size": 3488316
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/03-yunqi-koala-03-shengqi/mobile/yunqi-koala-03-shengqi_mobile_black_v1.mp4",
+        "sha256": "a634de70e4ceb353a78849042e758d9c09f443a22ea06a1c4739d9e86e7cfa02",
+        "size": 1372613
+      }
+    },
+    {
+      "seq": "04",
+      "label": "惊喜",
+      "itemId": "yunqi-koala-04-jingxi",
+      "assetVersion": "yunqi-koala-04-jingxi-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/04-yunqi-koala-04-jingxi/delivery/yunqi-koala-04-jingxi_alpha_vp9.webm",
+        "sha256": "13dafb7497cec27978a19e745bdc9b538687292bcd4f1a8b5954adfd8d263cf1",
+        "size": 2248723
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/04-yunqi-koala-04-jingxi/delivery/yunqi-koala-04-jingxi_alpha_hevc.mov",
+        "sha256": "5e50bc0ffc241fdb60d40a14431d4feebd50323b972cf4640f401560af3309f3",
+        "size": 6836236
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/04-yunqi-koala-04-jingxi/mobile/yunqi-koala-04-jingxi_mobile_black_v1.mp4",
+        "sha256": "17da575917bf5a95dcbbb85e03cb7571d0d02d66d1e67fde650abb5f7abad7c1",
+        "size": 2476300
+      }
+    },
+    {
+      "seq": "05",
+      "label": "调皮",
+      "itemId": "yunqi-koala-05-tiaopi",
+      "assetVersion": "yunqi-koala-05-tiaopi-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/05-yunqi-koala-05-tiaopi/delivery/yunqi-koala-05-tiaopi_alpha_vp9.webm",
+        "sha256": "ce4f974c2e16a43016ec038b717d4c174973f742b884342beef7aba9032f5502",
+        "size": 2071020
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/05-yunqi-koala-05-tiaopi/delivery/yunqi-koala-05-tiaopi_alpha_hevc.mov",
+        "sha256": "8301d8466d0dcb66b96a3c01775b9dfc0ad7c4a248d610a369762a55e0dbdbf9",
+        "size": 6933514
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/05-yunqi-koala-05-tiaopi/mobile/yunqi-koala-05-tiaopi_mobile_black_v1.mp4",
+        "sha256": "025224b0171284b64607f77943d348f0132ff5412cfdfaee511be49918aa9957",
+        "size": 2202580
+      }
+    },
+    {
+      "seq": "06",
+      "label": "吃醋",
+      "itemId": "yunqi-koala-06-chicu",
+      "assetVersion": "yunqi-koala-06-chicu-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/06-yunqi-koala-06-chicu/delivery/yunqi-koala-06-chicu_alpha_vp9.webm",
+        "sha256": "5f5b1678defc1d76a77850e9fae1bf99f17f4cdff7556cb8f3fd9badec65f644",
+        "size": 881640
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/06-yunqi-koala-06-chicu/delivery/yunqi-koala-06-chicu_alpha_hevc.mov",
+        "sha256": "dab7a7295103c2f8570bd87224982c38c9aa419b11135f94db2208eed7987b25",
+        "size": 2869654
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/06-yunqi-koala-06-chicu/mobile/yunqi-koala-06-chicu_mobile_black_v1.mp4",
+        "sha256": "1d666a77711d99dd89243d1c32b9209d26d2e5e1c09855fc13f6aa30435d795c",
+        "size": 950240
+      }
+    },
+    {
+      "seq": "07",
+      "label": "嘴硬",
+      "itemId": "yunqi-koala-07-zuiying",
+      "assetVersion": "yunqi-koala-07-zuiying-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/07-yunqi-koala-07-zuiying/delivery/yunqi-koala-07-zuiying_alpha_vp9.webm",
+        "sha256": "b24adb7d2107fbf4da75927b2fc74ea4bac747ffd4756bae54704945e4e0d4d7",
+        "size": 1316920
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/07-yunqi-koala-07-zuiying/delivery/yunqi-koala-07-zuiying_alpha_hevc.mov",
+        "sha256": "9ececf3a49261fa4a16ce0d636db62914b056329b2857f7a198eb045ee5a5ca7",
+        "size": 3766779
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/07-yunqi-koala-07-zuiying/mobile/yunqi-koala-07-zuiying_mobile_black_v1.mp4",
+        "sha256": "c2a8b32aa0357cefb0a506aff95fbb8ba04a6134f7ee0349956f3a9567401c40",
+        "size": 1377461
+      }
+    },
+    {
+      "seq": "08",
+      "label": "疑惑",
+      "itemId": "yunqi-koala-08-yihuo",
+      "assetVersion": "yunqi-koala-08-yihuo-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/08-yunqi-koala-08-yihuo/delivery/yunqi-koala-08-yihuo_alpha_vp9.webm",
+        "sha256": "38ec56d49b7c75de0b499e662438278393227ccc589eed140e9ca7abe0debb2b",
+        "size": 1344404
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/08-yunqi-koala-08-yihuo/delivery/yunqi-koala-08-yihuo_alpha_hevc.mov",
+        "sha256": "e121a4ae352a35a306a0effc48907703de945cec195ea2aac0ce8f5bb5a507c2",
+        "size": 3634611
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/08-yunqi-koala-08-yihuo/mobile/yunqi-koala-08-yihuo_mobile_black_v1.mp4",
+        "sha256": "117a4931446de699104d31b5608fb67aa60fb284818833991ea7b92a89a03706",
+        "size": 1335066
+      }
+    },
+    {
+      "seq": "09",
+      "label": "嫌弃",
+      "itemId": "yunqi-koala-09-xianqi",
+      "assetVersion": "yunqi-koala-09-xianqi-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/09-yunqi-koala-09-xianqi/delivery/yunqi-koala-09-xianqi_alpha_vp9.webm",
+        "sha256": "a22c613d803fc04d380d4514e19153798dbdd66d4afd72b814dc7d2629e4f101",
+        "size": 1137720
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/09-yunqi-koala-09-xianqi/delivery/yunqi-koala-09-xianqi_alpha_hevc.mov",
+        "sha256": "b3cea40a8961fe42157ad6cc5660ef71c597bc1d603dd396f89abc94d5aa3ae2",
+        "size": 3156879
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/09-yunqi-koala-09-xianqi/mobile/yunqi-koala-09-xianqi_mobile_black_v1.mp4",
+        "sha256": "bc26ac438f2faac0740eb4182bcc313749c37c51f24646caf8fcabe562ddd9c9",
+        "size": 1228954
+      }
+    },
+    {
+      "seq": "10",
+      "label": "幸灾乐祸",
+      "itemId": "yunqi-koala-10-xingzai",
+      "assetVersion": "yunqi-koala-10-xingzai-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/10-yunqi-koala-10-xingzai/delivery/yunqi-koala-10-xingzai_alpha_vp9.webm",
+        "sha256": "94bb334d710162c13d3531f9e59160732201d7f884d2f9f194960c78da689a90",
+        "size": 1540269
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/10-yunqi-koala-10-xingzai/delivery/yunqi-koala-10-xingzai_alpha_hevc.mov",
+        "sha256": "c717912f6e507f44b1bc0c8aae002609cff3174bad4f59e001e7778520853eae",
+        "size": 3955531
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/10-yunqi-koala-10-xingzai/mobile/yunqi-koala-10-xingzai_mobile_black_v1.mp4",
+        "sha256": "635fdce45142a9ebe11da7bcb3473027f6a5cc28cf7e0606812bb637b0724280",
+        "size": 1526827
+      }
+    },
+    {
+      "seq": "11",
+      "label": "撒娇",
+      "itemId": "yunqi-koala-11-sajiao",
+      "assetVersion": "yunqi-koala-11-sajiao-v1",
+      "vp9Alpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/11-yunqi-koala-11-sajiao/delivery/yunqi-koala-11-sajiao_alpha_vp9.webm",
+        "sha256": "e14d8a0a1ba151f2e9253d22c04f77cd44ade97b03b962acfedc09cf857f8947",
+        "size": 1138152
+      },
+      "hevcAlpha": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/11-yunqi-koala-11-sajiao/delivery/yunqi-koala-11-sajiao_alpha_hevc.mov",
+        "sha256": "31795a63dd97b4c6084de8a56e56007d9cad71bd61af0d30873eee899dc03030",
+        "size": 3272685
+      },
+      "h264Fallback": {
+        "url": "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/yunqi-koala/11-yunqi-koala-11-sajiao/mobile/yunqi-koala-11-sajiao_mobile_black_v1.mp4",
+        "sha256": "8c231020c49c850b05a2b963c8f36acd5cd957799d6901da14cf1e9b6668d17f",
+        "size": 1175281
+      }
+    }
+  ]
+}
