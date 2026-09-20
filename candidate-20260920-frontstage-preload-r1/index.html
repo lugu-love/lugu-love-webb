@@ -5158,10 +5158,12 @@ foregroundVideoPrepared = true;
 requestAnimationFrame(resolve);
 };
 const afterSeek = () => {
-if (typeof sourceVideo.requestVideoFrameCallback === "function") {
+if (!sourceVideo.paused && typeof sourceVideo.requestVideoFrameCallback === "function") {
 sourceVideo.requestVideoFrameCallback(function () { finishAfterFrame(); });
 } else {
-finishAfterFrame();
+// Paused video may not emit requestVideoFrameCallback. Two RAFs still
+// guarantee the seeked frame has been laid out before revealing.
+requestAnimationFrame(function () { requestAnimationFrame(finishAfterFrame); });
 }
 };
 try { sourceVideo.pause(); } catch (error) {}
