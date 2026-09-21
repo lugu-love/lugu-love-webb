@@ -1,0 +1,20 @@
+{
+  "releaseId": "release-20260912-03",
+  "buildId": "release-20260912-03",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "9ea902fef27168cfd9fd28d454e8557ca6eff49999cff6f4879ff06994471704",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/candidate-20260921-huawei-share-regression-r1/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-17T14:25:00.000000Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "baseline": "release-20260919-yunqi-koala-r1",
+  "baselineSource": "release-20260917-lingyao-monkey-r1 + accepted r4 shared intent template",
+  "previousRelease": "release-20260919-yunqi-koala-r1",
+  "releaseNote": "仅新增暖山熊15条情绪视频、角色入口和正式媒体映射；风信兔、光尾狐、凌遥猴、云栖考拉及现有页面逻辑不变。",
+  "frozenIndexSha256": "56eb30c20e2669d3ea360c5b68c920076bbfe47e8d3abd217c01bcc492e8ffd2",
+  "releaseName": "candidate-20260921-huawei-share-regression-r1",
+  "candidateRevision": "huawei-share-regression-r1",
+  "candidateNote": "仅恢复华为非 Chrome 浏览器直接文件分享尝试：即使 canShare({files}) 为 false，只要 navigator.share 存在也先尝试；失败后保留远程 MP4 fallback。iPhone 与非 Android 分享逻辑保持不变。"
+}
