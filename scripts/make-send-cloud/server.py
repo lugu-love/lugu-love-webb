@@ -442,7 +442,6 @@ _tts_cache = {}
 _tts_cache_lock = threading.Lock()
 DEFAULT_TEXT = "今天先开心，其他事情都给我排队。"
 APP_VIDEO_TTL = int(os.environ.get("APP_VIDEO_TTL", "600"))
-APP_VIDEO_MAX_READS = int(os.environ.get("APP_VIDEO_MAX_READS", "3"))
 PUBLIC_BASE_URL = os.environ.get("PUBLIC_BASE_URL", "https://api.lugu.love").rstrip("/")
 ANDROID_PACKAGE = "love.lugu.videosharepoc"
 ANDROID_DEBUG_CERT_SHA256 = os.environ.get(
@@ -632,7 +631,7 @@ def store_app_video(data):
     now = time.time()
     with _app_video_lock:
         for token, record in list(_app_videos.items()):
-            if record["expires"] <= now or record["reads"] <= 0:
+            if record["expires"] <= now:
                 try:
                     os.remove(record["path"])
                 except OSError:
@@ -645,16 +644,15 @@ def store_app_video(data):
         _app_videos[token] = {
             "path": path,
             "expires": now + APP_VIDEO_TTL,
-            "reads": APP_VIDEO_MAX_READS,
         }
     return token
 
 
-def take_app_video(token):
+def get_app_video(token):
     now = time.time()
     with _app_video_lock:
         record = _app_videos.get(token)
-        if not record or record["expires"] <= now or record["reads"] <= 0:
+        if not record or record["expires"] <= now:
             if record:
                 try:
                     os.remove(record["path"])
@@ -662,8 +660,35 @@ def take_app_video(token):
                     pass
                 _app_videos.pop(token, None)
             return None
-        record["reads"] -= 1
-        return record["path"], record["expires"], record["reads"]
+        return record["path"], record["expires"]
+
+
+def parse_byte_range(range_header, size):
+    """Parse one HTTP byte range. Returns tuple(start, end) or None/False."""
+    if not range_header:
+        return None
+    value = range_header.strip()
+    if not value.lower().startswith("bytes="):
+        return False
+    spec = value[6:].strip()
+    if not spec or "," in spec or "-" not in spec:
+        return False
+    start_text, end_text = spec.split("-", 1)
+    try:
+        if start_text == "":
+            suffix = int(end_text)
+            if suffix <= 0:
+                return False
+            start = max(0, size - suffix)
+            end = size - 1
+        else:
+            start = int(start_text)
+            end = int(end_text) if end_text else size - 1
+    except ValueError:
+        return False
+    if start < 0 or end < start or start >= size:
+        return False
+    return start, min(end, size - 1)
 
 
 def _tts_cache_key(text, voice_id, emotion_id="neutral"):
@@ -1323,7 +1348,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
             "Access-Control-Expose-Headers",
             "X-Video-Path, X-Video-Expires-In, X-Video-Id, X-Journey-Id, "
             "X-Parent-Video-Id, X-Generation, X-Remix-Entry, "
-            "X-TTS-Token, X-TTS-Provider, X-TTS-Voice, X-TTS-Provider-Voice, X-TTS-Requested-Voice, X-TTS-Emotion-Style, X-TTS-Fallback-Reason, X-Asset-Version, X-Master-SHA256",
+            "X-TTS-Token, X-TTS-Provider, X-TTS-Voice, X-TTS-Provider-Voice, X-TTS-Requested-Voice, X-TTS-Emotion-Style, X-TTS-Fallback-Reason, X-Asset-Version, X-Master-SHA256, Content-Range, Accept-Ranges",
         )
 
     def _send_json(self, code, obj):
@@ -1388,27 +1413,61 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
         self.end_headers()
         self.wfile.write(body)
 
-    def _send_app_video(self, token):
+    def _send_app_video(self, token, head_only=False):
         if not token or any(c not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_" for c in token):
             return self._not_found()
-        result = take_app_video(token)
+        result = get_app_video(token)
         if not result:
             return self._send_json(410, {"error": "video expired or unavailable"})
-        path, expires, reads_left = result
+        path, expires = result
         try:
-            with open(path, "rb") as f:
-                body = f.read()
+            size = os.path.getsize(path)
+            if size <= 0:
+                raise OSError("empty video")
         except OSError:
             return self._send_json(410, {"error": "video unavailable"})
-        self.send_response(200)
+
+        byte_range = parse_byte_range(self.headers.get("Range"), size)
+        if byte_range is False:
+            self.send_response(416)
+            self._cors()
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Range", "bytes */%d" % size)
+            self.send_header("Accept-Ranges", "bytes")
+            body = json.dumps({"error": "invalid range"}, ensure_ascii=False).encode("utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            if not head_only:
+                self.wfile.write(body)
+            return
+
+        if byte_range is None:
+            status = 200
+            start, end = 0, size - 1
+        else:
+            status = 206
+            start, end = byte_range
+        length = end - start + 1
+
+        self.send_response(status)
         self._cors()
         self.send_header("Content-Type", "video/mp4")
-        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Content-Length", str(length))
+        if status == 206:
+            self.send_header("Content-Range", "bytes %d-%d/%d" % (start, end, size))
+        self.send_header("Accept-Ranges", "bytes")
         self.send_header("Content-Disposition", 'inline; filename="emotion-video.mp4"')
         self.send_header("Cache-Control", "no-store")
         self.send_header("X-Video-Expires-In", str(max(0, int(expires - time.time()))))
-        self.send_header("X-Video-Reads-Left", str(reads_left))
         self.end_headers()
+        if head_only:
+            return
+        try:
+            with open(path, "rb") as f:
+                f.seek(start)
+                body = f.read(length)
+        except OSError:
+            return
         self.wfile.write(body)
 
     def _tts(self):
@@ -1602,6 +1661,15 @@ body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c1
                 expected_master_sha256=(qs.get("expectedMasterSHA256") or [""])[0],
             )
         return self._not_found()
+
+    def do_HEAD(self):
+        parsed = urllib.parse.urlparse(self.path)
+        path = parsed.path
+        if path.startswith("/app-video/") and path.endswith(".mp4"):
+            return self._send_app_video(path[len("/app-video/"):-4], head_only=True)
+        self.send_response(501)
+        self.send_header("Content-Length", "0")
+        self.end_headers()
 
     def do_POST(self):
         parsed = urllib.parse.urlparse(self.path)
