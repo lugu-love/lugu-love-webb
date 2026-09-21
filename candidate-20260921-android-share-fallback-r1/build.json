@@ -1,0 +1,20 @@
+{
+  "releaseId": "release-20260912-03",
+  "buildId": "release-20260912-03",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "9ea902fef27168cfd9fd28d454e8557ca6eff49999cff6f4879ff06994471704",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/candidate-20260921-android-share-fallback-r1/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-17T14:25:00.000000Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "baseline": "release-20260919-yunqi-koala-r1",
+  "baselineSource": "release-20260917-lingyao-monkey-r1 + accepted r4 shared intent template",
+  "previousRelease": "release-20260919-yunqi-koala-r1",
+  "releaseNote": "仅新增暖山熊15条情绪视频、角色入口和正式媒体映射；风信兔、光尾狐、凌遥猴、云栖考拉及现有页面逻辑不变。",
+  "frozenIndexSha256": "ae0a40ce84f0be9940f2756cfd8917e6be745969a767fbcfc5f8e914f64129bf",
+  "releaseName": "candidate-20260921-android-share-fallback-r1",
+  "candidateRevision": "android-share-fallback-r1",
+  "candidateNote": "仅调整 Android 分享/保存 fallback：支持文件分享时继续系统分享，不支持时打开后端远程 MP4；iPhone 分享逻辑不变。"
+}
