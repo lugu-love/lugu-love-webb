@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6efe3">
+  <title>新增生命内容卡｜我的生命空间</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/channel.css?v=20260728-8">
+  <link rel="stylesheet" href="css/life-card.css?v=20260728-8">
+  <link rel="stylesheet" href="css/editor.css?v=20260728-8">
+</head>
+<body>
+  <main class="page-shell editor-shell" data-drawer-state="half" data-active-tool="images">
+    <nav class="editor-nav">
+      <a href="channel.html?channel=life">← 返回</a>
+      <h1 id="editorTitle">新增记录</h1>
+      <a class="cancel" href="channel.html?channel=life">取消</a>
+      <button class="nav-save-button" id="mobileTextSave" type="submit" form="cardForm">保存</button>
+    </nav>
+    <div class="editor-workspace">
+      <section class="preview-column" aria-labelledby="previewTitle">
+        <div class="preview-heading">
+          <div>
+            <p class="preview-eyebrow">实时预览</p>
+            <h2 id="previewTitle">生命卡效果</h2>
+          </div>
+          <button class="full-preview-button" id="openFullPreview" type="button">查看完整效果</button>
+        </div>
+        <div class="preview-stage">
+          <div class="preview-scale-frame" id="lifeCardPreview" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <form class="editor-panel" id="cardForm">
+        <div class="drawer-grab-area">
+          <button class="drawer-grab" id="drawerStateButton" type="button" aria-label="切换编辑抽屉高度"><span></span></button>
+          <button class="return-preview-button" id="returnToPreview" type="button">↓ 返回预览</button>
+        </div>
+        <div class="editor-toolbar" role="tablist" aria-label="编辑工具">
+          <button class="tool-tab selected" type="button" role="tab" aria-selected="true" data-panel-target="images"><span>▧</span>图片</button>
+          <button class="tool-tab" type="button" role="tab" aria-selected="false" data-panel-target="video"><span>▶</span>视频</button>
+          <button class="tool-tab" type="button" role="tab" aria-selected="false" data-panel-target="voice"><span>●</span>语音</button>
+          <button class="tool-tab" type="button" role="tab" aria-selected="false" data-panel-target="text"><span>文</span>文字</button>
+          <button class="tool-tab" type="button" role="tab" aria-selected="false" data-panel-target="layout"><span>田</span>布局</button>
+        </div>
+
+        <div class="editor-panel-scroll">
+          <section class="tool-panel direct-manage-panel" data-tool-panel="manage" aria-label="直接管理内容" hidden>
+            <div class="direct-manage-section direct-image-tools">
+              <div id="manageLayoutSlot"></div>
+              <div id="manageUploadSlot"></div>
+            </div>
+            <div class="direct-manage-section manage-text-section">
+              <h3>文字内容</h3>
+              <p>修改标题、副标题、正文和记录时间。</p>
+              <div id="manageTextSlot"></div>
+            </div>
+            <div class="direct-manage-section text-paper-section">
+              <h3>文字背景</h3>
+              <p>选择适合文字内容的纸张颜色和花纹。</p>
+              <div class="text-paper-options" id="textPaperOptions"></div>
+            </div>
+            <div class="direct-manage-section">
+              <h3>视频与语音</h3>
+              <p>可以替换、删除视频，也可以重新录音或上传音频。</p>
+              <div class="manage-media-slots"><div id="manageVideoSlot"></div><div id="manageVoiceSlot"></div></div>
+            </div>
+            <div class="direct-manage-section">
+              <h3>已有照片</h3>
+              <p>拖动照片调整顺序，点击照片下方按钮可单独删除。</p>
+              <div id="manageExistingImagesSlot"></div>
+            </div>
+          </section>
+          <section class="tool-panel active" data-tool-panel="images" aria-label="图片编辑">
+            <div class="editor-quick-template">
+              <div class="quick-template-heading">
+                <h3>模板试阅</h3>
+                <span class="panel-count" id="panelImageCount">0 / 18</span>
+              </div>
+              <div class="quick-template-options" id="quickTemplateOptions" aria-label="选择图片模板"></div>
+            </div>
+            <div class="upload-field">
+              <label class="upload-area" id="uploadArea" for="imageInput">
+                <span><strong>＋ 选择照片</strong><small>可以一次选择多张，也可以稍后继续添加</small></span>
+              </label>
+              <input class="visually-hidden" id="imageInput" type="file" accept="image/*" multiple>
+              <div class="upload-progress" id="uploadProgress" role="status" aria-live="polite"></div>
+              <div class="selected-heading" id="selectedHeading" hidden>
+                <span id="selectedCount">已选择 0 张图片</span>
+                <label class="append-images" for="imageInput">继续添加</label>
+              </div>
+              <div class="image-order-list" id="imageOrderList" aria-label="调整图片顺序"></div>
+            </div>
+          </section>
+
+          <section class="tool-panel media-tool-panel" data-tool-panel="video" aria-label="视频编辑" hidden>
+            <div class="media-panel-heading"><h3>视频</h3><p>上传一段视频，保存后可在完整记录中播放。</p></div>
+            <label class="media-upload-button" for="videoInput">＋ 选择视频</label>
+            <input class="visually-hidden" id="videoInput" type="file" accept="video/*">
+            <video class="media-preview" id="videoPreview" controls playsinline hidden></video>
+            <button class="media-remove-button" id="removeVideo" type="button" hidden>删除视频</button>
+            <p class="media-status" id="videoStatus"></p>
+          </section>
+
+          <section class="tool-panel media-tool-panel" data-tool-panel="voice" aria-label="语音编辑" hidden>
+            <div class="media-panel-heading"><h3>语音</h3><p>可以直接录音，也可以上传已有音频。</p></div>
+            <div class="voice-actions">
+              <button class="record-button" id="startRecording" type="button">● 开始录音</button>
+              <button class="record-stop-button" id="stopRecording" type="button" disabled>■ 停止</button>
+              <label class="media-upload-button" for="audioInput">上传音频</label>
+            </div>
+            <input class="visually-hidden" id="audioInput" type="file" accept="audio/*" capture>
+            <audio class="media-preview audio-preview" id="audioPreview" controls hidden></audio>
+            <button class="media-remove-button" id="removeAudio" type="button" hidden>删除语音</button>
+            <p class="media-status" id="audioStatus">录音时请允许浏览器使用麦克风。</p>
+          </section>
+
+          <section class="tool-panel text-tool-panel" data-tool-panel="text" aria-label="文字编辑" hidden>
+            <div class="text-compose-fields">
+              <label class="compose-field compose-title-field" for="titleInput">
+                <span>标题</span>
+                <input class="compose-title" id="titleInput" maxlength="40" placeholder="写下最重要的一句话">
+              </label>
+              <label class="compose-field compose-subtitle-field" for="subtitleInput">
+                <span>副标题</span>
+                <input class="compose-subtitle" id="subtitleInput" maxlength="60" placeholder="用一句话补充标题">
+              </label>
+              <div class="compose-field compose-content-field">
+                <label for="contentInput">正文内容</label>
+                <textarea class="compose-content" id="contentInput" maxlength="5000" placeholder="记录发生的事情、当时的感受，或者任何想留下的话……"></textarea>
+                <label class="text-import-button" for="textFileInput">导入文件</label>
+                <input class="visually-hidden" id="textFileInput" type="file" accept=".txt,.text,.md,.markdown,.html,.htm,text/plain,text/markdown,text/html">
+              </div>
+              <div class="compose-date-row">
+                <label for="dateInput"><span aria-hidden="true">◷</span> 记录时间</label>
+                <input id="dateInput" type="datetime-local">
+              </div>
+              <div class="compose-meta-card" aria-label="发布信息">
+                <label class="compose-field compose-location-field" for="locationInput">
+                  <span>所在位置</span>
+                  <input class="compose-location" id="locationInput" maxlength="60" placeholder="比如：泸沽湖 / 家里 / 路上">
+                </label>
+                <fieldset class="visibility-field">
+                  <legend>谁可以看</legend>
+                  <label class="visibility-option">
+                    <input type="radio" name="visibility" value="private" checked>
+                    <span><strong>私密</strong><small>只有自己看到</small></span>
+                  </label>
+                  <label class="visibility-option">
+                    <input type="radio" name="visibility" value="invite">
+                    <span><strong>邀请</strong><small>通过链接进入</small></span>
+                  </label>
+                  <label class="visibility-option">
+                    <input type="radio" name="visibility" value="public">
+                    <span><strong>公开</strong><small>展示在公开空间</small></span>
+                  </label>
+                </fieldset>
+              </div>
+            </div>
+          </section>
+
+          <section class="tool-panel" data-tool-panel="layout" aria-label="布局编辑" hidden>
+            <div class="panel-heading"><div><h3>图片布局</h3><p>选择适合当前图片数量的排列方式。</p></div></div>
+            <fieldset class="layout-field" id="layoutField">
+              <legend class="visually-hidden">图片布局</legend>
+              <div class="layout-options" id="layoutOptions"></div>
+              <p class="layout-hint" id="layoutHint">系统会根据图片数量选择合适的组合。</p>
+            </fieldset>
+          </section>
+
+          <p class="form-message" id="formMessage" role="alert"></p>
+        </div>
+
+        <footer class="editor-footer">
+          <a class="cancel-button" href="channel.html?channel=life">取消</a>
+          <button class="save-button" id="saveButton" type="submit">保存生命内容卡</button>
+        </footer>
+      </form>
+    </div>
+  </main>
+  <div class="full-preview-backdrop" id="fullPreviewBackdrop" aria-hidden="true">
+    <section class="full-preview-panel" role="dialog" aria-modal="true" aria-labelledby="fullPreviewTitle">
+      <header><h2 id="fullPreviewTitle">完整效果预览</h2><button id="closeFullPreview" type="button" aria-label="关闭完整预览">×</button></header>
+      <div class="full-preview-content" id="fullLifeCardPreview"></div>
+    </section>
+  </div>
+  <div class="framing-backdrop" id="framingBackdrop" aria-hidden="true">
+    <section class="framing-panel" role="dialog" aria-modal="true" aria-labelledby="framingTitle">
+      <header>
+        <div><p>移动照片，让人物出现在相框中</p><h2 id="framingTitle">调整照片取景</h2></div>
+        <button type="button" data-frame-close aria-label="完成取景调整">完成</button>
+      </header>
+      <div class="framing-stage"><img id="framingImage" alt="照片取景预览" draggable="false"></div>
+      <p class="framing-drag-hint">直接拖动照片，或使用下面的按钮和滑杆调整</p>
+      <div class="framing-controls" aria-label="移动照片">
+        <button type="button" data-frame-move="up" aria-label="照片向上移动">↑</button>
+        <button type="button" data-frame-move="left" aria-label="照片向左移动">←</button>
+        <button class="framing-center" type="button" data-frame-move="center">居中</button>
+        <button type="button" data-frame-move="right" aria-label="照片向右移动">→</button>
+        <button type="button" data-frame-move="down" aria-label="照片向下移动">↓</button>
+      </div>
+      <div class="framing-ranges">
+        <label><span>水平位置</span><input id="framingX" type="range" min="0" max="100" step="1" value="50"></label>
+        <label><span>垂直位置</span><input id="framingY" type="range" min="0" max="100" step="1" value="50"></label>
+      </div>
+      <p class="framing-position" id="framingPosition">水平 50% · 垂直 50%</p>
+    </section>
+  </div>
+  <script src="data/default-data.js"></script>
+  <script src="js/image-storage.js"></script>
+  <script src="js/storage.js?v=20260728-8"></script>
+  <script src="js/life-card-renderer.js?v=20260728-8"></script>
+  <script src="js/editor.js?v=20260728-8"></script>
+</body>
+</html>
