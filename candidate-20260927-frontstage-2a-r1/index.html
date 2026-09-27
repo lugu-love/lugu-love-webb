@@ -3757,72 +3757,9 @@ const fengxinNarrativeTestEnabled = true;
 const disableFrontStagePerformance = true; // @deprecated 阶段2A：已从主流程解绑，仅保留变量与回滚说明
 const fengxinRabbitLegacySequence = []; // @deprecated 阶段2A：遗留图集回退，主流程不再引用
 
-/* ============================================================================
-   阶段2A 前场收口层（结构收口，行为不变）
-   1) 4 个出瓶入口 → FRONTSTAGE.release() 唯一入口
-   2) 散落的 dataset/布尔状态 → FRONTSTAGE 单一状态机
-   3) currentTime / 首帧准备 / 换层提交 → 唯一控制路径
-   4) 前场链路所有延时 → FRONTSTAGE.schedule() 统一时间轴（节奏数值不变）
-   回滚方法：删除本段，并把下方被替换的调用点还原为直接调用
-             expandRabbitPerformance() / enterLargeBottle() / setTimeout(...)
-             详见 PHASE2A-回滚说明.md
-   ========================================================================= */
-const __LUGU_LEGACY_EXPERIMENTS__ = false; // 历史实验总闸（nojump / feet / rise / legacy）；false = 已从主流程解绑
-const FRONTSTAGE = (() => {
-  const S = { IDLE:"IDLE", IN_BOTTLE:"IN_BOTTLE", TYPING:"TYPING", ZOOM:"ZOOM", HANDOFF:"HANDOFF", FOREGROUND:"FOREGROUND", RETURN:"RETURN", DONE:"DONE" };
-  const state = { value: S.IDLE, previous: null, changedAt: 0, reason: "" };
-  const timers = new Map();
-  const listeners = [];
-  let framePrepared = false;
-
-  function setState(next, meta) {
-    if (state.value === next) return;
-    state.previous = state.value;
-    state.value = next;
-    state.changedAt = Date.now();
-    state.reason = (meta && meta.at) || "";
-    listeners.forEach(function (fn) { try { fn(next, meta); } catch (e) {} });
-  }
-
-  // 统一时间轴：前场链路的所有延时都必须经过这里（delayMs 一律沿用原值）
-  function schedule(name, delayMs, fn) {
-    cancel(name);
-    const id = setTimeout(function () { timers.delete(name); fn(); }, delayMs);
-    timers.set(name, id);
-    return id;
-  }
-  function cancel(name) { const t = timers.get(name); if (t) { clearTimeout(t); timers.delete(name); } }
-  function cancelAll() { timers.forEach(function (t) { clearTimeout(t); }); timers.clear(); }
-
-  // 唯一换层提交点：几何与可见性在同一帧内提交
-  function commit(paint) { return requestAnimationFrame(function () { try { paint(); } catch (e) {} }); }
-
-  // 唯一首帧准备路径：任何需要把 currentTime 归零的地方都走这里
-  function prepareFrame(reason) {
-    if (!sourceVideo) { framePrepared = false; return false; }
-    try { sourceVideo.currentTime = 0; } catch (e) {}
-    framePrepared = true;
-    return true;
-  }
-
-  // 唯一出瓶入口：自动定时器 / 点击瓶子 / 自定义事件 / 外部代理 全部汇到这里
-  function release(reason) {
-    if (state.value === S.FOREGROUND) return false;
-    if (rabbitStage !== "large") return false;
-    if (!canvas || !canvas.isConnected) return false;
-    setState(S.HANDOFF, { at: reason || "release" });
-    expandRabbitPerformance();
-    return true;
-  }
-
-  return {
-    S: S, state: state, setState: setState, schedule: schedule, cancel: cancel, cancelAll: cancelAll,
-    commit: commit, prepareFrame: prepareFrame, release: release,
-    isFramePrepared: function () { return framePrepared; },
-    resetFramePrepared: function () { framePrepared = false; },
-    onState: function (fn) { listeners.push(fn); }
-  };
-})();
+/* 阶段2A：历史实验总闸（nojump / feet / rise / legacy）；false = 已从主流程解绑。
+   回滚：把 __LUGU_LEGACY_EXPERIMENTS__ 改为 true 即可恢复旧实验行为。 */
+const __LUGU_LEGACY_EXPERIMENTS__ = false;
 
 
 // 七星使者 × 情绪 → 已处理图集（配置化调用，共 8 条）
@@ -4706,6 +4643,73 @@ let videoFinishHandler = null;
 // There is one owner for progression.  Timers and taps may both ask to
 // advance, but only the active stage is allowed to perform the transition.
 let rabbitStage = "small";
+
+/* ============================================================================
+   阶段2A 前场收口层（结构收口，行为不变）—— 位于漂流瓶闭包内部，
+   可直接访问 canvas / container / sourceVideo / rabbitStage / expandRabbitPerformance。
+   1) 4 个出瓶入口 → FRONTSTAGE.release() 唯一入口
+   2) 散落的 dataset/布尔状态 → FRONTSTAGE 单一状态机
+   3) currentTime / 首帧准备 / 换层提交 → 唯一控制路径
+   4) 前场链路所有延时 → FRONTSTAGE.schedule() 统一时间轴（节奏数值不变）
+   回滚方法：删除本段 + 还原调用点（详见 PHASE2A-回滚说明.md）
+   ========================================================================= */
+const FRONTSTAGE = (() => {
+  const S = { IDLE:"IDLE", IN_BOTTLE:"IN_BOTTLE", TYPING:"TYPING", ZOOM:"ZOOM", HANDOFF:"HANDOFF", FOREGROUND:"FOREGROUND", RETURN:"RETURN", DONE:"DONE" };
+  const state = { value: S.IDLE, previous: null, changedAt: 0, reason: "" };
+  const timers = new Map();
+  const listeners = [];
+  let framePrepared = false;
+
+  function setState(next, meta) {
+    if (state.value === next) return;
+    state.previous = state.value;
+    state.value = next;
+    state.changedAt = Date.now();
+    state.reason = (meta && meta.at) || "";
+    listeners.forEach(function (fn) { try { fn(next, meta); } catch (e) {} });
+  }
+
+  // 统一时间轴：前场链路的所有延时都必须经过这里（delayMs 一律沿用原值）
+  function schedule(name, delayMs, fn) {
+    cancel(name);
+    const id = setTimeout(function () { timers.delete(name); fn(); }, delayMs);
+    timers.set(name, id);
+    return id;
+  }
+  function cancel(name) { const t = timers.get(name); if (t) { clearTimeout(t); timers.delete(name); } }
+  function cancelAll() { timers.forEach(function (t) { clearTimeout(t); }); timers.clear(); }
+
+  // 唯一换层提交点：几何与可见性在同一帧内提交
+  function commit(paint) { return requestAnimationFrame(function () { try { paint(); } catch (e) {} }); }
+
+  // 唯一首帧准备路径：任何需要把 currentTime 归零的地方都走这里
+  function prepareFrame(reason) {
+    if (!sourceVideo) { framePrepared = false; return false; }
+    try { sourceVideo.currentTime = 0; } catch (e) {}
+    framePrepared = true;
+    return true;
+  }
+
+  // 唯一出瓶入口：自动定时器 / 点击瓶子 / 自定义事件 / 外部代理 全部汇到这里
+  function release(reason) {
+    if (state.value === S.FOREGROUND) return false;
+    if (rabbitStage !== "large") return false;
+    if (!canvas || !canvas.isConnected) return false;
+    setState(S.HANDOFF, { at: reason || "release" });
+    expandRabbitPerformance();
+    return true;
+  }
+
+  return {
+    S: S, state: state, setState: setState, schedule: schedule, cancel: cancel, cancelAll: cancelAll,
+    commit: commit, prepareFrame: prepareFrame, release: release,
+    isFramePrepared: function () { return framePrepared; },
+    resetFramePrepared: function () { framePrepared = false; },
+    onState: function (fn) { listeners.push(fn); }
+  };
+})();
+if (container) container.__frontstage = FRONTSTAGE;   // 外层控制器（enterLargeBottle / 点击 / 打字）经此调用唯一入口
+
 if (context && typeof canvas.getContext === "function") {
 canvas.width = canvasSize;
 canvas.height = canvasSize;
@@ -7078,7 +7082,7 @@ const localDeltaX = determinant ? (parentMatrix.d * screenDeltaX - parentMatrix.
 const localDeltaY = determinant ? (-parentMatrix.b * screenDeltaX + parentMatrix.a * screenDeltaY) / determinant : screenDeltaY;
 bottle.style.setProperty("--bottle-zoom-x", `${localDeltaX.toFixed(2)}px`);
 bottle.style.setProperty("--bottle-zoom-y", `${localDeltaY.toFixed(2)}px`);
-FRONTSTAGE.setState(FRONTSTAGE.S.ZOOM, { at: "enterLargeBottle" });
+if (bottle.__frontstage) bottle.__frontstage.setState(bottle.__frontstage.S.ZOOM, { at: "enterLargeBottle" });
 bottle.dataset.zoomLevel = "2";
 bottle.classList.add("zoom-level-2");
 positionCardForLargeBottle();
@@ -7100,7 +7104,7 @@ if (bottle._replayNarrative) {
 bottle._replayNarrative();
 // Replay skips both the small-bottle playback and the enlarged-bottle stage:
 // the rabbit jumps straight out of the small bottle and starts on frame one.
-FRONTSTAGE.release("replay");
+if (bottle.__frontstage) bottle.__frontstage.release("replay"); else bottle._releaseRabbit?.();
 return;
 }
 const bottleWillBeVisible = bottle.classList.contains("is-final-bottle-hidden");
@@ -7128,7 +7132,7 @@ return;
 if (currentZoomLevel === 2) {
 // A touch during the enlarged-bottle stage advances the same release that
 // would otherwise happen automatically after five seconds.
-FRONTSTAGE.release("tap-zoom2");
+if (bottle.__frontstage) bottle.__frontstage.release("tap-zoom2"); else bottle._releaseRabbit?.();
 }
 });
 
@@ -7365,9 +7369,11 @@ if (collectButton) collectButton.classList.add("is-visible");
 // moving the bottle. Its performance itself will begin only at the jump-out.
 if (fengxinNarrativeTestEnabled && currentPage === pages.length - 1 && Number(bottle.dataset.zoomLevel || 0) === 0 && bottle.dataset.rabbitReleased !== "1") {
 clearTimeout(enlargeBottleTimer);
-enlargeBottleTimer = FRONTSTAGE.schedule("zoom", 4000, () => {
+enlargeBottleTimer = bottle.__frontstage ? bottle.__frontstage.schedule("zoom", 4000, () => {
 enterLargeBottle();
-});
+}) : setTimeout(() => {
+enterLargeBottle();
+}, 4000);
 }
 // Legacy clips keep their previous five-second pause after the first page.
 if (!fengxinNarrativeTestEnabled && currentPage === 0 && Number(bottle.dataset.zoomLevel || 0) === 0 && bottle.dataset.rabbitReleased !== "1") {
