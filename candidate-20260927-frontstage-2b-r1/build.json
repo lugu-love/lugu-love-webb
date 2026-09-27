@@ -1,0 +1,18 @@
+{
+  "releaseId": "release-20260912-03",
+  "buildId": "release-20260912-03",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "9ea902fef27168cfd9fd28d454e8557ca6eff49999cff6f4879ff06994471704",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/release-20260920-nuanshan-bear-r1/",
+  "backendBaseUrl": "https://api.lugu.love",
+  "builtAt": "2026-09-17T14:25:00.000000Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "baseline": "release-20260919-yunqi-koala-r1",
+  "baselineSource": "release-20260917-lingyao-monkey-r1 + accepted r4 shared intent template",
+  "previousRelease": "release-20260919-yunqi-koala-r1",
+  "releaseNote": "仅新增暖山熊15条情绪视频、角色入口和正式媒体映射；风信兔、光尾狐、凌遥猴、云栖考拉及现有页面逻辑不变。",
+  "frozenIndexSha256": "83df274d0fb9c460ecbe56ebbbbb9e9c5d9518ada979389fc6d21dbae2d74959",
+  "releaseName": "release-20260920-nuanshan-bear-r1"
+}
