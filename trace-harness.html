@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>七星使者 · 前场运行时追踪（真机）</title>
+<style>
+ body{margin:0;background:#0b0c18;color:#eef0ff;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",Arial,sans-serif}
+ .bar{padding:10px 12px;font-size:13px;line-height:1.6;background:#151833;border-bottom:1px solid rgba(255,255,255,.1)}
+ .bar b{color:#ffd98a}
+ .bar button{margin:6px 6px 0 0;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:#242a55;color:#fff;font-size:13px}
+ #log{white-space:pre-wrap;font-size:12px;padding:8px 12px;color:#a9b2e0;max-height:22vh;overflow:auto}
+ iframe{width:100%;height:64vh;border:0;background:#000;display:block}
+</style>
+</head>
+<body>
+<div class="bar">
+  <div><b>前场运行时追踪</b> · 目标：<span id="target"></span></div>
+  <div>操作：点下方按钮开始 → 在画面里轻抚心星 → 等第一次出瓶/前场/回瓶完成 → 再点“导出 timeline.json”</div>
+  <button id="start">开始记录</button>
+  <button id="export">导出 timeline.json</button>
+  <button id="reset">清空</button>
+</div>
+<div id="log"></div>
+<iframe id="stage"></iframe>
+<script>
+const qs = new URLSearchParams(location.search);
+const item = qs.get("item") || "rabbit-happy";
+const cand = qs.get("cand") || "candidate-20260927-frontstage-2c10-r1";
+const url = "../" + cand + "/?item=" + encodeURIComponent(item);
+document.getElementById("target").textContent = url;
+const stage = document.getElementById("stage");
+const logEl = document.getElementById("log");
+const runId = "run-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7);
+let T = null, recording = false;
+
+function newTimeline() {
+  return {
+    runId, character: item, url,
+    browser: navigator.userAgent, viewport: [innerWidth, innerHeight],
+    network: (navigator.connection && (navigator.connection.effectiveType || navigator.connection.type)) || "unknown",
+    buildHash: null, events: {}, frames: [], anomalies: { emptyBottle: 0, floatingFront: 0 },
+    media: [], log: []
+  };
+}
+function log(s) { T.log.push([Math.round(performance.now()), s]); logEl.textContent += s + "\n"; logEl.scrollTop = logEl.scrollHeight; }
+function mark(name) { if (!T.events[name]) { T.events[name] = Math.round(performance.now()); log("◆ " + name + " @ " + T.events[name] + "ms"); } }
+
+document.getElementById("start").onclick = () => { T = newTimeline(); recording = true; logEl.textContent = ""; log("start run " + runId); boot(); };
+document.getElementById("reset").onclick = () => { T = newTimeline(); logEl.textContent = ""; };
+document.getElementById("export").onclick = () => {
+  const blob = new Blob([JSON.stringify(T, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = runId + "-timeline.json";
+  document.body.appendChild(a); a.click(); a.remove();
+};
+
+function boot() {
+  stage.src = url;
+  stage.onload = () => {
+    try {
+      const d = stage.contentDocument, w = stage.contentWindow;
+      const meta = d.querySelector('meta[name="lugu-release-id"]');
+      T.buildHash = meta ? meta.content : "(unknown)";
+      // 抓页面资源指纹
+      try { fetch(url, { cache: "no-store" }).then(r => r.text()).then(t => { T.pageBytes = t.length; }); } catch (e) {}
+      const vis = function (el, clip) {
+        try {
+          if (!el) return false;
+          let op = 1, n = el;
+          while (n && n.nodeType === 1) { const cs = w.getComputedStyle(n); if (cs.visibility === "hidden" || cs.display === "none") return false; op *= Number(cs.opacity || 1); n = n.parentElement; }
+          if (op < 0.5) return false;
+          const r = el.getBoundingClientRect(); if (!r.width || !r.height) return false;
+          const c = clip ? clip.getBoundingClientRect() : { left: 0, top: 0, right: w.innerWidth, bottom: w.innerHeight };
+          const ix = Math.max(0, Math.min(r.right, c.right) - Math.max(r.left, c.left));
+          const iy = Math.max(0, Math.min(r.bottom, c.bottom) - Math.max(r.top, c.top));
+          return (ix * iy) / (r.width * r.height) > 0.5;
+        } catch (e) { return false; }
+      };
+      const inside = function (a, b) { return a.left >= b.left - 1 && a.top >= b.top - 1 && a.right <= b.right + 1 && a.bottom <= b.bottom + 1; };
+      const mo = new w.MutationObserver((ms) => { for (const m of ms) { if (m.target && m.target.classList && String(m.target.className).indexOf("voice-bottle") >= 0) mark("bottleEntranceStart"); } });
+      try { mo.observe(d.documentElement, { attributes: true, attributeFilter: ["class", "style"], subtree: true }); } catch (e) {}
+      const videos = new WeakSet();
+      const tick = function () {
+        if (!recording) { w.requestAnimationFrame(tick); return; }
+        try {
+          const b = d.querySelector(".voice-bottle"), demo = d.querySelector(".fengxin-rabbit-demo"), crop = d.querySelector(".fengxin-rabbit-crop");
+          const v = d.querySelector(".fengxin-rabbit-crop > video");
+          const t = Math.round(performance.now());
+          const bv = vis(b, null), dv = vis(demo, crop);
+          const br = b ? b.getBoundingClientRect() : null, cr = crop ? crop.getBoundingClientRect() : null, dr = demo ? demo.getBoundingClientRect() : null;
+          if (bv) mark("bottleFirstVisible");
+          if (dv) { mark("characterFirstVisible"); if (cr && dr && inside(dr, cr)) mark("characterFullyInside"); }
+          if (v && v.readyState >= 2) mark("mediaReadyState2");
+          const st = b && b.__frontstage ? b.__frontstage.state.value : null;
+          if (st === "IN_BOTTLE_READY") mark("IN_BOTTLE_READY");
+          if (st === "FOREGROUND") mark("foregroundStart");
+          if (dv && !bv) T.anomalies.floatingFront++;
+          if (bv && !dv) T.anomalies.emptyBottle++;
+          T.frames.push({ t, bv, dv, state: st, bottleRect: br ? [Math.round(br.left), Math.round(br.top), Math.round(br.width), Math.round(br.height)] : null,
+            cropRect: cr ? [Math.round(cr.left), Math.round(cr.top), Math.round(cr.width), Math.round(cr.height)] : null,
+            demoRect: dr ? [Math.round(dr.left), Math.round(dr.top), Math.round(dr.width), Math.round(dr.height)] : null,
+            overflow: crop ? w.getComputedStyle(crop).overflow : null, readyState: v ? v.readyState : null });
+          if (v && !videos.has(v)) {
+            videos.add(v);
+            v.addEventListener("loadeddata", () => { mark("mediaLoadeddata"); T.media.push([Math.round(performance.now()), "loadeddata", v.readyState]); });
+            v.addEventListener("canplay", () => { mark("mediaCanplay"); T.media.push([Math.round(performance.now()), "canplay", v.readyState]); });
+            const d2 = Object.getOwnPropertyDescriptor(w.HTMLMediaElement.prototype, "currentTime");
+            Object.defineProperty(w.HTMLMediaElement.prototype, "currentTime", { get: d2.get, set: function (val) { try { if (this.tagName === "VIDEO" && Number(val) === 0) T.media.push([Math.round(performance.now()), "seek0", myVis(this)]); } catch (e) {} return d2.set.call(this, val); } });
+            function myVis(el) { try { const cs = w.getComputedStyle(el); return cs.visibility !== "hidden" && Number(cs.opacity) > 0.5; } catch (e) { return null; } }
+          }
+        } catch (e) {}
+        w.requestAnimationFrame(tick);
+      };
+      w.requestAnimationFrame(tick);
+      log("iframe 就绪，等你在画面里轻抚心星…");
+    } catch (e) { log("iframe 访问失败：" + e.message); }
+  };
+}
+</script>
+</body>
+</html>
