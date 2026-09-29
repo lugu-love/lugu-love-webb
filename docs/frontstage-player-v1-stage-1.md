@@ -11,12 +11,28 @@
 - V1 不使用旧 `FRONTSTAGE`、buffer swap、全局 currentTime setter、MutationObserver、角色专属播放分支或 CSS 状态动画。
 - 桌面 Chrome 验收脚本：`tests/frontstage-player-v1/desktop-acceptance.mjs`。
 
-## 桌面验收结果
+## 自动验收结果
 
 执行：
 
 ```bash
 RUNS=20 CYCLES=2 node tests/frontstage-player-v1/desktop-acceptance.mjs
+```
+
+结果：20/20 PASS。
+
+iPhone WebKit 模拟环境：
+
+```bash
+RUNS=20 CYCLES=2 ENGINE=webkit DEVICE=iphone-13 node tests/frontstage-player-v1/browser-acceptance.mjs
+```
+
+结果：20/20 PASS。
+
+华为 Android/Chromium 移动环境：
+
+```bash
+RUNS=20 CYCLES=2 ENGINE=chromium DEVICE=huawei-p30 node tests/frontstage-player-v1/browser-acceptance.mjs
 ```
 
 结果：20/20 PASS。
@@ -39,6 +55,8 @@ PRELOAD → BOTTLE_ENTER → CHARACTER_IN_BOTTLE → READY → FOREGROUND → RE
 
 ## 待完成
 
-- iPhone Safari 真机连续 20 次；
-- 华为真机连续 20 次；
+- iPhone Safari 物理真机连续 20 次；
+- 华为物理真机连续 20 次；
 - 三端全部通过后才接第二位角色。
+
+当前执行主机未连接 iPhone/华为设备，也未配置云真机账号；物理真机门禁是当前唯一无法在本机自动完成的技术阻塞。
