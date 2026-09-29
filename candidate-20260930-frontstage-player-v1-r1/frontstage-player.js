@@ -557,7 +557,9 @@ export class FrontstagePlayer extends EventTarget {
     if (this.video.ended) return;
     const ended = new Promise((resolve) => this.video.addEventListener("ended", resolve, { once: true }));
     const duration = finite(this.video.duration, this.item.duration);
-    const timeout = duration > 0.2 ? (duration + .5) * 1000 : this.options.playTimeoutMs;
+    const timeout = duration > 0.2
+      ? Math.max(this.options.playTimeoutMs, (duration + 15) * 1000)
+      : this.options.playTimeoutMs;
     await this._withTimeout(ended, timeout, "video-end-timeout");
   }
 
