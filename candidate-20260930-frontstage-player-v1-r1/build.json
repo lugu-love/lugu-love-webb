@@ -1,0 +1,19 @@
+{
+  "candidateName": "candidate-20260930-frontstage-player-v1-r1",
+  "baselineCandidate": "candidate-20260927-frontstage-2c10-r1",
+  "baselineCommit": "b8308838b961ace9d281fd78c542ccfa496b5cdf",
+  "rollback": "0addbf9c800d886588653adeda0e9191f5e13dfb",
+  "playerVersion": "frontstage-player-v1",
+  "stage": 1,
+  "items": ["rabbit-happy"],
+  "states": [
+    "INIT",
+    "PRELOAD",
+    "BOTTLE_ENTER",
+    "CHARACTER_IN_BOTTLE",
+    "READY",
+    "FOREGROUND",
+    "RETURN",
+    "DONE"
+  ]
+}
