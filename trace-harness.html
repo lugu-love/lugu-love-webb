@@ -9,6 +9,7 @@
  .bar{padding:10px 12px;font-size:13px;line-height:1.6;background:#151833;border-bottom:1px solid rgba(255,255,255,.1)}
  .bar b{color:#ffd98a}
  .bar button{margin:6px 6px 0 0;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:#242a55;color:#fff;font-size:13px}
+ #status{margin-top:6px;color:#a9b2e0;word-break:break-all}
  #log{white-space:pre-wrap;font-size:12px;padding:8px 12px;color:#a9b2e0;max-height:22vh;overflow:auto}
  iframe{width:100%;height:64vh;border:0;background:#000;display:block}
 </style>
@@ -20,103 +21,495 @@
   <button id="start">开始记录</button>
   <button id="export">导出 timeline.json</button>
   <button id="reset">清空</button>
+  <div id="status"></div>
 </div>
 <div id="log"></div>
-<iframe id="stage"></iframe>
+<iframe id="stage" title="Candidate"></iframe>
 <script>
 const qs = new URLSearchParams(location.search);
 const item = qs.get("item") || "rabbit-happy";
 const cand = qs.get("cand") || "candidate-20260927-frontstage-2c10-r1";
-const url = "../" + cand + "/?item=" + encodeURIComponent(item);
+const CANDIDATES = {
+  "candidate-20260927-frontstage-2c10-r1": {
+    commit: "b8308838b961ace9d281fd78c542ccfa496b5cdf",
+    rollback: "0addbf9c800d886588653adeda0e9191f5e13dfb",
+    expectedPageSha256: "6de39d33a62f04fa2fc0db4e784be133302195a262de90c8738f59780ab6cc69"
+  },
+  "candidate-20260927-frontstage-2c9-r1": {
+    commit: "0addbf9c800d886588653adeda0e9191f5e13dfb",
+    rollback: "00db8083fcf91aa7e0e50035e7411c54d4e2ae40"
+  }
+};
+const candidateInfo = CANDIDATES[cand] || {};
+const candidatePageUrl = new URL(cand.replace(/^\/+|\/+$/g, "") + "/", location.href);
+for (const [key, value] of qs) {
+  if (key !== "item" && key !== "cand") candidatePageUrl.searchParams.append(key, value);
+}
+candidatePageUrl.searchParams.set("item", item);
+const url = candidatePageUrl.href;
 document.getElementById("target").textContent = url;
 const stage = document.getElementById("stage");
 const logEl = document.getElementById("log");
-const runId = "run-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7);
-let T = null, recording = false;
+const statusEl = document.getElementById("status");
+let T = null;
+let recording = false;
+let runToken = 0;
+let frameObserverToken = 0;
+let navigationProbeToken = 0;
+let anomalyState = { emptyBottle: false, floatingFront: false };
 
-function newTimeline() {
+const MEDIA_EVENTS = [
+  "loadstart", "durationchange", "loadedmetadata", "loadeddata", "canplay",
+  "canplaythrough", "playing", "waiting", "stalled", "seeking", "seeked",
+  "play", "pause", "ended", "error", "emptied"
+];
+
+function now() { return Math.round(performance.now()); }
+function makeRunId() {
+  const random = typeof crypto.randomUUID === "function"
+    ? crypto.randomUUID().slice(0, 8)
+    : Math.random().toString(36).slice(2, 10);
+  return "run-" + Date.now() + "-" + random;
+}
+function viewportOf(win) {
+  const vv = win.visualViewport;
   return {
-    runId, character: item, url,
-    browser: navigator.userAgent, viewport: [innerWidth, innerHeight],
-    network: (navigator.connection && (navigator.connection.effectiveType || navigator.connection.type)) || "unknown",
-    buildHash: null, events: {}, frames: [], anomalies: { emptyBottle: 0, floatingFront: 0 },
-    media: [], log: []
+    inner: [Math.round(win.innerWidth), Math.round(win.innerHeight)],
+    outer: [Math.round(win.outerWidth), Math.round(win.outerHeight)],
+    dpr: win.devicePixelRatio || 1,
+    visualViewport: vv ? [Math.round(vv.width), Math.round(vv.height)] : null
   };
 }
-function log(s) { T.log.push([Math.round(performance.now()), s]); logEl.textContent += s + "\n"; logEl.scrollTop = logEl.scrollHeight; }
-function mark(name) { if (!T.events[name]) { T.events[name] = Math.round(performance.now()); log("◆ " + name + " @ " + T.events[name] + "ms"); } }
+function updateViewports() {
+  if (!T) return;
+  T.outerViewport = viewportOf(window);
+  try {
+    if (stage.contentWindow) T.iframeViewport = viewportOf(stage.contentWindow);
+  } catch (e) {}
+}
+function newTimeline(runId) {
+  return {
+    runId,
+    candidateName: cand,
+    candidateCommit: qs.get("commit") || candidateInfo.commit || "unknown",
+    candidateRollback: candidateInfo.rollback || "unknown",
+    candidateUrl: url,
+    buildHash: null,
+    pageSha256: null,
+    pageSha256MatchesExpected: null,
+    releaseId: null,
+    pageBytes: null,
+    outerViewport: viewportOf(window),
+    iframeViewport: null,
+    observerAttachedAt: null,
+    observerMode: null,
+    stateListenerAttachedAt: null,
+    events: {},
+    stateEvents: [],
+    frames: [],
+    anomalies: { emptyBottle: 0, floatingFront: 0, events: [] },
+    media: [],
+    errors: [],
+    startedAt: new Date().toISOString(),
+    exportedAt: null,
+    log: []
+  };
+}
+function log(message) {
+  if (T) T.log.push([now(), message]);
+  logEl.textContent += message + "\n";
+  logEl.scrollTop = logEl.scrollHeight;
+}
+function setStatus(message) { statusEl.textContent = message; }
+function mark(name, detail, iframeT) {
+  if (!recording || !T || T.events[name]) return;
+  const record = { t: now(), iframeT: iframeT == null ? null : Math.round(iframeT) };
+  if (detail != null) record.detail = detail;
+  T.events[name] = record;
+  log("◆ " + name + " @ " + record.t + "ms");
+}
+function updateAnomaly(name, active, detail) {
+  if (!recording || !T || anomalyState[name] === active) return;
+  anomalyState[name] = active;
+  if (!active) return;
+  T.anomalies[name] += 1;
+  T.anomalies.events.push(Object.assign({ t: now(), name }, detail || {}));
+}
+async function sha256Hex(buffer) {
+  const digest = await crypto.subtle.digest("SHA-256", buffer);
+  return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+function collect(record) {
+  if (!recording || !T || !record) return;
+  if (record.kind === "observer" && record.name === "state-listener-attached") {
+    T.stateListenerAttachedAt = record;
+  } else if (record.kind === "media") {
+    T.media.push(record);
+    mark("media:" + record.name, record);
+  } else if (record.kind === "state") {
+    T.stateEvents.push(record);
+    mark("state:" + record.name, record, record.iframeT);
+  } else if (record.kind === "event") {
+    mark(record.name, record.detail, record.iframeT);
+  } else if (record.kind === "error") {
+    T.errors.push(record);
+    log("iframe error: " + record.message);
+  }
+}
+function probeEvent(win, token, kind, name, data) {
+  if (!recording || !T || token !== runToken) return;
+  collect(Object.assign({
+    kind,
+    name,
+    t: now(),
+    iframeT: Math.round(win.performance.now()),
+    wallTime: Date.now()
+  }, data || {}));
+}
 
-document.getElementById("start").onclick = () => { T = newTimeline(); recording = true; logEl.textContent = ""; log("start run " + runId); boot(); };
-document.getElementById("reset").onclick = () => { T = newTimeline(); logEl.textContent = ""; };
-document.getElementById("export").onclick = () => {
-  const blob = new Blob([JSON.stringify(T, null, 2)], { type: "application/json" });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob); a.download = runId + "-timeline.json";
-  document.body.appendChild(a); a.click(); a.remove();
+function attachNavigationProbe(win, doc, token) {
+  if (navigationProbeToken === token) return;
+  navigationProbeToken = token;
+  const attachedAt = {
+    t: now(),
+    iframeT: Math.round(win.performance.now()),
+    wallTime: Date.now(),
+    readyState: doc.readyState,
+    mode: "navigation-poll-attach",
+    videoCount: doc.querySelectorAll("video,audio").length,
+    earlyEventsPossiblyMissed: true,
+    earlyEventsPossiblyMissedReason: "父页在真实导航提交后以 0ms 轮询挂载；挂载前已发生的媒体事件无法补录"
+  };
+  T.observerAttachedAt = attachedAt;
+  T.observerMode = attachedAt.mode;
+  log("Candidate 导航已提交，观测挂载 readyState=" + doc.readyState);
+
+  const mediaIds = new WeakMap();
+  const mediaState = new WeakMap();
+  let nextMediaId = 0;
+  function mediaInfo(el, id) {
+    return {
+      mediaId: id,
+      tag: el.tagName,
+      src: el.currentSrc || el.src || "",
+      readyState: el.readyState,
+      networkState: el.networkState,
+      currentTime: Number.isFinite(el.currentTime) ? Number(el.currentTime.toFixed(3)) : null,
+      paused: !!el.paused,
+      ended: !!el.ended,
+      error: el.error ? { code: el.error.code, message: el.error.message || "" } : null
+    };
+  }
+  function ensureMedia(el) {
+    if (!el || !(el instanceof win.HTMLMediaElement)) return null;
+    let id = mediaIds.get(el);
+    if (id) return id;
+    id = ++nextMediaId;
+    mediaIds.set(el, id);
+    probeEvent(win, token, "event", "mediaElementCreated", mediaInfo(el, id));
+    probeEvent(win, token, "media", "element-created", Object.assign(mediaInfo(el, id), { event: "element-created" }));
+    mediaState.set(el, [el.readyState, el.networkState, el.paused, el.currentSrc || el.src || ""].join("|"));
+    MEDIA_EVENTS.forEach(function (eventName) {
+      el.addEventListener(eventName, function () {
+        probeEvent(win, token, "media", eventName, Object.assign(mediaInfo(el, id), { event: eventName }));
+      });
+    });
+    return id;
+  }
+  function scanMedia(root) {
+    try {
+      if (root && root.nodeType === 1 && root.matches && root.matches("video,audio")) ensureMedia(root);
+      if (root && root.querySelectorAll) root.querySelectorAll("video,audio").forEach(ensureMedia);
+    } catch (e) {}
+  }
+  try {
+    const descriptor = Object.getOwnPropertyDescriptor(win.HTMLMediaElement.prototype, "currentTime");
+    if (descriptor && descriptor.get && descriptor.set) {
+      Object.defineProperty(win.HTMLMediaElement.prototype, "currentTime", {
+        configurable: true,
+        enumerable: descriptor.enumerable,
+        get: descriptor.get,
+        set: function (value) {
+          const id = ensureMedia(this);
+          probeEvent(win, token, "media", "currentTime-set", Object.assign(mediaInfo(this, id), {
+            event: "currentTime-set",
+            value: Number(value)
+          }));
+          return descriptor.set.call(this, value);
+        }
+      });
+    }
+  } catch (e) {
+    probeEvent(win, token, "error", "currentTime-setter", { message: String(e && e.message || e) });
+  }
+  scanMedia(doc);
+
+  ["DOMContentLoaded", "load"].forEach(function (name) {
+    if (name === "DOMContentLoaded" && doc.readyState !== "loading") {
+      probeEvent(win, token, "event", name, { readyState: doc.readyState, observedPostFacto: true });
+    } else if (name === "load" && doc.readyState === "complete") {
+      probeEvent(win, token, "event", name, { readyState: doc.readyState, observedPostFacto: true });
+    } else {
+      win.addEventListener(name, function () {
+        probeEvent(win, token, "event", name, { readyState: doc.readyState });
+      }, { once: true });
+    }
+  });
+  doc.addEventListener("readystatechange", function () {
+    probeEvent(win, token, "event", "readystatechange", { readyState: doc.readyState });
+  });
+
+  function isElement(node) { return !!node && node.nodeType === 1; }
+  let bottleMutationMarked = false;
+  const observer = new win.MutationObserver(function (mutations) {
+    for (const mutation of mutations) {
+      if (mutation.type === "childList") mutation.addedNodes.forEach(scanMedia);
+      if (bottleMutationMarked) continue;
+      const target = mutation.target;
+      if (!isElement(target)) continue;
+      const bottle = target.matches && target.matches(".voice-bottle")
+        ? target
+        : target.closest && target.closest(".voice-bottle");
+      if (bottle) {
+        bottleMutationMarked = true;
+        probeEvent(win, token, "event", "bottleEntranceStart", {
+          detail: {
+            className: String(bottle.className || ""),
+            mutationType: mutation.type,
+            attributeName: mutation.attributeName || null
+          }
+        });
+      }
+    }
+  });
+  try {
+    observer.observe(doc.documentElement || doc, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ["class", "style"]
+    });
+  } catch (e) {
+    probeEvent(win, token, "error", "mutation-observer", { message: String(e && e.message || e) });
+  }
+
+  let stateAttached = false;
+  const stateTimer = setInterval(function () {
+    if (!recording || token !== runToken) { clearInterval(stateTimer); return; }
+    if (stateAttached) return;
+    try {
+      const bottle = doc.querySelector(".voice-bottle");
+      const api = bottle && bottle.__frontstage;
+      if (!api || typeof api.onState !== "function") return;
+      stateAttached = true;
+      clearInterval(stateTimer);
+      api.onState(function (next, meta) {
+        probeEvent(win, token, "state", next, {
+          state: next,
+          previous: api.state && api.state.previous,
+          reason: (meta && meta.at) || (api.state && api.state.reason) || ""
+        });
+      });
+      probeEvent(win, token, "observer", "state-listener-attached", {
+        state: api.state && api.state.value,
+        attachedAt: { t: now(), iframeT: Math.round(win.performance.now()) }
+      });
+    } catch (e) {}
+  }, 8);
+
+  const mediaTimer = setInterval(function () {
+    if (!recording || token !== runToken) { clearInterval(mediaTimer); observer.disconnect(); return; }
+    try {
+      doc.querySelectorAll("video,audio").forEach(function (el) {
+        const id = ensureMedia(el);
+        const current = [el.readyState, el.networkState, el.paused, el.currentSrc || el.src || ""].join("|");
+        if (mediaState.get(el) !== current) {
+          mediaState.set(el, current);
+          probeEvent(win, token, "media", "state-change", Object.assign(mediaInfo(el, id), { event: "state-change" }));
+        }
+      });
+    } catch (e) {}
+  }, 32);
+}
+
+function startFrameObserver(win, doc, token) {
+  if (frameObserverToken === token) return;
+  frameObserverToken = token;
+  function visible(el, clip) {
+    try {
+      if (!el) return false;
+      let opacity = 1;
+      let node = el;
+      while (node && node.nodeType === 1) {
+        const style = win.getComputedStyle(node);
+        if (style.visibility === "hidden" || style.display === "none") return false;
+        opacity *= Number(style.opacity || 1);
+        node = node.parentElement;
+      }
+      if (opacity < 0.5) return false;
+      const rect = el.getBoundingClientRect();
+      if (!rect.width || !rect.height) return false;
+      const boundary = clip ? clip.getBoundingClientRect() : { left: 0, top: 0, right: win.innerWidth, bottom: win.innerHeight };
+      const ix = Math.max(0, Math.min(rect.right, boundary.right) - Math.max(rect.left, boundary.left));
+      const iy = Math.max(0, Math.min(rect.bottom, boundary.bottom) - Math.max(rect.top, boundary.top));
+      return (ix * iy) / (rect.width * rect.height) > 0.5;
+    } catch (e) {
+      return false;
+    }
+  }
+  function inside(a, b) {
+    return a.left >= b.left - 1 && a.top >= b.top - 1 && a.right <= b.right + 1 && a.bottom <= b.bottom + 1;
+  }
+  function tick() {
+    if (token !== runToken || !recording) return;
+    try {
+      const bottle = doc.querySelector(".voice-bottle");
+      const demo = doc.querySelector(".fengxin-rabbit-demo");
+      const crop = doc.querySelector(".fengxin-rabbit-crop");
+      const videos = Array.from(doc.querySelectorAll(".fengxin-rabbit-crop video, video"));
+      const bottleVisible = visible(bottle, null);
+      const demoVisible = visible(demo, crop);
+      const bottleRect = bottle ? bottle.getBoundingClientRect() : null;
+      const cropRect = crop ? crop.getBoundingClientRect() : null;
+      const demoRect = demo ? demo.getBoundingClientRect() : null;
+      if (bottleVisible) mark("bottleFirstVisible");
+      if (demoVisible) {
+        mark("characterFirstVisible");
+        if (cropRect && demoRect && inside(demoRect, cropRect)) mark("characterFullyInside");
+      }
+      const api = bottle && bottle.__frontstage;
+      const state = api && api.state ? api.state.value : null;
+      if (state === "IN_BOTTLE_READY") mark("IN_BOTTLE_READY");
+      if (state === "FOREGROUND") mark("foregroundStart");
+      if (videos.some((video) => video.readyState >= 2)) mark("mediaReadyState2");
+      updateAnomaly("floatingFront", demoVisible && !bottleVisible, { state });
+      updateAnomaly("emptyBottle", bottleVisible && !demoVisible, { state });
+      T.frames.push({
+        t: now(),
+        iframeT: Math.round(win.performance.now()),
+        bv: bottleVisible,
+        dv: demoVisible,
+        state,
+        bottleRect: bottleRect ? [Math.round(bottleRect.left), Math.round(bottleRect.top), Math.round(bottleRect.width), Math.round(bottleRect.height)] : null,
+        cropRect: cropRect ? [Math.round(cropRect.left), Math.round(cropRect.top), Math.round(cropRect.width), Math.round(cropRect.height)] : null,
+        demoRect: demoRect ? [Math.round(demoRect.left), Math.round(demoRect.top), Math.round(demoRect.width), Math.round(demoRect.height)] : null,
+        overflow: crop ? win.getComputedStyle(crop).overflow : null,
+        videoReadyState: videos.map((video) => video.readyState),
+        videoCurrentTime: videos.map((video) => Number(video.currentTime.toFixed(3))),
+        videoPaused: videos.map((video) => video.paused)
+      });
+      updateViewports();
+    } catch (e) {}
+    win.requestAnimationFrame(tick);
+  }
+  updateViewports();
+  win.requestAnimationFrame(tick);
+}
+
+function watchFrame(token) {
+  if (token !== runToken || !recording) return;
+  try {
+    const win = stage.contentWindow;
+    const doc = stage.contentDocument;
+    if (win && doc && doc.documentElement) {
+      let currentUrl = "";
+      try { currentUrl = win.location.href; } catch (e) {}
+      if (currentUrl === url || currentUrl.indexOf(url + "#") === 0) {
+        attachNavigationProbe(win, doc, token);
+        startFrameObserver(win, doc, token);
+        updateViewports();
+      }
+    }
+  } catch (e) {}
+  if (token === runToken && recording) setTimeout(() => watchFrame(token), 0);
+}
+
+function onFrameLoaded(token) {
+  if (token !== runToken || !recording) return;
+  try {
+    log("iframe load 完成，readyState=" + stage.contentDocument.readyState);
+    if (stage.contentWindow.location.href === url) {
+      attachNavigationProbe(stage.contentWindow, stage.contentDocument, token);
+      startFrameObserver(stage.contentWindow, stage.contentDocument, token);
+      updateViewports();
+    }
+  } catch (e) {
+    log("iframe load 后检查失败：" + e.message);
+  }
+}
+
+async function boot(token) {
+  frameObserverToken = 0;
+  navigationProbeToken = 0;
+  anomalyState = { emptyBottle: false, floatingFront: false };
+  stage.onload = () => onFrameLoaded(token);
+  try {
+    setStatus("正在计算 " + cand + " 页面 sha256…");
+    const response = await fetch(url, { cache: "no-store", credentials: "same-origin" });
+    if (!response.ok) throw new Error("HTTP " + response.status);
+    const buffer = await response.arrayBuffer();
+    if (token !== runToken) return;
+    T.pageBytes = buffer.byteLength;
+    T.pageSha256 = await sha256Hex(buffer);
+    T.buildHash = T.pageSha256.slice(0, 12);
+    T.pageSha256MatchesExpected = candidateInfo.expectedPageSha256
+      ? T.pageSha256 === candidateInfo.expectedPageSha256
+      : null;
+    log("Candidate 页面指纹完成：" + T.pageSha256);
+  } catch (e) {
+    if (token !== runToken) return;
+    T.pageSha256Error = String(e && e.message || e);
+    log("页面指纹计算失败：" + T.pageSha256Error);
+  }
+  if (token !== runToken) return;
+  setStatus("runId=" + T.runId + " · buildHash=" + (T.buildHash || "unknown") + " · " + url);
+  stage.src = url;
+  watchFrame(token);
+}
+
+document.getElementById("start").onclick = () => {
+  const token = ++runToken;
+  const runId = makeRunId();
+  T = newTimeline(runId);
+  recording = true;
+  logEl.textContent = "";
+  setStatus("runId=" + runId + " · Candidate 加载中…");
+  log("start run " + runId);
+  boot(token);
 };
 
-function boot() {
-  stage.src = url;
-  stage.onload = () => {
-    try {
-      const d = stage.contentDocument, w = stage.contentWindow;
-      const meta = d.querySelector('meta[name="lugu-release-id"]');
-      T.buildHash = meta ? meta.content : "(unknown)";
-      // 抓页面资源指纹
-      try { fetch(url, { cache: "no-store" }).then(r => r.text()).then(t => { T.pageBytes = t.length; }); } catch (e) {}
-      const vis = function (el, clip) {
-        try {
-          if (!el) return false;
-          let op = 1, n = el;
-          while (n && n.nodeType === 1) { const cs = w.getComputedStyle(n); if (cs.visibility === "hidden" || cs.display === "none") return false; op *= Number(cs.opacity || 1); n = n.parentElement; }
-          if (op < 0.5) return false;
-          const r = el.getBoundingClientRect(); if (!r.width || !r.height) return false;
-          const c = clip ? clip.getBoundingClientRect() : { left: 0, top: 0, right: w.innerWidth, bottom: w.innerHeight };
-          const ix = Math.max(0, Math.min(r.right, c.right) - Math.max(r.left, c.left));
-          const iy = Math.max(0, Math.min(r.bottom, c.bottom) - Math.max(r.top, c.top));
-          return (ix * iy) / (r.width * r.height) > 0.5;
-        } catch (e) { return false; }
-      };
-      const inside = function (a, b) { return a.left >= b.left - 1 && a.top >= b.top - 1 && a.right <= b.right + 1 && a.bottom <= b.bottom + 1; };
-      const mo = new w.MutationObserver((ms) => { for (const m of ms) { if (m.target && m.target.classList && String(m.target.className).indexOf("voice-bottle") >= 0) mark("bottleEntranceStart"); } });
-      try { mo.observe(d.documentElement, { attributes: true, attributeFilter: ["class", "style"], subtree: true }); } catch (e) {}
-      const videos = new WeakSet();
-      const tick = function () {
-        if (!recording) { w.requestAnimationFrame(tick); return; }
-        try {
-          const b = d.querySelector(".voice-bottle"), demo = d.querySelector(".fengxin-rabbit-demo"), crop = d.querySelector(".fengxin-rabbit-crop");
-          const v = d.querySelector(".fengxin-rabbit-crop > video");
-          const t = Math.round(performance.now());
-          const bv = vis(b, null), dv = vis(demo, crop);
-          const br = b ? b.getBoundingClientRect() : null, cr = crop ? crop.getBoundingClientRect() : null, dr = demo ? demo.getBoundingClientRect() : null;
-          if (bv) mark("bottleFirstVisible");
-          if (dv) { mark("characterFirstVisible"); if (cr && dr && inside(dr, cr)) mark("characterFullyInside"); }
-          if (v && v.readyState >= 2) mark("mediaReadyState2");
-          const st = b && b.__frontstage ? b.__frontstage.state.value : null;
-          if (st === "IN_BOTTLE_READY") mark("IN_BOTTLE_READY");
-          if (st === "FOREGROUND") mark("foregroundStart");
-          if (dv && !bv) T.anomalies.floatingFront++;
-          if (bv && !dv) T.anomalies.emptyBottle++;
-          T.frames.push({ t, bv, dv, state: st, bottleRect: br ? [Math.round(br.left), Math.round(br.top), Math.round(br.width), Math.round(br.height)] : null,
-            cropRect: cr ? [Math.round(cr.left), Math.round(cr.top), Math.round(cr.width), Math.round(cr.height)] : null,
-            demoRect: dr ? [Math.round(dr.left), Math.round(dr.top), Math.round(dr.width), Math.round(dr.height)] : null,
-            overflow: crop ? w.getComputedStyle(crop).overflow : null, readyState: v ? v.readyState : null });
-          if (v && !videos.has(v)) {
-            videos.add(v);
-            v.addEventListener("loadeddata", () => { mark("mediaLoadeddata"); T.media.push([Math.round(performance.now()), "loadeddata", v.readyState]); });
-            v.addEventListener("canplay", () => { mark("mediaCanplay"); T.media.push([Math.round(performance.now()), "canplay", v.readyState]); });
-            const d2 = Object.getOwnPropertyDescriptor(w.HTMLMediaElement.prototype, "currentTime");
-            Object.defineProperty(w.HTMLMediaElement.prototype, "currentTime", { get: d2.get, set: function (val) { try { if (this.tagName === "VIDEO" && Number(val) === 0) T.media.push([Math.round(performance.now()), "seek0", myVis(this)]); } catch (e) {} return d2.set.call(this, val); } });
-            function myVis(el) { try { const cs = w.getComputedStyle(el); return cs.visibility !== "hidden" && Number(cs.opacity) > 0.5; } catch (e) { return null; } }
-          }
-        } catch (e) {}
-        w.requestAnimationFrame(tick);
-      };
-      w.requestAnimationFrame(tick);
-      log("iframe 就绪，等你在画面里轻抚心星…");
-    } catch (e) { log("iframe 访问失败：" + e.message); }
-  };
-}
+document.getElementById("reset").onclick = () => {
+  runToken++;
+  recording = false;
+  T = null;
+  stage.onload = null;
+  stage.src = "about:blank";
+  logEl.textContent = "";
+  setStatus("已清空；下次开始会生成新的 runId");
+};
+
+document.getElementById("export").onclick = () => {
+  if (!T) {
+    log("没有可导出的 timeline，请先开始记录");
+    return;
+  }
+  updateViewports();
+  T.exportedAt = new Date().toISOString();
+  const snapshot = JSON.parse(JSON.stringify(T));
+  recording = false;
+  const runId = snapshot.runId || makeRunId();
+  const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: "application/json" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = runId + "-timeline.json";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setStatus("已导出 " + runId + " · buildHash=" + (snapshot.buildHash || "unknown"));
+  log("export " + runId);
+};
+
+window.addEventListener("resize", updateViewports);
 </script>
 </body>
 </html>
