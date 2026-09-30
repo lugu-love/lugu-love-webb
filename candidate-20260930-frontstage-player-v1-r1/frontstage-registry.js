@@ -9,20 +9,24 @@ export const ASSET_REGISTRY = Object.freeze({
     posterFallback: "assets/characters/fengxin-rabbit/portrait.png",
     aspectRatio: 834 / 1112,
     duration: 5.041667,
+    requireAlpha: true,
     media: Object.freeze([
       Object.freeze({
         url: "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/01-rabbit-happy/delivery/rabbit_01_happy_alpha_vp9.webm",
         type: "video/webm",
+        alpha: true,
         order: Object.freeze(["chromium", "firefox", "safari"])
       }),
       Object.freeze({
-        url: "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/01-rabbit-happy/delivery/rabbit_01_happy_alpha_hevc.mov",
-        type: "video/quicktime",
+        url: "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/01-rabbit-happy/delivery/rabbit_01_happy_alpha_hevc_avconvert_r1.mov",
+        type: "video/mp4; codecs=\"hvc1\"",
+        alpha: true,
         order: Object.freeze(["safari", "chromium", "firefox"])
       }),
       Object.freeze({
         url: "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/01-rabbit-happy/mobile-v2/rabbit_01_happy_mobile_black_v2.mp4",
         type: "video/mp4",
+        alpha: false,
         order: Object.freeze(["chromium", "firefox", "safari"])
       })
     ])

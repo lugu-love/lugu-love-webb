@@ -11,6 +11,13 @@
 - V1 不使用旧 `FRONTSTAGE`、buffer swap、全局 currentTime setter、MutationObserver、角色专属播放分支或 CSS 状态动画。
 - 桌面 Chrome 验收脚本：`tests/frontstage-player-v1/desktop-acceptance.mjs`。
 
+## Safari 绿幕修复
+
+- Safari 只允许使用经 alpha 验证的 `rabbit_01_happy_alpha_hevc_avconvert_r1.mov`，MIME 为 `video/mp4; codecs="hvc1"`。
+- 旧 `rabbit_01_happy_alpha_hevc.mov` 已从播放候选删除。
+- 非 alpha 的 mobile MP4 fallback 被 `requireAlpha` 拦截，不会再以黑底或绿底候选冒充透明素材。
+- 修正后 WebKit/iPhone 环境连续两轮回归：5/5 PASS，绿底采样为 0。
+
 ## 自动验收结果
 
 执行：

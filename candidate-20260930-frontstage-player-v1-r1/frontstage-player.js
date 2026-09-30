@@ -275,7 +275,10 @@ export class FrontstagePlayer extends EventTarget {
 
   _orderedCandidates() {
     const device = deviceClass();
-    return [...this.item.media].sort((a, b) => {
+    const transparent = this.item.requireAlpha
+      ? this.item.media.filter((candidate) => candidate.alpha === true)
+      : this.item.media;
+    return [...transparent].sort((a, b) => {
       const aOrder = a.order.indexOf(device);
       const bOrder = b.order.indexOf(device);
       return (aOrder === -1 ? 99 : aOrder) - (bOrder === -1 ? 99 : bOrder);
