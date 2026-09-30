@@ -144,7 +144,10 @@ for (let run = 1; run <= runs; run += 1) {
     visualFrames.push(await imageMetrics(image));
     await page.waitForTimeout(50);
   }
-  if (!snapshot?.error && (snapshot?.state !== "DONE" || snapshot?.cycle !== cycles)) throw new Error(`timeout waiting for ${deviceName} run ${run}`);
+  if (!snapshot?.error && (snapshot?.state !== "DONE" || snapshot?.cycle !== cycles)) {
+    process.stderr.write(`timeout snapshot: ${JSON.stringify(snapshot)}\n`);
+    throw new Error(`timeout waiting for ${deviceName} run ${run}`);
+  }
   const result = validate(run, snapshot, visualFrames, pageErrors);
   results.push(result);
   page.off("pageerror", onPageError);

@@ -4,7 +4,7 @@ let registryPromise = null;
 
 export async function loadRegistry() {
   if (registryPromise) return registryPromise;
-  registryPromise = fetch("./frontstage-items.json", { cache: "no-store" })
+  registryPromise = fetch("./frontstage-items.json?v=20260930-a1", { cache: "no-store" })
     .then((response) => {
       if (!response.ok) throw new Error(`registry HTTP ${response.status}`);
       return response.json();
