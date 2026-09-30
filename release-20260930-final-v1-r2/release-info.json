@@ -1,0 +1,24 @@
+{
+  "releaseId": "release-20260930-final-v1-r2",
+  "sourceFinalRc": "72ab38746b99fdd3fc8b7b2c426501cc0e9becc0",
+  "sourceProductionRelease": "2a16e753abf96ca69562e359ed50c4baeebed5c5",
+  "rollbackTarget": "e086a35d88e0ecbf0a0f7042ce360e35b91224c0",
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/release-20260930-final-v1-r2/",
+  "realtimeUrl": "https://candidate.suomaanjia.cn:8443/lugu-b74/",
+  "backendBaseUrl": "https://candidate.suomaanjia.cn:8443/lugu-send",
+  "buildContract": {
+    "releaseId": "release-20260912-03",
+    "buildId": "release-20260912-03",
+    "manifestVersion": "20260912-03-c1"
+  },
+  "configurationChanges": [
+    "Restored C send-test build contract expected by send-test.html.",
+    "Kept A/B/C main logic unchanged.",
+    "Kept production entry unchanged pending final switch."
+  ],
+  "knownIssues": [
+    "Huawei download/save remains a post-release hotfix and is not a release blocker."
+  ],
+  "generatedAt": "2026-09-30T12:30:00Z"
+}
