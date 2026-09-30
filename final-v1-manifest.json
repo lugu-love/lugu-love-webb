@@ -1,0 +1,24 @@
+{
+  "name": "lugu-love-final-v1-rc",
+  "status": "automatic-acceptance",
+  "baseCommit": "24a55edc52ce5357affcc0af0f94cdbc81b4d727",
+  "components": {
+    "A": {
+      "candidate": "candidate-20260930-frontstage-player-v1-r1",
+      "commit": "ca4ed1046de1649e6537506dbeb686f33a118c66",
+      "entry": "https://lugu-love.github.io/lugu-love-webb/candidate-20260930-frontstage-player-v1-r1/?item=rabbit-happy"
+    },
+    "B": {
+      "candidate": "candidate-20260930-realtime-dialog-v1-r1",
+      "entry": "https://candidate.suomaanjia.cn:8443/lugu-b74/",
+      "service": "lugu-b74.service"
+    },
+    "C": {
+      "candidate": "candidate-20260930-emotion-send-v1-r1",
+      "entry": "candidate-20260930-emotion-send-v1-r1/send-test.html",
+      "backend": "https://candidate.suomaanjia.cn:8443/lugu-send",
+      "service": "lugu-send.service"
+    }
+  },
+  "rollback": "b8308838b961ace9d281fd78c542ccfa496b5cdf"
+}
