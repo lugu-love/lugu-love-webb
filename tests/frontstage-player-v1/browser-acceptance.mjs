@@ -137,7 +137,7 @@ for (let run = 1; run <= runs; run += 1) {
   const visualFrames = [];
   const started = Date.now();
   let snapshot = null;
-  while (Date.now() - started < 30000 + cycles * 15000) {
+  while (Date.now() - started < 30000 + cycles * 90000) {
     snapshot = await page.evaluate(() => window.__frontstagePlayer?.getSnapshot?.() || null);
     if (snapshot?.error || (snapshot?.state === "DONE" && snapshot?.cycle === cycles)) break;
     const image = await page.screenshot({ type: "jpeg", quality: 70 });

@@ -74,6 +74,7 @@ export class FrontstagePlayer extends EventTarget {
     this.error = null;
     this._logSeq = 0;
     this._watchdog = 0;
+    this._playbackMonitor = null;
     this._activeAnimation = null;
     this._openResolver = null;
     this._runPromise = null;
@@ -210,6 +211,14 @@ export class FrontstagePlayer extends EventTarget {
       this.error = error instanceof Error ? error : new Error(String(error));
       this._log("player-error", { name: this.error.name, message: this.error.message });
       this.dispatchEvent(new CustomEvent("playererror", { detail: this.getSnapshot() }));
+      if (this.state === PLAYER_STATES.FOREGROUND) {
+        try {
+          await this._transition(PLAYER_STATES.RETURN, { reason: "failure-recovery" });
+          await this._returnToBottle();
+        } catch (recoveryError) {
+          this._log("failure-recovery-error", { message: recoveryError.message });
+        }
+      }
       if (this.state !== PLAYER_STATES.DONE) await this._transition(PLAYER_STATES.DONE, { reason: "failure" });
       this._setStatus("播放失败：" + this.error.message);
     }
@@ -286,9 +295,13 @@ export class FrontstagePlayer extends EventTarget {
   }
 
   async _loadCandidate(candidate) {
-    const playable = this.video.canPlayType(candidate.type);
-    if (!playable && candidate.type !== "video/mp4") {
-      throw new Error(`Unsupported media type: ${candidate.type}`);
+    const currentSource = this.video.currentSrc || this.video.src || "";
+    if (this._activeMedia?.url === candidate.url && currentSource === candidate.url && this.video.readyState >= 2 && !this.video.error) {
+      this.video.pause();
+      this.video.loop = false;
+      await this._resetVideoToStart(true);
+      this._log("preload-reused", { url: candidate.url, type: candidate.type });
+      return;
     }
     this.video.pause();
     this.video.loop = false;
@@ -557,13 +570,45 @@ export class FrontstagePlayer extends EventTarget {
   }
 
   async _waitForVideoEndOrTimeout() {
-    if (this.video.ended) return;
-    const ended = new Promise((resolve) => this.video.addEventListener("ended", resolve, { once: true }));
     const duration = finite(this.video.duration, this.item.duration);
-    const timeout = duration > 0.2
-      ? Math.max(this.options.playTimeoutMs, (duration + 15) * 1000)
-      : this.options.playTimeoutMs;
-    await this._withTimeout(ended, timeout, "video-end-timeout");
+    const atEnd = () => this.video.ended || (duration > 0.2 && this.video.paused && this.video.currentTime >= duration - 0.05);
+    if (atEnd()) return;
+    return new Promise((resolve, reject) => {
+      let lastTime = this.video.currentTime;
+      let lastProgressAt = performance.now();
+      const startedAt = performance.now();
+      const hardDeadline = Math.max(300000, duration > 0.2 ? duration * 5000 : 0);
+      const onEnded = () => finish(resolve);
+      const onError = () => finish(() => reject(new Error("Media error")));
+      const monitor = window.setInterval(() => {
+        if (atEnd()) {
+          finish(resolve);
+          return;
+        }
+        const now = performance.now();
+        if (this.video.currentTime > lastTime + 0.02) {
+          lastTime = this.video.currentTime;
+          lastProgressAt = now;
+        }
+        if (now - lastProgressAt > 60000) {
+          finish(() => reject(new Error("video-stalled")));
+          return;
+        }
+        if (now - startedAt > hardDeadline) {
+          finish(() => reject(new Error("video-hard-timeout")));
+        }
+      }, 250);
+      const finish = (callback) => {
+        window.clearInterval(monitor);
+        this.video.removeEventListener("ended", onEnded);
+        this.video.removeEventListener("error", onError);
+        this._playbackMonitor = null;
+        callback();
+      };
+      this._playbackMonitor = monitor;
+      this.video.addEventListener("ended", onEnded, { once: true });
+      this.video.addEventListener("error", onError, { once: true });
+    });
   }
 
   _waitForVideoEvent(eventName, timeoutMs, code) {
@@ -626,6 +671,10 @@ export class FrontstagePlayer extends EventTarget {
     if (this._watchdog) {
       clearTimeout(this._watchdog);
       this._watchdog = 0;
+    }
+    if (this._playbackMonitor) {
+      clearInterval(this._playbackMonitor);
+      this._playbackMonitor = null;
     }
   }
 

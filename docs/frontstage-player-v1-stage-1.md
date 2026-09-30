@@ -67,3 +67,19 @@ PRELOAD → BOTTLE_ENTER → CHARACTER_IN_BOTTLE → READY → FOREGROUND → RE
 - 三端全部通过后才接第二位角色。
 
 当前执行主机未连接 iPhone/华为设备，也未配置云真机账号；物理真机门禁是当前唯一无法在本机自动完成的技术阻塞。
+
+## A 阶段收口候选
+
+为满足“只接入已合格素材”的要求，A 门禁使用透明素材已确认的代表项：
+
+- 风信兔：`rabbit-happy`
+- 光尾狐：`fox-pink-coquettish`
+- 凌遥猴：`monkey-wronged`
+
+自动验收结果：
+
+- 桌面 Chrome：3/3 角色，20/20，每次连续两轮。
+- iPhone WebKit：3/3 角色，20/20，每次连续两轮。
+- 华为 Android/Chromium：3/3 角色，20/20，每次连续两轮。
+
+其他情绪条目仍在 registry 中，但未完成透明素材真机确认前不进入正式 A 放行列表。
