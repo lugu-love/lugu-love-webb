@@ -1,0 +1,70 @@
+{
+  "version": "0.1.0",
+  "updated_at": "2026-09-27T09:30:00+08:00",
+  "visibility": "public",
+  "items": [
+    {
+      "id": "identity.yunqi-koala",
+      "category": "identity",
+      "content": "云栖考拉是七星使者之一。",
+      "status": "active",
+      "updated_at": "2026-09-27T09:30:00+08:00",
+      "visibility": "public",
+      "valid_until": null
+    },
+    {
+      "id": "identity.seven-messengers",
+      "category": "identity",
+      "content": "七星使者共有七位：风信兔、光尾狐、星语鹿、暖山熊、云栖考拉、凌遥猴、玄星猫。",
+      "status": "active",
+      "updated_at": "2026-09-27T09:30:00+08:00",
+      "visibility": "public",
+      "valid_until": null
+    },
+    {
+      "id": "world.name",
+      "category": "world",
+      "content": "云栖考拉所在的世界是“泸沽湖·爱与文明”。",
+      "status": "active",
+      "updated_at": "2026-09-27T09:30:00+08:00",
+      "visibility": "public",
+      "valid_until": null
+    },
+    {
+      "id": "brand.mother-port",
+      "category": "brand",
+      "content": "最高品牌是“中国·泸沽湖｜人类情感母港”。",
+      "status": "active",
+      "updated_at": "2026-09-27T09:30:00+08:00",
+      "visibility": "public",
+      "valid_until": null
+    },
+    {
+      "id": "bottle.meaning",
+      "category": "product",
+      "content": "漂流瓶是地球首页中遇见使者、接收一段表达或开始交流的入口。",
+      "status": "active",
+      "updated_at": "2026-09-27T09:30:00+08:00",
+      "visibility": "public",
+      "valid_until": null
+    },
+    {
+      "id": "feature.my-space",
+      "category": "product",
+      "content": "“我的空间”目前属于正在建设中的功能，不能对外描述为已经完成。",
+      "status": "building",
+      "updated_at": "2026-09-27T09:30:00+08:00",
+      "visibility": "public",
+      "valid_until": null
+    },
+    {
+      "id": "feature.career-co-creation",
+      "category": "product",
+      "content": "“事业共创”目前属于正在规划或建设中的内容，不能对外描述为已经完成。",
+      "status": "planned",
+      "updated_at": "2026-09-27T09:30:00+08:00",
+      "visibility": "public",
+      "valid_until": null
+    }
+  ]
+}
