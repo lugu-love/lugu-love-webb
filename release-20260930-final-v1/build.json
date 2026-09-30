@@ -1,0 +1,12 @@
+{
+  "releaseId": "release-20260930-final-v1",
+  "buildId": "release-20260930-final-v1",
+  "manifestVersion": "20260930-final-v1",
+  "releaseName": "release-20260930-final-v1",
+  "releasePath": "/release-20260930-final-v1/",
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "backendBaseUrl": "https://candidate.suomaanjia.cn:8443/lugu-send",
+  "realtimeUrl": "https://candidate.suomaanjia.cn:8443/lugu-b74/",
+  "rollbackCommit": "e086a35",
+  "sourceCommit": "72ab387"
+}
