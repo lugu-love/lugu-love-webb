@@ -15,32 +15,40 @@
     import { FrontstagePlayer, PLAYER_STATES } from "./frontstage-player.js?v=f5a3b69";
     import { DEFAULT_ITEM_ID, getRegisteredItem } from "./frontstage-registry.js?v=f5a3b69";
 
-    const params = new URLSearchParams(location.search);
-    const itemId = params.get("item") || DEFAULT_ITEM_ID;
-    const autoOpen = params.get("auto") === "1";
-    const autoCycles = Math.max(1, Number.parseInt(params.get("cycles") || "1", 10) || 1);
-    const item = getRegisteredItem(itemId);
-    const root = document.getElementById("player-root");
-    const player = new FrontstagePlayer(root, item, { autoOpen, autoCycles });
+    async function main() {
+      const params = new URLSearchParams(location.search);
+      const itemId = params.get("item") || DEFAULT_ITEM_ID;
+      const autoOpen = params.get("auto") === "1";
+      const autoCycles = Math.max(1, Number.parseInt(params.get("cycles") || "1", 10) || 1);
+      const item = await getRegisteredItem(itemId);
+      const root = document.getElementById("player-root");
+      const player = new FrontstagePlayer(root, item, { autoOpen, autoCycles });
 
-    window.__frontstagePlayer = player;
-    window.__frontstageMeta = {
-      candidateName: "candidate-20260930-frontstage-player-v1-r1",
-      baselineCommit: "b8308838b961ace9d281fd78c542ccfa496b5cdf",
-      playerVersion: "frontstage-player-v1",
-      itemId
-    };
+      window.__frontstagePlayer = player;
+      window.__frontstageMeta = {
+        candidateName: "candidate-20260930-frontstage-player-v1-r1",
+        baselineCommit: "b8308838b961ace9d281fd78c542ccfa496b5cdf",
+        playerVersion: "frontstage-player-v1",
+        itemId
+      };
 
-    player.addEventListener("statechange", (event) => {
-      document.documentElement.dataset.playerState = event.detail.to;
-      document.documentElement.dataset.playerCycle = String(event.detail.cycle);
-    });
-    player.addEventListener("playererror", () => {
+      player.addEventListener("statechange", (event) => {
+        document.documentElement.dataset.playerState = event.detail.to;
+        document.documentElement.dataset.playerCycle = String(event.detail.cycle);
+      });
+      player.addEventListener("playererror", () => {
+        document.documentElement.dataset.playerError = "1";
+      });
+
+      document.documentElement.dataset.playerState = PLAYER_STATES.INIT;
+      player.start();
+    }
+
+    main().catch((error) => {
       document.documentElement.dataset.playerError = "1";
+      document.getElementById("player-root").textContent = "Player 初始化失败：" + error.message;
+      console.error(error);
     });
-
-    document.documentElement.dataset.playerState = PLAYER_STATES.INIT;
-    player.start();
   </script>
 </body>
 </html>

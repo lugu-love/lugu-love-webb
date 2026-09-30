@@ -1,40 +1,24 @@
 export const DEFAULT_ITEM_ID = "rabbit-happy";
 
-export const ASSET_REGISTRY = Object.freeze({
-  "rabbit-happy": Object.freeze({
-    itemId: "rabbit-happy",
-    characterId: "fengxin-rabbit",
-    label: "开心",
-    poster: "assets/characters/fengxin-rabbit/rabbit-happy.webp",
-    posterFallback: "assets/characters/fengxin-rabbit/portrait.png",
-    aspectRatio: 834 / 1112,
-    duration: 5.041667,
-    requireAlpha: true,
-    media: Object.freeze([
-      Object.freeze({
-        url: "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/01-rabbit-happy/delivery/rabbit_01_happy_alpha_vp9.webm",
-        type: "video/webm",
-        alpha: true,
-        order: Object.freeze(["chromium", "firefox", "safari"])
-      }),
-      Object.freeze({
-        url: "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/01-rabbit-happy/delivery/rabbit_01_happy_alpha_hevc_avconvert_r1.mov",
-        type: "video/mp4; codecs=\"hvc1\"",
-        alpha: true,
-        order: Object.freeze(["safari", "chromium", "firefox"])
-      }),
-      Object.freeze({
-        url: "https://pub-baeb836de8654e238577516dce76dea3.r2.dev/seven-stars/fengxin-rabbit/01-rabbit-happy/mobile-v2/rabbit_01_happy_mobile_black_v2.mp4",
-        type: "video/mp4",
-        alpha: false,
-        order: Object.freeze(["chromium", "firefox", "safari"])
-      })
-    ])
-  })
-});
+let registryPromise = null;
 
-export function getRegisteredItem(itemId = DEFAULT_ITEM_ID) {
-  const item = ASSET_REGISTRY[itemId];
+export async function loadRegistry() {
+  if (registryPromise) return registryPromise;
+  registryPromise = fetch("./frontstage-items.json", { cache: "no-store" })
+    .then((response) => {
+      if (!response.ok) throw new Error(`registry HTTP ${response.status}`);
+      return response.json();
+    })
+    .then((registry) => {
+      if (!registry || !registry.items) throw new Error("invalid frontstage registry");
+      return registry.items;
+    });
+  return registryPromise;
+}
+
+export async function getRegisteredItem(itemId = DEFAULT_ITEM_ID) {
+  const items = await loadRegistry();
+  const item = items[itemId];
   if (!item) throw new Error(`Unknown frontstage item: ${itemId}`);
   return item;
 }

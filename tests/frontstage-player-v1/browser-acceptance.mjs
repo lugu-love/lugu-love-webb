@@ -10,6 +10,7 @@ const engine = process.env.ENGINE || "chromium";
 const deviceName = process.env.DEVICE || "desktop-chrome";
 const runs = Math.max(1, Number.parseInt(process.env.RUNS || "20", 10) || 20);
 const cycles = Math.max(1, Number.parseInt(process.env.CYCLES || "2", 10) || 2);
+const itemId = process.env.ITEM_ID || "rabbit-happy";
 const baseUrl = process.env.PLAYER_URL || "http://127.0.0.1:8770/candidate-20260930-frontstage-player-v1-r1/";
 const expectedSequence = ["PRELOAD", "BOTTLE_ENTER", "CHARACTER_IN_BOTTLE", "READY", "FOREGROUND", "RETURN", "DONE"];
 
@@ -128,7 +129,7 @@ for (let run = 1; run <= runs; run += 1) {
   const onPageError = (error) => pageErrors.push(error.message);
   page.on("pageerror", onPageError);
   const url = new URL(baseUrl);
-  url.searchParams.set("item", "rabbit-happy");
+  url.searchParams.set("item", itemId);
   url.searchParams.set("auto", "1");
   url.searchParams.set("cycles", String(cycles));
   url.searchParams.set("acceptanceRun", `${deviceName}-${run}`);
