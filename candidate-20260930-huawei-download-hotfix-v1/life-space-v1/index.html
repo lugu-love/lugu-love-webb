@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6efe3">
+  <title>我的生命空间 V1</title>
+  <link rel="stylesheet" href="css/main.css?v=20260728-6">
+</head>
+<body>
+  <main class="page-shell">
+    <div class="top-actions"><a class="earth-link" href="../index.html">返回地球主页</a></div>
+    <div class="identity-avatar home-avatar-hero">
+      <button class="avatar" id="profileAvatar" type="button" aria-label="编辑空间主页头像"><span>生</span></button>
+      <small id="profileNickname">我的生命空间</small>
+      <div class="home-avatar-actions" id="homeAvatarActions" hidden>
+        <button type="button" id="changeHomeAvatar">更换头像</button>
+        <button type="button" id="editHomeProfile">编辑资料</button>
+      </div>
+      <p class="home-avatar-tip" id="homeAvatarTip" hidden>点击头像后，可更换空间主页头像。</p>
+    </div>
+    <section class="identity-card" aria-labelledby="profileName">
+      <div class="identity-copy">
+        <h1 id="profileName">今天，也值得被记住</h1>
+        <p id="profileBio">记录生活，也记录成为自己的过程。</p>
+      </div>
+      <button class="edit-profile" id="editProfile" type="button" hidden>编辑资料</button>
+    </section>
+
+    <section class="welcome" id="homeWelcome">
+      <div class="welcome-copy">
+        <p class="eyebrow">Life Space V1</p>
+        <h2 id="homeTitle">欢迎来到我的生命空间</h2>
+        <p class="welcome-description" id="homeDescription">记录生活，也记录成为自己的过程。</p>
+      </div>
+    </section>
+
+    <section class="explore-entry" aria-labelledby="exploreTitle">
+      <div class="explore-globe" aria-hidden="true">🌍</div>
+      <div class="explore-copy">
+        <p class="eyebrow">Explore Life Spaces</p>
+        <h2 id="exploreTitle">世界生命空间展馆</h2>
+        <p>去看看世界各地的人，如何记录他们的人生。</p>
+      </div>
+      <a class="explore-button" href="explore.html">开始漫游 <span aria-hidden="true">→</span></a>
+    </section>
+
+    <section aria-labelledby="channelTitle">
+      <div class="section-heading">
+        <h2 id="channelTitle">我的频道</h2>
+        <button class="style-button" id="changeStyle" type="button">更换空间风格</button>
+      </div>
+      <div class="channel-grid" id="channelGrid"></div>
+    </section>
+  </main>
+
+  <div class="notice" id="notice" role="status" aria-live="polite"></div>
+  <div class="dialog-backdrop" id="profileDialog" aria-hidden="true">
+    <form class="dialog profile-dialog" id="profileForm">
+      <h2>编辑我的资料</h2>
+      <div class="avatar-editor">
+        <div class="avatar avatar-preview" id="avatarPreview" aria-hidden="true"><span>生</span></div>
+        <div class="avatar-actions">
+          <label class="avatar-upload" for="avatarInput">选择头像</label>
+          <button class="avatar-remove" id="removeAvatar" type="button">恢复默认</button>
+          <small id="avatarStatus">支持 JPG、PNG、WebP 等常见图片。</small>
+        </div>
+        <input class="visually-hidden" id="avatarInput" type="file" accept="image/*">
+      </div>
+      <section class="avatar-cropper" id="avatarCropper" aria-label="调整头像裁剪" hidden>
+        <p>拖动照片调整位置，滑动下方按钮缩放</p>
+        <div class="crop-viewport" id="cropViewport">
+          <img id="cropImage" alt="待裁剪头像">
+          <span class="crop-guide" aria-hidden="true"></span>
+        </div>
+        <label class="crop-zoom">
+          <span aria-hidden="true">－</span>
+          <input id="cropZoom" type="range" min="1" max="3" step="0.01" value="1" aria-label="头像缩放">
+          <span aria-hidden="true">＋</span>
+        </label>
+        <div class="crop-actions">
+          <button class="ghost-button" id="cancelCrop" type="button">取消裁剪</button>
+          <button class="primary-button" id="applyCrop" type="button">使用此裁剪</button>
+        </div>
+      </section>
+      <fieldset class="profile-theme-section">
+        <legend>头像板块样式</legend>
+        <p>选择颜色、图案与整体气质</p>
+        <div class="profile-theme-options" id="profileThemeOptions"></div>
+      </fieldset>
+      <fieldset class="profile-color-section">
+        <legend>字体颜色</legend>
+        <div class="profile-color-options" id="profileColorOptions"></div>
+      </fieldset>
+      <label class="field"><span>昵称（显示在头像下方）</span><input id="nicknameInput" maxlength="12" required></label>
+      <label class="field"><span>我最想说的一句话</span><input id="quoteInput" maxlength="30" required></label>
+      <label class="field preset-field">
+        <span>从题目库选择</span>
+        <select id="quotePreset"><option value="">选择一句喜欢的话</option></select>
+      </label>
+      <label class="field"><span>一句自我介绍</span><textarea id="bioInput" rows="3" maxlength="80" required></textarea></label>
+      <label class="field preset-field">
+        <span>从自我介绍文字库选择</span>
+        <select id="bioPreset"><option value="">选择一段自我介绍</option></select>
+      </label>
+      <div class="dialog-actions">
+        <button class="ghost-button" id="cancelProfile" type="button">取消</button>
+        <button class="primary-button" id="saveProfile" type="submit">保存资料</button>
+      </div>
+    </form>
+  </div>
+
+  <script src="data/default-data.js?v=20260725-4"></script>
+  <script src="data/demo-visitors.js?v=20260726-1"></script>
+  <script src="js/storage.js?v=20260725-5"></script>
+  <script src="js/app.js?v=20260728-6"></script>
+</body>
+</html>
