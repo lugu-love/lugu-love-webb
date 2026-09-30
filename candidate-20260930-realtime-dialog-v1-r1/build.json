@@ -1,0 +1,11 @@
+{
+  "candidateName": "candidate-20260930-realtime-dialog-v1-r1",
+  "baseline": "B7.4 Doubao Realtime Candidate",
+  "backendBasePath": "/lugu-b74",
+  "websocketPath": "/lugu-b74/ws/doubao",
+  "upstream": "wss://openspeech.bytedance.com/api/v3/duplex/realtime/dialogue",
+  "model": "1.2.6.1",
+  "characters": 7,
+  "languages": ["普通话", "四川话", "陕西话", "粤语", "东北话", "上海话", "英语"],
+  "expressionModes": ["accent", "local", "other"]
+}

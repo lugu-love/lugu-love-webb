@@ -1,0 +1,579 @@
+{
+  "version": "1.1.0-dialect-restore",
+  "provider": "doubao",
+  "model": "1.2.6.1",
+  "resource_id": "volc.speech.dialog",
+  "upstream": "wss://openspeech.bytedance.com/api/v3/duplex/realtime/dialogue",
+  "verified_at": "2026-09-28T10:00:00+08:00",
+  "verification_method": "session.create + speech_text_buffer.commit + response.output_audio.delta; generated audio duration > 0.2s",
+  "language_dimension": "independent_from_speaker; language and dialect are instruction/tts_prompt dimensions, not speaker IDs",
+  "unified_zh_audition_text": "你好，我是七星使者。很高兴在这里遇见你。今天想聊点什么？工作、生活、心里的事情，都可以慢慢说。",
+  "language_short_texts": {
+    "普通话": "你好，我是七星使者。今天天气不错，我们慢慢聊。",
+    "四川话": "今天天气巴适得很，我们慢慢摆一哈。",
+    "陕西话": "今儿个天气美得很，咱慢慢谝一谝。",
+    "粤语": "今日天气几好，我哋慢慢倾。",
+    "东北话": "今儿天儿挺不错，咱慢慢唠。",
+    "上海话": "今朝天气蛮好，我伲慢慢讲。",
+    "英语": "Hello, I am one of the Seven Star Messengers. We can take our time and talk."
+  },
+  "verified_voice_count": 26,
+  "full_language_matrix_voice_count": 16,
+  "voices": [
+    {
+      "speaker": "zh_female_vv_jupiter_bigtts",
+      "label": "vv｜年轻女声·清透自然",
+      "categories": [
+        "female",
+        "young",
+        "clear",
+        "neutral-leaning"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": true,
+      "quality_status": "pending_human_audition",
+      "language_support": {
+        "普通话": true,
+        "四川话": true,
+        "陕西话": true,
+        "粤语": true,
+        "东北话": true,
+        "上海话": true,
+        "英语": true
+      }
+    },
+    {
+      "speaker": "zh_female_xiaohe_jupiter_bigtts",
+      "label": "小何｜年轻女声·甜美活泼",
+      "categories": [
+        "female",
+        "young",
+        "sweet",
+        "lively"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": true,
+      "quality_status": "pending_human_audition",
+      "language_support": {
+        "普通话": true,
+        "四川话": true,
+        "陕西话": true,
+        "粤语": true,
+        "东北话": true,
+        "上海话": true,
+        "英语": true
+      }
+    },
+    {
+      "speaker": "zh_male_yunzhou_jupiter_bigtts",
+      "label": "云舟｜年轻男声·清爽沉稳",
+      "categories": [
+        "male",
+        "young",
+        "clear",
+        "calm"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": true,
+      "quality_status": "pending_human_audition",
+      "language_support": {
+        "普通话": true,
+        "四川话": true,
+        "陕西话": true,
+        "粤语": true,
+        "东北话": true,
+        "上海话": true,
+        "英语": true
+      }
+    },
+    {
+      "speaker": "zh_male_xiaotian_jupiter_bigtts",
+      "label": "小天｜年轻男声·磁性温暖",
+      "categories": [
+        "male",
+        "young",
+        "magnetic",
+        "warm"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": true,
+      "quality_status": "pending_human_audition",
+      "language_support": {
+        "普通话": true,
+        "四川话": true,
+        "陕西话": true,
+        "粤语": true,
+        "东北话": true,
+        "上海话": true,
+        "英语": true
+      }
+    },
+    {
+      "speaker": "saturn_zh_female_bingjiaojiejie_tob",
+      "label": "SC2.0 中文扩展音色｜已验证可生成，本轮未进入角色候选",
+      "categories": [
+        "chinese-expansion",
+        "not_in_curated_pool"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": false,
+      "quality_status": "pending_human_audition"
+    },
+    {
+      "speaker": "saturn_zh_female_keainvsheng_tob",
+      "label": "可爱女生｜轻快年轻女声",
+      "categories": [
+        "female",
+        "young",
+        "light",
+        "playful"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": true,
+      "quality_status": "pending_human_audition",
+      "language_support": {
+        "普通话": true,
+        "四川话": true,
+        "陕西话": true,
+        "粤语": true,
+        "东北话": true,
+        "上海话": true,
+        "英语": true
+      }
+    },
+    {
+      "speaker": "saturn_zh_female_nuanxinxuejie_tob",
+      "label": "暖心学姐｜自然亲和女声",
+      "categories": [
+        "female",
+        "young",
+        "warm",
+        "natural"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": true,
+      "quality_status": "pending_human_audition",
+      "language_support": {
+        "普通话": true,
+        "四川话": true,
+        "陕西话": true,
+        "粤语": true,
+        "东北话": true,
+        "上海话": true,
+        "英语": true
+      }
+    },
+    {
+      "speaker": "saturn_zh_female_tiexinnvyou_tob",
+      "label": "贴心女友｜年轻女性·亲和自然",
+      "categories": [
+        "female",
+        "young",
+        "warm",
+        "companion"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": true,
+      "quality_status": "pending_human_audition",
+      "language_support": {
+        "普通话": true,
+        "四川话": true,
+        "陕西话": true,
+        "粤语": true,
+        "东北话": true,
+        "上海话": true,
+        "英语": true
+      }
+    },
+    {
+      "speaker": "saturn_zh_female_wenrouwenya_tob",
+      "label": "温柔文雅｜柔和清透女声",
+      "categories": [
+        "female",
+        "young",
+        "gentle",
+        "clear"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": true,
+      "quality_status": "pending_human_audition",
+      "language_support": {
+        "普通话": true,
+        "四川话": true,
+        "陕西话": true,
+        "粤语": true,
+        "东北话": true,
+        "上海话": true,
+        "英语": true
+      }
+    },
+    {
+      "speaker": "saturn_zh_female_wumeiyujie_tob",
+      "label": "SC2.0 中文扩展音色｜已验证可生成，本轮未进入角色候选",
+      "categories": [
+        "chinese-expansion",
+        "not_in_curated_pool"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": false,
+      "quality_status": "pending_human_audition"
+    },
+    {
+      "speaker": "saturn_zh_female_xingganyujie_tob",
+      "label": "SC2.0 中文扩展音色｜已验证可生成，本轮未进入角色候选",
+      "categories": [
+        "chinese-expansion",
+        "not_in_curated_pool"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": false,
+      "quality_status": "pending_human_audition"
+    },
+    {
+      "speaker": "saturn_zh_male_aiqilingren_tob",
+      "label": "SC2.0 中文扩展音色｜已验证可生成，本轮未进入角色候选",
+      "categories": [
+        "chinese-expansion",
+        "not_in_curated_pool"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": false,
+      "quality_status": "pending_human_audition"
+    },
+    {
+      "speaker": "saturn_zh_male_aojiaogongzi_tob",
+      "label": "SC2.0 中文扩展音色｜已验证可生成，本轮未进入角色候选",
+      "categories": [
+        "chinese-expansion",
+        "not_in_curated_pool"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": false,
+      "quality_status": "pending_human_audition"
+    },
+    {
+      "speaker": "saturn_zh_male_aojiaojingying_tob",
+      "label": "傲娇精英｜清爽年轻男声",
+      "categories": [
+        "male",
+        "young",
+        "clear",
+        "trendy"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": true,
+      "quality_status": "pending_human_audition",
+      "language_support": {
+        "普通话": true,
+        "四川话": true,
+        "陕西话": true,
+        "粤语": true,
+        "东北话": true,
+        "上海话": true,
+        "英语": true
+      }
+    },
+    {
+      "speaker": "saturn_zh_male_aomanshaoye_tob",
+      "label": "SC2.0 中文扩展音色｜已验证可生成，本轮未进入角色候选",
+      "categories": [
+        "chinese-expansion",
+        "not_in_curated_pool"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": false,
+      "quality_status": "pending_human_audition"
+    },
+    {
+      "speaker": "saturn_zh_male_badaoshaoye_tob",
+      "label": "SC2.0 中文扩展音色｜已验证可生成，本轮未进入角色候选",
+      "categories": [
+        "chinese-expansion",
+        "not_in_curated_pool"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": false,
+      "quality_status": "pending_human_audition"
+    },
+    {
+      "speaker": "saturn_zh_male_bingjiaobailian_tob",
+      "label": "SC2.0 中文扩展音色｜已验证可生成，本轮未进入角色候选",
+      "categories": [
+        "chinese-expansion",
+        "not_in_curated_pool"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": false,
+      "quality_status": "pending_human_audition"
+    },
+    {
+      "speaker": "saturn_zh_male_bujiqingnian_tob",
+      "label": "不羁青年｜年轻中性偏男声",
+      "categories": [
+        "male",
+        "young",
+        "neutral-leaning",
+        "lively"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": true,
+      "quality_status": "pending_human_audition",
+      "language_support": {
+        "普通话": true,
+        "四川话": true,
+        "陕西话": true,
+        "粤语": true,
+        "东北话": true,
+        "上海话": true,
+        "英语": true
+      }
+    },
+    {
+      "speaker": "saturn_zh_male_chengshuzongcai_tob",
+      "label": "SC2.0 中文扩展音色｜已验证可生成，本轮未进入角色候选",
+      "categories": [
+        "chinese-expansion",
+        "not_in_curated_pool"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": false,
+      "quality_status": "pending_human_audition"
+    },
+    {
+      "speaker": "saturn_zh_male_cixingnansang_tob",
+      "label": "磁性男嗓｜厚实温暖男声",
+      "categories": [
+        "male",
+        "young-adult",
+        "magnetic",
+        "warm"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": true,
+      "quality_status": "pending_human_audition",
+      "language_support": {
+        "普通话": true,
+        "四川话": true,
+        "陕西话": true,
+        "粤语": true,
+        "东北话": true,
+        "上海话": true,
+        "英语": true
+      }
+    },
+    {
+      "speaker": "saturn_zh_male_cujingnanyou_tob",
+      "label": "粗犷男音｜厚实低压男声",
+      "categories": [
+        "male",
+        "young-adult",
+        "thick",
+        "low"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": true,
+      "quality_status": "pending_human_audition",
+      "language_support": {
+        "普通话": true,
+        "四川话": true,
+        "陕西话": true,
+        "粤语": true,
+        "东北话": true,
+        "上海话": true,
+        "英语": true
+      }
+    },
+    {
+      "speaker": "saturn_zh_male_fengfashaonian_tob",
+      "label": "风发少年｜清澈青年男声",
+      "categories": [
+        "male",
+        "young",
+        "clear",
+        "youthful"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": true,
+      "quality_status": "pending_human_audition",
+      "language_support": {
+        "普通话": true,
+        "四川话": true,
+        "陕西话": true,
+        "粤语": true,
+        "东北话": true,
+        "上海话": true,
+        "英语": true
+      }
+    },
+    {
+      "speaker": "saturn_zh_male_fuheigongzi_tob",
+      "label": "SC2.0 中文扩展音色｜已验证可生成，本轮未进入角色候选",
+      "categories": [
+        "chinese-expansion",
+        "not_in_curated_pool"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": false,
+      "quality_status": "pending_human_audition"
+    },
+    {
+      "speaker": "en_male_tim_uranus_bigtts",
+      "label": "英语系统音色｜身份参考，不默认分配给七使者的中文声音",
+      "categories": [
+        "english-system-reference"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": true,
+      "quality_status": "pending_human_audition",
+      "language_support": {
+        "普通话": true,
+        "四川话": true,
+        "陕西话": true,
+        "粤语": true,
+        "东北话": true,
+        "上海话": true,
+        "英语": true
+      }
+    },
+    {
+      "speaker": "en_female_dacey_uranus_bigtts",
+      "label": "英语系统音色｜身份参考，不默认分配给七使者的中文声音",
+      "categories": [
+        "english-system-reference"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": true,
+      "quality_status": "pending_human_audition",
+      "language_support": {
+        "普通话": true,
+        "四川话": true,
+        "陕西话": true,
+        "粤语": true,
+        "东北话": true,
+        "上海话": true,
+        "英语": true
+      }
+    },
+    {
+      "speaker": "en_female_stokie_uranus_bigtts",
+      "label": "英语系统音色｜身份参考，不默认分配给七使者的中文声音",
+      "categories": [
+        "english-system-reference"
+      ],
+      "tts_verified": true,
+      "language_matrix_tested": true,
+      "quality_status": "pending_human_audition",
+      "language_support": {
+        "普通话": true,
+        "四川话": true,
+        "陕西话": true,
+        "粤语": true,
+        "东北话": true,
+        "上海话": true,
+        "英语": true
+      }
+    }
+  ],
+  "excluded_after_live_probe": [
+    {
+      "speaker": "saturn_zh_female_aojiaonvyou_tob",
+      "reason": "timeout on current 1.2.6.1 probe; not used in UI"
+    },
+    {
+      "speaker": "saturn_zh_female_chengshujiejie_tob",
+      "reason": "timeout on current 1.2.6.1 probe; not used in UI"
+    }
+  ],
+  "notes": [
+    "This is an audition catalog, not a final casting decision.",
+    "All listed successful calls produced real PCM audio; actual emotional fit, accent quality and long-chat fatigue still require human listening.",
+    "The current B74 main dialogue speaker remains zh_female_vv_jupiter_bigtts until a human explicitly applies a candidate in the audition panel."
+  ],
+  "default_preset_v1": {
+    "id": "seven-messenger-default-voice-v1",
+    "status": "candidate_default_v1",
+    "selected_by": "human_audition_round_1",
+    "frozen": false,
+    "defaults": {
+      "fengxin-rabbit": "zh_female_vv_jupiter_bigtts",
+      "xinguang-fox": "saturn_zh_female_tiexinnvyou_tob",
+      "xingyu-deer": "saturn_zh_male_fengfashaonian_tob",
+      "nuanshan-bear": "saturn_zh_male_bujiqingnian_tob",
+      "yunqi-koala": "saturn_zh_female_nuanxinxuejie_tob",
+      "lingyao-monkey": "zh_male_xiaotian_jupiter_bigtts",
+      "xuanxing-cat": "saturn_zh_female_wenrouwenya_tob"
+    },
+    "note": "Candidate 第一版默认测试声音；2026-09-28 对换暖山熊与凌遥猴默认 speaker。"
+  },
+  "language_voice_channels": {
+    "version": "1.0.0",
+    "principle": "language_mode controls oral expression; voice_channel controls the actual TTS identity; World Knowledge facts are unchanged",
+    "channels": {
+      "普通话": {
+        "mode": "character_speaker",
+        "provider": "doubao",
+        "status": "character_default"
+      },
+      "四川话": {
+        "mode": "native_dialect",
+        "provider": "qwen3-tts",
+        "status": "restored",
+        "voices": {
+          "female": "Sunny",
+          "male": "Eric"
+        },
+        "source": "historical Voice V1.1"
+      },
+      "陕西话": {
+        "mode": "native_dialect",
+        "provider": "qwen3-tts",
+        "status": "partial",
+        "voices": {
+          "female": null,
+          "male": "Marcus"
+        },
+        "source": "historical Voice V1.1"
+      },
+      "粤语": {
+        "mode": "native_dialect",
+        "provider": "qwen3-tts",
+        "status": "restored",
+        "voices": {
+          "female": "Kiki",
+          "male": "Rocky"
+        },
+        "source": "historical Voice V1.1"
+      },
+      "东北话": {
+        "mode": "native_dialect",
+        "provider": "cosyvoice",
+        "status": "partial",
+        "voices": {
+          "female": null,
+          "male": "longlaotie_v3"
+        },
+        "source": "historical Voice V1.1"
+      },
+      "上海话": {
+        "mode": "native_dialect",
+        "provider": "qwen3-tts",
+        "status": "partial",
+        "voices": {
+          "female": "Jada",
+          "male": null
+        },
+        "source": "historical Voice V1.1"
+      },
+      "英语": {
+        "mode": "character_speaker",
+        "provider": "doubao",
+        "status": "unchanged"
+      }
+    },
+    "notes": [
+      "普通话和英语继续使用每位使者自己的 Doubao speaker。",
+      "方言有对应性别原生声道时，使用历史 Qwen3-TTS/CosyVoice voice channel；没有的性别槽位保持空值。",
+      "方言文本仍由同一豆包对话上下文生成，事实与世界知识不变。"
+    ]
+  }
+}
