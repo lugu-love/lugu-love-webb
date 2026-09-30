@@ -7,13 +7,13 @@
   <meta name="lugu-baseline-commit" content="b8308838b961ace9d281fd78c542ccfa496b5cdf">
   <meta name="theme-color" content="#080912">
   <title>Frontstage Player V1 · 风信兔</title>
-  <link rel="stylesheet" href="frontstage-player.css">
+  <link rel="stylesheet" href="frontstage-player.css?v=f5a3b69">
 </head>
 <body>
   <main id="player-root" aria-label="七星使者前场播放器"></main>
   <script type="module">
-    import { FrontstagePlayer, PLAYER_STATES } from "./frontstage-player.js";
-    import { DEFAULT_ITEM_ID, getRegisteredItem } from "./frontstage-registry.js";
+    import { FrontstagePlayer, PLAYER_STATES } from "./frontstage-player.js?v=f5a3b69";
+    import { DEFAULT_ITEM_ID, getRegisteredItem } from "./frontstage-registry.js?v=f5a3b69";
 
     const params = new URLSearchParams(location.search);
     const itemId = params.get("item") || DEFAULT_ITEM_ID;
