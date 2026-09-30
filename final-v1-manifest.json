@@ -20,5 +20,5 @@
       "service": "lugu-send.service"
     }
   },
-  "rollback": "b8308838b961ace9d281fd78c542ccfa496b5cdf"
+  "rollback": "e086a35"
 }
