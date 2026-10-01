@@ -21,6 +21,8 @@ window.__B74_REGISTRY_URL = "./characters.v1.json";
 </script>
 <script type="module">
 import "./b74-candidate.js?v=1";
+const requestedCharacter = new URLSearchParams(location.search).get("character") || "yunqi-koala";
+window.__b74Ready?.then(() => window.__b74SelectCharacter?.(requestedCharacter));
 const button = document.getElementById("b74-embed-start");
 button.hidden = true;
 let starting = false;
@@ -29,8 +31,6 @@ async function start() {
   starting = true;
   button.hidden = true;
   await (window.__b74Ready || Promise.resolve());
-  const requestedCharacter = new URLSearchParams(location.search).get('character') || 'yunqi-koala';
-  window.__b74SelectCharacter?.(requestedCharacter);
   const ok = await window.__b74OpenFaceToFace?.();
   if (!ok) {
     button.hidden = false;

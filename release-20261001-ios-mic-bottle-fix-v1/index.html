@@ -4757,13 +4757,18 @@ function prepareFrontstageRealtimeFrame() {
   frame.style.cssText = 'flex:1;width:100%;height:100%;border:0;background:#020407;display:block;';
   frame.src = new URL('b74-embed.html?character=' + encodeURIComponent(frontstageRealtimeCharacterId()), location.href).href;
   frame.addEventListener('load', function(){
-    frontstageRealtimeFrameReady = true;
-    try { frame.contentWindow.__b74SelectCharacter?.(frontstageRealtimeCharacterId()); } catch (error) {}
     styleFrontstageRealtimeFrame(frame);
-    if (frontstageRealtimeHold && !frontstageRealtimeEntry && !frontstageRealtimeOverlayVisible) {
-      clearTimeout(frontstageRealtimeEntryTimer);
-      frontstageRealtimeEntryTimer = setTimeout(showFrontstageRealtimeEntry, 120);
-    }
+    const markReady = function(){
+      frontstageRealtimeFrameReady = true;
+      try { frame.contentWindow.__b74SelectCharacter?.(frontstageRealtimeCharacterId()); } catch (error) {}
+      if (frontstageRealtimeHold && !frontstageRealtimeEntry && !frontstageRealtimeOverlayVisible) {
+        clearTimeout(frontstageRealtimeEntryTimer);
+        frontstageRealtimeEntryTimer = setTimeout(showFrontstageRealtimeEntry, 120);
+      }
+    };
+    const registryReady = frame.contentWindow && frame.contentWindow.__b74Ready;
+    if (registryReady && typeof registryReady.then === 'function') registryReady.then(markReady, markReady);
+    else setTimeout(markReady, 250);
   });
   overlay.querySelector('.fr-overlay-close').addEventListener('click', function(){ closeFrontstageRealtimeOverlay(false); });
   overlay.appendChild(frame);
@@ -4838,7 +4843,7 @@ function openFrontstageRealtimeOverlay() {
   frontstageAudioWasEnabled = window.earthMusicEnabled;
   window.earthMusicEnabled = false;
   clearInterval(frontstageRealtimeAudioGuard);
-  frontstageRealtimeAudioGuard = setInterval(function(){ if (!frontstageRealtimeOverlayVisible) return; try { stopEarthEffects(); stopMusic({ immediate: true }); stopVoiceMusic({ immediate: true }); if (sourceVideo) { sourceVideo.loop = true; if (sourceVideo.paused) sourceVideo.play().catch(function(){}); } } catch (error) {} }, 1000);
+  frontstageRealtimeAudioGuard = setInterval(function(){ if (!frontstageRealtimeOverlayVisible) return; try { stopEarthEffects(); stopMusic({ immediate: true }); stopVoiceMusic({ immediate: true }); if (sourceVideo) { sourceVideo.loop = true; sourceVideo.setAttribute("loop", ""); if (sourceVideo.paused) sourceVideo.play().catch(function(){}); } } catch (error) {} }, 1000);
   try { clearInterval(musicKeeperTimer); musicSeenPlaying = false; } catch (error) {}
   try { stopEarthEffects(); } catch (error) {}
   try { stopMusic({ immediate: true }); } catch (error) {}
@@ -4848,7 +4853,7 @@ function openFrontstageRealtimeOverlay() {
   frontstageRealtimeOverlayVisible = true;
   hideFrontstageRealtimeEntry();
   styleFrontstageRealtimeFrame(frontstageRealtimeFrame);
-  try { if (sourceVideo) { sourceVideo.loop = true; if (sourceVideo.paused) sourceVideo.play().catch(function(){}); } } catch (error) {}
+  try { if (sourceVideo) { sourceVideo.loop = true; sourceVideo.setAttribute("loop", ""); if (sourceVideo.paused) sourceVideo.play().catch(function(){}); } } catch (error) {}
   const child = frontstageRealtimeFrame.contentWindow;
   try {
     child.__b74SelectCharacter?.(frontstageRealtimeCharacterId());
