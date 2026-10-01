@@ -450,11 +450,13 @@ function flushAudioQueue() {
 async function initializeAudio() {
   if (!state.audioCtx) state.audioCtx = new AudioContext({ latencyHint: 'interactive' });
   await state.audioCtx.resume();
-  if (!state.mediaStream) {
+  const usableStream = state.mediaStream && state.mediaStream.getAudioTracks().some(track => track.readyState === "live");
+  if (!usableStream) {
     state.mediaStream = await navigator.mediaDevices.getUserMedia({
       audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true },
     });
   }
+  for (const track of state.mediaStream.getAudioTracks()) track.enabled = true;
   if (!state.sourceNode) {
     state.sourceNode = state.audioCtx.createMediaStreamSource(state.mediaStream);
     state.processor = state.audioCtx.createScriptProcessor(2048, 1, 1);
@@ -485,8 +487,7 @@ function stopAudioCapture() {
   state.sourceNode = null;
   state.processor = null;
   state.sinkGain = null;
-  if (state.mediaStream) for (const track of state.mediaStream.getTracks()) track.stop();
-  state.mediaStream = null;
+  if (state.mediaStream) for (const track of state.mediaStream.getAudioTracks()) track.enabled = false;
 }
 
 function sendClientMetric(name, value) {
@@ -1088,5 +1089,11 @@ window.__b74SelectCharacter = function(characterId) {
   return true;
 };
 
-window.addEventListener('pagehide', () => { stopVideoLayer(); sendClose(); });
+function releaseMicrophone() {
+  if (!state.mediaStream) return;
+  for (const track of state.mediaStream.getTracks()) track.stop();
+  state.mediaStream = null;
+}
+
+window.addEventListener('pagehide', () => { stopVideoLayer(); sendClose(); releaseMicrophone(); });
 window.addEventListener('offline', sendClose);
