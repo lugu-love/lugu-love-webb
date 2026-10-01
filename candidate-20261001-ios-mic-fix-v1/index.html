@@ -3451,6 +3451,7 @@ color: rgba(212, 226, 250, .62);
 #frontstageRealtimeOverlay .fr-overlay-copy span{display:block;margin-top:3px;color:rgba(255,255,255,.58);font-size:11px}
 #frontstageRealtimeOverlay .fr-overlay-close{min-height:40px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;font:500 13px/1 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;white-space:nowrap}
 #frontstageRealtimeOverlay iframe{flex:1;width:100%;border:0;background:#020407}
+html.frontstage-realtime-active .voice-letter,html.frontstage-realtime-active .voice-bottle-replay-hint{display:none!important}
 </style>
 </head>
 <body>
@@ -4849,6 +4850,7 @@ function openFrontstageRealtimeOverlay() {
   try { stopMusic({ immediate: true }); } catch (error) {}
   try { stopVoiceMusic({ immediate: true }); } catch (error) {}
   window.addEventListener('message', onFrontstageRealtimeMessage);
+  document.documentElement.classList.add('frontstage-realtime-active');
   frontstageRealtimeOverlay.style.display = 'flex';
   frontstageRealtimeOverlayVisible = true;
   hideFrontstageRealtimeEntry();
@@ -4868,6 +4870,7 @@ function closeFrontstageRealtimeOverlay(skip) {
   clearInterval(frontstageRealtimeAudioGuard);
   frontstageRealtimeAudioGuard = 0;
   if (frontstageAudioWasEnabled !== null) { window.earthMusicEnabled = frontstageAudioWasEnabled; frontstageAudioWasEnabled = null; }
+  document.documentElement.classList.remove('frontstage-realtime-active');
   if (frontstageRealtimeOverlay) frontstageRealtimeOverlay.style.display = 'none';
   frontstageRealtimeOverlayVisible = false;
   hideFrontstageRealtimeEntry();
@@ -4880,6 +4883,7 @@ function closeFrontstageRealtimeOverlay(skip) {
 }
 
 function cleanupFrontstageRealtimeFlow() {
+  document.documentElement.classList.remove('frontstage-realtime-active');
   hideFrontstageRealtimeEntry();
   clearInterval(frontstageRealtimeAudioGuard);
   frontstageRealtimeAudioGuard = 0;
