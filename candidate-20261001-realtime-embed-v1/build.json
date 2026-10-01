@@ -1,0 +1,18 @@
+{
+  "releaseId": "release-20260912-03",
+  "buildId": "release-20260912-03",
+  "manifestVersion": "20260912-03-c1",
+  "manifestSha256": "9ea902fef27168cfd9fd28d454e8557ca6eff49999cff6f4879ff06994471704",
+  "canonicalUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "releasePath": "/release-20260930-final-v1-r2/",
+  "backendBaseUrl": "https://candidate.suomaanjia.cn:8443/lugu-send",
+  "builtAt": "2026-09-30T12:30:00.000000Z",
+  "pwaEnabled": false,
+  "productionUrl": "https://lugu-love.github.io/lugu-love-webb/",
+  "baseline": "release-20260930-final-v1",
+  "baselineSource": "codex/final-v1-rc 72ab387 + production release 2a16e75",
+  "previousRelease": "release-20260920-nuanshan-bear-r1",
+  "releaseNote": "Final V1 release configuration fix: restore C send-test build contract. No A/B/C main logic changes.",
+  "frozenIndexSha256": "83df274d0fb9c460ecbe56ebbbbb9e9c5d9518ada979389fc6d21dbae2d74959",
+  "releaseName": "release-20260930-final-v1-r2"
+}
