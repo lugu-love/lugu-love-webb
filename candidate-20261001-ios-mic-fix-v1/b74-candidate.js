@@ -1080,6 +1080,13 @@ observer.observe(document.body, { childList: true, subtree: true });
 ensureTalkButton();
 window.__b74Ready = loadCharacterRegistry();
 window.__b74OpenFaceToFace = openFaceToFace;
+window.__b74SelectCharacter = function(characterId) {
+  const id = String(characterId || '').trim();
+  const profile = state.characters.find(item => item.character_id === id);
+  if (!profile) return false;
+  applyCharacter(profile);
+  return true;
+};
 
 window.addEventListener('pagehide', () => { stopVideoLayer(); sendClose(); });
 window.addEventListener('offline', sendClose);

@@ -4760,7 +4760,7 @@ function openFrontstageRealtimeOverlay() {
   try { stopVoiceMusic({ immediate: true }); } catch (error) {}
   frontstageRealtimeOverlay = document.createElement('div');
   frontstageRealtimeOverlay.id = 'frontstageRealtimeOverlay';
-  var embedUrl = new URL('b74-embed.html?autostart=1&character=fengxin-rabbit', location.href).href;
+  var embedUrl = new URL('b74-embed.html?autostart=1&character=' + encodeURIComponent(sequence?.characterId || 'yunqi-koala'), location.href).href;
   frontstageRealtimeOverlay.innerHTML = '<div class="fr-overlay-bar"><div class="fr-overlay-copy"><b>面对面实时对话</b><span>正在进入使者对话</span></div><button class="fr-overlay-close" type="button">结束对话并回瓶</button></div><iframe title="面对面实时对话" src="' + embedUrl + '" allow="microphone *; autoplay; fullscreen; camera" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>';
   frontstageRealtimeOverlay.querySelector('.fr-overlay-close').addEventListener('click', function(){ closeFrontstageRealtimeOverlay(false); });
   window.addEventListener('message', onFrontstageRealtimeMessage);

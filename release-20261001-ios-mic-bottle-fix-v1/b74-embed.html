@@ -28,6 +28,8 @@ async function start() {
   starting = true;
   button.hidden = true;
   await (window.__b74Ready || Promise.resolve());
+  const requestedCharacter = new URLSearchParams(location.search).get('character') || 'yunqi-koala';
+  window.__b74SelectCharacter?.(requestedCharacter);
   const ok = await window.__b74OpenFaceToFace?.();
   if (!ok) {
     button.hidden = false;
