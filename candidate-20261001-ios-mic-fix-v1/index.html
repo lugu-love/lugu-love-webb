@@ -5270,7 +5270,7 @@ if (rabbitStage === "large" && canvas.isConnected) expandRabbitPerformance();
 if (container) container._releaseRabbit = expandRabbitPerformance;
 if (container) container._returnRabbit = returnRabbitToBottle;
 if (container) container.addEventListener("rabbit-expanded", function(){ armFrontstageRealtimeFlow(container); });
-if (container) container.addEventListener("rabbit-returned-to-bottle", function(){ frontstageRealtimeHold = false; hideFrontstageRealtimeEntry(); });
+if (container) container.addEventListener("rabbit-returned-to-bottle", function(){ clearTimeout(bottleReleaseFallbackTimer); frontstageRealtimeHold = false; hideFrontstageRealtimeEntry(); });
 // 本候选实验开关：?nojump=1 时，兔子不跳出瓶子（不出现在屏幕中央的前场表演），
 // 整段留在瓶内原地表演，随后直接走既有的“返回小瓶 / 离场”流程。
 const noJumpExperiment = /[?&]nojump=1/.test(location.search);
@@ -6819,6 +6819,8 @@ let typeTimer = 0;
 let startTypewriter = 0;
 let cardDetachTimer = 0;
 let enlargeBottleTimer = 0;
+let bottleEnterFallbackTimer = 0;
+let bottleReleaseFallbackTimer = 0;
 let cardReturnTimer = 0;
 let collectStatusTimer = 0;
 let letterNode = null;
@@ -6840,6 +6842,8 @@ clearTimeout(cardTimer);
 clearTimeout(startTypewriter);
 clearTimeout(cardDetachTimer);
 clearTimeout(enlargeBottleTimer);
+clearTimeout(bottleEnterFallbackTimer);
+clearTimeout(bottleReleaseFallbackTimer);
 clearTimeout(cardReturnTimer);
 clearTimeout(collectStatusTimer);
 stopTyping();
@@ -7110,6 +7114,11 @@ positionCardForLargeBottle();
 // startLargeBottlePlayback belongs to that component's private scope, so it
 // must never be called from this outer bottle controller.
 bottle.dispatchEvent(new Event("fengxin-large-bottle-opened"));
+clearTimeout(bottleReleaseFallbackTimer);
+bottleReleaseFallbackTimer = setTimeout(function(){
+if (closed || !bottle?.isConnected || bottle.dataset.rabbitReleased === "1") return;
+try { bottle._releaseRabbit?.(); } catch (error) { console.warn("[bottle] release fallback failed", error); }
+}, 6500);
 }
 
 bottle.addEventListener("click", (event) => {
@@ -7164,6 +7173,11 @@ bottleCharacter,
 (arriveSeconds + .32) * 1000,
 2
 );
+clearTimeout(bottleEnterFallbackTimer);
+bottleEnterFallbackTimer = setTimeout(function(){
+if (closed || !bottle?.isConnected || bottle.dataset.rabbitReleased === "1" || Number(bottle.dataset.zoomLevel || 0) !== 0) return;
+enterLargeBottle();
+}, 9000);
 }
 
 letterNode = bottle.querySelector(".voice-letter");

@@ -1,9 +1,12 @@
-# iPhone Mic Fix V1 Candidate
+# iOS Mic + Bottle Exit Fix Candidate
 
-修复 iPhone Safari 在面对面 iframe 中一直等待麦克风的问题。
+修复：
 
-- iframe 显式放开 `microphone *`。
-- iPhone/Safari 不自动调用 `getUserMedia`。
-- 显示“点击开启麦克风并开始对话”，由用户手势触发麦克风授权。
-- 非 iPhone 仍保持自动进入对话。
-- 不修改 A 出瓶、C 生成和 Huawei 下载链路。
+- iPhone Safari 面对面 iframe 一直等待麦克风。
+- 首页部分设备/媒体状态下使者停在瓶内不出瓶。
+
+边界：
+
+- 不修改 C 生成链路。
+- 不继续 Huawei 下载热修复。
+- 不切换正式入口。
