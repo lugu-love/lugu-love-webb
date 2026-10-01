@@ -22,6 +22,7 @@ window.__B74_REGISTRY_URL = "./characters.v1.json";
 <script type="module">
 import "./b74-candidate.js?v=1";
 const button = document.getElementById("b74-embed-start");
+button.hidden = true;
 let starting = false;
 async function start() {
   if (starting) return;
@@ -37,15 +38,14 @@ async function start() {
   }
 }
 button.addEventListener("click", start);
-const ua = navigator.userAgent || "";
-const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-if (new URLSearchParams(location.search).get("autostart") === "1" && !isIOS) {
-  await (window.__b74Ready || Promise.resolve());
-  setTimeout(start, 350);
-} else if (isIOS) {
-  button.textContent = "点击开启麦克风并开始对话";
-  button.hidden = false;
-}
+setTimeout(() => {
+  const face = document.querySelector("#b74-face-layer");
+  const status = document.querySelector("#b74-face-status")?.textContent || "";
+  if (!face || face.hidden || /需要麦克风/.test(status)) {
+    button.textContent = "点击开启麦克风并开始对话";
+    button.hidden = false;
+  }
+}, 2500);
 </script>
 </body>
 </html>

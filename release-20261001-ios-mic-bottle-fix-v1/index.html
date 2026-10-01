@@ -4721,9 +4721,16 @@ let frontstageRealtimeEntryTimer = 0;
 let frontstageRealtimeEntryPositionTimer = 0;
 let frontstageRealtimeEntry = null;
 let frontstageRealtimeOverlay = null;
+let frontstageRealtimeFrame = null;
+let frontstageRealtimeFrameReady = false;
+let frontstageRealtimeOverlayVisible = false;
 let frontstageReturnHook = null;
 let frontstageRealtimeAudioGuard = 0;
 let frontstageAudioWasEnabled = null;
+
+function frontstageRealtimeCharacterId() {
+  return sequence?.characterId || 'yunqi-koala';
+}
 
 function hideFrontstageRealtimeEntry() {
   clearTimeout(frontstageRealtimeEntryTimer);
@@ -4736,8 +4743,42 @@ function hideFrontstageRealtimeEntry() {
   }
 }
 
+function prepareFrontstageRealtimeFrame() {
+  if (frontstageRealtimeFrame && frontstageRealtimeOverlay) return;
+  const overlay = document.createElement('div');
+  overlay.id = 'frontstageRealtimeOverlay';
+  overlay.style.display = 'none';
+  overlay.innerHTML = '<div class="fr-overlay-bar"><div class="fr-overlay-copy"><b>面对面实时对话</b><span>正在进入使者对话</span></div><button class="fr-overlay-close" type="button">结束对话并回瓶</button></div>';
+  const frame = document.createElement('iframe');
+  frame.id = 'frontstageRealtimeFrame';
+  frame.title = '面对面实时对话';
+  frame.allow = 'microphone *; autoplay; fullscreen; camera';
+  frame.setAttribute('allowfullscreen', '');
+  frame.style.cssText = 'flex:1;width:100%;height:100%;border:0;background:#020407;display:block;';
+  frame.src = new URL('b74-embed.html?character=' + encodeURIComponent(frontstageRealtimeCharacterId()), location.href).href;
+  frame.addEventListener('load', function(){
+    frontstageRealtimeFrameReady = true;
+    try { frame.contentWindow.__b74SelectCharacter?.(frontstageRealtimeCharacterId()); } catch (error) {}
+    if (frontstageRealtimeHold && !frontstageRealtimeEntry && !frontstageRealtimeOverlayVisible) {
+      clearTimeout(frontstageRealtimeEntryTimer);
+      frontstageRealtimeEntryTimer = setTimeout(showFrontstageRealtimeEntry, 120);
+    }
+  });
+  overlay.querySelector('.fr-overlay-close').addEventListener('click', function(){ closeFrontstageRealtimeOverlay(false); });
+  overlay.appendChild(frame);
+  document.body.appendChild(overlay);
+  frontstageRealtimeOverlay = overlay;
+  frontstageRealtimeFrame = frame;
+  frontstageRealtimeOverlayVisible = false;
+}
+
 function showFrontstageRealtimeEntry() {
-  if (frontstageRealtimeEntry || frontstageRealtimeOverlay) return;
+  if (frontstageRealtimeEntry || frontstageRealtimeOverlayVisible) return;
+  if (!frontstageRealtimeFrameReady) {
+    clearTimeout(frontstageRealtimeEntryTimer);
+    frontstageRealtimeEntryTimer = setTimeout(showFrontstageRealtimeEntry, 150);
+    return;
+  }
   frontstageRealtimeEntry = document.createElement('div');
   frontstageRealtimeEntry.id = 'frontstageRealtimeEntry';
   frontstageRealtimeEntry.innerHTML = '<button type="button" data-fr-talk>聊一聊呗</button><button type="button" class="fr-skip" data-fr-skip aria-label="先回瓶">×</button>';
@@ -4768,24 +4809,32 @@ function onFrontstageRealtimeMessage(event) {
 }
 
 function openFrontstageRealtimeOverlay() {
-  if (frontstageRealtimeOverlay) return;
+  if (frontstageRealtimeOverlayVisible) return;
+  if (!frontstageRealtimeFrameReady || !frontstageRealtimeFrame || !frontstageRealtimeOverlay) {
+    prepareFrontstageRealtimeFrame();
+    setTimeout(openFrontstageRealtimeOverlay, 120);
+    return;
+  }
   frontstageRealtimeHold = true;
   frontstageAudioWasEnabled = window.earthMusicEnabled;
   window.earthMusicEnabled = false;
   clearInterval(frontstageRealtimeAudioGuard);
-  frontstageRealtimeAudioGuard = setInterval(function(){ if (!frontstageRealtimeOverlay) return; try { stopEarthEffects(); stopMusic({ immediate: true }); stopVoiceMusic({ immediate: true }); } catch (error) {} }, 1000);
+  frontstageRealtimeAudioGuard = setInterval(function(){ if (!frontstageRealtimeOverlayVisible) return; try { stopEarthEffects(); stopMusic({ immediate: true }); stopVoiceMusic({ immediate: true }); } catch (error) {} }, 1000);
   try { clearInterval(musicKeeperTimer); musicSeenPlaying = false; } catch (error) {}
   try { stopEarthEffects(); } catch (error) {}
   try { stopMusic({ immediate: true }); } catch (error) {}
   try { stopVoiceMusic({ immediate: true }); } catch (error) {}
-  frontstageRealtimeOverlay = document.createElement('div');
-  frontstageRealtimeOverlay.id = 'frontstageRealtimeOverlay';
-  var embedUrl = new URL('b74-embed.html?autostart=1&character=' + encodeURIComponent(sequence?.characterId || 'yunqi-koala'), location.href).href;
-  frontstageRealtimeOverlay.innerHTML = '<div class="fr-overlay-bar"><div class="fr-overlay-copy"><b>面对面实时对话</b><span>正在进入使者对话</span></div><button class="fr-overlay-close" type="button">结束对话并回瓶</button></div><iframe title="面对面实时对话" src="' + embedUrl + '" allow="microphone *; autoplay; fullscreen; camera" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>';
-  frontstageRealtimeOverlay.querySelector('.fr-overlay-close').addEventListener('click', function(){ closeFrontstageRealtimeOverlay(false); });
   window.addEventListener('message', onFrontstageRealtimeMessage);
-  document.body.appendChild(frontstageRealtimeOverlay);
+  frontstageRealtimeOverlay.style.display = 'flex';
+  frontstageRealtimeOverlayVisible = true;
   hideFrontstageRealtimeEntry();
+  const child = frontstageRealtimeFrame.contentWindow;
+  try {
+    child.__b74SelectCharacter?.(frontstageRealtimeCharacterId());
+    child.__b74OpenFaceToFace?.();
+  } catch (error) {
+    console.warn('[frontstage-realtime] start failed', error);
+  }
 }
 
 function closeFrontstageRealtimeOverlay(skip) {
@@ -4793,10 +4842,8 @@ function closeFrontstageRealtimeOverlay(skip) {
   clearInterval(frontstageRealtimeAudioGuard);
   frontstageRealtimeAudioGuard = 0;
   if (frontstageAudioWasEnabled !== null) { window.earthMusicEnabled = frontstageAudioWasEnabled; frontstageAudioWasEnabled = null; }
-  if (frontstageRealtimeOverlay) {
-    frontstageRealtimeOverlay.remove();
-    frontstageRealtimeOverlay = null;
-  }
+  if (frontstageRealtimeOverlay) frontstageRealtimeOverlay.style.display = 'none';
+  frontstageRealtimeOverlayVisible = false;
   hideFrontstageRealtimeEntry();
   frontstageRealtimeHold = false;
   if (frontstageReturnHook) {
@@ -4806,13 +4853,31 @@ function closeFrontstageRealtimeOverlay(skip) {
   }
 }
 
+function cleanupFrontstageRealtimeFlow() {
+  hideFrontstageRealtimeEntry();
+  clearInterval(frontstageRealtimeAudioGuard);
+  frontstageRealtimeAudioGuard = 0;
+  if (frontstageRealtimeOverlay) {
+    frontstageRealtimeOverlay.remove();
+    frontstageRealtimeOverlay = null;
+  }
+  frontstageRealtimeFrame = null;
+  frontstageRealtimeFrameReady = false;
+  frontstageRealtimeOverlayVisible = false;
+  frontstageRealtimeHold = false;
+  frontstageReturnHook = null;
+  frontstageAudioWasEnabled = null;
+}
+
 function armFrontstageRealtimeFlow(bottleNode) {
   frontstageRealtimeHold = true;
   frontstageReturnHook = function(options){ return bottleNode && bottleNode._returnRabbit ? bottleNode._returnRabbit(options) : false; };
+  prepareFrontstageRealtimeFrame();
   clearTimeout(frontstageRealtimeEntryTimer);
   frontstageRealtimeEntryTimer = setTimeout(showFrontstageRealtimeEntry, 3600);
 }
 
+window.__frontstageRealtimeCleanup = cleanupFrontstageRealtimeFlow;
 function returnRabbitToBottle({ becomeStarAtBottle = false, force = false } = {}) {
   if (frontstageRealtimeHold && !force) { showFrontstageRealtimeEntry(); return; }
 if (!canvas.isConnected || canvas.dataset.exiting === "1" || (rabbitStage !== "expanded" && rabbitStage !== "finished")) return;
@@ -6821,7 +6886,8 @@ if (!activeVoiceExperience) return null;
 return activeVoiceExperience.close();
 }
 
-function openVoiceBottle(star){if(star.clicked)return;const outgoingExit=closeActiveVoiceExperience();const handoffDelay=outgoingExit ? 600 : 450;const beganSoundSession=!earthSoundUnlocked;unlockEarthSounds();dismissTouchGuide();stopMusic();if(!beganSoundSession){const primedVoiceAudio=startVoiceMusic({startSilent:true});playStarClickSound(()=>revealVoiceMusic(primedVoiceAudio));}else{scheduleVoiceMusicStart();}unlockTypingKeySounds();star.clicked=true;star.element.classList.add("is-touched");
+function openVoiceBottle(star){if(star.clicked)return;
+try { if (typeof window.__frontstageRealtimeCleanup === 'function') window.__frontstageRealtimeCleanup(); } catch (error) {}const outgoingExit=closeActiveVoiceExperience();const handoffDelay=outgoingExit ? 600 : 450;const beganSoundSession=!earthSoundUnlocked;unlockEarthSounds();dismissTouchGuide();stopMusic();if(!beganSoundSession){const primedVoiceAudio=startVoiceMusic({startSilent:true});playStarClickSound(()=>revealVoiceMusic(primedVoiceAudio));}else{scheduleVoiceMusicStart();}unlockTypingKeySounds();star.clicked=true;star.element.classList.add("is-touched");
 
 // 点击心星是主动交互：立刻选好这一瓶的使者并开始加载它的正式视频，
 // 不再等 15 张图集，也不让用户先看到静态封面干等。
@@ -6855,6 +6921,7 @@ if (textNode) textNode.classList.remove("is-typing");
 stopTypingKeySound();
 }
 function closeCard() {
+try { if (typeof window.__frontstageRealtimeCleanup === 'function') window.__frontstageRealtimeCleanup(); } catch (error) {}
 if (closed) return closeExitPromise || Promise.resolve();
 closed = true;
 clearInterval(musicKeeperTimer);
