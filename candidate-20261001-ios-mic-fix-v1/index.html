@@ -5270,7 +5270,7 @@ if (rabbitStage === "large" && canvas.isConnected) expandRabbitPerformance();
 if (container) container._releaseRabbit = expandRabbitPerformance;
 if (container) container._returnRabbit = returnRabbitToBottle;
 if (container) container.addEventListener("rabbit-expanded", function(){ armFrontstageRealtimeFlow(container); });
-if (container) container.addEventListener("rabbit-returned-to-bottle", function(){ clearTimeout(bottleReleaseFallbackTimer); frontstageRealtimeHold = false; hideFrontstageRealtimeEntry(); });
+if (container) container.addEventListener("rabbit-returned-to-bottle", function(){ frontstageRealtimeHold = false; hideFrontstageRealtimeEntry(); });
 // 本候选实验开关：?nojump=1 时，兔子不跳出瓶子（不出现在屏幕中央的前场表演），
 // 整段留在瓶内原地表演，随后直接走既有的“返回小瓶 / 离场”流程。
 const noJumpExperiment = /[?&]nojump=1/.test(location.search);
