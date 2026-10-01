@@ -4745,6 +4745,21 @@ function hideFrontstageRealtimeEntry() {
 }
 
 function prepareFrontstageRealtimeFrame() {
+  const shared = window.__frontstageRealtimeShared;
+  if (shared && shared.frame && shared.overlay && shared.frame.isConnected && shared.overlay.isConnected) {
+    frontstageRealtimeFrame = shared.frame;
+    frontstageRealtimeOverlay = shared.overlay;
+    frontstageRealtimeFrameReady = Boolean(shared.ready);
+    styleFrontstageRealtimeFrame(frontstageRealtimeFrame);
+    if (frontstageRealtimeFrameReady) {
+      try { frontstageRealtimeFrame.contentWindow.__b74SelectCharacter?.(frontstageRealtimeCharacterId()); } catch (error) {}
+      if (frontstageRealtimeHold && !frontstageRealtimeEntry && !frontstageRealtimeOverlayVisible) {
+        clearTimeout(frontstageRealtimeEntryTimer);
+        frontstageRealtimeEntryTimer = setTimeout(showFrontstageRealtimeEntry, 120);
+      }
+    }
+    return;
+  }
   if (frontstageRealtimeFrame && frontstageRealtimeOverlay) return;
   const overlay = document.createElement('div');
   overlay.id = 'frontstageRealtimeOverlay';
@@ -4761,6 +4776,7 @@ function prepareFrontstageRealtimeFrame() {
     styleFrontstageRealtimeFrame(frame);
     const markReady = function(){
       frontstageRealtimeFrameReady = true;
+      if (window.__frontstageRealtimeShared) window.__frontstageRealtimeShared.ready = true;
       try { frame.contentWindow.__b74SelectCharacter?.(frontstageRealtimeCharacterId()); } catch (error) {}
       if (frontstageRealtimeHold && !frontstageRealtimeEntry && !frontstageRealtimeOverlayVisible) {
         clearTimeout(frontstageRealtimeEntryTimer);
@@ -4777,6 +4793,7 @@ function prepareFrontstageRealtimeFrame() {
   frontstageRealtimeOverlay = overlay;
   frontstageRealtimeFrame = frame;
   frontstageRealtimeOverlayVisible = false;
+  window.__frontstageRealtimeShared = { overlay, frame, ready: false };
 }
 
 function styleFrontstageRealtimeFrame(frame) {
@@ -4870,6 +4887,7 @@ function closeFrontstageRealtimeOverlay(skip) {
   clearInterval(frontstageRealtimeAudioGuard);
   frontstageRealtimeAudioGuard = 0;
   if (frontstageAudioWasEnabled !== null) { window.earthMusicEnabled = frontstageAudioWasEnabled; frontstageAudioWasEnabled = null; }
+  try { frontstageRealtimeFrame?.contentWindow?.__b74CloseForReuse?.(); } catch (error) {}
   document.documentElement.classList.remove('frontstage-realtime-active');
   if (frontstageRealtimeOverlay) frontstageRealtimeOverlay.style.display = 'none';
   frontstageRealtimeOverlayVisible = false;
@@ -4887,16 +4905,15 @@ function cleanupFrontstageRealtimeFlow() {
   hideFrontstageRealtimeEntry();
   clearInterval(frontstageRealtimeAudioGuard);
   frontstageRealtimeAudioGuard = 0;
-  if (frontstageRealtimeOverlay) {
-    frontstageRealtimeOverlay.remove();
-    frontstageRealtimeOverlay = null;
-  }
+  if (frontstageAudioWasEnabled !== null) { window.earthMusicEnabled = frontstageAudioWasEnabled; frontstageAudioWasEnabled = null; }
+  try { stopEarthEffects(); stopMusic({ immediate: true }); stopVoiceMusic({ immediate: true }); } catch (error) {}
+  try { frontstageRealtimeFrame?.contentWindow?.__b74CloseForReuse?.(); } catch (error) {}
+  if (frontstageRealtimeOverlay) frontstageRealtimeOverlay.style.display = 'none';
+  frontstageRealtimeOverlayVisible = false;
   frontstageRealtimeFrame = null;
   frontstageRealtimeFrameReady = false;
-  frontstageRealtimeOverlayVisible = false;
   frontstageRealtimeHold = false;
   frontstageReturnHook = null;
-  frontstageAudioWasEnabled = null;
 }
 
 function armFrontstageRealtimeFlow(bottleNode) {

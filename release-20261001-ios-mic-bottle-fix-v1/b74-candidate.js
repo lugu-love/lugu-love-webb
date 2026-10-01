@@ -112,9 +112,11 @@ function createTransition({ returning = false } = {}) {
   transitionLayer.id = 'b74-transition';
   transitionLayer.innerHTML = `<img src="${posterUrl}" alt="${state.profile?.formal_name || '云栖考拉'}">`;
   document.body.appendChild(transitionLayer);
+  const layer = transitionLayer;
   requestAnimationFrame(() => {
-    transitionLayer.classList.add('show');
-    if (!returning) setTimeout(() => transitionLayer.classList.add('zoom'), 80);
+    if (!layer || !layer.isConnected) return;
+    layer.classList.add('show');
+    if (!returning) setTimeout(() => { if (layer.isConnected) layer.classList.add('zoom'); }, 80);
   });
   return transitionLayer;
 }
@@ -1081,6 +1083,14 @@ observer.observe(document.body, { childList: true, subtree: true });
 ensureTalkButton();
 window.__b74Ready = loadCharacterRegistry();
 window.__b74OpenFaceToFace = openFaceToFace;
+window.__b74CloseForReuse = function() {
+  try { sendClose(); } catch (error) {}
+  try { stopVideoLayer(); } catch (error) {}
+  if (faceLayer) faceLayer.hidden = true;
+  document.body.classList.remove("b74-transitioning");
+  try { transitionLayer?.remove(); } catch (error) {}
+  transitionLayer = null;
+};
 window.__b74SelectCharacter = function(characterId) {
   const id = String(characterId || '').trim();
   const profile = state.characters.find(item => item.character_id === id);
