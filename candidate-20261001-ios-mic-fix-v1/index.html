@@ -4894,8 +4894,11 @@ function closeFrontstageRealtimeOverlay(skip) {
   window.removeEventListener('message', onFrontstageRealtimeMessage);
   clearInterval(frontstageRealtimeAudioGuard);
   frontstageRealtimeAudioGuard = 0;
-  if (frontstageAudioWasEnabled !== null) { window.earthMusicEnabled = frontstageAudioWasEnabled; frontstageAudioWasEnabled = null; }
+  frontstageAudioWasEnabled = null;
+  window.earthMusicEnabled = false;
+  try { clearInterval(musicKeeperTimer); musicSeenPlaying = false; stopEarthEffects(); stopMusic({ immediate: true }); stopVoiceMusic({ immediate: true }); } catch (error) {}
   if (canvas) { canvas.style.pointerEvents = frontstageRealtimeCanvasPointerEvents || ""; frontstageRealtimeCanvasPointerEvents = null; }
+  if (window.syncAudioUI) window.syncAudioUI();
   try { frontstageRealtimeFrame?.contentWindow?.__b74CloseForReuse?.(); } catch (error) {}
   document.documentElement.classList.remove('frontstage-realtime-active');
   if (frontstageRealtimeOverlay) frontstageRealtimeOverlay.style.display = 'none';

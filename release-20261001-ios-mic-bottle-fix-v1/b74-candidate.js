@@ -35,6 +35,7 @@ const state = {
   lifeLoopTimer: null,
   audioCtx: null,
   mediaDest: null,
+  outputFilter: null,
   captureSink: null,
   outputAudio: null,
   mediaStream: null,
@@ -457,6 +458,7 @@ async function initializeAudio() {
   if (!state.audioCtx) state.audioCtx = new AudioContext({ latencyHint: 'interactive' });
   await state.audioCtx.resume();
   if (!state.mediaDest) state.mediaDest = state.audioCtx.createMediaStreamDestination();
+  if (!state.outputFilter) { state.outputFilter = state.audioCtx.createBiquadFilter(); state.outputFilter.type = "highpass"; state.outputFilter.frequency.value = 90; state.outputFilter.Q.value = 0.7; state.outputFilter.connect(state.mediaDest); }
   if (!state.captureSink) state.captureSink = state.audioCtx.createMediaStreamDestination();
   if (!state.outputAudio) {
     const output = document.createElement('audio');
@@ -537,7 +539,7 @@ function drainAudioQueue() {
     state.audioQueuedSeconds = Math.max(0, state.audioQueuedSeconds - buffer.duration);
     const source = state.audioCtx.createBufferSource();
     source.buffer = buffer;
-    source.connect(state.mediaDest || state.audioCtx.destination);
+    source.connect(state.outputFilter || state.mediaDest || state.audioCtx.destination);
     const startAt = Math.max(state.audioCtx.currentTime + 0.015, state.nextPlayTime || state.audioCtx.currentTime + 0.015);
     source.start(startAt);
     state.nextPlayTime = startAt + buffer.duration;
@@ -560,6 +562,15 @@ function enqueuePcmAudio(base64) {
   const bytes = base64ToBytes(base64);
   if (bytes.byteLength < 2) return;
   const pcm = new Int16Array(bytes.buffer, bytes.byteOffset, Math.floor(bytes.byteLength / 2));
+  let sumSquares = 0;
+  let peak = 0;
+  for (let i = 0; i < pcm.length; i += 1) {
+    const value = pcm[i] / 32768;
+    sumSquares += value * value;
+    if (Math.abs(value) > peak) peak = Math.abs(value);
+  }
+  const rms = Math.sqrt(sumSquares / Math.max(1, pcm.length));
+  if (rms < 0.0025 && peak < 0.015) return;
   const buffer = state.audioCtx.createBuffer(1, pcm.length, OUTPUT_RATE);
   const channel = buffer.getChannelData(0);
   for (let i = 0; i < pcm.length; i += 1) channel[i] = pcm[i] / 32768;
@@ -1132,6 +1143,8 @@ function releaseMicrophone() {
   try { state.outputAudio?.pause(); } catch (error) {}
   try { state.outputAudio?.remove(); } catch (error) {}
   state.outputAudio = null;
+  try { state.outputFilter?.disconnect(); } catch (error) {}
+  state.outputFilter = null;
   try { state.mediaDest?.disconnect(); } catch (error) {}
   state.mediaDest = null;
   try { state.captureSink?.disconnect(); } catch (error) {}
