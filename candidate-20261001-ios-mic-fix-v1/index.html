@@ -3581,7 +3581,7 @@ html.frontstage-realtime-active .voice-letter,html.frontstage-realtime-active .v
 <button type="button" data-lang="en" aria-label="English">EN</button>
 </span>
 <button id="audioToggleBtn" type="button" data-i18n-aria="musicToggle" aria-label="音乐开关">🔇</button>
-<input id="audioVolumeSlider" type="range" min="0" max="1" step="0.01" value="0.6" data-i18n-aria="volumeSlider" aria-label="背景音乐音量">
+<input id="audioVolumeSlider" type="range" min="0" max="1" step="0.01" value="0.36" data-i18n-aria="volumeSlider" aria-label="背景音乐音量">
 </div>
 </main>
 <script src="seven-stars-media-resolver.js?v=20260918-r1"></script>
@@ -4728,6 +4728,7 @@ let frontstageRealtimeOverlayVisible = false;
 let frontstageReturnHook = null;
 let frontstageRealtimeAudioGuard = 0;
 let frontstageAudioWasEnabled = null;
+let frontstageRealtimeCanvasPointerEvents = null;
 
 function frontstageRealtimeCharacterId() {
   return sequence?.characterId || 'yunqi-koala';
@@ -4862,6 +4863,8 @@ function openFrontstageRealtimeOverlay() {
     return;
   }
   frontstageRealtimeHold = true;
+  frontstageRealtimeCanvasPointerEvents = canvas?.style.pointerEvents || "";
+  if (canvas) canvas.style.pointerEvents = "none";
   frontstageAudioWasEnabled = window.earthMusicEnabled;
   window.earthMusicEnabled = false;
   clearInterval(frontstageRealtimeAudioGuard);
@@ -4892,6 +4895,7 @@ function closeFrontstageRealtimeOverlay(skip) {
   clearInterval(frontstageRealtimeAudioGuard);
   frontstageRealtimeAudioGuard = 0;
   if (frontstageAudioWasEnabled !== null) { window.earthMusicEnabled = frontstageAudioWasEnabled; frontstageAudioWasEnabled = null; }
+  if (canvas) { canvas.style.pointerEvents = frontstageRealtimeCanvasPointerEvents || ""; frontstageRealtimeCanvasPointerEvents = null; }
   try { frontstageRealtimeFrame?.contentWindow?.__b74CloseForReuse?.(); } catch (error) {}
   document.documentElement.classList.remove('frontstage-realtime-active');
   if (frontstageRealtimeOverlay) frontstageRealtimeOverlay.style.display = 'none';
@@ -4911,6 +4915,7 @@ function cleanupFrontstageRealtimeFlow() {
   clearInterval(frontstageRealtimeAudioGuard);
   frontstageRealtimeAudioGuard = 0;
   if (frontstageAudioWasEnabled !== null) { window.earthMusicEnabled = frontstageAudioWasEnabled; frontstageAudioWasEnabled = null; }
+  if (canvas) { canvas.style.pointerEvents = frontstageRealtimeCanvasPointerEvents || ""; frontstageRealtimeCanvasPointerEvents = null; }
   try { stopEarthEffects(); stopMusic({ immediate: true }); stopVoiceMusic({ immediate: true }); } catch (error) {}
   try { frontstageRealtimeFrame?.contentWindow?.__b74CloseForReuse?.(); } catch (error) {}
   if (frontstageRealtimeOverlay) frontstageRealtimeOverlay.style.display = 'none';
@@ -5577,7 +5582,7 @@ let musicForceAudible = false;
 let musicSilentStart = false;
 // 自动播放被拒后标记：下一次用户手势里重试
 let musicNeedsGesture = false;
-let musicVolume = .6;
+let musicVolume = .36;
 window.earthMusicEnabled = true;
 try { window.earthMusicEnabled = localStorage.getItem("lugu_earth_music_enabled") !== "0"; } catch (error) {}
 let earthSoundUnlocked = false;
@@ -5596,7 +5601,7 @@ const voiceMusicStartDelay = 1000;
 const starClickSoundSrc = "assets/sounds/star-click-typing.m4a";
 const openingLaughSoundSrc = "assets/sounds/child-laugh.m4a";
 const typingKeySoundSrc = "assets/sounds/typing-key-source.m4a";
-const typingKeyVolume = .32;
+const typingKeyVolume = .22;
 const typingKeyStartAt = 0;
 let typingKeyAudio = null;
 let activeVoiceExperience = null;
@@ -5611,6 +5616,15 @@ audio.pause();
 audio.removeAttribute("src");
 audio.load();
 earthEffectAudios.delete(audio);
+}
+
+function attachAudioToMediaSession(audio) {
+  if (!audio || audio.dataset.luguMediaSession === "1") return audio;
+  audio.dataset.luguMediaSession = "1";
+  audio.setAttribute("playsinline", "");
+  audio.style.display = "none";
+  document.body.appendChild(audio);
+  return audio;
 }
 
 function stopEarthEffects() {
@@ -6324,8 +6338,8 @@ if (!canPlayEarthSound()) {
 if (onEnded) onEnded();
 return;
 }
-const audio = new Audio(starClickSoundSrc);
-audio.volume = Math.min(.64, musicVolume);
+const audio = attachAudioToMediaSession(new Audio(starClickSoundSrc));
+audio.volume = Math.min(.4, musicVolume);
 earthEffectAudios.add(audio);
 audio.addEventListener("ended", () => {
 if (onEnded) onEnded();
@@ -6445,9 +6459,9 @@ scheduleOpeningBackgroundMusic(delay);
 
 function playOpeningLaughSound() {
 if (!earthSoundUnlocked || !canPlayEarthSound() || openingAfterLaughScheduled || openingLaughAudio) return;
-const audio = new Audio(openingLaughSoundSrc);
+const audio = attachAudioToMediaSession(new Audio(openingLaughSoundSrc));
 audio.preload = "auto";
-audio.volume = Math.min(.72, musicVolume);
+audio.volume = Math.min(.42, musicVolume);
 openingLaughAudio = audio;
 earthEffectAudios.add(audio);
 audio.addEventListener("ended", () => {
@@ -6500,7 +6514,7 @@ function playBackgroundTrack(session, fadeDuration = musicStartFadeDuration, for
 if (session !== musicSession) return;
 if (backgroundMusicPlayCount >= backgroundMusicMaxPlays) return;
 backgroundMusicPlayCount += 1;
-const audio = new Audio(backgroundMusicSrc);
+const audio = attachAudioToMediaSession(new Audio(backgroundMusicSrc));
 audio.loop = false;
 audio.muted = !forceAudible && !window.earthMusicEnabled;
 audio.volume = 0;
@@ -6559,7 +6573,7 @@ if (session !== musicSession || !activeMusicAudios.has(currentAudio)) return;
 if (backgroundMusicPlayCount >= backgroundMusicMaxPlays) return;
 backgroundMusicPlayCount += 1;
 
-const nextAudio = new Audio(backgroundMusicSrc);
+const nextAudio = attachAudioToMediaSession(new Audio(backgroundMusicSrc));
 nextAudio.loop = false;
 nextAudio.muted = !forceAudible && !window.earthMusicEnabled;
 nextAudio.volume = 0;
@@ -6685,7 +6699,7 @@ fadingVoiceAudio = null;
 
 const src = voiceMusicList[voiceMusicIndex % voiceMusicList.length];
 voiceMusicIndex += 1;
-const audio = new Audio(src);
+const audio = attachAudioToMediaSession(new Audio(src));
 voiceAudio = audio;
 window.audio = audio;
 audio.loop = true;
@@ -6785,7 +6799,7 @@ window.getMusicVolume = getMusicVolume;
 function prepareTypingKeySounds() {
 if (typingKeyAudio) return;
 
-typingKeyAudio = new Audio(typingKeySoundSrc);
+typingKeyAudio = attachAudioToMediaSession(new Audio(typingKeySoundSrc));
 typingKeyAudio.preload = "auto";
 typingKeyAudio.volume = typingKeyVolume;
 typingKeyAudio.load();
