@@ -34,6 +34,8 @@ const state = {
   idleTimer: null,
   lifeLoopTimer: null,
   audioCtx: null,
+  mediaDest: null,
+  outputAudio: null,
   mediaStream: null,
   sourceNode: null,
   processor: null,
@@ -453,6 +455,19 @@ function flushAudioQueue() {
 async function initializeAudio() {
   if (!state.audioCtx) state.audioCtx = new AudioContext({ latencyHint: 'interactive' });
   await state.audioCtx.resume();
+  if (!state.mediaDest) state.mediaDest = state.audioCtx.createMediaStreamDestination();
+  if (!state.outputAudio) {
+    const output = document.createElement('audio');
+    output.id = 'b74-audio-output';
+    output.autoplay = true;
+    output.playsInline = true;
+    output.setAttribute('playsinline', '');
+    output.style.display = 'none';
+    document.body.appendChild(output);
+    state.outputAudio = output;
+  }
+  if (state.outputAudio.srcObject !== state.mediaDest.stream) state.outputAudio.srcObject = state.mediaDest.stream;
+  state.outputAudio.play().catch(() => {});
   const usableStream = state.mediaStream && state.mediaStream.getAudioTracks().some(track => track.readyState === "live");
   if (!usableStream) {
     state.mediaStream = await navigator.mediaDevices.getUserMedia({
@@ -520,7 +535,7 @@ function drainAudioQueue() {
     state.audioQueuedSeconds = Math.max(0, state.audioQueuedSeconds - buffer.duration);
     const source = state.audioCtx.createBufferSource();
     source.buffer = buffer;
-    source.connect(state.audioCtx.destination);
+    source.connect(state.mediaDest || state.audioCtx.destination);
     const startAt = Math.max(state.audioCtx.currentTime + 0.015, state.nextPlayTime || state.audioCtx.currentTime + 0.015);
     source.start(startAt);
     state.nextPlayTime = startAt + buffer.duration;
@@ -1097,6 +1112,7 @@ window.__b74CloseForReuse = function() {
   try { stopVideoLayer(); } catch (error) {}
   state.openingSent = false;
   state.subtitleText = "";
+  try { state.outputAudio?.pause(); } catch (error) {}
   if (faceLayer) faceLayer.hidden = true;
   document.body.classList.remove("b74-transitioning");
   try { transitionLayer?.remove(); } catch (error) {}
@@ -1111,6 +1127,13 @@ window.__b74SelectCharacter = function(characterId) {
 };
 
 function releaseMicrophone() {
+  try { state.outputAudio?.pause(); } catch (error) {}
+  try { state.outputAudio?.remove(); } catch (error) {}
+  state.outputAudio = null;
+  try { state.mediaDest?.disconnect(); } catch (error) {}
+  state.mediaDest = null;
+  try { state.audioCtx?.close(); } catch (error) {}
+  state.audioCtx = null;
   if (!state.mediaStream) return;
   for (const track of state.mediaStream.getTracks()) track.stop();
   state.mediaStream = null;
