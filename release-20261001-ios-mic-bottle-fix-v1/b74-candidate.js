@@ -35,6 +35,7 @@ const state = {
   lifeLoopTimer: null,
   audioCtx: null,
   mediaDest: null,
+  captureSink: null,
   outputAudio: null,
   mediaStream: null,
   sourceNode: null,
@@ -456,6 +457,7 @@ async function initializeAudio() {
   if (!state.audioCtx) state.audioCtx = new AudioContext({ latencyHint: 'interactive' });
   await state.audioCtx.resume();
   if (!state.mediaDest) state.mediaDest = state.audioCtx.createMediaStreamDestination();
+  if (!state.captureSink) state.captureSink = state.audioCtx.createMediaStreamDestination();
   if (!state.outputAudio) {
     const output = document.createElement('audio');
     output.id = 'b74-audio-output';
@@ -482,7 +484,7 @@ async function initializeAudio() {
     state.sinkGain.gain.value = 0;
     state.sourceNode.connect(state.processor);
     state.processor.connect(state.sinkGain);
-    state.sinkGain.connect(state.audioCtx.destination);
+    state.sinkGain.connect(state.captureSink);
     state.processor.onaudioprocess = event => {
       if (!state.connected || state.closing || state.muted) return;
       const input = event.inputBuffer.getChannelData(0);
@@ -1132,6 +1134,8 @@ function releaseMicrophone() {
   state.outputAudio = null;
   try { state.mediaDest?.disconnect(); } catch (error) {}
   state.mediaDest = null;
+  try { state.captureSink?.disconnect(); } catch (error) {}
+  state.captureSink = null;
   try { state.audioCtx?.close(); } catch (error) {}
   state.audioCtx = null;
   if (!state.mediaStream) return;
