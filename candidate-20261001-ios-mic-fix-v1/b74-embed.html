@@ -18,8 +18,10 @@ window.__B74_REGISTRY_URL = "./characters.v1.json";
 </script>
 <script type="module">
 import "./b74-candidate.js?v=1";
-const requestedCharacter = new URLSearchParams(location.search).get("character") || "yunqi-koala";
-window.__b74Ready?.then(() => window.__b74SelectCharacter?.(requestedCharacter));
+const params = new URLSearchParams(location.search);
+const requestedCharacter = params.get("character") || "yunqi-koala";
+const requestedEmotion = params.get("emotion") || "";
+window.__b74Ready?.then(() => { window.__b74SelectCharacter?.(requestedCharacter); window.__b74SetMood?.(requestedEmotion); });
 </script>
 </body>
 </html>

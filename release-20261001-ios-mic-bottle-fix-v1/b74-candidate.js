@@ -18,6 +18,7 @@ const state = {
   closing: false,
   language: '普通话',
   expressionMode: 'accent',
+  mood: '',
   subtitleText: '',
   profile: null,
   characters: [],
@@ -605,8 +606,15 @@ function updateVoiceActivity(input) {
 
 function openingText(language) {
   const name = state.profile?.formal_name || '云栖考拉';
-  if (language === '英语') return `Hello, I am ${name}, one of the Seven Star Messengers. What would you like to talk about?`;
-  return `你好，我是七星使者${name}。你有什么要说的吗？`;
+  const mood = String(state.mood || '').trim();
+  if (language === '英语') {
+    return mood
+      ? `Hello, I am ${name}. I am coming out with a feeling of ${mood}. Let me tell you how I feel before we talk.`
+      : `Hello, I am ${name}, one of the Seven Star Messengers. What would you like to talk about?`;
+  }
+  return mood
+    ? `你好，我是${name}。我现在带着一点${mood}的心情出来，先想和你说说这份心情，再慢慢听你说。`
+    : `你好，我是七星使者${name}。你有什么要说的吗？`;
 }
 
 function openingPrompt(language, expressionMode = 'accent') {
@@ -683,7 +691,7 @@ function handleServerEvent(event) {
         state.ws.send(JSON.stringify({
           type: 'say',
           text: openingText(state.language),
-          tts_prompt: openingPrompt(state.language, state.expressionMode),
+          tts_prompt: openingPrompt(state.language, state.expressionMode) + (state.mood ? ` 语气要自然体现“${state.mood}”的情绪。` : ''),
         }));
       }
       break;
@@ -1083,9 +1091,12 @@ observer.observe(document.body, { childList: true, subtree: true });
 ensureTalkButton();
 window.__b74Ready = loadCharacterRegistry();
 window.__b74OpenFaceToFace = openFaceToFace;
+window.__b74SetMood = function(mood) { state.mood = String(mood || "").trim(); };
 window.__b74CloseForReuse = function() {
   try { sendClose(); } catch (error) {}
   try { stopVideoLayer(); } catch (error) {}
+  state.openingSent = false;
+  state.subtitleText = "";
   if (faceLayer) faceLayer.hidden = true;
   document.body.classList.remove("b74-transitioning");
   try { transitionLayer?.remove(); } catch (error) {}

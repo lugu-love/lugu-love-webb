@@ -4733,6 +4733,10 @@ function frontstageRealtimeCharacterId() {
   return sequence?.characterId || 'yunqi-koala';
 }
 
+function frontstageRealtimeMood() {
+  return sequence?.emotionName || sequence?.emotionId || '';
+}
+
 function hideFrontstageRealtimeEntry() {
   clearTimeout(frontstageRealtimeEntryTimer);
   frontstageRealtimeEntryTimer = 0;
@@ -4752,7 +4756,7 @@ function prepareFrontstageRealtimeFrame() {
     frontstageRealtimeFrameReady = Boolean(shared.ready);
     styleFrontstageRealtimeFrame(frontstageRealtimeFrame);
     if (frontstageRealtimeFrameReady) {
-      try { frontstageRealtimeFrame.contentWindow.__b74SelectCharacter?.(frontstageRealtimeCharacterId()); } catch (error) {}
+      try { frontstageRealtimeFrame.contentWindow.__b74SelectCharacter?.(frontstageRealtimeCharacterId()); frontstageRealtimeFrame.contentWindow.__b74SetMood?.(frontstageRealtimeMood()); } catch (error) {}
       if (frontstageRealtimeHold && !frontstageRealtimeEntry && !frontstageRealtimeOverlayVisible) {
         clearTimeout(frontstageRealtimeEntryTimer);
         frontstageRealtimeEntryTimer = setTimeout(showFrontstageRealtimeEntry, 120);
@@ -4771,13 +4775,13 @@ function prepareFrontstageRealtimeFrame() {
   frame.allow = 'microphone *; autoplay; fullscreen; camera';
   frame.setAttribute('allowfullscreen', '');
   frame.style.cssText = 'flex:1;width:100%;height:100%;border:0;background:#020407;display:block;';
-  frame.src = new URL('b74-embed.html?character=' + encodeURIComponent(frontstageRealtimeCharacterId()), location.href).href;
+  frame.src = new URL('b74-embed.html?character=' + encodeURIComponent(frontstageRealtimeCharacterId()) + '&emotion=' + encodeURIComponent(frontstageRealtimeMood()), location.href).href;
   frame.addEventListener('load', function(){
     styleFrontstageRealtimeFrame(frame);
     const markReady = function(){
       frontstageRealtimeFrameReady = true;
       if (window.__frontstageRealtimeShared) window.__frontstageRealtimeShared.ready = true;
-      try { frame.contentWindow.__b74SelectCharacter?.(frontstageRealtimeCharacterId()); } catch (error) {}
+      try { frame.contentWindow.__b74SelectCharacter?.(frontstageRealtimeCharacterId()); frame.contentWindow.__b74SetMood?.(frontstageRealtimeMood()); } catch (error) {}
       if (frontstageRealtimeHold && !frontstageRealtimeEntry && !frontstageRealtimeOverlayVisible) {
         clearTimeout(frontstageRealtimeEntryTimer);
         frontstageRealtimeEntryTimer = setTimeout(showFrontstageRealtimeEntry, 120);
@@ -4876,6 +4880,7 @@ function openFrontstageRealtimeOverlay() {
   const child = frontstageRealtimeFrame.contentWindow;
   try {
     child.__b74SelectCharacter?.(frontstageRealtimeCharacterId());
+    child.__b74SetMood?.(frontstageRealtimeMood());
     child.__b74OpenFaceToFace?.();
   } catch (error) {
     console.warn('[frontstage-realtime] start failed', error);
