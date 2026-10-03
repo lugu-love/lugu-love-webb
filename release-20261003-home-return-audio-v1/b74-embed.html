@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#020407">
+<title>面对面实时对话</title>
+<link rel="stylesheet" href="https://candidate.suomaanjia.cn:8443/lugu-b74/candidate.css?v=12">
+<style>
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#020407}
+</style>
+</head>
+<body>
+<script>
+window.__B74_BASE_PATH = "https://candidate.suomaanjia.cn:8443/lugu-b74";
+window.__B74_WS_URL = "wss://candidate.suomaanjia.cn:8443/lugu-b74/ws/doubao";
+window.__B74_REGISTRY_URL = "./characters.v1.json";
+</script>
+<script type="module">
+import "./b74-candidate.js?v=1";
+const params = new URLSearchParams(location.search);
+const requestedCharacter = params.get("character") || "yunqi-koala";
+const requestedEmotion = params.get("emotion") || "";
+window.__b74Ready?.then(() => { window.__b74SelectCharacter?.(requestedCharacter); window.__b74SetMood?.(requestedEmotion); });
+</script>
+</body>
+</html>
