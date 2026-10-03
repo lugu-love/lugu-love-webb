@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6efe3">
+  <title>我的生活｜我的生命空间</title>
+  <link rel="stylesheet" href="css/main.css?v=20260728-4">
+  <link rel="stylesheet" href="css/channel.css?v=20260728-8">
+  <link rel="stylesheet" href="css/life-card.css?v=20260728-8">
+</head>
+<body>
+  <main class="page-shell channel-shell">
+    <nav class="channel-nav">
+      <div class="channel-back-links">
+        <a class="earth-back-link" id="earthBackLink" href="../index.html" target="_top">← 返回地球</a>
+        <a class="back-link" href="index.html" target="_top">空间主页</a>
+      </div>
+      <button class="my-music-button" id="openMusicPanel" type="button"><span aria-hidden="true">♫</span> 我的音乐</button>
+    </nav>
+    <header class="channel-header">
+      <div class="channel-avatar-block">
+        <button class="avatar channel-avatar" id="channelAvatar" type="button" aria-label="编辑当前频道头像"><span>生</span></button>
+        <small id="channelNickname">我的生命空间</small>
+        <div class="channel-avatar-actions" id="channelAvatarActions" hidden>
+          <button type="button" id="changeChannelAvatar">更换头像</button>
+          <button type="button" id="resetChannelAvatar">恢复空间头像</button>
+        </div>
+        <p class="channel-avatar-tip" id="channelAvatarTip" hidden>当前频道可单独设置头像。</p>
+        <input class="visually-hidden" id="channelAvatarInput" type="file" accept="image/*">
+        <section class="avatar-cropper channel-avatar-cropper" id="channelAvatarCropper" aria-label="调整当前频道头像" hidden>
+          <p>拖动照片调整位置，滑动下方按钮缩放</p>
+          <div class="crop-viewport" id="channelCropViewport">
+            <img id="channelCropImage" alt="待裁剪频道头像">
+            <span class="crop-guide" aria-hidden="true"></span>
+          </div>
+          <label class="crop-zoom">
+            <span aria-hidden="true">－</span>
+            <input id="channelCropZoom" type="range" min="1" max="3" step="0.01" value="1" aria-label="频道头像缩放">
+            <span aria-hidden="true">＋</span>
+          </label>
+          <div class="crop-actions">
+            <button class="ghost-button" id="cancelChannelCrop" type="button">取消</button>
+            <button class="primary-button" id="applyChannelCrop" type="button">保存头像</button>
+          </div>
+        </section>
+      </div>
+      <p class="eyebrow">Life Channel</p>
+      <h1>我的生活</h1>
+      <p>记录生活中平凡却值得留下的时刻。</p>
+    </header>
+    <section class="prompt-card" id="promptCard">
+      <button class="prompt-background-button" id="changePromptBackground" type="button" aria-label="更换开始记录背景图" hidden>更换背景</button>
+      <input class="visually-hidden" id="promptBackgroundInput" type="file" accept="image/*">
+      <p>今天，有什么值得留下？</p>
+      <a class="prompt-record-button" href="editor.html?channel=life"><span aria-hidden="true">＋</span> 开始记录</a>
+    </section>
+    <section aria-labelledby="recordsTitle">
+      <div class="list-heading"><h2 id="recordsTitle">生活记录</h2><span class="record-count" id="recordCount">0 条</span></div>
+      <div class="card-list" id="cardList"></div>
+    </section>
+    <section class="channel-switcher" aria-labelledby="channelSwitcherTitle">
+      <h2 class="visually-hidden" id="channelSwitcherTitle">频道切换</h2>
+      <div class="channel-switcher-grid" id="channelSwitcherGrid"></div>
+    </section>
+  </main>
+
+  <div class="notice" id="notice" role="status" aria-live="polite"></div>
+  <div class="detail-backdrop" id="detailBackdrop" aria-hidden="true">
+    <article class="detail-panel" id="detailPanel"></article>
+  </div>
+  <div class="image-viewer" id="imageViewer" aria-hidden="true">
+    <button class="viewer-close" id="viewerClose" type="button" aria-label="关闭高清图片">×</button>
+    <button class="viewer-nav viewer-prev" id="viewerPrev" type="button" aria-label="上一张">‹</button>
+    <img id="viewerImage" alt="生命记录高清图片">
+    <button class="viewer-nav viewer-next" id="viewerNext" type="button" aria-label="下一张">›</button>
+    <div class="viewer-count" id="viewerCount"></div>
+  </div>
+  <div class="music-backdrop" id="musicBackdrop" aria-hidden="true">
+    <section class="music-panel" role="dialog" aria-modal="true" aria-labelledby="musicPanelTitle">
+      <header>
+        <div><p>Life Soundtrack</p><h2 id="musicPanelTitle">我的音乐</h2></div>
+        <button class="music-close" id="closeMusicPanel" type="button" aria-label="关闭我的音乐">×</button>
+      </header>
+      <label class="music-field" for="musicSelect">
+        <span>选择音乐</span>
+        <select id="musicSelect"><option value="">尚未添加音乐</option></select>
+      </label>
+      <label class="music-upload-button" for="musicInput">＋ 从设备添加音乐</label>
+      <input class="visually-hidden" id="musicInput" type="file" accept="audio/*">
+      <div class="music-control-row">
+        <div><strong>音乐开关</strong><small id="musicStatus">当前已关闭</small></div>
+        <label class="music-switch">
+          <input id="musicEnabled" type="checkbox">
+          <span aria-hidden="true"></span>
+          <b>播放背景音乐</b>
+        </label>
+      </div>
+      <label class="music-volume" for="musicVolume">
+        <span>音量</span>
+        <input id="musicVolume" type="range" min="0" max="100" step="1" value="45">
+        <output id="musicVolumeValue">45%</output>
+      </label>
+      <p class="music-tip">音乐只保存在当前设备中。首次播放需要点击一次音乐开关。</p>
+    </section>
+  </div>
+  <audio id="backgroundMusic" loop preload="metadata"></audio>
+  <script src="data/default-data.js"></script>
+  <script src="data/demo-visitors.js?v=20260726-1"></script>
+  <script src="js/image-storage.js"></script>
+  <script src="js/storage.js?v=20260728-8"></script>
+  <script src="js/life-card-renderer.js?v=20260728-8"></script>
+  <script src="js/channel.js?v=20260728-8"></script>
+</body>
+</html>
