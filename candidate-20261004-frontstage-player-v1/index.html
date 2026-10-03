@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Frontstage Player V1 · 最小验证</title>
+<link rel="stylesheet" href="player/player.css">
+</head>
+<body>
+<div class="player-root" data-player-state="INIT" data-bottle-visible="0">
+  <div class="bottle-stage">
+    <div class="bottle" id="bottle">
+      <div class="bottle-glass"></div>
+      <div class="character-slot" data-role="character-slot"></div>
+    </div>
+  </div>
+</div>
+
+<pre id="out" style="position:fixed;right:8px;top:8px;max-width:46vw;max-height:60svh;overflow:auto;font:10px/1.4 ui-monospace;color:#bfe;background:#04121f;border:1px solid #3a6;padding:6px;z-index:99;white-space:pre-wrap"></pre>
+<div class="hud" id="hud">
+  <div>state: <b id="hud-state">INIT</b> · cycle: <b id="hud-cycle">0</b></div>
+  <div>seq: <span id="hud-seq">-</span></div>
+  <div id="hud-anom"></div>
+  <button id="btn-advance">推进 / 第二次播放</button>
+  <button id="btn-selfcheck">自检：跑满 2 轮 + 导出 JSON</button>
+</div>
+
+<script>
+window.onerror = function (m, u, l, c, e) {
+  try { var i = new Image(); i.src = '/__err?m=' + encodeURIComponent(String(m) + ' @' + l + ':' + c); } catch (_) {}
+};
+window.addEventListener('unhandledrejection', function (ev) {
+  try { var i = new Image(); i.src = '/__rej?m=' + encodeURIComponent(String(ev.reason && (ev.reason.stack || ev.reason.message) || ev.reason)); } catch (_) {}
+});
+</script>
+<script src="player/registry.js"></script>
+<script src="player/player.js"></script>
+<script>
+(function () {
+  var root = document.querySelector('.player-root');
+  var registry = window.FrontstageRegistryV1;
+  var ITEM_ID = 'rabbit-happy';
+
+  var player = window.FrontstagePlayerV1.createPlayer({
+    root: root,
+    registry: registry,
+    config: { itemId: ITEM_ID, canvasSize: 540, readyDwellMs: 1200, enforceWriteGuard: true }
+  });
+  window.__player = player;
+
+  var hudState = document.getElementById('hud-state');
+  var hudCycle = document.getElementById('hud-cycle');
+  var hudSeq = document.getElementById('hud-seq');
+  var hudAnom = document.getElementById('hud-anom');
+  var seq = [];
+
+  function refresh() {
+    var s = player.snapshot();
+    hudState.textContent = s.state;
+    hudCycle.textContent = String(s.cycle);
+    if (s.state === 'state.enter') seq.push(s.state);
+    hudSeq.textContent = seq.join(' → ');
+    hudAnom.innerHTML = player.anomalies.length
+      ? '<span class="bad">anomalies: ' + player.anomalies.length + '</span>'
+      : 'anomalies: 0';
+  }
+  player.on('log', function (e) { if (e.event === 'state.enter') { seq.push(e.to); } refresh(); });
+
+  document.getElementById('bottle').addEventListener('click', function () { player.advance(); });
+  document.getElementById('btn-advance').addEventListener('click', function () { player.advance(); });
+
+  function waitFor(state, timeoutMs) {
+    return new Promise(function (resolve, reject) {
+      if (player.state === state) return resolve();
+      var to = setTimeout(function () { reject(new Error('timeout waiting for ' + state + ' (now ' + player.state + ')')); }, timeoutMs || 20000);
+      var off = function () {};
+      player.on('state', function (ev) {
+        if (ev.to === state) { clearTimeout(to); resolve(); }
+      });
+    });
+  }
+
+  window.__playerSelfCheck = function () {
+    var before = player.anomalies.length;
+    seq = [];
+    return player.start(), waitFor('DONE', 25000)
+      .then(function () { return player.secondPlay(), waitFor('DONE', 25000); })
+      .then(function () {
+        var stateSeq = player.log.filter(function (e) { return e.event === 'state.enter'; }).map(function (e) { return e.to; });
+        var noNewAnomalies = JSON.stringify(player.anomalies.slice(before)) === '[]';
+        var count = function (n) { return stateSeq.filter(function (x) { return x === n; }).length; };
+        var invariants = player.assertInvariants();
+        var ok = noNewAnomalies && invariants.length === 0 &&
+                 count('FOREGROUND') >= 2 && count('RETURN') >= 2 && count('DONE') >= 2 &&
+                 count('PRELOAD') === 1 && count('BOTTLE_ENTER') === 2;
+        var result = {
+          ok: ok,
+          plays: count('FOREGROUND'),
+          preloadOnce: count('PRELOAD') === 1,
+          candidateName: 'candidate-20261004-frontstage-player-v1',
+          itemId: ITEM_ID,
+          cycles: player.cycle,
+          stateSequence: stateSeq,
+          anomalies: player.anomalies,
+          invariants: invariants,
+          mediaEvents: player.media.events,
+          observerAttachedAt: player.media.attachedAt,
+          timeline: player.timeline
+        };
+        console.log('[selfcheck]', JSON.stringify(result, null, 2));
+        return result;
+      });
+  };
+
+  document.getElementById('btn-selfcheck').addEventListener('click', function () {
+    window.__playerSelfCheck().then(function (r) {
+      alert('自检完成: ok=' + r.ok + '\ncycles=' + r.cycles + '\nanomalies=' + r.anomalies.length);
+    }).catch(function (e) { alert('自检失败: ' + e.message); });
+  });
+
+  if (/[?&]selfcheck=1/.test(location.search)) {
+    window.__selfcheck_auto = true;
+    var pre = document.getElementById('out');
+    window.__playerSelfCheck().then(function (r) {
+      pre.textContent = 'SELFCHECK_RESULT_BEGIN' + JSON.stringify(r) + 'SELFCHECK_RESULT_END';
+      var summary = {
+        ok: r.ok, cycles: r.cycles, anomalies: r.anomalies.length,
+        seq: r.stateSequence.join(','), mediaEvents: r.mediaEvents.length,
+        observerAttachedAt: r.observerAttachedAt, invariants: r.invariants
+      };
+      var probe = new Image();
+      probe.src = '/__result?d=' + encodeURIComponent(JSON.stringify(summary));
+      window.__selfcheckSummary = summary;
+    }).catch(function (e) {
+      pre.textContent = 'SELFCHECK_ERROR_BEGIN' + (e && e.message) + 'SELFCHECK_ERROR_END';
+    });
+  }
+  if (!window.__selfcheck_auto) { player.start(); }
+  refresh();
+  window.__playerReady = true;
+})();
+</script>
+</body>
+</html>
