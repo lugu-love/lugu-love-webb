@@ -7710,6 +7710,17 @@ if (event.target.closest && event.target.closest(".voice-star")) return;
 unlockEarthSounds();
 }, { passive: true });
 requestAnimationFrame(updateVoiceStars);
+window.addEventListener("pageshow", (event) => {
+try { if (typeof window.__frontstageRealtimeCleanup === "function") window.__frontstageRealtimeCleanup(); } catch (error) {}
+try { closeActiveVoiceExperience(); } catch (error) {}
+try { stars.forEach((star) => { try { star.element?.remove(); } catch (error) {} }); stars.clear(); } catch (error) {}
+document.querySelectorAll(".voice-star,.voice-bottle,.voice-letter,.fengxin-rabbit-demo,.voice-bottle-replay-hint").forEach((node) => node.remove());
+voiceStarsEnabled = false;
+voiceStarStartAt = 0;
+nextSpawn = 0;
+clearTimeout(voiceStarStartTimer);
+setTimeout(startVoiceStars, 250);
+});
 })();
 </script>
 <script>
