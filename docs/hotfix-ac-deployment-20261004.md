@@ -101,3 +101,85 @@ OPTIONS /make-send (CORS preflight)     -> 204
 - 本机（开发机）DNS 被代理接管（返回 198.18.x 假 IP），且沙箱禁止本地端口转发，
   **无法从开发机跑真机级浏览器验收**。四端验收必须在真机上进行。
 - `api.lugu.love` 需在阿里云把 DNS 指向 `47.109.185.222`，才能签证书并恢复该域名。
+
+
+---
+
+# 2026-10-04 真机失败后的修复（P0）
+
+## 华为打不开：先排除后再定位
+
+`check-host.net` 30 个全球节点实测 `https://candidate.suomaanjia.cn/...`：
+**29/30 返回 200**（美/日/德/法/荷/俄/印…），仅 1 个节点 broken pipe。
+说明域名、DNS、443、证书链在公网层面是通的，不是"华为网络下不稳定"。
+
+真正可疑点：**证书只有 ECDSA（P-256）**，
+且 Let's Encrypt 2026-09 新中间证书 `YE2`。老旧华为/安卓 TLS 栈不支持
+ECDSA-only 服务端是已知失败模式，表现就是华为浏览器"网站暂时无法打开，网络连接正常"。
+
+处置：
+1. `certbot certonly --key-type rsa --cert-name candidate.suomaanjia.cn-rsa`
+2. 443 与 8443 同时配置 **ECDSA + RSA 双证书**，nginx 按客户端能力择优
+3. 放宽密码套件（补回 `ECDHE-RSA-AES128-SHA` / `AES128-SHA` 等 CBC 套件）
+
+验证：
+```
+RSA 客户端  -> Public Key Algorithm: rsaEncryption
+ECDSA 客户端 -> Public Key Algorithm: id_ecPublicKey
+```
+
+## 微信"素材契约加载失败"：根因是 `<base href>` 与部署路径不匹配
+
+`send-test.html` 第 4 行：
+
+```html
+<base href="../release-20260920-nuanshan-bear-r1/">
+```
+
+`<base>` 会让**所有相对 fetch 改写到 `../release-20260920-nuanshan-bear-r1/`**。
+我最初把 Candidate 部署到 `/hotfix-ac-v1/`，同级没有这个目录，
+于是以下请求全部 404：
+
+| 页面实际请求 URL（修复前） | 状态 |
+| --- | --- |
+| `/release-20260920-nuanshan-bear-r1/build.json?v=0` | **404** |
+| `/release-20260920-nuanshan-bear-r1/asset-manifest.json` | **404** |
+| `/release-20260920-nuanshan-bear-r1/seven-stars-assets-manifest.json` | **404** |
+| `/release-20260920-nuanshan-bear-r1/blessing-manifest.json` | **404** |
+
+`loadProductionManifest()` 第一步 `build contract mismatch` 之前就先 fetch 失败，
+直接落到 `.catch()` → `setStatus("生产素材契约加载失败，已停止生成。")`。
+
+注意：契约文件本身**全部正确**（已逐条核对 build/manifest 版本与 5 角色 11/8/15/11/15 条目数），
+问题纯粹是 URL 解析。
+
+处置：按 `<base href>` 重建部署目录：
+
+```
+/var/www/lugu-web/
+├── candidate-20261004-hotfix-ac-v1 -> release-20260920-nuanshan-bear-r1   (symlink)
+└── release-20260920-nuanshan-bear-r1/                                      (真实文件)
+```
+
+nginx：`/lugu-web/` → `alias /var/www/lugu-web/`；旧 `/hotfix-ac-v1/` 302 到新路径。
+
+## 修复后真机入口
+
+| 用途 | URL |
+| --- | --- |
+| Hotfix A 首页 | `https://candidate.suomaanjia.cn/lugu-web/candidate-20261004-hotfix-ac-v1/` |
+| Hotfix C 情绪表达 | `https://candidate.suomaanjia.cn/lugu-web/candidate-20261004-hotfix-ac-v1/send-test.html` |
+
+## 微信 UA 实测（修复后）
+
+```
+build.json                        200 application/json 1021B
+asset-manifest.json               200 application/json 172094B
+seven-stars-assets-manifest.json  200 application/json 73951B
+blessing-manifest.json            200 application/json 18644B
+welcome-messages.json             200 application/json 909B
+/lugu-send/status                 200 (CORS: access-control-allow-origin: *)
+OPTIONS /make-send                204
+GET /make-send?...&async=1        202 {"job":"-i0PdIhlF_h_c2DL0Vhs7w"}
+GET /make-send/result?job=...     {"status":"done","videoPath":"/app-video/Yz7ttx7DvrShbEwwBuTeVsJVTsDQsjxN.mp4"}
+```
