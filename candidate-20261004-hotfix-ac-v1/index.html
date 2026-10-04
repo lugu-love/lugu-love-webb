@@ -4883,110 +4883,118 @@ if (!returnFlightFinished) rabbitStage = "interrupted";
 
 
 // ============================================================================
-// 面对面实时对话 —— 独立模块（B74，香港节点）
-// 职责边界：只负责「出瓶后显示入口 → 打开对话 → 对话期间挂住回瓶 → 结束后回瓶」。
-// 不复制旧播放链，不改变漂流瓶播放状态机，不触碰 C 生成链路。
-// 唯一对既有链路的改动：returnRabbitToBottle 顶部的 hold 开关（见函数首行）。
+// 面对面实时对话 —— 独立模块（B74，香港节点）  [幂等版]
+// 边界：只负责「出瓶后显示入口 → 打开对话 → 对话期间挂住回瓶 → 结束后回瓶」。
+// 不复制旧播放链、不改变漂流瓶播放状态机、不触碰 C 生成链路。
+//
+// 重要：本模块由 playFengxinRabbitAngryDemo 的闭包承载，每开一瓶都会重新执行。
+// 因此核心状态与 DOM 必须放在 window.__luguRealtimeCore 上「只初始化一次」，
+// 否则第二次 defineProperty 会抛 TypeError 而中断整段开瓶初始化。
 // ============================================================================
 (function(){
-  var hold=false, entryTimer=0, entry=null, overlay=null, frame=null, frameReady=false, overlayVisible=false, returnHook=null, audioGuard=0, prevAudio=null;
-  var current={character:'yunqi-koala',emotion:''};
-
-  function characterId(){ return current.character || 'yunqi-koala'; }
-  function mood(){ return current.emotion || ''; }
-
-  function hideEntry(){ clearTimeout(entryTimer); entryTimer=0; if(entry){ entry.remove(); entry=null; } }
-
-  function styleFrame(f){ if(f) { f.style.cssText='flex:1 1 auto;min-height:0;width:100%;border:0;background:#020407;display:block;'; } }
-
-  function ensureFrame(){
-    if(frame && overlay) return;
-    overlay=document.createElement('div');
-    overlay.id='frontstageRealtimeOverlay';
-    overlay.innerHTML='<div class="fr-overlay-bar"><div class="fr-overlay-copy"><b>面对面实时对话</b><span>正在进入使者对话</span></div><button class="fr-overlay-close" type="button">结束对话并回瓶</button></div>';
-    frame=document.createElement('iframe');
-    frame.id='frontstageRealtimeFrame';
-    frame.title='面对面实时对话';
-    frame.allow='microphone *; autoplay; fullscreen; camera';
-    frame.setAttribute('allowfullscreen','');
-    styleFrame(frame);
-    frame.src=new URL('b74-embed.html?character='+encodeURIComponent(characterId())+'&emotion='+encodeURIComponent(mood()), location.href).href;
-    frame.addEventListener('load', function(){
-      frameReady=true;
-      try { frame.contentWindow.__b74SelectCharacter?.(characterId()); frame.contentWindow.__b74SetMood?.(mood()); } catch(e){}
-    });
-    overlay.appendChild(frame);
-    overlay.querySelector('.fr-overlay-close').addEventListener('click', function(){ close(false); });
-    document.body.appendChild(overlay);
-  }
-
-  function showEntry(){
-    clearTimeout(entryTimer);
-    if(overlayVisible) return;
-    if(entry) return;
-    entry=document.createElement('div');
-    entry.id='frontstageRealtimeEntry';
-    entry.innerHTML='<button type="button" data-fr-talk>面对面聊聊</button><button type="button" class="fr-skip" data-fr-skip aria-label="先回瓶">\u00d7</button>';
-    document.body.appendChild(entry);
-    entry.querySelector('[data-fr-talk]').addEventListener('click', function(){ open(); });
-    entry.querySelector('[data-fr-skip]').addEventListener('click', function(){
-      hold=false; hideEntry();
-      var h=returnHook; returnHook=null;
-      if(h){ try{ h({force:true}); }catch(e){} }
-    });
-  }
-
-  function open(){
-    ensureFrame();
-    if(!frameReady){ setTimeout(open,150); return; }
-    hold=true;
-    hideEntry();
-    prevAudio=window.earthMusicEnabled;
-    window.earthMusicEnabled=false;
-    try{ stopEarthEffects(); stopMusic({immediate:true}); stopVoiceMusic({immediate:true}); }catch(e){}
-    if(sourceVideo){ try{ sourceVideo.loop=true; sourceVideo.setAttribute('loop',''); if(sourceVideo.paused) sourceVideo.play().catch(function(){}); }catch(e){} }
-    clearInterval(audioGuard);
-    audioGuard=setInterval(function(){
-      if(!overlayVisible) return;
-      try{ stopEarthEffects(); stopMusic({immediate:true}); stopVoiceMusic({immediate:true}); }catch(e){}
-    },1000);
-    document.documentElement.classList.add('frontstage-realtime-active');
-    overlay.style.display='flex';
-    overlayVisible=true;
-    try{ frame.contentWindow.__b74SelectCharacter?.(characterId()); frame.contentWindow.__b74SetMood?.(mood()); frame.contentWindow.__b74OpenFaceToFace?.(); }catch(e){}
-  }
-
-  function close(skip){
-    clearInterval(audioGuard); audioGuard=0;
-    window.earthMusicEnabled=false;
-    try{ stopEarthEffects(); stopMusic({immediate:true}); stopVoiceMusic({immediate:true}); }catch(e){}
-    try{ if(window.syncAudioUI) window.syncAudioUI(); }catch(e){}
-    try{ frame && frame.contentWindow && frame.contentWindow.__b74CloseForReuse?.(); }catch(e){}
-    document.documentElement.classList.remove('frontstage-realtime-active');
-    if(overlay) overlay.style.display='none';
-    overlayVisible=false;
-    hideEntry();
-    hold=false;
-    if(returnHook){ var h=returnHook; returnHook=null; try{ h({force:true}); }catch(e){} }
-  }
-
-  window.addEventListener('message', function(ev){ if(ev && ev.data && ev.data.type==='b74-session-ended') close(false); });
-
-  // 模块对外的三个接口（回瓶守卫读的就是 __luguRealtimeHold / __luguRealtimeShowEntry）
-  window.__luguRealtimeShowEntry = showEntry;
-  Object.defineProperty(window,'__luguRealtimeHold',{get:function(){return hold;}});
-  window.__luguRealtimeArm = function(bottleNode, detail){
-    hold=true;
-    returnHook=function(options){
-      if(bottleNode && typeof bottleNode._returnRabbit === 'function') return bottleNode._returnRabbit(options);
-      return returnRabbitToBottle(options||{});
+  var C = window.__luguRealtimeCore;
+  if (!C) {
+    C = window.__luguRealtimeCore = {
+      hold:false, entryTimer:0, entry:null, overlay:null, frame:null, frameReady:false,
+      overlayVisible:false, returnHook:null, audioGuard:0, current:{character:'yunqi-koala', emotion:''}
     };
-    if(detail){ current.character=detail.characterId||current.character; current.emotion=detail.emotionName||detail.emotionId||current.emotion; }
-    ensureFrame();
-    clearTimeout(entryTimer);
-    entryTimer=setTimeout(showEntry, 3600);
+    Object.defineProperty(window, '__luguRealtimeHold', { get:function(){ return C.hold; }, configurable:true });
+
+    C.hideEntry = function(){ clearTimeout(C.entryTimer); C.entryTimer=0; if(C.entry){ C.entry.remove(); C.entry=null; } };
+    C.characterId = function(){ return C.current.character || 'yunqi-koala'; };
+    C.mood = function(){ return C.current.emotion || ''; };
+
+    C.ensureFrame = function(){
+      if (C.frame && C.overlay) return;
+      var ov = document.createElement('div');
+      ov.id = 'frontstageRealtimeOverlay';
+      ov.innerHTML = '<div class="fr-overlay-bar"><div class="fr-overlay-copy"><b>面对面实时对话</b><span>正在进入使者对话</span></div><button class="fr-overlay-close" type="button">结束对话并回瓶</button></div>';
+      var fr = document.createElement('iframe');
+      fr.id = 'frontstageRealtimeFrame';
+      fr.title = '面对面实时对话';
+      fr.allow = 'microphone *; autoplay; fullscreen; camera';
+      fr.setAttribute('allowfullscreen','');
+      fr.style.cssText = 'flex:1 1 auto;min-height:0;width:100%;border:0;background:#020407;display:block;';
+      fr.src = new URL('b74-embed.html?character=' + encodeURIComponent(C.characterId()) + '&emotion=' + encodeURIComponent(C.mood()), location.href).href;
+      fr.addEventListener('load', function(){
+        C.frameReady = true;
+        try { fr.contentWindow.__b74SelectCharacter?.(C.characterId()); fr.contentWindow.__b74SetMood?.(C.mood()); } catch(e){}
+      });
+      ov.appendChild(fr);
+      ov.querySelector('.fr-overlay-close').addEventListener('click', function(){ C.close(false); });
+      document.body.appendChild(ov);
+      C.overlay = ov; C.frame = fr;
+    };
+
+    C.showEntry = function(){
+      clearTimeout(C.entryTimer);
+      if (C.overlayVisible || C.entry) return;
+      var el = document.createElement('div');
+      el.id = 'frontstageRealtimeEntry';
+      el.innerHTML = '<button type="button" data-fr-talk>面对面聊聊</button><button type="button" class="fr-skip" data-fr-skip aria-label="先回瓶">\u00d7</button>';
+      document.body.appendChild(el);
+      el.querySelector('[data-fr-talk]').addEventListener('click', function(){ C.open(); });
+      el.querySelector('[data-fr-skip]').addEventListener('click', function(){
+        C.hold = false; C.hideEntry();
+        var h = C.returnHook; C.returnHook = null;
+        if (h) { try { h({force:true}); } catch(e){} }
+      });
+      C.entry = el;
+    };
+
+    C.open = function(){
+      C.ensureFrame();
+      if (!C.frameReady) { setTimeout(C.open, 150); return; }
+      C.hold = true;
+      C.hideEntry();
+      window.earthMusicEnabled = false;
+      try { stopEarthEffects(); stopMusic({immediate:true}); stopVoiceMusic({immediate:true}); } catch(e){}
+      try { if (sourceVideo) { sourceVideo.loop = true; sourceVideo.setAttribute('loop',''); if (sourceVideo.paused) sourceVideo.play().catch(function(){}); } } catch(e){}
+      clearInterval(C.audioGuard);
+      C.audioGuard = setInterval(function(){
+        if (!C.overlayVisible) return;
+        try { stopEarthEffects(); stopMusic({immediate:true}); stopVoiceMusic({immediate:true}); } catch(e){}
+      }, 1000);
+      document.documentElement.classList.add('frontstage-realtime-active');
+      C.overlay.style.display = 'flex';
+      C.overlayVisible = true;
+      try { C.frame.contentWindow.__b74SelectCharacter?.(C.characterId()); C.frame.contentWindow.__b74SetMood?.(C.mood()); C.frame.contentWindow.__b74OpenFaceToFace?.(); } catch(e){}
+    };
+
+    C.close = function(skip){
+      clearInterval(C.audioGuard); C.audioGuard = 0;
+      window.earthMusicEnabled = false;
+      try { stopEarthEffects(); stopMusic({immediate:true}); stopVoiceMusic({immediate:true}); } catch(e){}
+      try { if (window.syncAudioUI) window.syncAudioUI(); } catch(e){}
+      try { C.frame && C.frame.contentWindow && C.frame.contentWindow.__b74CloseForReuse?.(); } catch(e){}
+      document.documentElement.classList.remove('frontstage-realtime-active');
+      if (C.overlay) C.overlay.style.display = 'none';
+      C.overlayVisible = false;
+      C.hideEntry();
+      C.hold = false;
+      if (C.returnHook) { var h = C.returnHook; C.returnHook = null; try { h({force:true}); } catch(e){} }
+    };
+
+    window.addEventListener('message', function(ev){
+      if (ev && ev.data && ev.data.type === 'b74-session-ended') { try { C.close(false); } catch(e){} }
+    });
+    window.__luguRealtimeShowEntry = C.showEntry;
+    window.__luguRealtimeCleanup = function(){ C.hold = false; C.hideEntry(); C.close(true); };
+  }
+
+  // 每瓶重新绑定：捕获「本瓶闭包内」的 returnRabbitToBottle
+  window.__luguRealtimeShowEntry = C.showEntry;
+  window.__luguRealtimeArm = function(bottleNode, detail){
+    C.hold = true;
+    C.returnHook = function(options){
+      if (bottleNode && typeof bottleNode._returnRabbit === 'function') return bottleNode._returnRabbit(options);
+      return returnRabbitToBottle(options || {});
+    };
+    if (detail) { C.current.character = detail.characterId || C.current.character; C.current.emotion = detail.emotionName || detail.emotionId || C.current.emotion; }
+    C.ensureFrame();
+    clearTimeout(C.entryTimer);
+    C.entryTimer = setTimeout(C.showEntry, 3600);
   };
-  try{ window.__luguRealtimeCleanup = function(){ hold=false; hideEntry(); close(true); }; }catch(e){}
 })();
 
 function keepExpandedPlayback(event) {

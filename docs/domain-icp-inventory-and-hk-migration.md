@@ -315,3 +315,63 @@ B74 服务端健康（香港 `/lugu-b74/api/health`）：
 - **麦克风授权**：B74 面板内的麦克风按钮需要真人手势授权，CDP 无法代点系统权限弹窗。
 - **微信内置浏览器**：插件式 WebView，adb 无法拉起（与之前一致）。
 - 出瓶后二次点星无法重开（`star.clicked` 既有行为），需刷新页面；这是 0920 基线原有逻辑，本次未改动。
+
+---
+
+# 2026-10-05 第二次开瓶失败 —— 真根因与修复
+
+## 真正的根因：不是 `rabbitMessage`，是我 B74 模块的重复初始化
+
+诊断日志（临时加在 pages 构建之后）只打印了**一次**：
+
+```
+[DIAG] seqId=monkey-guilty copiesLen=1 msgLen=16 pagesLen=1 arrive=2.075
+```
+
+第二次开瓶**完全没打印** → 说明代码根本没执行到构建 pages 那一步，流程更早就中断了。
+同时 CDP 捕获到页面异常：
+
+```
+TypeError: Cannot redefine property: __luguRealtimeHold
+```
+
+`Object.defineProperty(window,'__luguRealtimeHold', …)` 默认 **non-configurable**。
+我的模块被注入在 `playFengxinRabbitAngryDemo` 的闭包内，**每开一瓶都会重新执行一次 IIFE**，
+第二次重复定义同名属性 → 抛 TypeError → **整段 `playFengxinRabbitAngryDemo` 初始化中断**
+→ 卡片文案/pages 从未构建 → 打字瞬间结束 → 放大定时器永不武装 → 瓶子永不放大。
+
+**这与我上一轮推测的 `rabbitMessage` 为空无关**，`msgLen=16 pagesLen=1` 证明文案来源本身是好的。
+
+## 修复：模块改为幂等
+
+核心状态与 DOM 从「每次 IIFE 局部变量」搬到 `window.__luguRealtimeCore`，只初始化一次：
+
+```js
+var C = window.__luguRealtimeCore;
+if (!C) {                                   // ← 只初始化一次
+  C = window.__luguRealtimeCore = { hold:false, entry:null, overlay:null, frame:null, … };
+  Object.defineProperty(window,'__luguRealtimeHold',{ get:function(){return C.hold;}, configurable:true });
+  C.showEntry = …; C.open = …; C.close = …; C.ensureFrame = …;
+}
+// 每瓶只重新绑定 arm（捕获本瓶闭包内的 returnRabbitToBottle），不再重建 DOM/属性
+window.__luguRealtimeArm = function(bottleNode, detail){ … };
+```
+
+未改 Player 时序、未加角色特判、未加延时补偿、未改 B74 后端、未改 C 生成链路。
+
+## 真机验收（HONOR LGE-AN00 / CDP 驱动）
+
+| 轮次 | 文案非空 | 放大 zoomLevel=2 | 出瓶 | 对话入口 | 进入对话 | 结束回瓶 | 结果 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 第 1 次 | 20 字 | ✅ t=16s | ✅ t=20s | ✅ t=24s | ✅ overlay=flex | ✅ t=32s | ✅ |
+| 第 2 次 | 16 字 | ✅ t=16s | ✅ t=20s | ✅ t=24s | ✅ overlay=flex | ✅ t=32s | ✅ |
+| 第 3 次 | 16 字 | ✅ t=16s | ✅ t=20s | ✅ t=24s | ✅ overlay=flex | ✅ t=32s | ✅ |
+
+**连续 3/3 全部通过**，且每轮之间无需刷新页面（真正的"下一轮可再次启动"）。
+
+## QQ 浏览器
+
+页面正常渲染（3422 色阶 / 55.4 万浅色像素）、logcat 无 `production-contract` / `Uncaught` / `net::ERR`；
+第一轮实测到 **「面对面聊聊」入口出现**（紫像素 5746，坐标 705×1537）并成功点击。
+但 **QQ 的内核不开放 WebView DevTools**（`webview_devtools_remote_*` 属于 `com.honor.browser`），
+且星星每次位置随机，纯坐标盲点无法稳定命中，因此 QQ 无法完成 3 次自动化闭环 —— 需人工确认。
