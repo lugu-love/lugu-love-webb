@@ -80,3 +80,81 @@ QQ 浏览器 ✅ 渲染（51.9 万浅色像素，无 JS 报错）；均无 `net:
 - 大陆机：`/etc/nginx/sites-enabled/suomalianjia-staging`、`candidate-suomaanjia` 的改动均已加注释块，删除块并 `nginx -s reload` 即回退；服务 `lugu-send.service` 未被改动。
 - 香港机：`suomalianjia-http` 只新增一行 `include`，注释掉即回退；`lugu-send.service` 为新增，`systemctl disable` 即移除。
 - 正式站入口 `index.html` **未做任何改动**，仍指向 `release-20260920-nuanshan-bear-r1`。
+
+---
+
+# 2026-10-04 香港本地化完成
+
+## 传输与校验
+
+```
+大陆 → 香港（经 /lugu-web/_migrate/ 走 IP 直传，无 SNI）
+lugu-send-app.tgz  294,454,596 B  md5 94ec07b483894245175446a959b0def5  ✅ 两侧一致
+lugu-web.tgz        70,178,101 B  md5 b80f4250c2c57ee2bf4f6e67f8975e7f  ✅ 两侧一致
+dashscope.env             134 B
+```
+
+## 香港本地部署
+
+| 项目 | 位置 |
+| --- | --- |
+| 后端代码 | `/opt/lugu-send/app`（108 文件，含 67 个 generation-masters） |
+| 虚拟环境 | `/opt/lugu-send/venv`（edge-tts / Pillow / dashscope / psycopg） |
+| 凭据 | `/etc/lugu-send/dashscope.env`（600） |
+| 静态站 | `/var/www/lugu-web`（899 文件） |
+| 服务 | `lugu-send.service` → **active + enabled**，`127.0.0.1:8791` |
+| 依赖 | `ffmpeg` 7:6.1.1 + `fonts-noto-cjk` 已装 |
+
+### 两处必要的基础设施调整（非业务逻辑）
+
+1. `server.py` 原硬编码 `ThreadingHTTPServer(("0.0.0.0", port))`，
+   初次启动后 **8791 对公网可达**（安全组放行）。改为读 `HOST` 环境变量，unit 内设 `HOST=127.0.0.1`，
+   现已只监听 `127.0.0.1:8791`。备份：`server.py.bak-migrate`。
+2. `Environment=FONT_FC=Noto Sans CJK SC` 含空格被 systemd 解析成多条无效变量，已加引号。
+3. `PrivateTmp=true` → `false`：视频落盘从 `/tmp/systemd-private-*/app-video-cache/`
+   改为持久 `/tmp/app-video-cache/`，服务重启后 `/app-video/*.mp4` 链接不再失效。
+
+## nginx 切换
+
+`/etc/nginx/snippets/lugu-web-send.conf`：
+
+```diff
+- proxy_pass http://47.109.185.222:80/lugu-send/;     # 大陆反代
++ proxy_pass http://127.0.0.1:8791/;                  # 香港本地
+- proxy_pass http://47.109.185.222:80/lugu-web/;      # 大陆反代
++ alias /var/www/lugu-web/;                            # 香港本地静态
+```
+
+备份：`lugu-web-send.conf.bak-mainland-proxy`。
+`grep -rn "47.109.185.222" /etc/nginx/{sites-enabled,snippets}` → **无任何引用**。
+`/lugu-b74/` 的 `include /etc/nginx/snippets/lugu-b74.conf;` **未改动**，`lugu-b74-doubao.service` 仍 active。
+
+## 脱离大陆依赖的证明
+
+| 证据 | 结果 |
+| --- | --- |
+| 香港 nginx 配置中大陆 IP 引用 | **0 处** |
+| 大陆 `lugu-send` 最后一次 `/make-send` 调用 | **10:09:32**（切换前） |
+| 切换（约 10:22）之后大陆 `/make-send` 调用数 | **0 次** |
+| 香港本地产出物 | `/tmp/app-video-cache/2WA924JE-…mp4`（真机下载的正是该文件） |
+
+## 真机验收（HONOR LGE-AN00 / Android 15 / ADB）
+
+| 项目 | 结果 |
+| --- | --- |
+| 首页 `/lugu-web/candidate-20261004-hotfix-ac-v1/` | 200 **verify=0** |
+| 情绪表达 `send-test.html` | 200 **verify=0** |
+| `build.json` / `asset-manifest.json` / `seven-stars-assets-manifest.json` | 200 **verify=0** |
+| `/lugu-send/status` | 200 **verify=0** |
+| 生成链路（切换后 ×3 次） | 202 → done → MP4 1,210,779 / 1,209,200 B |
+| 服务重启后再生成 | 202 → done → MP4 1,209,200 B |
+| HONOR 系统浏览器渲染 | ✅ 478,226 浅色像素 |
+| QQ 浏览器渲染 | ✅ 553,721 浅色像素 |
+| JS 报错 | 无 `net::ERR` / `Uncaught` / `production-contract` |
+
+## Rollback
+
+- 香港 nginx：`cp lugu-web-send.conf.bak-mainland-proxy lugu-web-send.conf && nginx -s reload`（退回大陆反代）
+- 香港后端：`systemctl disable --now lugu-send`（不影响其它服务）
+- 大陆侧：本次仅新增 `/var/www/lugu-web/_migrate/` 与 nginx 注释块，删除即回退；`lugu-send.service` 未改
+- 正式站 `index.html`：**一行未动**
