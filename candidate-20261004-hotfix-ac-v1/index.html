@@ -7345,6 +7345,16 @@ if (event.detail) followRabbitCard(event.detail);
 // （本版不做自动离场，瓶子留着，用户手动关闭。）
 {
 bottle.addEventListener("rabbit-returned-to-bottle", () => {
+// ==== 独立小修：回瓶完成后复位该星，允许再次点星重新走完整流程 ====
+// 该星在被点击时已从 stars 集合移除，因此不会被 updateVoiceStars 回收；
+// 这里只复位可见状态与 clicked 标记，不触碰任何播放时序。
+try {
+if (star && star.element && star.element.isConnected) {
+star.clicked = false;
+star.element.classList.remove("is-touched");
+}
+} catch (error) {}
+// ==== /独立小修 ====
 const video = bottle.querySelector(".fengxin-rabbit-video");
 if (!video) return;
 try { video.currentTime = 0; } catch (error) {}
