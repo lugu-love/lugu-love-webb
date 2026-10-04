@@ -215,3 +215,52 @@ Environment=APP_VIDEO_MAX_READS=1000000
 
 - 关持久化：unit 中删除 `APP_VIDEO_DIR/APP_VIDEO_PERSIST/APP_VIDEO_TTL/APP_VIDEO_MAX_READS` 四行 → 回到 `/tmp` + 600s TTL 原行为
 - 回滚代码：`cp server.py.bak-persist server.py`
+
+---
+
+# 2026-10-04 真机最终排查（无线 ADB）—— 发现并修复两个阻塞生成的问题
+
+设备：HONOR LGE-AN00 / Android 15，无线 ADB `192.168.1.8:40835`
+调试：`adb forward tcp:9222 localabstract:webview_devtools_remote_32385`
+→ DevTools 显示 `Chrome/116.0.5845.114 HonorBrowser/1.0.0`，可直接对真实页面做 DOM/JS/网络检查。
+
+## 阻塞 1：页面自暂停（**我自己引入的**）
+
+`runtime-config.js` 里我写了 `window.PRODUCTION_SITE_ENABLED = false;`
+而 `send-test.html` 的逻辑是：
+
+```js
+var staticOn = window.PRODUCTION_SITE_ENABLED !== false;
+if (!staticOn) { pause(); return; }     // 设 window.__SITE_PAUSED__ = true，隐藏 .app
+...
+async function generateVideo(){
+  if(window.__SITE_PAUSED__ === true){ showToast("服务暂时不可用，请稍后再试"); return; }  // 直接早退
+```
+
+真机实测：`window.__SITE_PAUSED__ === true`，点「生成视频 →」按钮文案始终不变、**零 `/lugu-send/` 请求**。
+
+修复：`PRODUCTION_SITE_ENABLED = true`。
+
+## 阻塞 2：健康检查硬编码已死的 `api.lugu.love`
+
+`send-test.html` 里 `fetch('https://api.lugu.love/status')`（Railway 已删除）。
+修复为同源：`fetch((window.LUGU_API_BASE || 'https://api.lugu.love') + '/status')`。
+
+## 真机验收结果
+
+| 项 | 结果 |
+| --- | --- |
+| 1 华为系统浏览器 | ✅ 打开并渲染（3624 色阶 / 46.7 万浅色像素），无 `net::ERR` |
+| 2 QQ 浏览器 | ✅ 打开情绪表达页并渲染（882 色阶 / 52.8 万浅色像素），无契约/网络错误 |
+| 3 微信内置浏览器 | ⏸ 其插件式 WebView 无法用 `am start` 拉起，需真人点链接 |
+| 4 首页漂流瓶放大 / 使者出瓶 | ✅ CDP 实测：t=1s 瓶子出现 → **t=16s `zoomLevel="2"`（放大）** → **t=20s `rabbitReleased="1"` + `.rabbit-expanded`（出瓶）** |
+| 5 面对面对话入口 | ❌ **本 Candidate 不含**（`grep 聊一聊呗/面对面/realtime` = 0）。入口在 `release-20261003-home-return-audio-v1`（聊一聊呗=1）与 `release-20261001-frontstage-realtime-v1`（面对面聊聊=1）。Candidate 基于 0920 基线，按「A+C 独立、不动 B」边界本就不含它 |
+| 6 情绪表达页 | ✅ `contractErr:false`；`build.json` 178ms、`asset-manifest.json` 268ms |
+| 7 视频生成（真实 UI 点击） | ✅ `make-send` **202** → `make-send/result` 轮询 → `app-video/…mp4` **200**；终态 `done:true`、`readyState:4` 正常播放 |
+| 8 保存 / 分享 | ✅ 华为/QQ 浏览器**无 Web Share API**（`navigator.share` undefined）→ 自动走三级降级第 3 级：提示「长按复制视频链接」并给出可用 URL `https://suomalianjia.cn/lugu-send/app-video/y_uuWBeY9ruqF4Z0_qu7PbckfJBwEcNl.mp4`，**不强制下载** |
+
+## 改动文件
+
+- `candidate-20261004-hotfix-ac-v1/runtime-config.js`：`PRODUCTION_SITE_ENABLED = true`
+- `candidate-20261004-hotfix-ac-v1/send-test.html`：健康检查改同源
+- 已部署到香港 `/var/www/lugu-web/release-20260920-nuanshan-bear-r1/`

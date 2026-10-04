@@ -569,7 +569,7 @@ window.__LUGU_BOOT__ = (function () {
   // 首屏优先：延后 2s 再发，避免和“当前使者”R2 素材抢首屏连接与带宽。
   setTimeout(function () {
     try {
-      fetch('https://api.lugu.love/status', { cache: 'no-store' })
+      fetch((window.LUGU_API_BASE || 'https://api.lugu.love') + '/status', { cache: 'no-store' })
         .then(function (r) { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
         .then(function (d) { if (d && d.enabled === false) { window.__SITE_PAUSED__ = true; } })
         .catch(function () {});
