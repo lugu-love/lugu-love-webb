@@ -3440,6 +3440,20 @@ letter-spacing: .2em;
 color: rgba(212, 226, 250, .62);
 }
 </style>
+
+<style id="frontstage-realtime-flow-style">
+#frontstageRealtimeEntry{position:fixed;left:50%;top:60%;z-index:90;display:flex;gap:7px;align-items:center;justify-content:center;padding:0;background:transparent;border:0;box-shadow:none}
+#frontstageRealtimeEntry button{min-height:36px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,235,195,.32);background:linear-gradient(135deg,rgba(143,118,255,.92),rgba(190,103,255,.9));color:#fff;font:650 13px/1 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;letter-spacing:.03em;box-shadow:0 6px 18px rgba(125,90,255,.24)}
+#frontstageRealtimeEntry .fr-skip{width:30px;height:30px;min-height:30px;padding:0;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;border-color:rgba(255,255,255,.24);background:rgba(8,12,25,.78);color:#fff;font-size:17px;line-height:1;box-shadow:0 6px 18px rgba(0,0,0,.24)}
+#frontstageRealtimeOverlay{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:9999;height:min(34svh,300px);min-height:220px;display:none;flex-direction:column;background:rgba(2,4,7,.95);pointer-events:none;border-top:1px solid rgba(255,255,255,.12);border-radius:20px 20px 0 0;overflow:hidden;box-shadow:0 -16px 42px rgba(0,0,0,.48)}
+#frontstageRealtimeOverlay .fr-overlay-bar{position:relative;z-index:2;flex:0 0 auto;pointer-events:auto;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:54px;padding:8px 14px;background:rgba(5,8,18,.96);border-bottom:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.86);font:500 13px/1.35 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif}
+#frontstageRealtimeOverlay .fr-overlay-copy{min-width:0;flex:1}
+#frontstageRealtimeOverlay .fr-overlay-copy b{display:block;color:#fff;font-size:14px}
+#frontstageRealtimeOverlay .fr-overlay-copy span{display:block;margin-top:3px;color:rgba(255,255,255,.58);font-size:11px}
+#frontstageRealtimeOverlay .fr-overlay-close{position:relative;z-index:3;pointer-events:auto;min-height:40px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;font:500 13px/1 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;white-space:nowrap}
+#frontstageRealtimeOverlay iframe{flex:1 1 auto;min-height:0;width:100%;border:0;background:#020407;pointer-events:auto}
+html.frontstage-realtime-active .voice-letter,html.frontstage-realtime-active .voice-bottle-replay-hint{display:none!important}
+</style>
 </head>
 <body>
 <main class="phone-stage" id="phoneStage" data-i18n-aria="phoneStage" aria-label="地球首页手机竖屏舞台">
@@ -4704,7 +4718,11 @@ delete container._replayNarrative;
 if (activeFengxinRabbitDemo === canvas) activeFengxinRabbitDemo = null;
 }
 
-function returnRabbitToBottle({ becomeStarAtBottle = false } = {}) {
+function returnRabbitToBottle({ becomeStarAtBottle = false, force = false } = {}) {
+// ==== 面对面实时对话（独立模块）唯一挂点：对话中/入口待选时挂住自动回瓶 ====
+if (window.__luguRealtimeHold && !force) { if (window.__luguRealtimeShowEntry) window.__luguRealtimeShowEntry(); return; }
+// ==== /独立模块 ====
+
 if (!canvas.isConnected || canvas.dataset.exiting === "1" || (rabbitStage !== "expanded" && rabbitStage !== "finished")) return;
 rabbitStage = "returning";
 canvas.removeEventListener("click", keepExpandedPlayback);
@@ -4862,6 +4880,114 @@ if (!returnFlightFinished) rabbitStage = "interrupted";
 }, FAST_EXIT_RETURN_DELAY_MS);
 });
 }
+
+
+// ============================================================================
+// 面对面实时对话 —— 独立模块（B74，香港节点）
+// 职责边界：只负责「出瓶后显示入口 → 打开对话 → 对话期间挂住回瓶 → 结束后回瓶」。
+// 不复制旧播放链，不改变漂流瓶播放状态机，不触碰 C 生成链路。
+// 唯一对既有链路的改动：returnRabbitToBottle 顶部的 hold 开关（见函数首行）。
+// ============================================================================
+(function(){
+  var hold=false, entryTimer=0, entry=null, overlay=null, frame=null, frameReady=false, overlayVisible=false, returnHook=null, audioGuard=0, prevAudio=null;
+  var current={character:'yunqi-koala',emotion:''};
+
+  function characterId(){ return current.character || 'yunqi-koala'; }
+  function mood(){ return current.emotion || ''; }
+
+  function hideEntry(){ clearTimeout(entryTimer); entryTimer=0; if(entry){ entry.remove(); entry=null; } }
+
+  function styleFrame(f){ if(f) { f.style.cssText='flex:1 1 auto;min-height:0;width:100%;border:0;background:#020407;display:block;'; } }
+
+  function ensureFrame(){
+    if(frame && overlay) return;
+    overlay=document.createElement('div');
+    overlay.id='frontstageRealtimeOverlay';
+    overlay.innerHTML='<div class="fr-overlay-bar"><div class="fr-overlay-copy"><b>面对面实时对话</b><span>正在进入使者对话</span></div><button class="fr-overlay-close" type="button">结束对话并回瓶</button></div>';
+    frame=document.createElement('iframe');
+    frame.id='frontstageRealtimeFrame';
+    frame.title='面对面实时对话';
+    frame.allow='microphone *; autoplay; fullscreen; camera';
+    frame.setAttribute('allowfullscreen','');
+    styleFrame(frame);
+    frame.src=new URL('b74-embed.html?character='+encodeURIComponent(characterId())+'&emotion='+encodeURIComponent(mood()), location.href).href;
+    frame.addEventListener('load', function(){
+      frameReady=true;
+      try { frame.contentWindow.__b74SelectCharacter?.(characterId()); frame.contentWindow.__b74SetMood?.(mood()); } catch(e){}
+    });
+    overlay.appendChild(frame);
+    overlay.querySelector('.fr-overlay-close').addEventListener('click', function(){ close(false); });
+    document.body.appendChild(overlay);
+  }
+
+  function showEntry(){
+    clearTimeout(entryTimer);
+    if(overlayVisible) return;
+    if(entry) return;
+    entry=document.createElement('div');
+    entry.id='frontstageRealtimeEntry';
+    entry.innerHTML='<button type="button" data-fr-talk>面对面聊聊</button><button type="button" class="fr-skip" data-fr-skip aria-label="先回瓶">\u00d7</button>';
+    document.body.appendChild(entry);
+    entry.querySelector('[data-fr-talk]').addEventListener('click', function(){ open(); });
+    entry.querySelector('[data-fr-skip]').addEventListener('click', function(){
+      hold=false; hideEntry();
+      var h=returnHook; returnHook=null;
+      if(h){ try{ h({force:true}); }catch(e){} }
+    });
+  }
+
+  function open(){
+    ensureFrame();
+    if(!frameReady){ setTimeout(open,150); return; }
+    hold=true;
+    hideEntry();
+    prevAudio=window.earthMusicEnabled;
+    window.earthMusicEnabled=false;
+    try{ stopEarthEffects(); stopMusic({immediate:true}); stopVoiceMusic({immediate:true}); }catch(e){}
+    if(sourceVideo){ try{ sourceVideo.loop=true; sourceVideo.setAttribute('loop',''); if(sourceVideo.paused) sourceVideo.play().catch(function(){}); }catch(e){} }
+    clearInterval(audioGuard);
+    audioGuard=setInterval(function(){
+      if(!overlayVisible) return;
+      try{ stopEarthEffects(); stopMusic({immediate:true}); stopVoiceMusic({immediate:true}); }catch(e){}
+    },1000);
+    document.documentElement.classList.add('frontstage-realtime-active');
+    overlay.style.display='flex';
+    overlayVisible=true;
+    try{ frame.contentWindow.__b74SelectCharacter?.(characterId()); frame.contentWindow.__b74SetMood?.(mood()); frame.contentWindow.__b74OpenFaceToFace?.(); }catch(e){}
+  }
+
+  function close(skip){
+    clearInterval(audioGuard); audioGuard=0;
+    window.earthMusicEnabled=false;
+    try{ stopEarthEffects(); stopMusic({immediate:true}); stopVoiceMusic({immediate:true}); }catch(e){}
+    try{ if(window.syncAudioUI) window.syncAudioUI(); }catch(e){}
+    try{ frame && frame.contentWindow && frame.contentWindow.__b74CloseForReuse?.(); }catch(e){}
+    document.documentElement.classList.remove('frontstage-realtime-active');
+    if(overlay) overlay.style.display='none';
+    overlayVisible=false;
+    hideEntry();
+    hold=false;
+    if(returnHook){ var h=returnHook; returnHook=null; try{ h({force:true}); }catch(e){} }
+  }
+
+  window.addEventListener('message', function(ev){ if(ev && ev.data && ev.data.type==='b74-session-ended') close(false); });
+
+  // 模块对外的三个接口（回瓶守卫读的就是 __luguRealtimeHold / __luguRealtimeShowEntry）
+  window.__luguRealtimeShowEntry = showEntry;
+  Object.defineProperty(window,'__luguRealtimeHold',{get:function(){return hold;}});
+  window.__luguRealtimeArm = function(bottleNode, detail){
+    hold=true;
+    returnHook=function(options){
+      if(bottleNode && typeof bottleNode._returnRabbit === 'function') return bottleNode._returnRabbit(options);
+      return returnRabbitToBottle(options||{});
+    };
+    if(detail){ current.character=detail.characterId||current.character; current.emotion=detail.emotionName||detail.emotionId||current.emotion; }
+    ensureFrame();
+    clearTimeout(entryTimer);
+    entryTimer=setTimeout(showEntry, 3600);
+  };
+  try{ window.__luguRealtimeCleanup = function(){ hold=false; hideEntry(); close(true); }; }catch(e){}
+})();
 
 function keepExpandedPlayback(event) {
 event.stopPropagation();
@@ -5094,6 +5220,7 @@ container.dataset.rabbitReleased = "1";
 container.classList.add("is-rabbit-releasing");
 if (isNarrativeTest) container.classList.add("is-rabbit-emerging");
 container.dispatchEvent(new CustomEvent("rabbit-expanded", { detail: {
+characterId: sequence && sequence.characterId, emotionId: sequence && sequence.emotionId, emotionName: sequence && sequence.emotionName,
 toBottom: cardAnchorTop + rabbitSize * rabbitVisibleBottomRatio,
 duration: isNarrativeTest ? (narrativeReplayActive ? 1200 : 4000) : 450,
 easing: isNarrativeTest ? "cubic-bezier(.18, .7, .16, 1)" : "cubic-bezier(.2, .72, .2, 1)"
@@ -7201,6 +7328,7 @@ letterNode?.classList.remove("is-following-rabbit-return");
 positionCardFromBottle();
 });
 bottle.addEventListener("rabbit-expanded", (event) => {
+try { if (window.__luguRealtimeArm) window.__luguRealtimeArm(bottle, event.detail); } catch (error) { console.warn("[realtime-arm]", error); }
 if (event.detail) {
 // The big rabbit pose already reserves room below its feet, so the card sits
 // BELOW the feet (gap 12) instead of being lifted over them: the first text

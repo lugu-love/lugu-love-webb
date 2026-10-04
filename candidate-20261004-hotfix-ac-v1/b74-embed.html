@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#020407">
+<title>面对面实时对话</title>
+<style>html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#020407}</style>
+</head>
+<body>
+<script>
+/* 香港节点：B74 实时对话服务（独立模块，不改播放链） */
+window.__B74_BASE_PATH = "https://suomalianjia.cn/b74";
+window.__B74_WS_URL = "wss://suomalianjia.cn/b74/ws/doubao";
+window.__B74_REGISTRY_URL = "https://suomalianjia.cn/b74/api/characters";
+window.__B74_CSS_URL = "https://suomalianjia.cn/b74/candidate.css?v=12";
+</script>
+<script>
+(function(){var l=document.createElement('link');l.rel='stylesheet';l.href=window.__B74_CSS_URL;document.head.appendChild(l);})();
+</script>
+<script type="module">
+import "./b74-candidate.js?v=1";
+const params = new URLSearchParams(location.search);
+const requestedCharacter = params.get("character") || "yunqi-koala";
+const requestedEmotion = params.get("emotion") || "";
+const apply = () => { try { window.__b74SelectCharacter?.(requestedCharacter); window.__b74SetMood?.(requestedEmotion); } catch (e) {} };
+if (window.__b74Ready && typeof window.__b74Ready.then === "function") { window.__b74Ready.then(apply); }
+else { apply(); }
+</script>
+</body>
+</html>

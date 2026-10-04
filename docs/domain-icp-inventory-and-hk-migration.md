@@ -264,3 +264,54 @@ async function generateVideo(){
 - `candidate-20261004-hotfix-ac-v1/runtime-config.js`：`PRODUCTION_SITE_ENABLED = true`
 - `candidate-20261004-hotfix-ac-v1/send-test.html`：健康检查改同源
 - 已部署到香港 `/var/www/lugu-web/release-20260920-nuanshan-bear-r1/`
+
+---
+
+# 2026-10-05 B74 面对面实时对话 —— 以独立模块接入当前 Candidate
+
+## 接入方式（不复制旧播放链、不改 A 状态机、不动 C 生成链路）
+
+参考实现来自 `release-20261003-home-return-audio-v1`，但**只移植模块本身**，并把后端地址从已失效的
+`candidate.suomaanjia.cn:8443` 改为香港 `suomalianjia.cn/b74`。
+
+新增/改动文件（都在 `candidate-20261004-hotfix-ac-v1/`）：
+
+| 文件 | 说明 |
+| --- | --- |
+| `b74-embed.html` | 新增。薄壳，指向 `https://suomalianjia.cn/b74`、`wss://suomalianjia.cn/b74/ws/doubao`、注册表 `/b74/api/characters` |
+| `b74-candidate.js` | 新增（43KB，从 1003 版原样复制，未改） |
+| `index.html` | ①CSS 块 ②模块 IIFE ③`returnRabbitToBottle` 顶部 hold 守卫 ④`rabbit-expanded` detail 增加 characterId/emotion ⑤出瓶后武装模块 |
+
+**对既有链路的唯一改动**是 `returnRabbitToBottle()` 顶部两行：
+
+```js
+function returnRabbitToBottle({ becomeStarAtBottle = false, force = false } = {}) {
+if (window.__luguRealtimeHold && !force) { if (window.__luguRealtimeShowEntry) window.__luguRealtimeShowEntry(); return; }
+```
+
+——只做「挂住/放行」，不改变任何播放、几何、状态推进逻辑。
+模块通过 `window.__luguRealtimeArm / __luguRealtimeHold / __luguRealtimeShowEntry` 三个接口与页面耦合，
+回瓶动作走同作用域的 `returnRabbitToBottle({force:true})`。
+
+## 真机验证（HONOR LGE-AN00 / CDP 驱动真实页面）
+
+| 步骤 | 实测 |
+| --- | --- |
+| 点星 → 出瓶 | t=16s `zoomLevel="2"`；t=20s `rabbitReleased="1"`，同时 `hold=true`、iframe 创建 |
+| 对话入口出现 | t=24s `#frontstageRealtimeEntry` 出现，文案 **「面对面聊聊」** |
+| 挂住回瓶 | t=20→48s `rabbitFinalState` 始终 `null`（**未自动回瓶**；接入前 t=36s 就回瓶了） |
+| 点击入口 | overlay `display:flex`、`frontstage-realtime-active`、`hold=true`、`final` 仍 `null` |
+| 对话面板资源 | `b74-embed.html` 200 / `candidate.css` 200 / `b74-candidate.js` 200 / `api/characters` 200 / 立绘 200×7 |
+| 面板内部 UI | 读取 iframe DOM 成功：**7 位使者选择器**（风信兔/光尾狐/星语鹿/暖山熊/云栖考拉/凌遥猴/玄星猫）+ 语言「普通话」+ 音色试听 |
+| 结束对话并回瓶 | 点 `.fr-overlay-close` → overlay 收起、`hold=false`、`active=false`；**t=5s 后 `rabbitFinalState="1"`（正常回瓶）** |
+
+B74 服务端健康（香港 `/lugu-b74/api/health`）：
+`key_configured:true`、`dashscope_configured:true`、`model:"1.2.6.1"`、
+`upstream: wss://openspeech.bytedance.com/api/v3/duplex/realtime/dialogue`、
+`languages: ["普通话","四川话","陕西话","粤语","东北话","上海话","英语"]`。
+
+## 未完成
+
+- **麦克风授权**：B74 面板内的麦克风按钮需要真人手势授权，CDP 无法代点系统权限弹窗。
+- **微信内置浏览器**：插件式 WebView，adb 无法拉起（与之前一致）。
+- 出瓶后二次点星无法重开（`star.clicked` 既有行为），需刷新页面；这是 0920 基线原有逻辑，本次未改动。
