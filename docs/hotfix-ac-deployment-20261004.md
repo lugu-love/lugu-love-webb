@@ -183,3 +183,84 @@ OPTIONS /make-send                204
 GET /make-send?...&async=1        202 {"job":"-i0PdIhlF_h_c2DL0Vhs7w"}
 GET /make-send/result?job=...     {"status":"done","videoPath":"/app-video/Yz7ttx7DvrShbEwwBuTeVsJVTsDQsjxN.mp4"}
 ```
+
+---
+
+# 2026-10-04 真机（HONOR LGE-AN00 / Android 15 / MagicOS）ADB 排查结论
+
+## 华为/QQ 打不开的**真正根因**：阿里云 ICP 备案合规拦截
+
+真机复现（`adb shell curl -v`）：
+
+```
+* Connected to candidate.suomaanjia.cn (47.109.185.222) port 443
+* TLSv1.2 (OUT), TLS handshake, Client hello (1):
+} [512 bytes data]
+* Recv failure: Connection reset by peer     <-- ClientHello 后立即被重置
+```
+
+同一台真机、同一 IP 的对照实验：
+
+| 请求 | 结果 | 说明 |
+| --- | --- | --- |
+| `http://candidate.suomaanjia.cn/...` | **403** | 响应头 `Server: Beaver`，标题 **"Non-compliance ICP Filing"**，跳 `aliyun.com/beian/beian-block` |
+| `https://47.109.185.222/`（SNI=IP） | 200 | 通 |
+| `https://47.109.185.222` + SNI `www.baidu.com` | 404 | 到达 nginx |
+| `https://47.109.185.222` + 随机 SNI | 404 | 到达 nginx |
+| `https://candidate.suomaanjia.cn`（SNI=该域名） | **RST** | 被拦 |
+| `https://suomalianjia.cn`（已备案，另一台） | 200 verify=0 | 通 |
+
+**结论：不是证书问题、不是 TLS 版本、不是 IPv6、不是华为兼容性。**
+`suomaanjia.cn` 未做 ICP 备案，阿里云对该域名在其 IP 上做合规拦截：
+HTTP 返回备案拦截页，HTTPS 按 SNI 直接 RST。所以任何指向这台阿里云机器的域名都会在境内被拦。
+
+（顺带完成的无害加固：为 `candidate.suomaanjia.cn` 加了 RSA 证书，443/8443 双证书 + 兼容密码套件。
+这不是根因，保留。）
+
+## 修复：改用无备案拦截的入口
+
+| 入口 | 地址 | 真机结果 |
+| --- | --- | --- |
+| IP 直连（页面+API 同源，无 SNI） | `http://47.109.185.222/lugu-web/candidate-20261004-hotfix-ac-v1/` | **200** |
+| 同入口情绪表达 | `http://47.109.185.222/lugu-web/candidate-20261004-hotfix-ac-v1/send-test.html` | **200** |
+| 后端 | `http://47.109.185.222/lugu-send/` | **200** |
+| GitHub Pages（HTTPS，证书受信） | `https://lugu-love.github.io/lugu-love-webb/candidate-20261004-hotfix-ac-v1/` | **200 verify=0** |
+
+`runtime-config.js` 改为同源推导：
+`window.LUGU_API_BASE = location.protocol + "//" + location.host + "/lugu-send"`，
+因此页面与 API 永远同源，换入口不用再改前端。
+
+## 微信"素材契约加载失败"根因（已修）
+
+`send-test.html` 第 4 行 `<base href="../release-20260920-nuanshan-bear-r1/">`
+会把所有相对请求改写到 `../release-20260920-nuanshan-bear-r1/`。
+最初部署在 `/hotfix-ac-v1/`，同级没有该目录 → 四个契约全部 **404**：
+
+- `…/release-20260920-nuanshan-bear-r1/build.json?v=0`
+- `…/release-20260920-nuanshan-bear-r1/asset-manifest.json`
+- `…/release-20260920-nuanshan-bear-r1/seven-stars-assets-manifest.json`
+- `…/release-20260920-nuanshan-bear-r1/blessing-manifest.json`
+
+→ `loadProductionManifest()` 首个 fetch 失败即落 `.catch()` → "生产素材契约加载失败，已停止生成。"
+
+修复：按 base href 重建部署目录 `/var/www/lugu-web/{candidate-…,release-20260920-nuanshan-bear-r1}`。
+契约文件本身经逐条校验无误（版本号 + 5 角色 11/8/15/11/15 条目）。
+
+## 真机验收结果
+
+| 项目 | 结果 |
+| --- | --- |
+| HONOR 系统浏览器打开 IP 入口 | ✅ 渲染正常（截图 1122×2442，3785 色阶，深色底符合站点） |
+| QQ 浏览器打开 IP 入口 | ✅ 渲染正常（3112 色阶） |
+| WebView JS 执行 | ✅ `setJavaScriptEnabled=true`，无 `net::ERR`、无 `Uncaught`、无 `production-contract` 报错、无渲染进程崩溃 |
+| 契约 URL（微信 UA） | ✅ 全部 200 + 正确 content-type |
+| 视频生成（真机网络栈） | ✅ `202 {"job":"yvwkcbx68dhVM__HLxDwMw"}` → `done` → `/app-video/7gfRGp9tChbNP4AD4ZzzwlGy3fBzhkkT.mp4` → **200 video/mp4 1,206,137 bytes** |
+| QQ 浏览器 + 微信 UA CORS | ✅ `access-control-allow-origin: *`，`OPTIONS /make-send` 204 |
+
+## 仍未完成
+
+- 微信内置浏览器必须**从聊天里点链接**打开（微信 WebView 是插件式 activity，`am start` 无法拉起），
+  需要真人在微信里点一次；UA 级契约与 API 已全部验证通过。
+- 面对面对话入口、保存/分享未验证（按指示暂停下载/分享修复）。
+- `http://` 入口无 TLS，`getUserMedia`（麦克风）在非安全上下文不可用；B 实时对话需要 HTTPS 入口。
+- 真正的长期修复：给一个**已备案域名**加一条 A 记录指向可用服务器（或把后端迁到非阿里云主机）。
