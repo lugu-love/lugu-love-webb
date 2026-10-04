@@ -158,3 +158,60 @@ dashscope.env             134 B
 - 香港后端：`systemctl disable --now lugu-send`（不影响其它服务）
 - 大陆侧：本次仅新增 `/var/www/lugu-web/_migrate/` 与 nginx 注释块，删除即回退；`lugu-send.service` 未改
 - 正式站 `index.html`：**一行未动**
+
+---
+
+# 2026-10-04 视频持久化收口
+
+## 关键发现：仅换目录不够
+
+`/app-video/` 的 token 注册表 `_app_videos` 是**纯内存 dict**，`take_app_video(token)` 只查内存。
+服务一重启注册表即空 → 旧链接必然 410，**与文件是否在磁盘无关**。
+且 `APP_VIDEO_TTL=600`、`APP_VIDEO_MAX_READS=3`，10 分钟或读 3 次即被删除。
+
+迁移前实测：`/tmp/app-video-cache` 已被 TTL 清空（0 文件），旧 token 返回 **410**。
+
+## 改动
+
+### 1. 配置（无代码）
+
+`/etc/systemd/system/lugu-send.service` 新增：
+
+```
+Environment=APP_VIDEO_DIR=/var/lib/lugu-send/app-video
+Environment=APP_VIDEO_PERSIST=1
+Environment=APP_VIDEO_TTL=315360000        # 10 年
+Environment=APP_VIDEO_MAX_READS=1000000
+```
+
+### 2. 后端（可选开关，默认关闭）
+
+`server.py` 新增 `APP_VIDEO_PERSIST`，仅在开启时：
+- 清理循环不再 `os.remove`
+- `take_app_video()` 在内存未命中时按 token 从 `APP_VIDEO_DIR` **磁盘回落**
+
+`_send_app_video` 原有 token 白名单 `[A-Za-z0-9_-]` 已阻止路径穿越。
+**不设置该环境变量时行为与原来完全一致。** 备份：`server.py.bak-persist`。
+
+### 3. nginx
+
+`/app-video/` **不需要独立映射** —— 它是 `/lugu-send/` 反代下由后端自己提供的路由
+（已确认 nginx 配置中无 `app-video` 条目）。故 nginx 侧本轮无改动，仅做 reload。
+
+## 验证
+
+| 项目 | 结果 |
+| --- | --- |
+| 旧链接（重启后） | **200**，1,209,609 B |
+| 同一 URL 重启前后内容 | md5 **完全一致** `299a64b6a378d0e28f17a36a4422219c` |
+| 新生成 | 202 → done → `/app-video/hlEH4uQ8TxkK6UVAd0qiN6rJ3aut9RUj.mp4` |
+| 新视频 | 200 `video/mp4` 1,208,409 B；ffprobe `h264 720x1280 + aac, 5.056s` |
+| 持久目录 | `/var/lib/lugu-send/app-video`，2 文件 / 2.4M |
+| `lugu-send` | active + enabled |
+| nginx | active |
+| `/lugu-b74/` | **未改动**，`lugu-b74-doubao.service` active，308 |
+
+## Rollback
+
+- 关持久化：unit 中删除 `APP_VIDEO_DIR/APP_VIDEO_PERSIST/APP_VIDEO_TTL/APP_VIDEO_MAX_READS` 四行 → 回到 `/tmp` + 600s TTL 原行为
+- 回滚代码：`cp server.py.bak-persist server.py`
