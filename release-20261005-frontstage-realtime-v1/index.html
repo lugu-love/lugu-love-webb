@@ -4909,8 +4909,15 @@ if (!returnFlightFinished) rabbitStage = "interrupted";
       var wantKey = wantChar + '|' + C.mood();
       // 角色或情绪变了必须重建 embed：iframe 的 ?character=/?emotion= 只在创建时生效，
       // 单例复用会让对话里永远停留在第一个开瓶的使者/情绪。
-      if (C.frame && C.overlay && C.frameChar === wantKey) return;
-      if (C.frame) { try { C.frame.remove(); } catch (e) {} C.frame = null; C.frameReady = false; }
+      if (C.frame && C.overlay && C.frame.isConnected && C.overlay.isConnected && C.frameChar === wantKey) return;
+      // 关键：重建时必须连旧 overlay 一起清掉。只 remove frame 会留下空 overlay，
+      // 多次开瓶后 DOM 里会累积多个 #frontstageRealtimeOverlay，
+      // 导致 querySelector 命中旧节点、对话里显示上一个使者的角色。
+      try {
+        var stale = document.querySelectorAll('#frontstageRealtimeOverlay');
+        for (var si = 0; si < stale.length; si++) stale[si].remove();
+      } catch (e) {}
+      C.overlay = null; C.frame = null; C.frameReady = false;
       var ov = document.createElement('div');
       ov.id = 'frontstageRealtimeOverlay';
       ov.innerHTML = '<div class="fr-overlay-bar"><div class="fr-overlay-copy"><b>面对面实时对话</b><span>正在进入使者对话</span></div><button class="fr-overlay-close" type="button">结束对话并回瓶</button></div>';
