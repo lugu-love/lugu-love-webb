@@ -2763,35 +2763,23 @@ window.__MAIN__ = function () {
         alphaVideo.removeEventListener("loadeddata", checkAlpha);
         if(token !== alphaVideoToken) return;
         if(delivery.alphaVideoPolicy === "lingyao-monkey-v1"){ reveal(); return; }
-        // loadeddata 时首帧往往还没解码完成，drawImage 会画出空白(全透明)，
-        // 导致"未抠像绿幕"被误判为合格而放行 —— 必须等真正有像素后再判定。
-        var attempts = 0;
-        var verify = function(){
-          if(token !== alphaVideoToken) return;
-          attempts++;
-          try {
-            var c=document.createElement("canvas"); c.width=16; c.height=16;
-            var cx=c.getContext("2d"); cx.clearRect(0,0,16,16); cx.drawImage(alphaVideo,0,0,16,16);
-            var d=cx.getImageData(0,0,16,16).data;
-            var transparent=0, opaque=0, opaqueGreen=0;
-            for(var i=0;i<d.length;i+=4){
-              if(d[i+3] < 20) transparent++;
-              else { opaque++; if(d[i+1] > d[i]+30 && d[i+1] > d[i+2]+30) opaqueGreen++; }
-            }
-            // 一帧都没画出来（全透明或全 0）→ 稍后重试，最多 5 次
-            if(opaque === 0 && attempts < 5){ setTimeout(verify, 200); return; }
-            if(transparent < 8 && opaqueGreen > 24){
-              failedSources.push({ url: url, reason: "green-screen" });
-              console.warn("[alpha-video] 该源是未抠像绿幕，已跳过", url);
-              // 余下候选（黑底 MP4）同样不透明，继续试只会换个颜色的方块。
-              // 直接走精灵图 canvas：PNG 序列自带 alpha，是唯一真透明的兜底。
-              fallbackCanvas();
-              return;
-            }
-          } catch(e) { /* 采样失败（跨域/解码差异）不阻断正常播放 */ }
-          reveal();
-        };
-        setTimeout(verify, 140);
+        try {
+          var c=document.createElement("canvas"); c.width=8; c.height=8;
+          var cx=c.getContext("2d"); cx.drawImage(alphaVideo,0,0,8,8);
+          var d=cx.getImageData(0,0,8,8).data;
+          var transparent=0, opaqueGreen=0;
+          for(var i=0;i<d.length;i+=4){
+            if(d[i+3] < 20) transparent++;
+            else if(d[i+1] > d[i]+30 && d[i+1] > d[i+2]+30) opaqueGreen++;
+          }
+          if(transparent < 8 && opaqueGreen > 24){
+            failedSources.push({ url: url, reason: "green-screen" });
+            console.warn("[alpha-video] 该源是未抠像绿幕，已跳过", url);
+            tryNextSource();
+            return;
+          }
+        } catch(e) { /* 采样失败（跨域/解码差异）不阻断正常播放 */ }
+        reveal();
       };
       alphaVideo.addEventListener("loadeddata", checkAlpha, {once:true});
       var pr = alphaVideo.play();

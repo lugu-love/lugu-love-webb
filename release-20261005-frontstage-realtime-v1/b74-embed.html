@@ -12,10 +12,7 @@
 /* 香港节点：B74 实时对话服务（独立模块，不改播放链） */
 window.__B74_BASE_PATH = "https://suomalianjia.cn/b74";
 window.__B74_WS_URL = "wss://suomalianjia.cn/b74/ws/doubao";
-/* 同源注册表：B74 的 /api/characters 不带 CORS 头，跨域 fetch 会被浏览器拦掉，
-   导致 state.characters 为空、__b74SelectCharacter 永远失败、对话恒显示默认考拉。
-   改为读取与本页同源的角色表副本，彻底不依赖 CORS。 */
-window.__B74_REGISTRY_URL = "./characters.v1.json";
+window.__B74_REGISTRY_URL = "https://suomalianjia.cn/b74/api/characters";
 window.__B74_CSS_URL = "https://suomalianjia.cn/b74/candidate.css?v=12";
 </script>
 <script>
