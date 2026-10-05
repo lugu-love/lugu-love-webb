@@ -4896,7 +4896,7 @@ if (!returnFlightFinished) rabbitStage = "interrupted";
   if (!C) {
     C = window.__luguRealtimeCore = {
       hold:false, entryTimer:0, entry:null, overlay:null, frame:null, frameReady:false,
-      overlayVisible:false, returnHook:null, audioGuard:0, current:{character:'yunqi-koala', emotion:''}
+      overlayVisible:false, returnHook:null, audioGuard:0, frameChar:null, current:{character:'yunqi-koala', emotion:''}
     };
     Object.defineProperty(window, '__luguRealtimeHold', { get:function(){ return C.hold; }, configurable:true });
 
@@ -4905,7 +4905,12 @@ if (!returnFlightFinished) rabbitStage = "interrupted";
     C.mood = function(){ return C.current.emotion || ''; };
 
     C.ensureFrame = function(){
-      if (C.frame && C.overlay) return;
+      var wantChar = C.characterId();
+      var wantKey = wantChar + '|' + C.mood();
+      // 角色或情绪变了必须重建 embed：iframe 的 ?character=/?emotion= 只在创建时生效，
+      // 单例复用会让对话里永远停留在第一个开瓶的使者/情绪。
+      if (C.frame && C.overlay && C.frameChar === wantKey) return;
+      if (C.frame) { try { C.frame.remove(); } catch (e) {} C.frame = null; C.frameReady = false; }
       var ov = document.createElement('div');
       ov.id = 'frontstageRealtimeOverlay';
       ov.innerHTML = '<div class="fr-overlay-bar"><div class="fr-overlay-copy"><b>面对面实时对话</b><span>正在进入使者对话</span></div><button class="fr-overlay-close" type="button">结束对话并回瓶</button></div>';
@@ -4916,6 +4921,7 @@ if (!returnFlightFinished) rabbitStage = "interrupted";
       fr.setAttribute('allowfullscreen','');
       fr.style.cssText = 'flex:1 1 auto;min-height:0;width:100%;border:0;background:#020407;display:block;';
       fr.src = new URL('b74-embed.html?character=' + encodeURIComponent(C.characterId()) + '&emotion=' + encodeURIComponent(C.mood()), location.href).href;
+      C.frameChar = wantKey;
       fr.addEventListener('load', function(){
         C.frameReady = true;
         try { fr.contentWindow.__b74SelectCharacter?.(C.characterId()); fr.contentWindow.__b74SetMood?.(C.mood()); } catch(e){}
@@ -4931,7 +4937,7 @@ if (!returnFlightFinished) rabbitStage = "interrupted";
       if (C.overlayVisible || C.entry) return;
       var el = document.createElement('div');
       el.id = 'frontstageRealtimeEntry';
-      el.innerHTML = '<button type="button" data-fr-talk>面对面聊聊</button><button type="button" class="fr-skip" data-fr-skip aria-label="先回瓶">\u00d7</button>';
+      el.innerHTML = '<button type="button" data-fr-talk>聊一聊呗</button><button type="button" class="fr-skip" data-fr-skip aria-label="先回瓶">\u00d7</button>';
       document.body.appendChild(el);
       el.querySelector('[data-fr-talk]').addEventListener('click', function(){ C.open(); });
       el.querySelector('[data-fr-skip]').addEventListener('click', function(){
@@ -4958,7 +4964,13 @@ if (!returnFlightFinished) rabbitStage = "interrupted";
       document.documentElement.classList.add('frontstage-realtime-active');
       C.overlay.style.display = 'flex';
       C.overlayVisible = true;
-      try { C.frame.contentWindow.__b74SelectCharacter?.(C.characterId()); C.frame.contentWindow.__b74SetMood?.(C.mood()); C.frame.contentWindow.__b74OpenFaceToFace?.(); } catch(e){}
+      try {
+        var w = C.frame.contentWindow;
+        var ready = w.__b74Ready;
+        var go = function(){ try { w.__b74SelectCharacter?.(C.characterId()); w.__b74SetMood?.(C.mood()); w.__b74OpenFaceToFace?.(); } catch(e){} };
+        // __b74SelectCharacter 在角色表未加载完时会静默返回 false，必须先等 __b74Ready
+        if (ready && typeof ready.then === 'function') { ready.then(go).catch(function(){}); } else { go(); }
+      } catch(e){}
     };
 
     C.close = function(skip){
