@@ -83,3 +83,50 @@ cd /private/tmp/lugu-frontstage-v2
 git revert --no-edit 0108b04 aefdbf0   # 或
 git push origin 5f901d5:main           # 直接回到 rollback commit
 ```
+
+---
+
+# 2026-10-05 追补：两处"不是最新版本"的修复
+
+用户反馈：① 入口文案应为「聊一聊呗」；② 瓶内使者与对话内角色不一致（瓶里是狐狸、对话是考拉）。
+
+## 修复 1：入口文案
+
+`面对面聊聊` → `聊一聊呗`（保留旁边圆形 `×` 先回瓶）。已上线验证。
+
+## 修复 2：对话角色与瓶内使者错位
+
+**真机实测到的错位（差一瓶）：**
+
+| 瓶 | 瓶内素材（真实使者） | iframe 角色 |
+| --- | --- | --- |
+| 1 | `monkey_06_stubborn_...`（凌遥猴） | `xinguang-fox`（光尾狐） |
+| 2 | `yunqi-koala-09-...`（云栖考拉） | `lingyao-monkey`（凌遥猴）= 上一瓶 |
+
+**两层根因：**
+
+1. `b74-candidate.js` 的 `__b74SelectCharacter` 在角色表未加载完时 **静默返回 false**
+   （`state.characters.find` 为空），而此时 embed 用的仍是创建时的 `requestedCharacter`。
+2. **主因**：`ensureFrame` 重建时只 `C.frame.remove()`，**没删旧 overlay**。
+   每次开瓶都会多留一个空的 `#frontstageRealtimeOverlay`（实测累积到 **4 个**），
+   `document.querySelector('#frontstageRealtimeOverlay')` 命中旧节点，
+   于是对话里显示的是上一个使者的角色与情绪。
+
+**修复：**
+
+- `ensureFrame` 以 `character|emotion` 为复用 key，变化时重建；
+- 重建前清掉**所有**历史 `#frontstageRealtimeOverlay`（连同其 iframe），并校验 `isConnected`；
+- `open()` 里选角色改为等 `__b74Ready` 就绪后再调 `__b74SelectCharacter`。
+
+**真机复验（HONOR，连续 3 瓶）：**
+
+| 瓶 | 瓶内使者 | iframe 角色 | 结果 |
+| --- | --- | --- | --- |
+| 1 | 暖山熊 `nuanshan-bear-08-...` | 暖山熊 `nuanshan-bear` | ✅ |
+| 2 | 风信兔 `rabbit_09_confused_...` | 风信兔 `fengxin-rabbit` | ✅ |
+| 3 | 光尾狐 `fox_pink_coquettish_...` | 光尾狐 `xinguang-fox` | ✅ |
+
+overlay 数始终 **1**；按钮文案 **聊一聊呗**；`character_id` 与前场 `characterId` 一一对应
+（B74 注册表：fengxin-rabbit / xinguang-fox / xingyu-deer / nuanshan-bear / yunqi-koala / lingyao-monkey / xuanxing-cat）。
+
+commit：`672970c`（文案 + 按角色重建）、`8ea91f4`（清理历史 overlay）。香港副本同步。
