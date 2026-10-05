@@ -4408,6 +4408,8 @@ function createBottleVideoController(sequence) {
 const candidates = bottleVideoSources(sequence);
 const element = document.createElement("video");
 element.className = "fengxin-rabbit-video";
+// 运行时抠绿需要读像素：R2 已返回 Access-Control-Allow-Origin，加 crossorigin 避免画布被污染
+try { element.crossOrigin = "anonymous"; element.setAttribute("crossorigin", "anonymous"); } catch (error) {}
 element.muted = true;
 element.defaultMuted = true;
 element.playsInline = true;
@@ -4487,6 +4489,81 @@ tryNextSource();
 tryNextSource();
 return controller;
 }
+
+// ============================================================================
+// 前场运行时抠绿（独立小模块）
+// 背景：Honor 的 Chromium 116 解不出 VP9 的 alpha 平面，绿幕遮罩色被直接播出。
+// 做法：把视频逐帧画进 canvas，把明显偏绿的像素键成透明，显示 canvas 代替视频。
+// 只在实测到「不透明绿幕」时启用；alpha 正常的浏览器（Chrome 138 / iOS）完全不受影响。
+// ============================================================================
+function installBottleGreenKeyer(video, sequence) {
+  if (!video) return null;
+  var active = false, raf = 0, canvas = null, ctx = null, W = 0, H = 0, last = 0;
+  var FPS = (sequence && sequence.playback && Number(sequence.playback.fps)) || 24;
+  var step = 1000 / (FPS || 24);
+  function probe() {
+    try {
+      var c = document.createElement("canvas"); c.width = 16; c.height = 16;
+      var x = c.getContext("2d"); x.clearRect(0, 0, 16, 16);
+      x.drawImage(video, 0, 0, 16, 16);
+      var d = x.getImageData(0, 0, 16, 16).data, tr = 0, gr = 0;
+      for (var i = 0; i < d.length; i += 4) {
+        if (d[i+3] < 20) tr++; else if (d[i+1] > d[i] + 30 && d[i+1] > d[i+2] + 30) gr++;
+      }
+      return { transparent: tr, green: gr };
+    } catch (e) { return null; }   // 画布被污染/尚未解码 → 不启用，保持原样
+  }
+  function start() {
+    if (active) return;
+    var r = probe();
+    if (!r || !(r.green > 60 && r.transparent < 8)) return;   // 不是绿幕 → 什么都不做
+    W = Math.min(480, video.videoWidth || 480);
+    H = Math.round(W * (video.videoHeight || 670) / (video.videoWidth || 480));
+    canvas = document.createElement("canvas");
+    canvas.width = W; canvas.height = H;
+    canvas.className = "fengxin-rabbit-video fengxin-rabbit-keyed";
+    ctx = canvas.getContext("2d", { willReadFrequently: true });
+    var host = video.parentNode;
+    var box = video.getBoundingClientRect();
+    canvas.style.cssText = video.style.cssText || "";
+    canvas.style.width = box.width ? box.width + "px" : "";
+    canvas.style.height = box.height ? box.height + "px" : "";
+    if (host) host.insertBefore(canvas, video);
+    video.style.visibility = "hidden";
+    active = true;
+    console.log("[frontstage-greenkey] 检测到不透明绿幕，已启用运行时抠绿", W + "x" + H);
+    loop(0);
+  }
+  function loop(now) {
+    if (!active) return;
+    raf = requestAnimationFrame(loop);
+    if (video.readyState < 2) return;
+    if (now - last < step) return;
+    last = now;
+    try {
+      ctx.clearRect(0, 0, W, H);
+      ctx.drawImage(video, 0, 0, W, H);
+      var img = ctx.getImageData(0, 0, W, H);
+      var d = img.data;
+      for (var i = 0; i < d.length; i += 4) {
+        var r = d[i], g = d[i+1], b = d[i+2];
+        if (g > r + 24 && g > b + 24) {
+          // 典型绿幕：绿明显占优 → 全透明
+          d[i+3] = 0;
+        } else if (g > r + 10 && g > b + 10) {
+          // 边缘溢色：去绿 + 半透明
+          d[i+1] = Math.max(r, b);
+          d[i+3] = Math.round(d[i+3] * 0.55);
+        }
+      }
+      ctx.putImageData(img, 0, 0);
+    } catch (e) { /* 采样失败则保持上一帧 */ }
+  }
+  video.addEventListener("loadeddata", function(){ setTimeout(start, 120); }, { once: true });
+  video.addEventListener("playing", function(){ if (!active) setTimeout(start, 200); }, { once: true });
+  return function stop(){ active = false; if (raf) cancelAnimationFrame(raf); raf = 0; if (canvas && canvas.parentNode) canvas.remove(); if (video) video.style.visibility = ""; };
+}
+
 function mountBottleVideoCharacter(stageElement, controller, sequence) {
 const frame = bottleVideoFrame(sequence);
 const cropWindow = document.createElement("div");
@@ -4509,6 +4586,9 @@ stageElement.appendChild(cropWindow);
 controller.ready.then(() => {
 if (controller.mode === "video") {
 cover.classList.add("is-hidden");
+// 前场运行时抠绿：Honor/Chromium116 解不出 VP9 alpha 时，绿幕遮罩会被直接播出。
+// 这里在视频真正开始播放前挂上抠绿器；alpha 正常的浏览器里它探测后会自动不启用。
+try { installBottleGreenKeyer(controller.element, sequence); } catch (error) { console.warn("[frontstage-greenkey]", error); }
 // 用户点击心星属于主动交互：视频一进入场景就立即播放。
 controller.play();
 } else {
@@ -6866,7 +6946,11 @@ if (!activeVoiceExperience) return null;
 return activeVoiceExperience.close();
 }
 
-function openVoiceBottle(star){if(star.clicked)return;const outgoingExit=closeActiveVoiceExperience();const handoffDelay=outgoingExit ? 600 : 450;const beganSoundSession=!earthSoundUnlocked;unlockEarthSounds();dismissTouchGuide();stopMusic();if(!beganSoundSession){const primedVoiceAudio=startVoiceMusic({startSilent:true});playStarClickSound(()=>revealVoiceMusic(primedVoiceAudio));}else{scheduleVoiceMusicStart();}unlockTypingKeySounds();star.clicked=true;star.element.classList.add("is-touched");
+function openVoiceBottle(star){if(star.clicked)return;
+// 开新瓶前必须先收掉上一轮面对面对话：否则旧对话面板会一直挂着，
+// 且其 hold 会挡住新瓶的「聊一聊呗」入口（showEntry 在 overlayVisible 时直接 return）。
+try { if (window.__luguRealtimeCleanup) window.__luguRealtimeCleanup(); } catch (error) {}
+const outgoingExit=closeActiveVoiceExperience();const handoffDelay=outgoingExit ? 600 : 450;const beganSoundSession=!earthSoundUnlocked;unlockEarthSounds();dismissTouchGuide();stopMusic();if(!beganSoundSession){const primedVoiceAudio=startVoiceMusic({startSilent:true});playStarClickSound(()=>revealVoiceMusic(primedVoiceAudio));}else{scheduleVoiceMusicStart();}unlockTypingKeySounds();star.clicked=true;star.element.classList.add("is-touched");
 
 // 点击心星是主动交互：立刻选好这一瓶的使者并开始加载它的正式视频，
 // 不再等 15 张图集，也不让用户先看到静态封面干等。
