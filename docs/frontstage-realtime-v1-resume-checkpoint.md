@@ -130,3 +130,62 @@ overlay 数始终 **1**；按钮文案 **聊一聊呗**；`character_id` 与前�
 （B74 注册表：fengxin-rabbit / xinguang-fox / xingyu-deer / nuanshan-bear / yunqi-koala / lingyao-monkey / xuanxing-cat）。
 
 commit：`672970c`（文案 + 按角色重建）、`8ea91f4`（清理历史 overlay）。香港副本同步。
+
+---
+
+# 2026-10-05 第二轮追补：用户报的三个问题
+
+## 问题 1「所有使者对话里都是考拉」— 已修并真机验证 ✅
+
+**实测（真机 CDP，读 iframe 内部渲染）：**
+
+| 瓶内使者 | iframe `?character=` | `#b74-face-title` | `#b74-face-poster` |
+| --- | --- | --- | --- |
+| 光尾狐 | `xinguang-fox` ✓ | 云栖考拉 ✗ | `yunqi-koala/main.png` ✗ |
+| 凌遥猴 | `lingyao-monkey` ✓ | 云栖考拉 ✗ | `yunqi-koala/main.png` ✗ |
+
+**根因**：`b74-candidate.js` 的 `loadCharacterRegistry()` 去 fetch `window.__B74_REGISTRY_URL`
+（我原先设成 `https://suomalianjia.cn/b74/api/characters`）。但 **B74 的 `/api/characters` 不带
+`Access-Control-Allow-Origin`**（对比 `/lugu-send/status` 有 `*`），embed 在 `lugu-love.github.io`
+上跨域 fetch 被浏览器拦掉 → `state.characters = []` → `__b74SelectCharacter` 里
+`state.characters.find(...)` 找不到 → 静默 `return false` → `applyCharacter` 不执行 →
+停在 `DEFAULT_POSTER`（云栖考拉）。
+
+**修复**：把角色表落成同源文件 `characters.v1.json`（33KB / 7 使者），
+`__B74_REGISTRY_URL = "./characters.v1.json"`，彻底不依赖 CORS（也未改 nginx）。
+
+**修复后真机验证**：光尾狐 → `face-title 光尾狐` + `xinguang-fox/main.png`；
+凌遥猴 → `face-title 凌遥猴` + `lingyao-monkey/main.png`。
+
+## 问题 2「对话时点不到其他星星」— 已改，部分验证 ⚠️
+
+**根因**：星星层 `z-index:2`，对话面板 `z-index:9999`，面板覆盖区域的星星点不到。
+
+**修复**：`html.frontstage-realtime-active .voice-star-layer{z-index:10000}`
+（图层本身 `pointer-events:none`、星星 `pointer-events:auto`，不挡对话交互）。
+
+**真机验证**：对话打开后，面板外的星星命中测试 7/7 通过；
+落在面板内「结束对话并回瓶」按钮上的那颗仍被按钮挡住（该按钮必须可点，属预期）。
+**尚未干净验证**：正落在 iframe 区域的星星 —— 多轮测试里对话面板反复处于关闭态，未能稳定复现开态样本。
+
+## 问题 3「情绪表达页使者带立方块背景并挡住选择使者」— 已修并真机验证 ✅
+
+**真机实测**：`#alphaVideo` 播 `rabbit_12_apology_alpha_vp9.webm` 时四角采样
+`[0,177,14,255]` = **不透明纯绿**，`transparentCount:0 / greenCount:222`。这就是那个"立方块"。
+
+**根因两层**：
+1. 绿幕体检挂在 `loadeddata`，那时**首帧还没解码**，`drawImage` 画出空白（全透明），
+   于是 `transparent < 8` 不成立 → 判定通过 → `reveal()` 放行了未抠像源。
+   （素材源 CORS 正常、画布可采样，已排除跨域污染。）
+2. 即便拒掉绿幕，下一候选是**黑底 MP4** —— 只是把绿方块换黑方块。
+
+**修复**：等真正有像素后再判定（全透明则重试最多 5 次 ×200ms）；判定为绿幕时
+**直接走精灵图 canvas**（PNG 自带 alpha，唯一真透明兜底），不再退到黑底 MP4。
+
+**修复后真机验证**：`alphaVideo` 隐藏、`#stage` canvas 显示，
+像素统计 **不透明 29189 / 透明 262411 / 绿 19** → 透明角色，无方块。
+布局实测：使者预览 y=104..360，使者选择行 y=60..96，**无重叠**，选择行 `z-index:82` 在预览之上可点。
+
+## 涉及提交
+
+`01e69ec`（绿幕体检）、`5f14c6f`（同源注册表 + 星星层 z-index）
