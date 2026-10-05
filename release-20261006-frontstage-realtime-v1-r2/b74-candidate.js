@@ -17,9 +17,6 @@ const state = {
   connected: false,
   closing: false,
   language: '普通话',
-  expressionMode: 'accent',
-  mood: '',
-  subtitleText: '',
   profile: null,
   characters: [],
   voiceSelections: loadSavedVoiceSelections(),
@@ -34,10 +31,6 @@ const state = {
   idleTimer: null,
   lifeLoopTimer: null,
   audioCtx: null,
-  mediaDest: null,
-  outputFilter: null,
-  captureSink: null,
-  outputAudio: null,
   mediaStream: null,
   sourceNode: null,
   processor: null,
@@ -117,11 +110,9 @@ function createTransition({ returning = false } = {}) {
   transitionLayer.id = 'b74-transition';
   transitionLayer.innerHTML = `<img src="${posterUrl}" alt="${state.profile?.formal_name || '云栖考拉'}">`;
   document.body.appendChild(transitionLayer);
-  const layer = transitionLayer;
   requestAnimationFrame(() => {
-    if (!layer || !layer.isConnected) return;
-    layer.classList.add('show');
-    if (!returning) setTimeout(() => { if (layer.isConnected) layer.classList.add('zoom'); }, 80);
+    transitionLayer.classList.add('show');
+    if (!returning) setTimeout(() => transitionLayer.classList.add('zoom'), 80);
   });
   return transitionLayer;
 }
@@ -136,11 +127,6 @@ function createFaceLayer() {
     <div id="b74-video-states"></div>
     <img id="b74-face-poster" src="${posterUrl}" alt="${state.profile?.formal_name || '云栖考拉'}">
     <div id="b74-face-title">${state.profile?.formal_name || '云栖考拉'}</div>
-    <div id="b74-mode-wrap" role="group" aria-label="表达模式">
-      <button type="button" data-mode="accent">原文 + 方言</button>
-      <button type="button" data-mode="local">地方口语</button>
-      <button type="button" data-mode="other">其他地方</button>
-    </div>
     <div id="b74-language-wrap">
       <label for="b74-language">当前语言</label>
       <select id="b74-language">
@@ -153,7 +139,6 @@ function createFaceLayer() {
         <option value="英语">English</option>
       </select>
     </div>
-    <div id="b74-subtitle" aria-live="polite"></div>
     <div id="b74-face-status">正在让云栖考拉出来…</div>
     <div id="b74-face-controls">
       <button id="b74-mic" type="button">麦克风：开</button>
@@ -187,47 +172,11 @@ function createFaceLayer() {
     if (state.connected && state.ws?.readyState === WebSocket.OPEN) {
       stopPlayback();
       state.ws.send(JSON.stringify({ type: 'cancel' }));
-      state.ws.send(JSON.stringify({ type: 'switch_language', language, mode: state.expressionMode }));
+      state.ws.send(JSON.stringify({ type: 'switch_language', language }));
       setStatus(`正在切换到${language}…`, 'connecting');
     }
   });
-  faceLayer.querySelectorAll('#b74-mode-wrap [data-mode]').forEach(button => {
-    button.addEventListener('click', () => setExpressionMode(button.dataset.mode));
-  });
-  updateExpressionModeUI();
   return faceLayer;
-}
-
-function modeLabel(mode) {
-  return mode === 'local' ? '地方口语' : mode === 'other' ? '其他地方' : '原文 + 方言';
-}
-
-function updateExpressionModeUI() {
-  if (!faceLayer) return;
-  faceLayer.querySelectorAll('#b74-mode-wrap [data-mode]').forEach(button => {
-    const active = button.dataset.mode === state.expressionMode;
-    button.classList.toggle('is-active', active);
-    button.setAttribute('aria-pressed', String(active));
-  });
-}
-
-function setExpressionMode(mode) {
-  state.expressionMode = ['accent', 'local', 'other'].includes(mode) ? mode : 'accent';
-  updateExpressionModeUI();
-  if (state.connected && state.ws?.readyState === WebSocket.OPEN) {
-    stopPlayback();
-    state.ws.send(JSON.stringify({ type: 'cancel' }));
-    state.ws.send(JSON.stringify({ type: 'switch_mode', mode: state.expressionMode, language: state.language }));
-    setStatus(`已切换到${modeLabel(state.expressionMode)}`, 'connecting');
-  }
-}
-
-function setSubtitle(text) {
-  state.subtitleText = String(text || '').trim();
-  if (faceLayer) {
-    const node = faceLayer.querySelector('#b74-subtitle');
-    if (node) node.textContent = state.subtitleText;
-  }
 }
 
 function setStatus(text, mode = 'idle') {
@@ -457,28 +406,11 @@ function flushAudioQueue() {
 async function initializeAudio() {
   if (!state.audioCtx) state.audioCtx = new AudioContext({ latencyHint: 'interactive' });
   await state.audioCtx.resume();
-  if (!state.mediaDest) state.mediaDest = state.audioCtx.createMediaStreamDestination();
-  if (!state.outputFilter) { state.outputFilter = state.audioCtx.createBiquadFilter(); state.outputFilter.type = "highpass"; state.outputFilter.frequency.value = 90; state.outputFilter.Q.value = 0.7; state.outputFilter.connect(state.mediaDest); }
-  if (!state.captureSink) state.captureSink = state.audioCtx.createMediaStreamDestination();
-  if (!state.outputAudio) {
-    const output = document.createElement('audio');
-    output.id = 'b74-audio-output';
-    output.autoplay = true;
-    output.playsInline = true;
-    output.setAttribute('playsinline', '');
-    output.style.display = 'none';
-    document.body.appendChild(output);
-    state.outputAudio = output;
-  }
-  if (state.outputAudio.srcObject !== state.mediaDest.stream) state.outputAudio.srcObject = state.mediaDest.stream;
-  state.outputAudio.play().catch(() => {});
-  const usableStream = state.mediaStream && state.mediaStream.getAudioTracks().some(track => track.readyState === "live");
-  if (!usableStream) {
+  if (!state.mediaStream) {
     state.mediaStream = await navigator.mediaDevices.getUserMedia({
       audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true },
     });
   }
-  for (const track of state.mediaStream.getAudioTracks()) track.enabled = true;
   if (!state.sourceNode) {
     state.sourceNode = state.audioCtx.createMediaStreamSource(state.mediaStream);
     state.processor = state.audioCtx.createScriptProcessor(2048, 1, 1);
@@ -486,7 +418,7 @@ async function initializeAudio() {
     state.sinkGain.gain.value = 0;
     state.sourceNode.connect(state.processor);
     state.processor.connect(state.sinkGain);
-    state.sinkGain.connect(state.captureSink);
+    state.sinkGain.connect(state.audioCtx.destination);
     state.processor.onaudioprocess = event => {
       if (!state.connected || state.closing || state.muted) return;
       const input = event.inputBuffer.getChannelData(0);
@@ -509,7 +441,8 @@ function stopAudioCapture() {
   state.sourceNode = null;
   state.processor = null;
   state.sinkGain = null;
-  if (state.mediaStream) for (const track of state.mediaStream.getAudioTracks()) track.enabled = false;
+  if (state.mediaStream) for (const track of state.mediaStream.getTracks()) track.stop();
+  state.mediaStream = null;
 }
 
 function sendClientMetric(name, value) {
@@ -539,7 +472,7 @@ function drainAudioQueue() {
     state.audioQueuedSeconds = Math.max(0, state.audioQueuedSeconds - buffer.duration);
     const source = state.audioCtx.createBufferSource();
     source.buffer = buffer;
-    source.connect(state.outputFilter || state.mediaDest || state.audioCtx.destination);
+    source.connect(state.audioCtx.destination);
     const startAt = Math.max(state.audioCtx.currentTime + 0.015, state.nextPlayTime || state.audioCtx.currentTime + 0.015);
     source.start(startAt);
     state.nextPlayTime = startAt + buffer.duration;
@@ -562,15 +495,6 @@ function enqueuePcmAudio(base64) {
   const bytes = base64ToBytes(base64);
   if (bytes.byteLength < 2) return;
   const pcm = new Int16Array(bytes.buffer, bytes.byteOffset, Math.floor(bytes.byteLength / 2));
-  let sumSquares = 0;
-  let peak = 0;
-  for (let i = 0; i < pcm.length; i += 1) {
-    const value = pcm[i] / 32768;
-    sumSquares += value * value;
-    if (Math.abs(value) > peak) peak = Math.abs(value);
-  }
-  const rms = Math.sqrt(sumSquares / Math.max(1, pcm.length));
-  if (rms < 0.0025 && peak < 0.015) return;
   const buffer = state.audioCtx.createBuffer(1, pcm.length, OUTPUT_RATE);
   const channel = buffer.getChannelData(0);
   for (let i = 0; i < pcm.length; i += 1) channel[i] = pcm[i] / 32768;
@@ -634,29 +558,19 @@ function updateVoiceActivity(input) {
 
 function openingText(language) {
   const name = state.profile?.formal_name || '云栖考拉';
-  const mood = String(state.mood || '').trim();
-  if (language === '英语') {
-    return mood
-      ? `Hello, I am ${name}. I am coming out with a feeling of ${mood}. Let me tell you how I feel before we talk.`
-      : `Hello, I am ${name}, one of the Seven Star Messengers. What would you like to talk about?`;
-  }
-  return mood
-    ? `你好，我是${name}。我现在带着一点${mood}的心情出来，先想和你说说这份心情，再慢慢听你说。`
-    : `你好，我是七星使者${name}。你有什么要说的吗？`;
+  if (language === '英语') return `Hello, I am ${name}, one of the Seven Star Messengers. What would you like to talk about?`;
+  return `你好，我是七星使者${name}。你有什么要说的吗？`;
 }
 
-function openingPrompt(language, expressionMode = 'accent') {
+function openingPrompt(language) {
   if (language === '英语') return 'Speak in natural conversational English.';
   if (language === '普通话') return '用自然、亲切、温暖的普通话说这句话。';
-  if (expressionMode === 'local') return `直接使用自然的${language}地方口语说这句话，句式要像当地人日常聊天。`;
-  if (expressionMode === 'other') return `保留普通话词义，使用邻近地区常见、易懂的${language}口音和表达说这句话。`;
-  return `只给普通话原文加入自然、不过度夸张的${language}口音，不要把词义改成方言词。`;
+  return `用自然、亲切、不过度夸张的${language}口音说这句话。`;
 }
 
 function connect() {
   const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const wsUrl = window.__B74_WS_URL || `${protocol}//${location.host}${BASE_PATH}/ws/doubao`;
-  const ws = new WebSocket(wsUrl);
+  const ws = new WebSocket(`${protocol}//${location.host}${BASE_PATH}/ws/doubao`);
   state.ws = ws;
   state.closing = false;
   setStatus('正在让云栖考拉出来…', 'connecting');
@@ -665,7 +579,6 @@ function connect() {
     ws.send(JSON.stringify({
       type: 'start',
       language: state.language,
-      mode: state.expressionMode,
       characterId: state.profile?.character_id || DEFAULT_CHARACTER_ID,
       speaker: selectedSpeakerFor(state.profile),
     }));
@@ -699,10 +612,6 @@ function handleServerEvent(event) {
       }
       if (event.source === 'voice_intent') setStatus(`已切换到${state.language}`, 'idle');
       break;
-    case 'proxy.mode_ready':
-      state.expressionMode = event.mode || state.expressionMode;
-      updateExpressionModeUI();
-      break;
     case 'proxy.voice_ready':
       state.currentSpeaker = event.speaker || state.currentSpeaker;
       renderVoiceAudition();
@@ -719,12 +628,11 @@ function handleServerEvent(event) {
         state.ws.send(JSON.stringify({
           type: 'say',
           text: openingText(state.language),
-          tts_prompt: openingPrompt(state.language, state.expressionMode) + (state.mood ? ` 语气要自然体现“${state.mood}”的情绪。` : ''),
+          tts_prompt: openingPrompt(state.language),
         }));
       }
       break;
     case 'conversation.item.input_audio_transcription.started':
-      setSubtitle('');
       if (state.phase === 'speaking' || state.playbackStarted || state.audioQueue.length) triggerUserInterrupt();
       else stopPlayback();
       state.interruptSent = false;
@@ -733,7 +641,6 @@ function handleServerEvent(event) {
       setStatus('正在听你说', 'listening');
       break;
     case 'conversation.item.input_audio_transcription.completed':
-      setSubtitle(event.transcript || '');
       state.phase = 'thinking';
       setVideoState('thinking');
       setStatus('云栖考拉正在想…', 'thinking');
@@ -746,12 +653,6 @@ function handleServerEvent(event) {
       state.firstAudioDeltaAt = 0;
       setVideoState('speaking');
       setStatus(`${state.profile?.formal_name || '使者'}正在说`, 'speaking');
-      break;
-    case 'response.output_text.delta':
-      setSubtitle((state.subtitleText || '') + (event.delta || ''));
-      break;
-    case 'response.output_text.done':
-      setSubtitle(event.text || state.subtitleText || '');
       break;
     case 'response.output_audio.delta':
       if (event.delta) enqueuePcmAudio(event.delta);
@@ -824,10 +725,9 @@ async function openFaceToFace() {
   } catch (error) {
     setStatus('需要麦克风权限', 'idle');
     console.error('[B74 microphone]', error);
-    return false;
+    return;
   }
   setTimeout(connect, 850);
-  return true;
 }
 
 function sendClose() {
@@ -847,7 +747,6 @@ function finishSession({ returnHome = true } = {}) {
   if (voicePanel && !voicePanel.hidden) toggleVoiceAudition(false);
   sendClose();
   stopVideoLayer();
-  try { if (window.parent && window.parent !== window) window.parent.postMessage({ type: 'b74-session-ended' }, '*'); } catch (error) {}
   setStatus('正在回到地球…', 'idle');
   const returning = createTransition({ returning: true });
   setTimeout(() => {
@@ -1117,44 +1016,31 @@ async function loadCharacterRegistry() {
 const observer = new MutationObserver(() => ensureTalkButton());
 observer.observe(document.body, { childList: true, subtree: true });
 ensureTalkButton();
-window.__b74Ready = loadCharacterRegistry();
-window.__b74OpenFaceToFace = openFaceToFace;
-window.__b74SetMood = function(mood) { state.mood = String(mood || "").trim(); };
-window.__b74CloseForReuse = function() {
-  try { sendClose(); } catch (error) {}
-  try { stopVideoLayer(); } catch (error) {}
-  state.openingSent = false;
-  state.subtitleText = "";
-  try { state.outputAudio?.pause(); } catch (error) {}
-  if (faceLayer) faceLayer.hidden = true;
-  document.body.classList.remove("b74-transitioning");
-  try { transitionLayer?.remove(); } catch (error) {}
-  transitionLayer = null;
-};
-window.__b74SelectCharacter = function(characterId) {
+const __registryPromise = loadCharacterRegistry();
+
+window.addEventListener('pagehide', () => { stopVideoLayer(); sendClose(); });
+window.addEventListener('offline', sendClose);
+
+
+// ============================================================================
+// 前场接入胶水（embed 接口）
+// 本文件是 ES module，顶层函数不可从外部访问，因此在这里主动暴露给宿主页面。
+// ============================================================================
+window.__b74Ready = __registryPromise;
+window.__b74SelectCharacter = function (characterId) {
   const id = String(characterId || '').trim();
   const profile = state.characters.find(item => item.character_id === id);
   if (!profile) return false;
   applyCharacter(profile);
   return true;
 };
-
-function releaseMicrophone() {
-  try { state.outputAudio?.pause(); } catch (error) {}
-  try { state.outputAudio?.remove(); } catch (error) {}
-  state.outputAudio = null;
-  try { state.outputFilter?.disconnect(); } catch (error) {}
-  state.outputFilter = null;
-  try { state.mediaDest?.disconnect(); } catch (error) {}
-  state.mediaDest = null;
-  try { state.captureSink?.disconnect(); } catch (error) {}
-  state.captureSink = null;
-  try { state.audioCtx?.close(); } catch (error) {}
-  state.audioCtx = null;
-  if (!state.mediaStream) return;
-  for (const track of state.mediaStream.getTracks()) track.stop();
-  state.mediaStream = null;
-}
-
-window.addEventListener('pagehide', () => { stopVideoLayer(); sendClose(); releaseMicrophone(); });
-window.addEventListener('offline', sendClose);
+window.__b74SetMood = function (mood) { state.mood = String(mood || '').trim(); };
+window.__b74OpenFaceToFace = openFaceToFace;
+window.__b74CloseForReuse = function () {
+  try { sendClose(); } catch (error) {}
+  try { stopVideoLayer(); } catch (error) {}
+  if (faceLayer) faceLayer.hidden = true;
+  try { document.body.classList.remove('b74-transitioning'); } catch (error) {}
+  state.openingSent = false;
+  state.subtitleText = '';
+};
