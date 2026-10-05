@@ -2783,7 +2783,9 @@ window.__MAIN__ = function () {
             if(transparent < 8 && opaqueGreen > 24){
               failedSources.push({ url: url, reason: "green-screen" });
               console.warn("[alpha-video] 该源是未抠像绿幕，已跳过", url);
-              tryNextSource();
+              // 余下候选（黑底 MP4）同样不透明，继续试只会换个颜色的方块。
+              // 直接走精灵图 canvas：PNG 序列自带 alpha，是唯一真透明的兜底。
+              fallbackCanvas();
               return;
             }
           } catch(e) { /* 采样失败（跨域/解码差异）不阻断正常播放 */ }
