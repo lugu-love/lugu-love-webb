@@ -28,6 +28,8 @@ const state = {
   videoState: 'idle',
   phase: 'idle',
   videoElements: new Map(),
+  lifeMedia: null,
+  lifeMediaKind: null,
   idleTimer: null,
   lifeLoopTimer: null,
   audioCtx: null,
@@ -124,6 +126,7 @@ function createFaceLayer() {
   faceLayer.hidden = true;
   faceLayer.innerHTML = `
     <div id="b74-face-backdrop" style="background-image:url('${BACKDROP}')"></div>
+    <div id="b74-video-states"></div>
     <div id="b74-face-title">${state.profile?.formal_name || '云栖考拉'}</div>
     <div id="b74-language-wrap">
       <label for="b74-language">当前语言</label>
@@ -205,10 +208,8 @@ function applyCharacter(profile) {
     if (image) image.src = posterUrl;
   }
   if (faceLayer) {
-    const poster = faceLayer.querySelector('#b74-face-poster');
     const backdrop = faceLayer.querySelector('#b74-face-backdrop');
     const title = faceLayer.querySelector('#b74-face-title');
-    if (poster) poster.src = posterUrl;
     if (backdrop) backdrop.style.backgroundImage = `url('${BACKDROP}')`;
     if (title) title.textContent = profile.formal_name || '云栖考拉';
   }
@@ -217,8 +218,9 @@ function applyCharacter(profile) {
 }
 
 function ensureLifeLoopPlaying() {
-  const video = state.videoElements.get('life');
-  if (!video) return;
+  if (state.lifeMediaKind !== 'video') return;
+  const video = state.lifeMedia;
+  if (!video || typeof video.play !== 'function') return;
   if (state.closing || !faceLayer || faceLayer.hidden) return;
   if (video.paused) video.play().catch(() => {});
 }
@@ -233,121 +235,114 @@ function stopLifeLoopWatchdog() {
   state.lifeLoopTimer = null;
 }
 
+// —— 面对面对话素材准入（唯一入口）——
+// 只允许「真透明 life-loop」：必须显式声明 alpha 且为透明容器格式（webm/mov/mkv）。
+// 无 alpha 通道的黑底 MP4（H.264 yuv420p 等）一律拒绝，绝不作为 fallback 进入面对面对话。
+function isTransparentLifeLoop(clip) {
+  if (!clip || clip.alpha !== true) return false;
+  const src = String(clip.source || '');
+  return /\.(webm|mov|mkv)(?:[?#]|$)/i.test(src) || /alpha/i.test(src);
+}
+
+function resetLifeMedia() {
+  if (state.lifeMedia) {
+    try { state.lifeMedia.pause(); } catch {}
+    try { state.lifeMedia.removeAttribute('src'); state.lifeMedia.load(); } catch {}
+  }
+  state.lifeMedia = null;
+  state.lifeMediaKind = null;
+  state.videoElements.clear();
+}
+
+// 透明 PNG fallback 的轻微呼吸动画（纯 transform，不涉及任何“去黑底/遮黑”样式）
+function ensureLifePngStyle() {
+  if (document.getElementById('b74-life-png-style')) return;
+  const style = document.createElement('style');
+  style.id = 'b74-life-png-style';
+  style.textContent = [
+    '.b74-life-png{transform-origin:50% 88%;animation:b74-life-breathe 4.4s ease-in-out infinite;}',
+    '@keyframes b74-life-breathe{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-0.5%) scale(1.008);}}'
+  ].join('');
+  document.head.appendChild(style);
+}
+
 function renderVideoStateLayer() {
   if (!faceLayer) return;
   const container = faceLayer.querySelector('#b74-video-states');
   if (!container) return;
   state.videoToken += 1;
-  for (const video of state.videoElements.values()) {
-    try { video.pause(); } catch {}
-    video.removeAttribute('src');
-    video.load();
-  }
-  state.videoElements.clear();
+  resetLifeMedia();
   container.innerHTML = '';
   faceLayer.classList.remove('video-ready');
 
   const profile = state.profile;
-  const videoStates = profile?.video_states?.states;
-  const singleLoop = profile?.video_states?.life_loop || (profile?.video_states?.mode === 'single_loop' ? profile.video_states.single_loop : null);
-  if (!videoStates && !singleLoop) return;
-  if (singleLoop) startLifeLoopWatchdog();
+  const lifeLoop = profile?.video_states?.life_loop
+    || (profile?.video_states?.mode === 'single_loop' ? profile?.video_states?.single_loop : null);
 
-  const definitions = singleLoop
-    ? [['life', singleLoop]]
-    : ['idle', 'listening', 'thinking', 'speaking']
-        .filter(stateName => videoStates?.[stateName]?.source)
-        .map(stateName => [stateName, videoStates[stateName]]);
-
-  for (const [stateName, clip] of definitions) {
+  // 1) 真透明 life-loop（显式 alpha）：直接播放，不依赖任何去黑底 CSS。
+  if (isTransparentLifeLoop(lifeLoop)) {
     const video = document.createElement('video');
-    video.className = 'b74-state-video';
+    video.className = 'b74-state-video is-active';
     video.muted = true;
     video.playsInline = true;
+    video.autoplay = true;
     video.preload = 'auto';
     video.volume = 0;
-    if (singleLoop) {
-      video.loop = true;
-      video.autoplay = true;
-      video.addEventListener('ended', () => video.play().catch(() => {}));
-      video.addEventListener('pause', () => {
-        if (!state.closing && faceLayer && !faceLayer.hidden) setTimeout(() => video.play().catch(() => {}), 120);
-      });
-    }
-    video.dataset.stateName = stateName;
-    video.dataset.start = String(clip.start ?? 0);
-    video.dataset.end = String(clip.end ?? 2.5);
-    video.classList.add('is-active');
-    video.src = absoluteAsset(clip.source);
+    video.loop = true;
+    video.style.mixBlendMode = 'normal';
+    video.dataset.stateName = 'life';
     video.addEventListener('loadeddata', () => {
       faceLayer.classList.add('video-ready');
-      try { video.currentTime = Number(video.dataset.start) || 0; } catch {}
       video.play().catch(() => {});
-      if (!singleLoop) monitorVideo(video, state.videoToken);
     });
+    video.addEventListener('ended', () => video.play().catch(() => {}));
+    video.addEventListener('pause', () => {
+      if (!state.closing && faceLayer && !faceLayer.hidden) setTimeout(() => video.play().catch(() => {}), 120);
+    });
+    video.src = absoluteAsset(lifeLoop.source);
     container.appendChild(video);
-    state.videoElements.set(stateName, video);
+    state.lifeMedia = video;
+    state.lifeMediaKind = 'video';
+    state.videoElements.set('life', video);
+    startLifeLoopWatchdog();
+    return;
   }
-}
 
-function monitorVideo(video, token) {
-  if (token !== state.videoToken || !video.classList.contains('is-active')) return;
-  const start = Number(video.dataset.start) || 0;
-  const end = Number(video.dataset.end) || start + 2;
-  if (video.currentTime >= end || video.currentTime < start - 0.08) {
-    try { video.currentTime = start; } catch {}
-  }
-  if (video.requestVideoFrameCallback) {
-    video.requestVideoFrameCallback(() => monitorVideo(video, token));
-  } else {
-    setTimeout(() => monitorVideo(video, token), 40);
-  }
+  // 2) 透明 PNG fallback：角色透明原图 + 轻微呼吸。
+  //    绝不使用黑底 MP4 / 黑底 poster / 黑色占位图。
+  const pngSrc = absoluteAsset(profile?.main_image || profile?.portrait);
+  if (!pngSrc) return;
+  ensureLifePngStyle();
+  const img = document.createElement('img');
+  img.className = 'b74-state-video is-active b74-life-png';
+  img.alt = profile?.formal_name || '';
+  img.decoding = 'async';
+  img.style.mixBlendMode = 'normal';
+  img.addEventListener('load', () => faceLayer.classList.add('video-ready'));
+  img.src = pngSrc;
+  container.appendChild(img);
+  state.lifeMedia = img;
+  state.lifeMediaKind = 'png';
+  faceLayer.classList.add('video-ready');
 }
 
 function setVideoState(nextState) {
   state.videoState = nextState;
   if (!faceLayer) return;
-  const videoStates = state.profile?.video_states?.states;
-  const singleLoop = state.profile?.video_states?.life_loop || (state.profile?.video_states?.mode === 'single_loop' ? state.profile.video_states.single_loop : null);
-  if (!videoStates && !singleLoop) return;
-  if (singleLoop) {
-    const video = state.videoElements.get('life');
-    if (video) {
-      if (video.readyState >= 2) {
-        faceLayer.classList.add('video-ready');
-        video.play().catch(() => {});
-      }
-      startLifeLoopWatchdog();
-    }
-    return;
+  if (state.lifeMediaKind === 'png') { faceLayer.classList.add('video-ready'); return; }
+  if (state.lifeMediaKind !== 'video') return;
+  const video = state.lifeMedia;
+  if (video && video.readyState >= 2) {
+    faceLayer.classList.add('video-ready');
+    video.play().catch(() => {});
   }
-  state.videoToken += 1;
-  const token = state.videoToken;
-  for (const [name, video] of state.videoElements) {
-    const active = name === nextState;
-    video.classList.toggle('is-active', active);
-    if (!active) {
-      try { video.pause(); } catch {}
-      continue;
-    }
-    if (video.readyState >= 2) {
-      faceLayer.classList.add('video-ready');
-      const start = Number(video.dataset.start) || 0;
-      if (Math.abs(video.currentTime - start) > 0.25) {
-        try { video.currentTime = start; } catch {}
-      }
-      video.play().catch(() => {});
-      monitorVideo(video, token);
-    }
-  }
+  startLifeLoopWatchdog();
 }
 
 function stopVideoLayer() {
   stopLifeLoopWatchdog();
   state.videoToken += 1;
-  for (const video of state.videoElements.values()) {
-    try { video.pause(); } catch {}
-  }
+  resetLifeMedia();
   if (faceLayer) faceLayer.classList.remove('video-ready');
 }
 
@@ -402,13 +397,19 @@ function flushAudioQueue() {
 }
 
 async function initializeAudio() {
+  // 1) AudioContext 必须在用户手势内同步创建（否则安卓/华为内核挂起 -> 没声音）
   if (!state.audioCtx) state.audioCtx = new AudioContext({ latencyHint: 'interactive' });
-  await state.audioCtx.resume();
+  // 2) 每次进入对话都必须主动发起一次麦克风请求；先要麦再 resume，Safari 才会弹授权
   if (!state.mediaStream) {
-    state.mediaStream = await navigator.mediaDevices.getUserMedia({
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      const err = new Error('当前浏览器不支持麦克风采集'); err.name = 'NotSupportedError'; throw err;
+    }
+    const micPromise = navigator.mediaDevices.getUserMedia({
       audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true },
     });
+    state.mediaStream = await micPromise;
   }
+  await state.audioCtx.resume();
   if (!state.sourceNode) {
     state.sourceNode = state.audioCtx.createMediaStreamSource(state.mediaStream);
     state.processor = state.audioCtx.createScriptProcessor(2048, 1, 1);
@@ -556,8 +557,15 @@ function updateVoiceActivity(input) {
 
 function openingText(language) {
   const name = state.profile?.formal_name || '云栖考拉';
-  if (language === '英语') return `Hello, I am ${name}, one of the Seven Star Messengers. What would you like to talk about?`;
-  return `你好，我是七星使者${name}。你有什么要说的吗？`;
+  const mood = String(state.mood || '').trim();
+  if (language === '英语') {
+    return mood
+      ? `Hello, I am ${name}. I am coming out with a feeling of ${mood}. Let me tell you how I feel before we talk.`
+      : `Hello, I am ${name}, one of the Seven Star Messengers. What would you like to talk about?`;
+  }
+  return mood
+    ? `你好，我是${name}。我现在带着一点${mood}的心情出来，先想和你说说这份心情，再慢慢听你说。`
+    : `你好，我是七星使者${name}。你有什么要说的吗？`;
 }
 
 function openingPrompt(language) {
@@ -627,7 +635,7 @@ function handleServerEvent(event) {
         state.ws.send(JSON.stringify({
           type: 'say',
           text: openingText(state.language),
-          tts_prompt: openingPrompt(state.language),
+          tts_prompt: openingPrompt(state.language) + (state.mood ? ` 语气要自然体现“${state.mood}”的情绪。` : ''),
         }));
       }
       break;
@@ -722,7 +730,7 @@ async function openFaceToFace() {
   try {
     await initializeAudio();
   } catch (error) {
-    setStatus('需要麦克风权限', 'idle');
+    setStatus('需要麦克风权限才能面对面对话', 'idle');
     console.error('[B74 microphone]', error);
     return;
   }
