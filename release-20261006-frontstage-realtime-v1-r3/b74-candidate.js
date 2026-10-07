@@ -181,6 +181,8 @@ function setStatus(text, mode = 'idle') {
 function setLayerVisible(visible) {
   if (!faceLayer) return;
   faceLayer.hidden = !visible;
+  // 对话未显示时，iframe 不得拦截点击（否则会挡住宿主页面底部按钮）
+  try { document.documentElement.style.pointerEvents = visible ? '' : 'none'; } catch (error) {}
   requestAnimationFrame(() => faceLayer.classList.toggle('visible', visible));
 }
 
@@ -764,6 +766,7 @@ function finishSession({ returnHome = true } = {}) {
     state.openingSent = false;
     state.closing = false;
     if (faceLayer) faceLayer.hidden = true;
+    try { document.documentElement.style.pointerEvents = 'none'; } catch (error) {}
   }, 1150);
 }
 
