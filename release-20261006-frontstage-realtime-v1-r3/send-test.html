@@ -3739,7 +3739,7 @@ window.__MAIN__ = function () {
           setHint("点击“发给TA”，可选择微信或其他应用。");
         } else {
           btnSave.hidden=false;
-          setHint("点击“发给TA”即可分享；不支持文件分享的浏览器会自动分享视频链接。");
+          setHint("点击“发给TA”，视频会直接保存到手机。");
         }
       }
       // 用户内容系统 V1：生成结果与当前编辑内容版本绑定，并写入「最近使用」
@@ -3803,53 +3803,6 @@ window.__MAIN__ = function () {
     }
   }
 
-  function shareVideoUrl(){
-    // 第二/三级：分享稳定 HTTPS 视频链接，不要求用户先手工下载。
-    var url = lastVideoUrl;
-    if(!url){ showToast("视频链接尚未就绪"); return Promise.reject(new Error("no video url")); }
-    if(navigator.share){
-      // 二级：URL 分享（支持文件分享 / 支持链接分享的浏览器都走这里）
-      return navigator.share({ url:url, title:"心意表达", text:textInput.value });
-    }
-    // 三级：微信/QQ 内置浏览器等：复制链接，直接粘贴发送，不需要先下载
-    return copyToClipboard(url).then(function(ok){
-      if(ok){ setStatus("链接已复制", "ok"); setHint("链接已复制，粘贴到微信即可发给TA。"); showLinkFallback(url); }
-      else { setHint("当前浏览器无法直接分享，请长按复制上面的视频链接后发送。"); showLinkFallback(url); }
-    });
-  }
-
-  function copyToClipboard(text){
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      return navigator.clipboard.writeText(text).then(function(){ return true; }).catch(function(){ return legacyCopy(text); });
-    }
-    return Promise.resolve(legacyCopy(text));
-  }
-
-  function legacyCopy(text){
-    try{
-      var ta=document.createElement("textarea");
-      ta.value=text; ta.setAttribute("readonly","");
-      ta.style.cssText="position:fixed;left:-9999px;top:0;opacity:0";
-      document.body.appendChild(ta); ta.select();
-      var ok=document.execCommand && document.execCommand("copy");
-      ta.remove();
-      return !!ok;
-    }catch(e){ return false; }
-  }
-
-  function showLinkFallback(url){
-    var box=document.getElementById("shareLinkBox");
-    if(!box){
-      box=document.createElement("div");
-      box.id="shareLinkBox";
-      box.style.cssText="margin-top:10px;font-size:12px;line-height:1.5;word-break:break-all;color:#cfe2ff";
-      var anchor=btnSend && btnSend.parentNode ? btnSend.parentNode : document.body;
-      anchor.appendChild(box);
-    }
-    box.innerHTML="视频链接（长按复制）：<br><a href='"+url+"' target='_blank' rel='noopener' style='color:#8fd3ff'>"+url+"</a>";
-    box.hidden=false;
-  }
-
   function sendVideo(){
     if(!lastFile){ showToast("请先生成视频"); return; }
     // 结果已过期（生成后又改过文字 / 使者 / 情绪 / 声音）：不允许把旧视频当成当前内容发送
@@ -3882,35 +3835,34 @@ window.__MAIN__ = function () {
           setHint("已取消发送，可再次点击“发给TA”。");
           keepResultPage();
         } else {
-          // 一级失败 → 自动降级到二级/三级，不再逼用户下载
-          setHint("文件分享不可用，正在改用链接分享…");
-          shareVideoUrl().then(function(){
-            setStatus("已调起分享", "ok");
-          }).catch(function(){
-            setStatus("视频已生成", "ok");
-            setHint("分享没有完成，可长按复制视频链接发送。");
-            showLinkFallback(lastVideoUrl);
-          }).then(keepResultPage);
+          // 一级失败 → 直接保存 MP4 到手机（不再甩链接）
+          setStatus("正在保存视频…", "ok");
+          try { downloadBlob(lastFile, EXPORT_FILE_NAME); } catch(e2) { try { saveVideo(); } catch(e3) {} }
+          setTimeout(function(){
+            setStatus("视频已保存", "ok");
+            setHint("已保存到手机（浏览器下载记录里可找到），去微信把这段视频发给TA。");
+          }, 500);
+          keepResultPage();
         }
       });
       return;
     }
 
-    // —— 二级 / 三级：URL 分享 → 复制链接 ——
-    shareVideoUrl().then(function(){
-      if(navigator.share){ setStatus("已调起分享", "ok"); }
-      keepResultPage();
-    }).catch(function(e){
-      if(e && e.name === "AbortError"){
-        setStatus("视频已生成", "ok");
-        setHint("已取消分享，可再次点击“发给TA”。");
-      } else {
-        setStatus("视频已生成", "ok");
-        setHint("分享没有完成，可长按复制视频链接发送。");
-        if(lastVideoUrl) showLinkFallback(lastVideoUrl);
-      }
-      keepResultPage();
-    });
+    // —— 二级：没有系统文件分享能力（华为等）时，直接把视频存到手机，不再甩链接 ——
+    // 微信内核也直接保存 MP4（不再显示长链接）
+    try { downloadBlob(lastFile, EXPORT_FILE_NAME); } catch(e) { try { saveVideo(); } catch(e2) {} }
+    setStatus("视频已保存", "ok");
+    setHint("已开始保存视频（若没反应，点右上角「…」→ 在浏览器中打开后再点“发给TA”）。");
+    keepResultPage();
+    return;
+    setStatus("正在保存视频…", "ok");
+    keepResultPage();
+    try { downloadBlob(lastFile, EXPORT_FILE_NAME); } catch(e) { try { saveVideo(); } catch(e2) {} }
+    setTimeout(function(){
+      setStatus("视频已保存", "ok");
+      setHint("已保存到手机（浏览器下载记录里可找到），去微信把这段视频发给TA。");
+    }, 500);
+    return;
   }
 
   if(quickSceneSelect){
