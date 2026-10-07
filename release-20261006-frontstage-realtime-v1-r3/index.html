@@ -3458,7 +3458,7 @@ html.frontstage-realtime-active .voice-letter,html.frontstage-realtime-active .v
    所以面板区域内的星星也能点，且不会挡住对话交互。 */
 html.frontstage-realtime-active .voice-star-layer{z-index:10000}
 </style>
-</head>
+<style id="ft-transparent-panel">#frontstageRealtimeOverlay{background:transparent !important;border-top:0 !important}.fr-overlay-bar{background:transparent !important}#frontstageRealtimeOverlay iframe{background:transparent !important}</style></head>
 <body>
 <main class="phone-stage" id="phoneStage" data-i18n-aria="phoneStage" aria-label="地球首页手机竖屏舞台">
 <a class="place-mark" href="lugu/index.html?from=earth" data-i18n-aria="enterLugu" aria-label="进入中国·泸沽湖">
@@ -5004,7 +5004,7 @@ if (!returnFlightFinished) rabbitStage = "interrupted";
       C.overlay = null; C.frame = null; C.frameReady = false;
       var ov = document.createElement('div');
       ov.id = 'frontstageRealtimeOverlay';
-      ov.innerHTML = '<div class="fr-overlay-bar"><div class="fr-overlay-copy"><b>面对面实时对话</b><span>正在进入使者对话</span></div><button class="fr-overlay-close" type="button">结束对话并回瓶</button></div>';
+      ov.innerHTML = '';
       var fr = document.createElement('iframe');
       fr.id = 'frontstageRealtimeFrame';
       fr.title = '面对面实时对话';
@@ -5018,7 +5018,6 @@ if (!returnFlightFinished) rabbitStage = "interrupted";
         try { fr.contentWindow.__b74SelectCharacter?.(C.characterId()); fr.contentWindow.__b74SetMood?.(C.mood()); } catch(e){}
       });
       ov.appendChild(fr);
-      ov.querySelector('.fr-overlay-close').addEventListener('click', function(){ C.close(false); });
       document.body.appendChild(ov);
       C.overlay = ov; C.frame = fr;
     };

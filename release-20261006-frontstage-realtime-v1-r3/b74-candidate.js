@@ -110,7 +110,7 @@ function createTransition({ returning = false } = {}) {
   if (transitionLayer) transitionLayer.remove();
   transitionLayer = document.createElement('div');
   transitionLayer.id = 'b74-transition';
-  transitionLayer.innerHTML = `<img src="${posterUrl}" alt="${state.profile?.formal_name || '云栖考拉'}">`;
+  transitionLayer.innerHTML = '';
   document.body.appendChild(transitionLayer);
   requestAnimationFrame(() => {
     transitionLayer.classList.add('show');
@@ -127,9 +127,7 @@ function createFaceLayer() {
   faceLayer.innerHTML = `
     <div id="b74-face-backdrop" style="background-image:url('${BACKDROP}')"></div>
     <div id="b74-video-states"></div>
-    <div id="b74-face-title">${state.profile?.formal_name || '云栖考拉'}</div>
     <div id="b74-language-wrap">
-      <label for="b74-language">当前语言</label>
       <select id="b74-language">
         <option value="普通话" selected>普通话</option>
         <option value="四川话">四川话</option>
@@ -140,31 +138,15 @@ function createFaceLayer() {
         <option value="英语">English</option>
       </select>
     </div>
-    <div id="b74-face-status">正在让云栖考拉出来…</div>
     <div id="b74-face-controls">
-      <button id="b74-mic" type="button">麦克风：开</button>
-      <button id="b74-interrupt" type="button">打断</button>
       <button id="b74-end" type="button">结束对话</button>
-      <button id="b74-back" type="button">返回地球</button>
+      <button id="b74-back" type="button">返回首页</button>
     </div>
   `;
   document.body.appendChild(faceLayer);
-  statusNode = faceLayer.querySelector('#b74-face-status');
+  statusNode = null;
   renderVideoStateLayer();
   setVideoState('idle');
-  faceLayer.querySelector('#b74-mic').addEventListener('click', async () => {
-    state.muted = !state.muted;
-    if (state.muted) state.sendQueue = [];
-    faceLayer.querySelector('#b74-mic').textContent = state.muted ? '麦克风：关' : '麦克风：开';
-  });
-  faceLayer.querySelector('#b74-interrupt').addEventListener('click', () => {
-    stopPlayback();
-    if (state.ws?.readyState === WebSocket.OPEN) {
-      state.ws.send(JSON.stringify({ type: 'cancel' }));
-    }
-    setVideoState('listening');
-    setStatus('正在听你说', 'listening');
-  });
   faceLayer.querySelector('#b74-end').addEventListener('click', () => finishSession({ returnHome: true }));
   faceLayer.querySelector('#b74-back').addEventListener('click', () => finishSession({ returnHome: true }));
   faceLayer.querySelector('#b74-language').addEventListener('change', event => {
@@ -274,6 +256,9 @@ function renderVideoStateLayer() {
   resetLifeMedia();
   container.innerHTML = '';
   faceLayer.classList.remove('video-ready');
+
+  // 下半部分不显示任何图片（按需求移除媒体图片）
+  return;
 
   const profile = state.profile;
   const lifeLoop = profile?.video_states?.life_loop
@@ -892,6 +877,7 @@ function toggleVoiceAudition(show) {
 }
 
 function ensureVoiceAuditionButton() {
+  return; // 精简 UI：不显示声音/试听按钮
   if (!voiceButton) {
     voiceButton = document.createElement('button');
     voiceButton.id = 'b74-voice-button';
@@ -972,6 +958,7 @@ function toggleCharacterPicker(show) {
 }
 
 function ensureCharacterPicker() {
+  return; // 精简 UI：不显示选择使者按钮
   if (!state.characters.length) return;
   if (!characterButton) {
     characterButton = document.createElement('button');

@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#020407">
 <title>面对面实时对话</title>
 <style>html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#020407}</style>
-</head>
+<style id="ft-transparent-embed">#b74-language-wrap{position:absolute !important;top:10px !important;left:8px !important;right:auto !important;transform:none !important;z-index:6 !important;width:auto !important;height:36px !important;padding:0 12px !important;border-radius:999px !important;border:1px solid rgba(192,240,232,.30) !important;background:rgba(6,20,24,.86) !important;display:flex !important;align-items:center !important;justify-content:center !important;box-shadow:0 4px 14px rgba(0,0,0,.35) !important}#b74-language-wrap label{display:none !important}#b74-language{width:auto !important;min-height:30px !important;border:0 !important;background:transparent !important;color:#eafcf8 !important;font:600 13px/1 -apple-system,"PingFang SC",sans-serif !important;text-align:center !important;padding:0 2px !important;text-align-last:center !important}#b74-face-controls{position:absolute !important;top:10px !important;bottom:auto !important;left:auto !important;right:8px !important;transform:none !important;width:auto !important;display:flex !important;gap:8px !important}#b74-face-layer #b74-face-controls button{flex:0 0 auto !important;min-height:36px !important;padding:0 16px !important;border-radius:999px !important;font:600 13px/1 -apple-system,"PingFang SC",sans-serif !important;letter-spacing:.02em !important;box-shadow:0 4px 14px rgba(0,0,0,.35) !important}#b74-face-layer #b74-end{color:#fff4f2 !important;background:linear-gradient(135deg,rgba(168,72,72,.92),rgba(122,48,52,.92)) !important;border:1px solid rgba(255,158,150,.32) !important}#b74-face-layer #b74-back{color:#f4fffd !important;background:linear-gradient(135deg,rgba(40,132,124,.96),rgba(72,110,172,.96)) !important;border:1px solid rgba(192,240,232,.32) !important}html,body{background:transparent !important}#b74-face-layer{background:transparent !important}#b74-face-backdrop{background-image:none !important}</style></head>
 <body>
 <script>
 /* 香港节点：B74 实时对话服务（独立模块，不改播放链） */
@@ -22,7 +22,7 @@ window.__B74_CSS_URL = "https://suomalianjia.cn/b74/candidate.css?v=12";
 (function(){var l=document.createElement('link');l.rel='stylesheet';l.href=window.__B74_CSS_URL;document.head.appendChild(l);})();
 </script>
 <script type="module">
-import "./b74-candidate.js?v=20261006-r3";
+import "./b74-candidate.js?v=20261007-fix-a1";
 const params = new URLSearchParams(location.search);
 const requestedCharacter = params.get("character") || "yunqi-koala";
 const requestedEmotion = params.get("emotion") || "";
