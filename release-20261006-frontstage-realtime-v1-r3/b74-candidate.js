@@ -148,7 +148,16 @@ function createFaceLayer() {
   renderVideoStateLayer();
   setVideoState('idle');
   faceLayer.querySelector('#b74-end').addEventListener('click', () => finishSession({ returnHome: true }));
-  faceLayer.querySelector('#b74-back').addEventListener('click', () => finishSession({ returnHome: true }));
+  faceLayer.querySelector('#b74-back').addEventListener('click', () => {
+    finishSession({ returnHome: true });
+    // 返回首页：结束对话后真正回到首页首屏
+    setTimeout(() => {
+      try {
+        const topWin = window.top;
+        topWin.location.href = new URL('index.html', topWin.location.href).href;
+      } catch (error) {}
+    }, 700);
+  });
   faceLayer.querySelector('#b74-language').addEventListener('change', event => {
     const language = event.target.value;
     state.language = language;
@@ -738,6 +747,8 @@ function finishSession({ returnHome = true } = {}) {
   if (state.closing && !faceLayer?.hidden) return;
   if (voicePanel && !voicePanel.hidden) toggleVoiceAudition(false);
   sendClose();
+  // 通知宿主页面：结束对话（宿主据此关闭面板并让使者回漂流瓶）
+  try { if (window.parent && window.parent !== window) window.parent.postMessage({ type: 'b74-session-ended' }, '*'); } catch (error) {}
   stopVideoLayer();
   setStatus('正在回到地球…', 'idle');
   const returning = createTransition({ returning: true });
